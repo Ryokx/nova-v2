@@ -20,12 +20,14 @@ export const authOptions: NextAuthOptions = {
       ? [GoogleProvider({
           clientId: process.env.GOOGLE_CLIENT_ID,
           clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          allowDangerousEmailAccountLinking: true,
         })]
       : []),
     ...(process.env.APPLE_CLIENT_ID && process.env.APPLE_CLIENT_SECRET
       ? [AppleProvider({
           clientId: process.env.APPLE_CLIENT_ID,
           clientSecret: process.env.APPLE_CLIENT_SECRET,
+          allowDangerousEmailAccountLinking: true,
         })]
       : []),
     CredentialsProvider({
@@ -63,24 +65,62 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      // For OAuth providers, ensure the user exists in our DB with correct role
+      if (account?.provider === "google" || account?.provider === "apple") {
+        if (user.email) {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
+          });
+          if (!existingUser) {
+            // User will be created by PrismaAdapter automatically
+            // Just allow the sign in
+            return true;
+          }
+        }
+      }
+      return true;
+    },
     async redirect({ url, baseUrl }) {
-      // Allow relative URLs
       if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // Allow URLs on the same origin
       if (new URL(url).origin === baseUrl) return url;
       return `${baseUrl}/dashboard`;
     },
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, trigger, account }) {
+      // On initial sign in (credentials or OAuth)
       if (user) {
-        token.id = user.id;
-        token.role = (user as { role?: string }).role ?? "CLIENT";
-        // Check if phone exists for new OAuth users
-        const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { phone: true } });
-        token.hasPhone = !!dbUser?.phone;
+        // For OAuth, the user.id from adapter might differ, fetch from DB
+        if (account?.provider === "google" || account?.provider === "apple") {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: user.email! },
+            select: { id: true, role: true, phone: true },
+          });
+          if (dbUser) {
+            token.id = dbUser.id;
+            token.role = dbUser.role;
+            token.hasPhone = !!dbUser.phone;
+          } else {
+            token.id = user.id;
+            token.role = "CLIENT";
+            token.hasPhone = false;
+          }
+        } else {
+          // Credentials provider
+          token.id = user.id;
+          token.role = (user as { role?: string }).role ?? "CLIENT";
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { phone: true },
+          });
+          token.hasPhone = !!dbUser?.phone;
+        }
       }
       // Refresh phone status when session is updated
       if (trigger === "update") {
-        const dbUser = await prisma.user.findUnique({ where: { id: token.id as string }, select: { phone: true } });
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { phone: true },
+        });
         token.hasPhone = !!dbUser?.phone;
       }
       return token;
