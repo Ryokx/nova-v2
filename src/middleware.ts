@@ -25,6 +25,6 @@ export const config = {
     "/dashboard/:path*",
     "/artisan/:path*",
     "/admin/:path*",
-    "/api/((?!auth).*)/:path*",
+    "/api/((?!auth|webhooks|upload|pusher).*)/:path*",
   ],
 };

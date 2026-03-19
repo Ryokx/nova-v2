@@ -151,12 +151,41 @@ Prototypes JSX interactifs créés dans Claude.ai. Fichiers dans `/reference/`.
 - [x] robots.txt — Pages admin/dashboard/API exclues
 - [x] Metadata OG sur les landings
 
-### Phase 6 : Intégrations
-- [ ] Stripe Connect (séquestre réel)
-- [ ] Cloudflare R2 (upload fichiers)
-- [ ] Resend (emails transactionnels)
-- [ ] Pusher (chat + temps réel)
-- [ ] Stubs Klarna, Pennylane, Yousign
+### Phase 6 : Intégrations externes — 2026-03-19
+
+#### Stripe Connect (Séquestre)
+- [x] stripe.ts — Client Stripe initialisé (apiVersion 2026-02-25.clover)
+- [x] createConnectedAccount() — Compte Express artisan
+- [x] createOnboardingLink() — Lien onboarding Stripe
+- [x] createEscrowPayment() — PaymentIntent capture_method: "manual" + transfer_data
+- [x] releaseEscrowPayment() — Capture (libération vers artisan moins 5% commission)
+- [x] refundEscrowPayment() — Annulation si litige
+- [x] createCheckoutSession() — Session Checkout avec séquestre intégré
+- [x] POST /api/webhooks/stripe — Webhook (payment_intent.amount_capturable_updated, succeeded, canceled, account.updated)
+
+#### Cloudflare R2 / S3 (Upload)
+- [x] upload.ts — Client S3 compatible R2 (fallback MinIO local)
+- [x] getPresignedUploadUrl() — URL présignée 10min pour upload direct client-side
+- [x] getPresignedReadUrl() — URL présignée 1h pour lecture fichiers privés
+- [x] uploadFile() — Upload serveur direct
+- [x] POST /api/upload — Endpoint presigned URL (catégories: documents/photos/videos/avatars)
+
+#### Resend (Emails transactionnels)
+- [x] 6 fonctions email : sendWelcomeEmail, sendDevisReceivedEmail, sendDevisSignedEmail, sendPaymentEscrowedEmail, sendMissionCompletedEmail, sendPaymentReleasedEmail
+- [x] Templates HTML branded (header gradient, stats, CTA, footer)
+- [x] sendEmail() via Resend API avec fallback console.log
+
+#### Pusher (Temps réel)
+- [x] pusher.ts — Server + Client instances
+- [x] Channels : private-mission-{id} (chat), private-tracking-{id} (suivi), private-user-{id} (notifications)
+- [x] Events : new-message, status-update, notification, client-typing
+- [x] Helpers : sendChatMessage(), sendStatusUpdate(), sendNotification()
+- [x] POST /api/pusher/auth — Authentification channels privés
+
+#### Stubs (API surface prête)
+- [x] Klarna — createKlarnaSession(), confirmKlarnaPayment() (3x/4x, UI prête)
+- [x] Pennylane/Indy/QuickBooks/Tiime — connectProvider(), exportInvoice(), generateCSV()
+- [x] Yousign — createSignatureRequest(), getSignatureStatus(), cancelSignatureRequest()
 
 ### Phase 7 : Tests + Deploy
 - [ ] Tests unitaires (Jest + Testing Library)
