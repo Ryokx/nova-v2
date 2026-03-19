@@ -60,23 +60,48 @@ Prototypes JSX interactifs créés dans Claude.ai. Fichiers dans `/reference/`.
 - [x] Validation Zod : registerSchema (nom, email, password 8+ chars + majuscule + chiffre), loginSchema
 - [x] Seed data : 3 clients + 1 admin + 6 artisans, 5 missions, 3 devis, 5 paiements, 3 factures, 4 avis, 9 notifications, 4 messages, 1 contrat entretien, 2 parrainages, 18 documents
 
-### Phase 2 : Layout + Pages publiques
-- [ ] Navbar responsive + Footer
-- [ ] Page d'accueil (hero asymétrique + 7 sections)
-- [ ] Login + Signup + Support
-- [ ] SEO (metadata, sémantique, Schema.org)
+### Phase 2 : Layout + Navbar/Footer — 2026-03-19
+- [x] Navbar responsive (desktop links + mobile hamburger, auth-aware, active route highlight)
+- [x] Footer (4 colonnes, liens plateforme/compte/légal)
+- [x] SessionProvider + ToastProvider wrapping root layout
 
-### Phase 3 : Dashboard Client
-- [ ] Dashboard + stats
-- [ ] Recherche artisans + filtres
-- [ ] Profil artisan + avis
-- [ ] Booking 3 étapes
-- [ ] Missions + tracking temps réel
-- [ ] Signature devis + paiement
-- [ ] Vidéo diagnostic
-- [ ] Contrats entretien
-- [ ] Parrainage
-- [ ] Profil + paramètres
+### Phase 3 : Parcours client complet — 2026-03-19
+
+#### API Routes (6 routes)
+- [x] GET /api/artisans (filtres catégorie + recherche)
+- [x] GET /api/artisans/[id] (profil détaillé + avis)
+- [x] GET/POST /api/missions (liste + création)
+- [x] GET/PATCH /api/missions/[id] (détail + update statut)
+- [x] POST /api/payments (création paiement séquestre)
+- [x] POST /api/reviews (notation + libération paiement)
+- [x] GET/PATCH /api/notifications (liste + marquer lu)
+- [x] GET/PATCH /api/devis/[id] (détail + signature)
+
+#### Feature Components
+- [x] EscrowStepper (timeline 4 étapes avec statut coloré)
+- [x] StarRating (interactive + readonly, 3 tailles)
+- [x] ArtisanCard (avatar, nom, métier, rating, tarif, badges)
+- [x] MissionCard (artisan, type, montant, statut, date)
+- [x] useFetch hook (data, loading, error, refetch)
+
+#### Pages Client (17 pages)
+- [x] /dashboard — 3 stats KPI, missions récentes, 4 quick actions
+- [x] /artisans — Filtres catégorie, recherche, grille 2col/1col mobile
+- [x] /artisan/[slug] — Profil complet, avis, CTA (chat, appeler, RDV, urgence)
+- [x] /booking/[slug] — 3 étapes (calendrier, créneau+description, récapitulatif)
+- [x] /missions — Onglets filtres (Toutes, En cours, Terminées, Validées, Litiges)
+- [x] /tracking/[id] — Carte artisan, EscrowStepper temps réel, info séquestre
+- [x] /mission/[id] — Détails, paiement, documents, validation + rating + confetti
+- [x] /sign-devis/[id] — Récapitulatif lignes, canvas signature tactile
+- [x] /payment/[id] — Choix méthode (CB/virement/Apple Pay), fractionnement 1x/3x/4x Klarna
+- [x] /video-diagnostic — 3 étapes (tips, preview vidéo, confirmation envoi)
+- [x] /entretien/[slug] — 4 plans (Chaudière/Clim/Plomberie/Pack Sérénité), souscription
+- [x] /referral — Code copiable, 4 boutons partage, stats parrainages
+- [x] /profile — Avatar, infos personnelles, quick links
+- [x] /settings — Notifications toggle, sécurité (changement mdp), dark mode (soon)
+- [x] /urgence — Sélection catégorie, artisans dispo immédiat
+- [x] /notifications — Liste avec indicateur non-lu, marquer tout lu
+- [x] /payment-methods — Cartes bancaires, Apple Pay, virement, sécurité
 
 ### Phase 4 : Dashboard Artisan
 - [ ] Dashboard + KPIs

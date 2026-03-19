@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
+import { Providers } from "@/components/layout/providers";
+import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
 
 export const metadata: Metadata = {
   title: "Nova — Artisans certifiés, paiement sécurisé",
@@ -12,7 +15,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr">
       <body className="min-h-screen bg-bgPage font-body text-navy antialiased">
-        {children}
+        <Providers>
+          <Navbar />
+          <main className="min-h-[calc(100vh-64px)]">{children}</main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
