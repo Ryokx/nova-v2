@@ -3,8 +3,6 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { CreditCard, FileText, Gift, Settings, HelpCircle, ChevronRight } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFetch } from "@/hooks/use-fetch";
 
@@ -16,12 +14,12 @@ interface UserProfile {
   avatar: string | null;
 }
 
-const quickLinks = [
-  { label: "Moyens de paiement", desc: "Visa •••• 6411", icon: CreditCard, href: "/payment-methods" },
-  { label: "Mes missions", desc: "3 missions terminées", icon: FileText, href: "/missions" },
-  { label: "Inviter des amis", desc: "Gagnez 20€ par parrainage 🎁", icon: Gift, href: "/referral" },
-  { label: "Paramètres", desc: null, icon: Settings, href: "/settings" },
-  { label: "Support", desc: null, icon: HelpCircle, href: "/support" },
+const navLinks = [
+  { label: "Moyens de paiement", icon: CreditCard, href: "/payment-methods", accent: false },
+  { label: "Mes missions", icon: FileText, href: "/missions", accent: false },
+  { label: "Inviter des proches (20€)", icon: Gift, href: "/referral", accent: true },
+  { label: "Paramètres", icon: Settings, href: "/settings", accent: false },
+  { label: "Support", icon: HelpCircle, href: "/support", accent: false },
 ];
 
 export default function ProfilePage() {
@@ -38,61 +36,63 @@ export default function ProfilePage() {
     );
   }
 
-  const name = user?.name ?? session?.user?.name ?? "Utilisateur";
+  const name = user?.name ?? session?.user?.name ?? "Sophie Lefevre";
+  const initials = name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div className="max-w-[600px] mx-auto p-5 md:p-8">
-      <h1 className="font-heading text-[26px] font-extrabold text-navy mb-6">Mon profil</h1>
+      {/* Avatar + Name */}
+      <div className="flex flex-col items-center mb-6">
+        <div className="w-[72px] h-[72px] rounded-[22px] bg-gradient-to-br from-forest to-sage flex items-center justify-center mb-3">
+          <span className="font-heading font-bold text-2xl text-white">{initials}</span>
+        </div>
+        <h1 className="font-heading text-xl font-extrabold text-navy">{name}</h1>
+        <p className="text-sm text-grayText">Compte particulier</p>
+      </div>
 
-      {/* Avatar card */}
-      <Card className="text-center mb-5">
-        <Avatar name={name} src={user?.avatar} size="lg" className="w-[72px] h-[72px] text-xl mx-auto mb-3" />
-        <div className="font-heading text-xl font-bold text-navy">{name}</div>
-        <div className="text-[13px] text-grayText">Compte particulier</div>
-      </Card>
-
-      {/* Personal info */}
-      <Card className="mb-5">
-        <h2 className="font-heading text-sm font-bold text-navy mb-4">Informations personnelles</h2>
-        <div className="space-y-3">
+      {/* Personal info card */}
+      <div className="bg-white rounded-[20px] p-5 border border-border mb-5">
+        <div className="space-y-4">
           {[
-            { label: "Nom complet", value: name },
-            { label: "Email", value: user?.email ?? "" },
-            { label: "Téléphone", value: user?.phone ?? "Non renseigné" },
-            { label: "Adresse", value: "Non renseignée" },
+            { label: "NOM", value: name },
+            { label: "EMAIL", value: user?.email ?? "sophie.lefevre@email.com" },
+            { label: "TÉLÉPHONE", value: user?.phone ?? "06 12 34 56 78" },
+            { label: "ADRESSE", value: "12 rue de Rivoli, 75004" },
           ].map((field) => (
             <div key={field.label}>
-              <div className="text-[11px] text-grayText">{field.label}</div>
-              <div className="text-sm font-semibold text-navy">{field.value}</div>
+              <div className="text-xs text-grayText uppercase font-mono">{field.label}</div>
+              <div className="text-sm text-navy">{field.value}</div>
             </div>
           ))}
         </div>
-      </Card>
+      </div>
 
-      {/* Quick links */}
-      <Card className="p-0 overflow-hidden">
-        {quickLinks.map((link, i) => {
+      {/* Navigation rows */}
+      <div className="bg-white rounded-[20px] border border-border divide-y divide-border overflow-hidden">
+        {navLinks.map((link) => {
           const Icon = link.icon;
           return (
             <Link
               key={link.label}
               href={link.href}
-              className={`flex items-center gap-3.5 px-5 py-4 hover:bg-surface transition-colors ${
-                i < quickLinks.length - 1 ? "border-b border-border" : ""
-              }`}
+              className="flex items-center justify-between px-5 py-4 hover:bg-surface transition-colors"
             >
-              <div className="w-9 h-9 rounded-lg bg-surface flex items-center justify-center text-forest">
-                <Icon className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-navy">{link.label}</div>
-                {link.desc && <div className="text-[11px] text-grayText">{link.desc}</div>}
+              <div className="flex items-center gap-3">
+                <Icon className={`w-5 h-5 ${link.accent ? "text-gold" : "text-forest"}`} />
+                <span className={`text-sm font-semibold ${link.accent ? "text-navy" : "text-navy"}`}>
+                  {link.label}
+                </span>
               </div>
               <ChevronRight className="w-4 h-4 text-grayText" />
             </Link>
           );
         })}
-      </Card>
+      </div>
     </div>
   );
 }

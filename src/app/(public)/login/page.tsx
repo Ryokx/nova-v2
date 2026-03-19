@@ -29,7 +29,11 @@ export default function LoginPage() {
     if (result?.error) {
       setError("Email ou mot de passe incorrect");
     } else {
-      window.location.href = "/dashboard";
+      // Fetch session to determine role-based redirect
+      const res = await fetch("/api/auth/session");
+      const session = await res.json();
+      const role = session?.user?.role;
+      window.location.href = role === "ARTISAN" ? "/artisan-dashboard" : "/dashboard";
     }
   };
 
@@ -150,7 +154,7 @@ export default function LoginPage() {
                 signIn("credentials", {
                   email: "jm.plombier@demo.nova.fr",
                   password: "Demo1234!",
-                  callbackUrl: "/dashboard",
+                  callbackUrl: "/artisan-dashboard",
                 })
               }
             >

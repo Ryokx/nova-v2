@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Gift, Copy, Check, MessageCircle, Mail, Link2, Smartphone } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { MessageCircle, Mail, Link2, Smartphone } from "lucide-react";
 
 export default function ReferralPage() {
   const [copied, setCopied] = useState(false);
@@ -15,78 +14,79 @@ export default function ReferralPage() {
   };
 
   const shareButtons = [
-    { label: "WhatsApp", icon: MessageCircle, color: "bg-[#25D366] text-white" },
-    { label: "SMS", icon: Smartphone, color: "bg-navy/80 text-white" },
-    { label: "Email", icon: Mail, color: "bg-forest text-white" },
-    { label: "Lien", icon: Link2, color: "bg-grayText text-white" },
+    { label: "WhatsApp", icon: MessageCircle, color: "bg-[#25D366]" },
+    { label: "SMS", icon: Smartphone, color: "bg-gray-500" },
+    { label: "Email", icon: Mail, color: "bg-forest" },
+    { label: "Lien", icon: Link2, color: "bg-gray-400" },
   ];
 
   return (
-    <div className="max-w-[500px] mx-auto p-5 md:p-8">
-      <h1 className="font-heading text-[26px] font-extrabold text-navy mb-1">Parrainage</h1>
-      <p className="text-sm text-grayText mb-6">Invitez vos proches et gagnez des récompenses</p>
+    <div className="max-w-[600px] mx-auto px-6 py-8">
+      <h1 className="font-heading text-[26px] font-extrabold text-navy mb-6">
+        Inviter des proches
+      </h1>
 
-      {/* Bonus banner */}
-      <Card className="bg-gradient-to-br from-deepForest to-forest text-white mb-5">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
-            <Gift className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="font-heading text-lg font-bold">Gagnez 20€ par parrainage</div>
-            <p className="text-xs text-white/70">Pour chaque ami inscrit qui réalise sa première mission</p>
-          </div>
+      {/* Dark green gradient banner */}
+      <div className="bg-gradient-to-br from-deepForest to-forest rounded-[20px] px-6 py-8 text-center mb-6">
+        <div className="text-4xl mb-3">🎁</div>
+        <div className="font-heading text-[22px] font-extrabold text-white mb-2">
+          Gagnez 20€ par parrainage
         </div>
-      </Card>
+        <p className="text-sm text-white/70 leading-relaxed">
+          Invitez un ami. Quand il réalise sa première intervention, vous recevez chacun 20€.
+        </p>
+      </div>
 
-      {/* Code */}
-      <Card className="mb-5">
-        <div className="text-xs text-grayText text-center mb-2">Votre code de parrainage</div>
-        <div className="flex items-center justify-center gap-3">
-          <span className="font-mono text-xl font-bold text-forest">{code}</span>
+      {/* Referral code card */}
+      <div className="bg-white border border-border shadow-sm rounded-[20px] p-5 mb-5">
+        <div className="text-sm font-bold text-navy mb-2.5">Votre code</div>
+        <div className="flex gap-2">
+          <div className="flex-1 bg-surface rounded-xl px-4 py-3.5 font-mono text-lg font-bold text-forest tracking-wider">
+            {code}
+          </div>
           <button
             onClick={handleCopy}
-            className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-all ${
-              copied ? "bg-success/10 text-success" : "bg-forest/10 text-forest hover:bg-forest/20"
+            className={`px-5 py-3.5 rounded-xl text-[13px] font-semibold text-white transition-all ${
+              copied ? "bg-success" : "bg-forest hover:bg-forest/90"
             }`}
           >
-            {copied ? <><Check className="w-3 h-3 inline mr-1" />Copié</> : <><Copy className="w-3 h-3 inline mr-1" />Copier</>}
+            {copied ? "Copié ✓" : "Copier"}
           </button>
         </div>
-      </Card>
+      </div>
 
       {/* Share buttons */}
-      <div className="grid grid-cols-4 gap-2 mb-6">
+      <div className="grid grid-cols-4 gap-2.5 mb-6">
         {shareButtons.map((btn) => {
           const Icon = btn.icon;
           return (
             <button
               key={btn.label}
-              className={`flex flex-col items-center gap-1.5 py-3 rounded-xl ${btn.color} hover:opacity-90 transition-opacity`}
+              className={`flex flex-col items-center gap-1 py-4 px-2 rounded-[14px] ${btn.color} text-white hover:opacity-90 transition-opacity cursor-pointer`}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[10px] font-semibold">{btn.label}</span>
+              <span className="text-[11px] font-semibold">{btn.label}</span>
             </button>
           );
         })}
       </div>
 
       {/* Stats */}
-      <Card>
-        <h2 className="font-heading text-sm font-bold text-navy mb-3">Vos statistiques</h2>
-        <div className="grid grid-cols-3 gap-3 text-center">
+      <div className="bg-white border border-border shadow-sm rounded-[20px] p-5">
+        <div className="text-xs text-grayText mb-2.5">Vos parrainages</div>
+        <div className="grid grid-cols-3 gap-3">
           {[
             { value: "3", label: "Invitations" },
             { value: "1", label: "Inscrit" },
             { value: "20€", label: "Crédit gagné" },
           ].map((s) => (
-            <div key={s.label}>
-              <div className="font-mono text-xl font-bold text-forest">{s.value}</div>
-              <div className="text-[11px] text-grayText">{s.label}</div>
+            <div key={s.label} className="text-center py-3 rounded-xl bg-surface">
+              <div className="font-mono text-[22px] font-bold text-forest">{s.value}</div>
+              <div className="text-[10px] text-grayText mt-0.5">{s.label}</div>
             </div>
           ))}
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

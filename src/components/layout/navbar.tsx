@@ -35,7 +35,7 @@ export function Navbar() {
     <>
       <nav className="sticky top-0 z-50 h-16 bg-white/88 backdrop-blur-xl border-b border-border/60 px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link href={session ? "/dashboard" : "/"} className="relative flex items-center">
+        <Link href={session ? (isArtisan ? "/artisan-dashboard" : "/dashboard") : "/"} className="relative flex items-center">
           <span className="font-heading text-[22px] font-extrabold text-navy tracking-tight">
             Nova
           </span>
