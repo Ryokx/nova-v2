@@ -4,8 +4,6 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -29,7 +27,6 @@ export default function LoginPage() {
     if (result?.error) {
       setError("Email ou mot de passe incorrect");
     } else {
-      // Fetch session to determine role-based redirect
       const res = await fetch("/api/auth/session");
       const session = await res.json();
       const role = session?.user?.role;
@@ -52,11 +49,11 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-xl p-7 shadow-sm border border-border">
+        <div className="bg-white rounded-[20px] p-7 shadow-sm border border-border">
           {/* SSO Buttons */}
           <button
             onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="w-full h-12 rounded-md border border-border bg-white text-navy text-sm font-semibold flex items-center justify-center gap-2.5 mb-2.5 hover:bg-surface transition-colors"
+            className="w-full h-12 rounded-[12px] border border-border bg-white text-navy text-sm font-semibold flex items-center justify-center gap-2.5 mb-2.5 hover:bg-surface transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -68,7 +65,7 @@ export default function LoginPage() {
           </button>
           <button
             onClick={() => signIn("apple", { callbackUrl: "/dashboard" })}
-            className="w-full h-12 rounded-md bg-black text-white text-sm font-semibold flex items-center justify-center gap-2.5 mb-4 hover:bg-navy transition-colors"
+            className="w-full h-12 rounded-[12px] bg-black text-white text-sm font-semibold flex items-center justify-center gap-2.5 mb-4 hover:bg-navy transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 814 1000" fill="#fff">
               <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57.8-155.5-127.4c-58.3-81.6-105.6-210.8-105.6-334.1C0 397.1 78.6 283.9 190.5 283.9c64.2 0 117.8 42.8 155.5 42.8 39 0 99.7-45.2 172.8-45.2 27.8 0 127.7 2.5 193.3 59.4z"/>
@@ -78,23 +75,24 @@ export default function LoginPage() {
           </button>
 
           {/* Divider */}
-          <div className="flex items-center gap-3 my-4">
+          <div className="flex items-center gap-3 my-5">
             <div className="flex-1 h-px bg-border" />
-            <span className="text-xs text-grayText">ou</span>
+            <span className="text-xs text-grayText font-mono">ou</span>
             <div className="flex-1 h-px bg-border" />
           </div>
 
           {/* Credentials form */}
-          <form onSubmit={handleSubmit} className="space-y-2.5">
-            <Input
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               aria-label="Email"
+              className="w-full h-12 px-4 rounded-[12px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
             />
-            <Input
+            <input
               type="password"
               placeholder="Mot de passe"
               value={password}
@@ -102,6 +100,7 @@ export default function LoginPage() {
               required
               minLength={8}
               aria-label="Mot de passe"
+              className="w-full h-12 px-4 rounded-[12px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
             />
 
             {error && (
@@ -116,9 +115,20 @@ export default function LoginPage() {
               </button>
             </div>
 
-            <Button type="submit" className="w-full h-12 rounded-md" loading={loading}>
-              Se connecter
-            </Button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 rounded-[14px] bg-deepForest text-white font-heading font-bold text-sm hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Connexion...
+                </span>
+              ) : (
+                "Se connecter"
+              )}
+            </button>
           </form>
         </div>
 
@@ -131,12 +141,10 @@ export default function LoginPage() {
         </p>
 
         {/* Demo mode */}
-        <div className="mt-6 p-4 rounded-lg bg-forest/5 border border-dashed border-forest/15 text-center">
-          <div className="text-xs font-semibold text-forest mb-2.5">Mode démo</div>
-          <div className="flex gap-2 justify-center">
-            <Button
-              variant="outline"
-              size="sm"
+        <div className="mt-6 p-5 rounded-[16px] bg-surface border border-dashed border-forest/15 text-center">
+          <div className="text-xs font-mono font-semibold text-forest mb-3 uppercase tracking-wider">Mode démo</div>
+          <div className="flex gap-2.5 justify-center">
+            <button
               onClick={() =>
                 signIn("credentials", {
                   email: "sophie.client@demo.nova.fr",
@@ -144,12 +152,11 @@ export default function LoginPage() {
                   callbackUrl: "/dashboard",
                 })
               }
+              className="flex-1 h-10 rounded-[10px] border border-border bg-white text-navy text-[13px] font-semibold hover:bg-bgPage transition-colors"
             >
               Client
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
+            </button>
+            <button
               onClick={() =>
                 signIn("credentials", {
                   email: "jm.plombier@demo.nova.fr",
@@ -157,9 +164,10 @@ export default function LoginPage() {
                   callbackUrl: "/artisan-dashboard",
                 })
               }
+              className="flex-1 h-10 rounded-[10px] border border-border bg-white text-navy text-[13px] font-semibold hover:bg-bgPage transition-colors"
             >
               Artisan
-            </Button>
+            </button>
           </div>
         </div>
       </div>
