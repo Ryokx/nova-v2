@@ -7,6 +7,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ━━━ ENUMS ━━━
+
 enum UserRole {
   CLIENT
   ARTISAN
@@ -23,43 +25,48 @@ enum MissionStatus {
   CANCELLED
 }
 
+enum DevisStatus {
+  DRAFT
+  SENT
+  SIGNED
+  REFUSED
+}
+
 enum PaymentStatus {
-  HELD
+  PENDING
+  ESCROWED
   RELEASED
   REFUNDED
-  DISPUTED
 }
 
 enum DocumentType {
   SIRET
-  DECENNALE
+  INSURANCE
   IDENTITY
   RGE
   QUALIBAT
   KBIS
 }
 
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  phone         String?
-  passwordHash  String?
-  role          UserRole  @default(CLIENT)
-  avatar        String?
-  emailVerified DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Relations
-  artisanProfile ArtisanProfile?
-  clientMissions Mission[]       @relation("ClientMissions")
-  reviews        Review[]
-  accounts       Account[]
-  sessions       Session[]
-
-  @@map("users")
+enum ContractType {
+  BOILER
+  AC
+  PLUMBING
+  FULL
 }
+
+enum ContractStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum ReferralStatus {
+  PENDING
+  COMPLETED
+}
+
+// ━━━ AUTH (NextAuth) ━━━
 
 model Account {
   id                String  @id @default(cuid())
@@ -67,12 +74,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -101,29 +108,70 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-model ArtisanProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  companyName String?
-  siret       String?
-  description String?
-  specialties String[]
-  city        String?
-  postalCode  String?
-  latitude    Float?
-  longitude   Float?
-  rating      Float    @default(0)
-  reviewCount Int      @default(0)
-  verified    Boolean  @default(false)
-  stripeAccountId String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+// ━━━ USERS ━━━
 
-  // Relations
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?
+  name          String?
+  phone         String?
+  role          UserRole  @default(CLIENT)
+  avatar        String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts       Account[]
+  sessions       Session[]
+  artisanProfile ArtisanProfile?
+  clientMissions Mission[]            @relation("ClientMissions")
+  reviews        Review[]
+  notifications  Notification[]
+  sentMessages   Message[]
+  referralsMade  Referral[]           @relation("Referrer")
+  referralsUsed  Referral[]           @relation("Referred")
+  clientContracts MaintenanceContract[] @relation("ContractClient")
+
+  @@map("users")
+}
+
+// ━━━ ARTISAN ━━━
+
+model ArtisanProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  companyName      String?
+  siret            String?
+  trade            String
+  description      String?  @db.Text
+  hourlyRate       Float?
+  travelFee        Float    @default(0)
+  certifications   Json?
+  insuranceNumber  String?
+  insuranceExpiry  DateTime?
+  rgeNumber        String?
+  city             String?
+  postalCode       String?
+  latitude         Float?
+  longitude        Float?
+  responseTime     String?
+  rating           Float    @default(0)
+  reviewCount      Int      @default(0)
+  missionCount     Int      @default(0)
+  isVerified       Boolean  @default(false)
+  isAvailable      Boolean  @default(true)
+  stripeAccountId  String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents Document[]
-  missions  Mission[]  @relation("ArtisanMissions")
+  missions  Mission[]             @relation("ArtisanMissions")
   reviews   Review[]
+  devis     Devis[]
+  invoices  Invoice[]
+  contracts MaintenanceContract[] @relation("ContractArtisan")
 
   @@map("artisan_profiles")
 }
@@ -133,8 +181,9 @@ model Document {
   artisanProfileId String
   type             DocumentType
   fileUrl          String
-  fileName         String
+  fileName         String?
   verified         Boolean      @default(false)
+  verifiedAt       DateTime?
   expiresAt        DateTime?
   createdAt        DateTime     @default(now())
 
@@ -143,45 +192,100 @@ model Document {
   @@map("documents")
 }
 
-model Mission {
-  id          String        @id @default(cuid())
-  clientId    String
-  artisanId   String
-  title       String
-  description String?
-  category    String
-  address     String?
-  status      MissionStatus @default(PENDING)
-  amount      Float?
-  scheduledAt DateTime?
-  completedAt DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+// ━━━ MISSIONS ━━━
 
-  // Relations
-  client  User           @relation("ClientMissions", fields: [clientId], references: [id])
-  artisan ArtisanProfile @relation("ArtisanMissions", fields: [artisanId], references: [id])
-  payment Payment?
-  review  Review?
+model Mission {
+  id            String        @id @default(cuid())
+  clientId      String
+  artisanId     String
+  type          String
+  category      String?
+  description   String?       @db.Text
+  status        MissionStatus @default(PENDING)
+  address       String?
+  scheduledDate DateTime?
+  scheduledSlot String?
+  amount        Float?
+  completedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  client   User           @relation("ClientMissions", fields: [clientId], references: [id])
+  artisan  ArtisanProfile @relation("ArtisanMissions", fields: [artisanId], references: [id])
+  payment  Payment?
+  review   Review?
+  devis    Devis?
+  invoice  Invoice?
+  messages Message[]
 
   @@map("missions")
 }
 
+// ━━━ DEVIS ━━━
+
+model Devis {
+  id            String      @id @default(cuid())
+  missionId     String      @unique
+  artisanId     String
+  clientId      String
+  number        String      @unique
+  items         Json
+  totalHT       Float
+  totalTTC      Float
+  tva           Float
+  status        DevisStatus @default(DRAFT)
+  signatureData String?     @db.Text
+  signedAt      DateTime?
+  validUntil    DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  mission  Mission        @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  artisan  ArtisanProfile @relation(fields: [artisanId], references: [id])
+
+  @@map("devis")
+}
+
+// ━━━ PAYMENTS ━━━
+
 model Payment {
-  id              String        @id @default(cuid())
-  missionId       String        @unique
-  amount          Float
-  commission      Float
-  status          PaymentStatus @default(HELD)
-  stripePaymentId String?
-  paidAt          DateTime?
-  releasedAt      DateTime?
-  createdAt       DateTime      @default(now())
+  id                    String        @id @default(cuid())
+  missionId             String        @unique
+  amount                Float
+  status                PaymentStatus @default(PENDING)
+  stripePaymentIntentId String?
+  escrowedAt            DateTime?
+  releasedAt            DateTime?
+  commissionAmount      Float?
+  commissionRate        Float         @default(0.05)
+  createdAt             DateTime      @default(now())
 
   mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }
+
+// ━━━ INVOICES ━━━
+
+model Invoice {
+  id        String   @id @default(cuid())
+  missionId String   @unique
+  artisanId String
+  number    String   @unique
+  items     Json
+  totalHT   Float
+  totalTTC  Float
+  tva       Float
+  paidAt    DateTime?
+  createdAt DateTime @default(now())
+
+  mission Mission        @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  artisan ArtisanProfile @relation(fields: [artisanId], references: [id])
+
+  @@map("invoices")
+}
+
+// ━━━ REVIEWS ━━━
 
 model Review {
   id               String   @id @default(cuid())
@@ -189,7 +293,7 @@ model Review {
   userId           String
   artisanProfileId String
   rating           Int
-  comment          String?
+  comment          String?  @db.Text
   createdAt        DateTime @default(now())
 
   mission        Mission        @relation(fields: [missionId], references: [id], onDelete: Cascade)
@@ -197,4 +301,78 @@ model Review {
   artisanProfile ArtisanProfile @relation(fields: [artisanProfileId], references: [id])
 
   @@map("reviews")
+}
+
+// ━━━ NOTIFICATIONS ━━━
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  body      String   @db.Text
+  read      Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+// ━━━ MESSAGES ━━━
+
+model Message {
+  id        String   @id @default(cuid())
+  missionId String
+  senderId  String
+  content   String   @db.Text
+  mediaUrl  String?
+  createdAt DateTime @default(now())
+
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  sender  User    @relation(fields: [senderId], references: [id])
+
+  @@index([missionId, createdAt])
+  @@map("messages")
+}
+
+// ━━━ MAINTENANCE CONTRACTS ━━━
+
+model MaintenanceContract {
+  id            String         @id @default(cuid())
+  clientId      String
+  artisanId     String
+  type          ContractType
+  price         Float
+  frequency     String         @default("annual")
+  status        ContractStatus @default(ACTIVE)
+  nextVisitDate DateTime?
+  startDate     DateTime       @default(now())
+  endDate       DateTime?
+  createdAt     DateTime       @default(now())
+
+  client  User           @relation("ContractClient", fields: [clientId], references: [id])
+  artisan ArtisanProfile @relation("ContractArtisan", fields: [artisanId], references: [id])
+
+  @@map("maintenance_contracts")
+}
+
+// ━━━ REFERRALS ━━━
+
+model Referral {
+  id           String         @id @default(cuid())
+  referrerId   String
+  referredId   String?
+  code         String         @unique
+  status       ReferralStatus @default(PENDING)
+  rewardAmount Float          @default(20)
+  createdAt    DateTime       @default(now())
+  completedAt  DateTime?
+
+  referrer User  @relation("Referrer", fields: [referrerId], references: [id])
+  referred User? @relation("Referred", fields: [referredId], references: [id])
+
+  @@map("referrals")
 }

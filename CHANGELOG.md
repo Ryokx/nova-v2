@@ -50,11 +50,15 @@ Prototypes JSX interactifs créés dans Claude.ai. Fichiers dans `/reference/`.
 - [x] Structure /src avec App Router, components/ui, lib, types, hooks, styles
 - [x] Git init + premier commit
 
-### Phase 1 : Base de données + Auth
-- [ ] Schema Prisma complet (12 models)
-- [ ] NextAuth.js (Google, Apple, Credentials)
-- [ ] API routes auth + middleware
-- [ ] Seed data de démo
+### Phase 1 : Base de données + Auth — 2026-03-19
+- [x] Schema Prisma complet (12 models : User, ArtisanProfile, Mission, Devis, Payment, Invoice, Review, Notification, Message, MaintenanceContract, Referral, Document + Account/Session/VerificationToken pour NextAuth)
+- [x] NextAuth.js (Google, Apple, Credentials avec bcrypt) + session JWT + PrismaAdapter
+- [x] API routes : POST /api/auth/register (validation Zod), GET /api/auth/me, NextAuth [...nextauth]
+- [x] Middleware de protection des routes (/dashboard, /artisan, /admin, /api sauf auth)
+- [x] Helpers API : requireAuth, requireArtisan, requireClient, requireAdmin
+- [x] Pages Login et Signup fidèles au prototype (SSO Google/Apple, formulaire credentials, mode démo, sélecteur de rôle, champs artisan conditionnels)
+- [x] Validation Zod : registerSchema (nom, email, password 8+ chars + majuscule + chiffre), loginSchema
+- [x] Seed data : 3 clients + 1 admin + 6 artisans, 5 missions, 3 devis, 5 paiements, 3 factures, 4 avis, 9 notifications, 4 messages, 1 contrat entretien, 2 parrainages, 18 documents
 
 ### Phase 2 : Layout + Pages publiques
 - [ ] Navbar responsive + Footer
