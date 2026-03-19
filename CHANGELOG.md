@@ -103,14 +103,25 @@ Prototypes JSX interactifs créés dans Claude.ai. Fichiers dans `/reference/`.
 - [x] /notifications — Liste avec indicateur non-lu, marquer tout lu
 - [x] /payment-methods — Cartes bancaires, Apple Pay, virement, sécurité
 
-### Phase 4 : Dashboard Artisan
-- [ ] Dashboard + KPIs
-- [ ] Création devis + factures
-- [ ] Documents + paiements
-- [ ] Carnet clients
-- [ ] QR code profil
-- [ ] Comptabilité
-- [ ] Notifications
+### Phase 4 : Parcours artisan complet — 2026-03-19
+
+#### API Routes (4 routes)
+- [x] GET /api/artisan/stats (revenus mois, missions actives, devis en attente, note, prochains RDV)
+- [x] GET /api/artisan/clients (carnet clients groupé par client, stats CA)
+- [x] GET/POST /api/devis (liste + création avec numérotation auto DEV-YYYY-NNN)
+- [x] GET /api/invoices (liste factures artisan)
+
+#### Pages Artisan (10 pages)
+- [x] /artisan-dashboard — 4 KPI stats, alerte urgente, prochains RDV
+- [x] /artisan-devis/new — Création devis 3 étapes (client, lignes dynamiques, envoi)
+- [x] /artisan-invoices — Liste factures, lignes détaillées, export PDF
+- [x] /artisan-documents — Onglets devis/factures, statuts (Brouillon, Envoyé, Accepté, Refusé, Payé)
+- [x] /artisan-payments — 3 onglets (En séquestre collapsible + progress bar, Reçus, En attente)
+- [x] /artisan-clients — 3 KPIs, recherche, liste clients avec contact + CA
+- [x] /artisan-qr-code — QR code généré, boutons enregistrer/partager, 5 cas d'usage
+- [x] /artisan-compta — 4 services (Pennylane/Indy/QuickBooks/Tiime), toggle auto-export, export CSV/PDF, récap mensuel
+- [x] /artisan-profile — Infos perso + entreprise, certifications, 8 liens menu
+- [x] /artisan-notifications — Types (urgence, devis, paiement, RDV, certification), indicateurs non-lu
 
 ### Phase 5 : Landings + Admin + Email
 - [ ] Landing artisans (/devenir-partenaire)

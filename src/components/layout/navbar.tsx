@@ -17,8 +17,8 @@ const clientLinks = [
 
 const artisanLinks = [
   { href: "/artisan-dashboard", label: "Dashboard" },
-  { href: "/documents", label: "Documents" },
-  { href: "/payments", label: "Paiements" },
+  { href: "/artisan-documents", label: "Documents" },
+  { href: "/artisan-payments", label: "Paiements" },
   { href: "/artisan-notifications", label: "Notifications" },
   { href: "/artisan-profile", label: "Profil" },
 ];
