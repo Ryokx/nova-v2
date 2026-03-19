@@ -14,7 +14,6 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
-    newUser: "/signup",
   },
   providers: [
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
@@ -64,6 +63,13 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Allow relative URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allow URLs on the same origin
+      if (new URL(url).origin === baseUrl) return url;
+      return `${baseUrl}/dashboard`;
+    },
     async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
