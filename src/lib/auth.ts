@@ -2,12 +2,10 @@ import { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -20,14 +18,12 @@ export const authOptions: NextAuthOptions = {
       ? [GoogleProvider({
           clientId: process.env.GOOGLE_CLIENT_ID,
           clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-          allowDangerousEmailAccountLinking: true,
         })]
       : []),
     ...(process.env.APPLE_CLIENT_ID && process.env.APPLE_CLIENT_SECRET
       ? [AppleProvider({
           clientId: process.env.APPLE_CLIENT_ID,
           clientSecret: process.env.APPLE_CLIENT_SECRET,
-          allowDangerousEmailAccountLinking: true,
         })]
       : []),
     CredentialsProvider({
@@ -65,18 +61,57 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
-      // For OAuth providers, ensure the user exists in our DB with correct role
+    async signIn({ user, account, profile }) {
       if (account?.provider === "google" || account?.provider === "apple") {
-        if (user.email) {
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email },
-          });
-          if (!existingUser) {
-            // User will be created by PrismaAdapter automatically
-            // Just allow the sign in
-            return true;
+        const email = user.email ?? profile?.email;
+        if (!email) return false;
+
+        try {
+          // Check if user already exists
+          let dbUser = await prisma.user.findUnique({ where: { email } });
+
+          if (!dbUser) {
+            // Create new user from OAuth
+            dbUser = await prisma.user.create({
+              data: {
+                email,
+                name: user.name ?? profile?.name ?? email.split("@")[0],
+                avatar: user.image ?? null,
+                role: "CLIENT",
+                emailVerified: new Date(),
+              },
+            });
           }
+
+          // Link OAuth account if not already linked
+          const existingAccount = await prisma.account.findFirst({
+            where: {
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+            },
+          });
+
+          if (!existingAccount) {
+            await prisma.account.create({
+              data: {
+                userId: dbUser.id,
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                access_token: account.access_token ?? null,
+                refresh_token: account.refresh_token ?? null,
+                expires_at: account.expires_at ?? null,
+                token_type: account.token_type ?? null,
+                scope: account.scope ?? null,
+                id_token: account.id_token ?? null,
+              },
+            });
+          }
+
+          return true;
+        } catch (error) {
+          console.error("[AUTH] OAuth signIn error:", error);
+          return false;
         }
       }
       return true;
@@ -87,10 +122,9 @@ export const authOptions: NextAuthOptions = {
       return `${baseUrl}/dashboard`;
     },
     async jwt({ token, user, trigger, account }) {
-      // On initial sign in (credentials or OAuth)
       if (user) {
-        // For OAuth, the user.id from adapter might differ, fetch from DB
         if (account?.provider === "google" || account?.provider === "apple") {
+          // Fetch the DB user by email for OAuth
           const dbUser = await prisma.user.findUnique({
             where: { email: user.email! },
             select: { id: true, role: true, phone: true },
@@ -99,10 +133,6 @@ export const authOptions: NextAuthOptions = {
             token.id = dbUser.id;
             token.role = dbUser.role;
             token.hasPhone = !!dbUser.phone;
-          } else {
-            token.id = user.id;
-            token.role = "CLIENT";
-            token.hasPhone = false;
           }
         } else {
           // Credentials provider
@@ -115,7 +145,6 @@ export const authOptions: NextAuthOptions = {
           token.hasPhone = !!dbUser?.phone;
         }
       }
-      // Refresh phone status when session is updated
       if (trigger === "update") {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
