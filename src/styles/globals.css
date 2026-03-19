@@ -2,11 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500;700&display=swap");
-
 @layer base {
   html {
-    font-family: "DM Sans", sans-serif;
+    font-family: var(--font-body), "DM Sans", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -15,26 +13,48 @@
     @apply bg-bgPage text-navy;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: "Manrope", sans-serif;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), "Manrope", sans-serif;
+  }
+
+  /* Focus visible for keyboard navigation */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-forest;
+  }
+
+  /* Smooth scroll */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 @layer utilities {
   .font-heading {
-    font-family: "Manrope", sans-serif;
+    font-family: var(--font-heading), "Manrope", sans-serif;
   }
 
   .font-body {
-    font-family: "DM Sans", sans-serif;
+    font-family: var(--font-body), "DM Sans", sans-serif;
   }
 
   .font-mono {
-    font-family: "DM Mono", monospace;
+    font-family: var(--font-mono), "DM Mono", monospace;
+  }
+
+  /* Hide scrollbar */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }
