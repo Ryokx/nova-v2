@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/api-middleware";
 import { getPresignedUploadUrl } from "@/lib/upload";

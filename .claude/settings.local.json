@@ -13,7 +13,9 @@
       "Bash(npx next:*)",
       "Bash(npx prisma:*)",
       "Bash(find /c/Users/EAF/Documents/nova/reference -name *.jsx -type f)",
-      "Bash(npx jest:*)"
+      "Bash(npx jest:*)",
+      "Bash(npx tsx:*)",
+      "Bash(openssl rand:*)"
     ]
   }
 }
