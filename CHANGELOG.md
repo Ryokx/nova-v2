@@ -123,13 +123,33 @@ Prototypes JSX interactifs créés dans Claude.ai. Fichiers dans `/reference/`.
 - [x] /artisan-profile — Infos perso + entreprise, certifications, 8 liens menu
 - [x] /artisan-notifications — Types (urgence, devis, paiement, RDV, certification), indicateurs non-lu
 
-### Phase 5 : Landings + Admin + Email
-- [ ] Landing artisans (/devenir-partenaire)
-- [ ] Landing particuliers (/comment-ca-marche)
-- [ ] Dashboard admin complet
-- [ ] Templates email (Resend)
-- [ ] Pages légales (CGU, confidentialité, mentions)
-- [ ] Sitemap + robots.txt
+### Phase 5 : Landings + Admin + Email + Legal + SEO — 2026-03-19
+
+#### Landing Pages
+- [x] /devenir-partenaire — Hero (badges, offre, compteur artisans), avant/après (4 stats × 2), avantages (3 cards dont 1 dark), simulateur (3 forfaits), FAQ (9 questions collapsibles), CTA final gradient, modale inscription 4 étapes (email/mdp avec barre force, infos perso, upload documents obligatoires/facultatifs, confirmation timeline)
+- [x] /comment-ca-marche — Hero (titre animé mot tournant), 4 étapes (comment ça marche), 3 garanties, 3 témoignages, FAQ (6 questions), CTA final, modale recherche 3 étapes (catégorie, description, loading+résultats)
+
+#### Admin Dashboard
+- [x] /admin — Protection rôle ADMIN, 3 onglets :
+  - Vue d'ensemble : 8 KPI cards (interventions, validation, litiges, revenus 7j, séquestre, artisans, clients, note), alerte litiges
+  - Utilisateurs : recherche, liste avec rôle/badge/stats artisan
+  - Missions : filtres statut, détail avec actions litige (libérer paiement, rembourser)
+- [x] API : GET /api/admin/stats, GET /api/admin/users, GET /api/admin/missions, PATCH /api/admin/payments
+
+#### Email Templates
+- [x] artisanWelcomeEmail — Template HTML (header gradient, stats cards, CTA, footer legal)
+- [x] missionNotificationEmail — Template HTML (notification mission, montant, dates, CTA)
+- [x] sendEmail() — Envoi via Resend API (fallback console.log sans API key)
+
+#### Pages Légales
+- [x] /cgu — 7 articles (objet, définitions, inscription, paiement séquestre, litiges, responsabilité, droit applicable)
+- [x] /confidentialite — RGPD complet (responsable, données, finalités, base légale, conservation, droits, sous-traitants, cookies)
+- [x] /mentions-legales — Éditeur, hébergeur, activité, propriété intellectuelle, médiation
+
+#### SEO
+- [x] sitemap.xml — 9 pages publiques indexées avec priorités
+- [x] robots.txt — Pages admin/dashboard/API exclues
+- [x] Metadata OG sur les landings
 
 ### Phase 6 : Intégrations
 - [ ] Stripe Connect (séquestre réel)
