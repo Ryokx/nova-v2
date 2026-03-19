@@ -60,10 +60,18 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role ?? "CLIENT";
+        // Check if phone exists for new OAuth users
+        const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { phone: true } });
+        token.hasPhone = !!dbUser?.phone;
+      }
+      // Refresh phone status when session is updated
+      if (trigger === "update") {
+        const dbUser = await prisma.user.findUnique({ where: { id: token.id as string }, select: { phone: true } });
+        token.hasPhone = !!dbUser?.phone;
       }
       return token;
     },
@@ -71,6 +79,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.hasPhone = token.hasPhone as boolean;
       }
       return session;
     },
