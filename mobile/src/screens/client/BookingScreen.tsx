@@ -6,7 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Image,
+  Alert,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Button, Card } from "../../components/ui";
@@ -58,6 +61,60 @@ export function BookingScreen({
   const [selectedDay, setSelectedDay] = useState(15);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [description, setDescription] = useState("");
+  const [media, setMedia] = useState<{ uri: string; type: "image" | "video" }[]>([]);
+  const [confirmed, setConfirmed] = useState(false);
+
+  const pickFromGallery = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images", "videos"],
+      allowsMultipleSelection: true,
+      quality: 0.8,
+    });
+    if (!result.canceled) {
+      setMedia((prev) => [
+        ...prev,
+        ...result.assets.map((a) => ({
+          uri: a.uri,
+          type: (a.type === "video" ? "video" : "image") as "image" | "video",
+        })),
+      ]);
+    }
+  };
+
+  const takePhoto = async () => {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) {
+      Alert.alert("Permission requise", "Autorisez l'accès à la caméra pour prendre une photo.");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ["images"],
+      quality: 0.8,
+    });
+    if (!result.canceled) {
+      setMedia((prev) => [...prev, { uri: result.assets[0].uri, type: "image" }]);
+    }
+  };
+
+  const recordVideo = async () => {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) {
+      Alert.alert("Permission requise", "Autorisez l'accès à la caméra pour enregistrer une vidéo.");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ["videos"],
+      videoMaxDuration: 60,
+      quality: 0.7,
+    });
+    if (!result.canceled) {
+      setMedia((prev) => [...prev, { uri: result.assets[0].uri, type: "video" }]);
+    }
+  };
+
+  const removeMedia = (index: number) => {
+    setMedia((prev) => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <View style={styles.root}>
@@ -179,11 +236,40 @@ export function BookingScreen({
               onChangeText={setDescription}
             />
 
-            <TouchableOpacity style={styles.photoBtn} activeOpacity={0.7}>
-              <Text style={styles.photoBtnText}>
-                <MaterialCommunityIcons name="camera" size={18} color={Colors.forest} /> Ajouter des photos
-              </Text>
-            </TouchableOpacity>
+            {/* Media picker buttons */}
+            <View style={styles.mediaActions}>
+              <TouchableOpacity style={styles.mediaBtn} activeOpacity={0.7} onPress={pickFromGallery}>
+                <MaterialCommunityIcons name="image-multiple" size={18} color={Colors.forest} />
+                <Text style={styles.mediaBtnText}>Galerie</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.mediaBtn} activeOpacity={0.7} onPress={takePhoto}>
+                <MaterialCommunityIcons name="camera" size={18} color={Colors.forest} />
+                <Text style={styles.mediaBtnText}>Photo</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.mediaBtn} activeOpacity={0.7} onPress={recordVideo}>
+                <MaterialCommunityIcons name="video" size={18} color={Colors.forest} />
+                <Text style={styles.mediaBtnText}>Vidéo</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Media preview */}
+            {media.length > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.mediaPreviewScroll}>
+                {media.map((m, i) => (
+                  <View key={i} style={styles.mediaThumb}>
+                    <Image source={{ uri: m.uri }} style={styles.mediaImage} />
+                    {m.type === "video" && (
+                      <View style={styles.mediaVideoOverlay}>
+                        <MaterialCommunityIcons name="play-circle" size={24} color={Colors.white} />
+                      </View>
+                    )}
+                    <TouchableOpacity style={styles.mediaRemove} onPress={() => removeMedia(i)}>
+                      <MaterialCommunityIcons name="close" size={14} color={Colors.white} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
 
             <View style={{ marginTop: 16 }}>
               <Button
@@ -228,17 +314,32 @@ export function BookingScreen({
               </Text>
             </View>
 
-            <Button
-              title="Confirmer le rendez-vous"
-              onPress={() =>
-                navigation.navigate("Payment", {
-                  missionId: "1",
-                  amount: 320,
-                })
-              }
-              fullWidth
-              size="lg"
-            />
+            {!confirmed ? (
+              <Button
+                title="Confirmer le rendez-vous"
+                onPress={() => {
+                  setConfirmed(true);
+                  Alert.alert(
+                    "Rendez-vous confirmé ✓",
+                    `Votre RDV avec Jean-Michel P. le ${selectedDay} mars à ${selectedSlot || "14h00"} est confirmé.\n\nVous allez être redirigé vers le paiement sécurisé.`,
+                    [
+                      {
+                        text: "Procéder au paiement",
+                        onPress: () =>
+                          navigation.navigate("Payment", { missionId: "1", amount: 320 }),
+                      },
+                    ]
+                  );
+                }}
+                fullWidth
+                size="lg"
+              />
+            ) : (
+              <View style={styles.confirmedBanner}>
+                <MaterialCommunityIcons name="check-circle" size={20} color={Colors.success} />
+                <Text style={styles.confirmedText}>Rendez-vous confirmé</Text>
+              </View>
+            )}
           </View>
         )}
       </ScrollView>
@@ -375,17 +476,70 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  /* Photo button */
-  photoBtn: {
+  /* Media picker */
+  mediaActions: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 12,
+  },
+  mediaBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
     backgroundColor: "rgba(27,107,78,0.04)",
     borderWidth: 1.5,
     borderStyle: "dashed",
-    borderColor: "rgba(27,107,78,0.3)",
-    borderRadius: 14,
-    padding: 12,
-    alignItems: "center",
+    borderColor: "rgba(27,107,78,0.25)",
+    borderRadius: 12,
+    paddingVertical: 12,
   },
-  photoBtnText: { fontSize: 13, fontWeight: "600", color: Colors.forest },
+  mediaBtnText: { fontSize: 12, fontFamily: "DMSans_600SemiBold", color: Colors.forest },
+  mediaPreviewScroll: { marginBottom: 12 },
+  mediaThumb: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+    marginRight: 8,
+    overflow: "hidden",
+    position: "relative",
+  },
+  mediaImage: { width: "100%", height: "100%", borderRadius: 12 },
+  mediaVideoOverlay: {
+    position: "absolute",
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  mediaRemove: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  confirmedBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "rgba(34,200,138,0.08)",
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "rgba(34,200,138,0.2)",
+  },
+  confirmedText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 14,
+    color: Colors.success,
+  },
 
   /* Summary */
   summaryRow: {
