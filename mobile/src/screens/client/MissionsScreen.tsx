@@ -206,18 +206,19 @@ const styles = StyleSheet.create({
   },
   tabsRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: 6,
   },
   tab: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
+    flex: 1,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 20,
     borderWidth: 1,
   },
   tabText: {
     fontFamily: "DMSans_500Medium",
-    fontSize: 12,
+    fontSize: 11.5,
     color: "#4A5568",
   },
   tabTextActive: { color: Colors.white },
