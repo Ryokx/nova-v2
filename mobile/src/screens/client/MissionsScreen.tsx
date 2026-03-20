@@ -146,38 +146,30 @@ export function ClientMissionsScreen({
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: c.bg }]} edges={["top"]}>
-      {/* Header */}
-      <View style={styles.header}>
+      {/* Header + filters */}
+      <View style={styles.headerSection}>
         <Text style={[styles.headerTitle, { color: c.text }]}>Interventions</Text>
+        <View style={styles.tabsRow}>
+          {tabs.map((t) => {
+            const active = activeTab === t.id;
+            return (
+              <TouchableOpacity
+                key={t.id}
+                style={[
+                  styles.tab,
+                  { backgroundColor: active ? Colors.deepForest : c.card, borderColor: active ? Colors.deepForest : c.border },
+                ]}
+                onPress={() => setActiveTab(t.id)}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.tabText, active && styles.tabTextActive]}>
+                  {t.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
-
-      {/* Filter pills */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.tabsContainer}
-      >
-        {tabs.map((t) => (
-          <TouchableOpacity
-            key={t.id}
-            style={[
-              styles.tab,
-              activeTab !== t.id && { backgroundColor: c.card },
-              activeTab === t.id && styles.tabActive,
-            ]}
-            onPress={() => setActiveTab(t.id)}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === t.id && styles.tabTextActive,
-              ]}
-            >
-              {t.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
 
       {/* Count */}
       <Text style={styles.countText}>
@@ -200,40 +192,32 @@ export function ClientMissionsScreen({
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.bgPage },
 
-  /* Header */
-  header: {
-    paddingHorizontal: 20,
+  /* Header + filters */
+  headerSection: {
+    paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: 14,
+    paddingBottom: 6,
   },
   headerTitle: {
     fontFamily: "Manrope_800ExtraBold",
     fontSize: 22,
     color: Colors.navy,
+    marginBottom: 12,
   },
-
-  /* Tabs */
-  tabsContainer: {
-    paddingHorizontal: 16,
+  tabsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 6,
-    paddingBottom: 4,
   },
   tab: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    backgroundColor: Colors.white,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  tabActive: {
-    backgroundColor: Colors.deepForest,
-    borderColor: Colors.deepForest,
-    ...Shadows.sm,
   },
   tabText: {
     fontFamily: "DMSans_500Medium",
-    fontSize: 11,
+    fontSize: 12,
     color: "#4A5568",
   },
   tabTextActive: { color: Colors.white },
