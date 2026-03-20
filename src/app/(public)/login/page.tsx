@@ -3,13 +3,37 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { Shield } from "lucide-react";
+import { Shield, CheckCircle, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState(false);
+  const [forgotError, setForgotError] = useState("");
+
+  const handleForgotPassword = async () => {
+    if (!forgotEmail) return;
+    setForgotError("");
+    setForgotLoading(true);
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      if (!res.ok) throw new Error();
+      setForgotSuccess(true);
+    } catch {
+      setForgotError("Une erreur est survenue. Veuillez réessayer.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,10 +134,91 @@ export default function LoginPage() {
             )}
 
             <div className="text-right">
-              <button type="button" className="text-xs text-forest font-medium hover:underline">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForgot(true);
+                  setForgotEmail(email);
+                  setForgotSuccess(false);
+                  setForgotError("");
+                }}
+                className="text-xs text-forest font-medium hover:underline"
+              >
                 Mot de passe oublié ?
               </button>
             </div>
+
+            {/* Forgot password inline form */}
+            {showForgot && (
+              <div className="p-4 rounded-[14px] bg-surface border border-border space-y-3">
+                {forgotSuccess ? (
+                  <div className="text-center py-2">
+                    <CheckCircle className="w-8 h-8 text-success mx-auto mb-2" />
+                    <p className="text-sm font-semibold text-navy mb-1">
+                      Email envoyé !
+                    </p>
+                    <p className="text-xs text-grayText">
+                      Un email de réinitialisation a été envoyé. Consultez votre
+                      boîte mail.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForgot(false);
+                        setForgotSuccess(false);
+                      }}
+                      className="text-xs text-forest font-medium hover:underline mt-3"
+                    >
+                      Fermer
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowForgot(false)}
+                        className="text-grayText hover:text-navy transition-colors"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                      </button>
+                      <p className="text-sm font-semibold text-navy">
+                        Mot de passe oublié
+                      </p>
+                    </div>
+                    <p className="text-xs text-grayText">
+                      Entrez votre email, nous vous enverrons un lien de
+                      réinitialisation.
+                    </p>
+                    <input
+                      type="email"
+                      placeholder="Votre email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      className="w-full h-10 px-3 rounded-[10px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
+                    />
+                    {forgotError && (
+                      <p className="text-xs text-red">{forgotError}</p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
+                      disabled={forgotLoading || !forgotEmail}
+                      className="w-full h-10 rounded-[10px] bg-deepForest text-white font-heading font-bold text-xs hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
+                    >
+                      {forgotLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Envoi...
+                        </span>
+                      ) : (
+                        "Envoyer le lien"
+                      )}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
             <button
               type="submit"

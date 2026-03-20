@@ -16,7 +16,25 @@
       "Bash(npx jest:*)",
       "Bash(npx tsx:*)",
       "Bash(openssl rand:*)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Bash(npx tsc:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npx create-expo-app@latest mobile --template blank-typescript)",
+      "Bash(node -e \"const m = require\\(''@expo-google-fonts/dm-mono''\\); console.log\\(Object.keys\\(m\\).filter\\(k => k.startsWith\\(''DMMono''\\)\\)\\)\")",
+      "Bash(npx expo:*)",
+      "Bash(node -e \"console.log\\(require\\(''./node_modules/expo/package.json''\\).version\\)\")",
+      "Bash(cd:*)",
+      "Bash(node -e \"console.log\\(''expo:'', require\\(''./node_modules/expo/package.json''\\).version\\)\")",
+      "Bash(node -e \"console.log\\(''expo:'', require\\(''./node_modules/expo/package.json''\\).version, ''| react-native:'', require\\(''./node_modules/react-native/package.json''\\).version\\)\")",
+      "Bash(grep -rl '\\\\\\\\u00' src/screens/)",
+      "Bash(grep -c '\\\\\\\\é\\\\|\\\\\\\\è\\\\|\\\\\\\\ê\\\\|\\\\\\\\ç\\\\|\\\\\\\\à\\\\|\\\\\\\\â\\\\|\\\\\\\\ô\\\\|\\\\\\\\î\\\\|\\\\\\\\ù' src/screens/auth/AuthScreen.tsx)",
+      "Bash(node fix-backslash.js)",
+      "Bash(rm fix-backslash.js)",
+      "Bash(grep -rn '\\\\\\\\é\\\\|\\\\\\\\è\\\\|\\\\\\\\ê\\\\|\\\\\\\\ç\\\\|\\\\\\\\à\\\\|\\\\\\\\ô' src/screens/)",
+      "Bash(node:*)",
+      "Bash(ls:*)"
     ]
   }
 }

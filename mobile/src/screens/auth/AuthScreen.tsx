@@ -9,11 +9,13 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Button, Input } from "../../components/ui";
+import { API_BASE_URL } from "../../constants/api";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -50,8 +52,15 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
   const [onboardDone, setOnboardDone] = useState(false);
   const [onboardSlide, setOnboardSlide] = useState(0);
   const [showCreate, setShowCreate] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
   const [selectedRole, setSelectedRole] = useState<"client" | "artisan">("client");
   const flatListRef = useRef<FlatList>(null);
+
+  // Forgot password state
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState(false);
+  const [forgotError, setForgotError] = useState("");
 
   // ── Onboarding ──
   if (!onboardDone) {
@@ -234,6 +243,119 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
     );
   }
 
+  // ── Forgot password ──
+  if (showForgot) {
+    const handleForgotSubmit = async () => {
+      if (!forgotEmail) return;
+      setForgotError("");
+      setForgotLoading(true);
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: forgotEmail }),
+        });
+        if (!res.ok) throw new Error();
+        setForgotSuccess(true);
+      } catch {
+        setForgotError("Erreur réseau. Veuillez réessayer.");
+      } finally {
+        setForgotLoading(false);
+      }
+    };
+
+    return (
+      <SafeAreaView style={styles.screen}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.flex}
+        >
+          <ScrollView
+            style={styles.flex}
+            contentContainerStyle={styles.createContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* Back */}
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={() => {
+                setShowForgot(false);
+                setForgotSuccess(false);
+                setForgotError("");
+                setForgotEmail("");
+              }}
+            >
+              <Text style={styles.backArrow}>{"‹"}</Text>
+            </TouchableOpacity>
+
+            {forgotSuccess ? (
+              <View style={styles.forgotSuccessWrap}>
+                <View style={styles.forgotSuccessIcon}>
+                  <MaterialCommunityIcons
+                    name="check-circle"
+                    size={48}
+                    color={Colors.success}
+                  />
+                </View>
+                <Text style={styles.createTitle}>Email envoyé !</Text>
+                <Text style={[styles.createSubtitle, { marginBottom: 32 }]}>
+                  Consultez votre boîte mail et cliquez sur le lien reçu pour
+                  réinitialiser votre mot de passe.
+                </Text>
+                <Button
+                  title="Retour à la connexion"
+                  onPress={() => {
+                    setShowForgot(false);
+                    setForgotSuccess(false);
+                    setForgotError("");
+                    setForgotEmail("");
+                  }}
+                  size="lg"
+                  fullWidth
+                />
+              </View>
+            ) : (
+              <>
+                <Text style={styles.createTitle}>Mot de passe oublié</Text>
+                <Text style={styles.createSubtitle}>
+                  Entrez votre email, nous vous enverrons un lien de
+                  réinitialisation.
+                </Text>
+
+                <Input
+                  placeholder="Votre email"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={forgotEmail}
+                  onChangeText={setForgotEmail}
+                />
+
+                {forgotError ? (
+                  <Text style={styles.forgotErrorText}>{forgotError}</Text>
+                ) : null}
+
+                <Button
+                  title={forgotLoading ? "" : "Envoyer le lien"}
+                  onPress={handleForgotSubmit}
+                  size="lg"
+                  fullWidth
+                  disabled={forgotLoading || !forgotEmail}
+                  style={{ marginTop: 8 }}
+                />
+                {forgotLoading && (
+                  <ActivityIndicator
+                    color={Colors.white}
+                    style={{ position: "absolute", alignSelf: "center", bottom: 68 }}
+                  />
+                )}
+              </>
+            )}
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    );
+  }
+
   // ── Login form ──
   return (
     <SafeAreaView style={styles.screen}>
@@ -278,7 +400,14 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
           <Input placeholder="Mot de passe" secureTextEntry />
 
           {/* Forgot password */}
-          <TouchableOpacity style={styles.forgotWrap}>
+          <TouchableOpacity
+            style={styles.forgotWrap}
+            onPress={() => {
+              setShowForgot(true);
+              setForgotSuccess(false);
+              setForgotError("");
+            }}
+          >
             <Text style={styles.forgotText}>Mot de passe oublié ?</Text>
           </TouchableOpacity>
 
@@ -586,5 +715,21 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 17,
     marginTop: 14,
+  },
+
+  /* ── Forgot password ── */
+  forgotSuccessWrap: {
+    alignItems: "center",
+    paddingTop: 40,
+  },
+  forgotSuccessIcon: {
+    marginBottom: 20,
+  },
+  forgotErrorText: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: "#E8302A",
+    textAlign: "center",
+    marginTop: 8,
   },
 });
