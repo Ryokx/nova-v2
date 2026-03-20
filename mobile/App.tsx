@@ -21,9 +21,19 @@ import {
 } from "@expo-google-fonts/dm-mono";
 
 import { RootNavigator } from "./src/navigation/RootNavigator";
+import { ThemeProvider, useTheme } from "./src/hooks/useTheme";
 
-// Keep splash screen visible while fonts load
 SplashScreen.preventAutoHideAsync();
+
+function AppContent() {
+  const { dark } = useTheme();
+  return (
+    <>
+      <StatusBar barStyle={dark ? "light-content" : "dark-content"} />
+      <RootNavigator />
+    </>
+  );
+}
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -49,11 +59,12 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider onLayout={onLayoutRootView}>
-      <NavigationContainer>
-        <StatusBar barStyle="dark-content" />
-        <RootNavigator />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <ThemeProvider>
+      <SafeAreaProvider onLayout={onLayoutRootView}>
+        <NavigationContainer>
+          <AppContent />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 }

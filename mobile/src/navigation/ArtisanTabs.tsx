@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "../constants/theme";
+import { useTheme } from "../hooks/useTheme";
 
 // Tab screens
 import { ArtisanHomeScreen } from "../screens/artisan/HomeScreen";
@@ -117,11 +118,12 @@ function TabIcon({ name, focused, badge }: { name: string; focused: boolean; bad
 }
 
 export function ArtisanTabs() {
+  const { c } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: { ...styles.tabBar, backgroundColor: c.card + "F0", borderTopColor: c.border },
         tabBarLabelStyle: styles.tabLabel,
         tabBarActiveTintColor: Colors.forest,
         tabBarInactiveTintColor: Colors.textHint,

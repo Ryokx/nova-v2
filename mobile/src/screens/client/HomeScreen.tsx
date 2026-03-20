@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge } from "../../components/ui";
+import { useTheme } from "../../hooks/useTheme";
 import type { ClientTabScreenProps } from "../../navigation/types";
 
 /* ── Mock data ── */
@@ -52,6 +53,7 @@ const allArtisans = [
 export function ClientHomeScreen({
   navigation,
 }: ClientTabScreenProps<"ClientHome">) {
+  const { c } = useTheme();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -80,7 +82,7 @@ export function ClientHomeScreen({
   const showResults = search.length >= 2;
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: c.bg }]} edges={["top"]}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -89,18 +91,18 @@ export function ClientHomeScreen({
         {/* ── Header ── */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Bonjour Sophie</Text>
+            <Text style={[styles.greeting, { color: c.text }]}>Bonjour Sophie</Text>
           </View>
           <TouchableOpacity
-            style={styles.bellBtn}
+            style={[styles.bellBtn, { backgroundColor: c.card }]}
             onPress={() => navigation.navigate("ClientNotifications")}
           >
-            <Text style={styles.bellIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+            <Text style={styles.bellIcon}><MaterialCommunityIcons name="bell" size={22} color={c.text} /></Text>
           </TouchableOpacity>
         </View>
 
         {/* ── Search bar ── */}
-        <View style={styles.searchBar}>
+        <View style={[styles.searchBar, { backgroundColor: c.card }]}>
           <MaterialCommunityIcons name="magnify" size={18} color={Colors.textHint} />
           <TextInput
             style={styles.searchInput}
@@ -119,7 +121,7 @@ export function ClientHomeScreen({
 
         {/* ── Search results ── */}
         {showResults && (
-          <View style={styles.searchResults}>
+          <View style={[styles.searchResults, { backgroundColor: c.card, borderColor: c.border }]}>
             {searchResults.length === 0 && debouncedSearch.length >= 2 ? (
               <View style={styles.searchEmpty}>
                 <Text style={styles.searchEmptyText}>
@@ -144,7 +146,7 @@ export function ClientHomeScreen({
                 >
                   <Avatar name={a.name} size={36} radius={12} />
                   <View style={styles.searchResultInfo}>
-                    <Text style={styles.searchResultName}>{a.name}</Text>
+                    <Text style={[styles.searchResultName, { color: c.text }]}>{a.name}</Text>
                     <Text style={styles.searchResultJob}>{a.job}</Text>
                   </View>
                   <View style={styles.searchResultRight}>
@@ -165,7 +167,7 @@ export function ClientHomeScreen({
           {categories.map((cat) => (
             <TouchableOpacity
               key={cat.id}
-              style={styles.catCard}
+              style={[styles.catCard, { backgroundColor: c.card }]}
               activeOpacity={0.8}
               onPress={() =>
                 cat.id === "all"
@@ -174,14 +176,14 @@ export function ClientHomeScreen({
               }
             >
               <MaterialCommunityIcons name={cat.emoji as any} size={22} color={Colors.forest} />
-              <Text style={styles.catLabel}>{cat.label}</Text>
+              <Text style={[styles.catLabel, { color: c.text }]}>{cat.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* ── Emergency banner ── */}
         <TouchableOpacity
-          style={styles.emergencyCard}
+          style={[styles.emergencyCard, { backgroundColor: c.card }]}
           activeOpacity={0.85}
           onPress={() => navigation.navigate("Emergency")}
         >
@@ -200,7 +202,7 @@ export function ClientHomeScreen({
         </TouchableOpacity>
 
         {/* ── Top rated section ── */}
-        <Text style={styles.sectionTitle}>Artisans les mieux notés</Text>
+        <Text style={[styles.sectionTitle, { color: c.text }]}>Artisans les mieux notés</Text>
 
         <FlatList
           data={topArtisans}
@@ -210,7 +212,7 @@ export function ClientHomeScreen({
           contentContainerStyle={styles.artisanList}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={styles.artisanCard}
+              style={[styles.artisanCard, { backgroundColor: c.card }]}
               activeOpacity={0.85}
               onPress={() =>
                 navigation.navigate("ArtisanProfile", { id: item.id })
@@ -220,7 +222,7 @@ export function ClientHomeScreen({
               <View style={styles.artisanRow}>
                 <Avatar name={item.name} size={44} radius={14} />
                 <View style={styles.artisanInfo}>
-                  <Text style={styles.artisanName}>{item.name}</Text>
+                  <Text style={[styles.artisanName, { color: c.text }]}>{item.name}</Text>
                   <Text style={styles.artisanJob}>{item.job}</Text>
                 </View>
               </View>

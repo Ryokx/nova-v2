@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
+import { useTheme } from "../../hooks/useTheme";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
 
 type PayTab = "escrow" | "received" | "pending";
@@ -33,13 +34,14 @@ const receivedPayments = [
 export function ArtisanPaymentsScreen({
   navigation,
 }: ArtisanTabScreenProps<"ArtisanPayments">) {
+  const { c } = useTheme();
   const [tab, setTab] = useState<PayTab>("escrow");
   const [expandedReceived, setExpandedReceived] = useState<number | null>(null);
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: c.bg }]} edges={["top"]}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Mes paiements</Text>
+        <Text style={[styles.headerTitle, { color: c.text }]}>Mes paiements</Text>
       </View>
 
       <ScrollView
@@ -54,7 +56,7 @@ export function ArtisanPaymentsScreen({
             return (
               <TouchableOpacity
                 key={t.id}
-                style={[styles.tab, active && styles.tabActive]}
+                style={[styles.tab, !active && { backgroundColor: c.card }, active && styles.tabActive]}
                 onPress={() => setTab(t.id)}
               >
                 <Text style={[styles.tabText, active && styles.tabTextActive]}>
@@ -75,13 +77,13 @@ export function ArtisanPaymentsScreen({
               </Text>
             </View>
             {escrowPayments.map((m, i) => (
-              <View key={i} style={styles.payCard}>
+              <View key={i} style={[styles.payCard, { backgroundColor: c.card }]}>
                 <View style={styles.payCardTop}>
                   <View>
-                    <Text style={styles.payClient}>{m.client}</Text>
+                    <Text style={[styles.payClient, { color: c.text }]}>{m.client}</Text>
                     <Text style={styles.payMission}>{m.mission}</Text>
                   </View>
-                  <Text style={styles.payAmount}>{m.amount}</Text>
+                  <Text style={[styles.payAmount, { color: c.text }]}>{m.amount}</Text>
                 </View>
                 {/* Progress bar */}
                 <View style={styles.progressBg}>
@@ -106,13 +108,13 @@ export function ArtisanPaymentsScreen({
             {receivedPayments.map((p, i) => (
               <TouchableOpacity
                 key={i}
-                style={[styles.receivedCard, expandedReceived === i && { borderColor: Colors.success + "40", borderWidth: 1.5 }]}
+                style={[styles.receivedCard, { backgroundColor: c.card }, expandedReceived === i && { borderColor: Colors.success + "40", borderWidth: 1.5 }]}
                 activeOpacity={0.85}
                 onPress={() => setExpandedReceived(expandedReceived === i ? null : i)}
               >
                 <View style={styles.receivedTop}>
                   <View>
-                    <Text style={styles.payClient}>{p.client}</Text>
+                    <Text style={[styles.payClient, { color: c.text }]}>{p.client}</Text>
                     <Text style={styles.receivedDate}>{p.date}</Text>
                   </View>
                   <View style={styles.receivedRight}>

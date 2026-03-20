@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
+import { useTheme } from "../../hooks/useTheme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ── Language options ── */
@@ -50,6 +51,7 @@ function SettingRow({
   onPress?: () => void;
   danger?: boolean;
 }) {
+  const { c } = useTheme();
   return (
     <TouchableOpacity
       style={styles.settingRow}
@@ -59,13 +61,13 @@ function SettingRow({
     >
       <View style={styles.settingRowLeft}>
         <Text
-          style={[styles.settingLabel, danger && styles.settingLabelDanger]}
+          style={[styles.settingLabel, { color: c.text }, danger && styles.settingLabelDanger]}
         >
           {label}
         </Text>
       </View>
       {right || (
-        <Text style={styles.chevron}>{"›"}</Text>
+        <Text style={[styles.chevron, { color: c.textHint }]}>{"›"}</Text>
       )}
     </TouchableOpacity>
   );
@@ -79,9 +81,10 @@ function SectionCard({
   title: string;
   children: React.ReactNode;
 }) {
+  const { c } = useTheme();
   return (
-    <View style={styles.sectionCard}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+    <View style={[styles.sectionCard, { backgroundColor: c.card, borderColor: c.border }]}>
+      <Text style={[styles.sectionTitle, { color: c.text }]}>{title}</Text>
       {children}
     </View>
   );
@@ -90,8 +93,8 @@ function SectionCard({
 export function SettingsScreen({
   navigation,
 }: RootStackScreenProps<"Settings">) {
-  /* state */
-  const [darkMode, setDarkMode] = useState(false);
+  /* theme */
+  const { dark: darkMode, toggleDark, c } = useTheme();
   const [twoFA, setTwoFA] = useState(false);
   const [language, setLanguage] = useState("FR");
 
@@ -168,16 +171,16 @@ export function SettingsScreen({
   const currentLegal = legalModal ? LEGAL_TEXTS[legalModal] : null;
 
   return (
-    <SafeAreaView style={styles.root} edges={["top"]}>
+    <SafeAreaView style={[styles.root, { backgroundColor: c.bg }]} edges={["top"]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          style={styles.backBtn}
+          style={[styles.backBtn, { backgroundColor: darkMode ? c.surface : "rgba(27,107,78,0.08)" }]}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"‹"}</Text>
+          <Text style={[styles.backArrow, { color: darkMode ? c.text : Colors.forest }]}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Paramètres</Text>
+        <Text style={[styles.headerTitle, { color: c.text }]}>Paramètres</Text>
         <View style={styles.backBtn} />
       </View>
 
@@ -193,7 +196,7 @@ export function SettingsScreen({
             right={
               <Switch
                 value={darkMode}
-                onValueChange={setDarkMode}
+                onValueChange={toggleDark}
                 trackColor={{ false: Colors.border, true: Colors.forest }}
                 thumbColor={Colors.white}
               />

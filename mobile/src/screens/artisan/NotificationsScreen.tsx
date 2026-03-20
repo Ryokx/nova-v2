@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
+import { useTheme } from "../../hooks/useTheme";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
 
 type NotifType = "demande" | "devis" | "payment" | "rdv" | "info";
@@ -68,6 +69,7 @@ const initialNotifications: Notification[] = [
 export function ArtisanNotificationsScreen({
   navigation,
 }: ArtisanTabScreenProps<"ArtisanNotifications">) {
+  const { c } = useTheme();
   const [notifs, setNotifs] = useState(initialNotifications);
 
   const markAllRead = () => {
@@ -86,9 +88,9 @@ export function ArtisanNotificationsScreen({
   const unreadCount = notifs.filter((n) => !n.read).length;
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: c.bg }]} edges={["top"]}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Notifications</Text>
+        <Text style={[styles.headerTitle, { color: c.text }]}>Notifications</Text>
         {unreadCount > 0 && (
           <TouchableOpacity onPress={markAllRead}>
             <Text style={styles.markAllRead}>Tout marquer comme lu</Text>
@@ -108,6 +110,7 @@ export function ArtisanNotificationsScreen({
               key={n.id}
               style={[
                 styles.notifCard,
+                { backgroundColor: c.card },
                 !n.read && { borderColor: st.accent + "30", borderWidth: 1.5 },
               ]}
               activeOpacity={0.85}
@@ -121,7 +124,7 @@ export function ArtisanNotificationsScreen({
                   <MaterialCommunityIcons name={st.icon as any} size={18} color={st.accent} />
                 </View>
                 <View style={styles.notifContent}>
-                  <Text style={styles.notifTitle}>{n.title}</Text>
+                  <Text style={[styles.notifTitle, { color: c.text }]}>{n.title}</Text>
                   <Text style={styles.notifDesc}>{n.desc}</Text>
                   <View style={styles.notifBottom}>
                     <Text style={styles.notifTime}>{n.time}</Text>

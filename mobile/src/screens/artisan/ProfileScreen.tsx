@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar, Badge } from "../../components/ui";
+import { useTheme } from "../../hooks/useTheme";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
 
 const profile = {
@@ -58,6 +59,7 @@ type EditSection = "personal" | "company" | "certifs" | null;
 export function ArtisanProfileScreen({
   navigation,
 }: ArtisanTabScreenProps<"ArtisanProfile">) {
+  const { c } = useTheme();
   const [editSection, setEditSection] = useState<EditSection>(null);
 
   const EditableField = ({
@@ -78,7 +80,7 @@ export function ArtisanProfileScreen({
           placeholderTextColor={Colors.textHint}
         />
       ) : (
-        <Text style={styles.fieldValue}>{value}</Text>
+        <Text style={[styles.fieldValue, { color: c.text }]}>{value}</Text>
       )}
     </View>
   );
@@ -91,7 +93,7 @@ export function ArtisanProfileScreen({
     section: EditSection;
   }) => (
     <View style={styles.sectionHeaderRow}>
-      <Text style={styles.sectionHeaderTitle}>{title}</Text>
+      <Text style={[styles.sectionHeaderTitle, { color: c.text }]}>{title}</Text>
       <TouchableOpacity
         onPress={() => setEditSection(editSection === section ? null : section)}
         style={styles.editBtn}
@@ -104,9 +106,9 @@ export function ArtisanProfileScreen({
   );
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: c.bg }]} edges={["top"]}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Mon profil</Text>
+        <Text style={[styles.headerTitle, { color: c.text }]}>Mon profil</Text>
       </View>
 
       <ScrollView
@@ -122,7 +124,7 @@ export function ArtisanProfileScreen({
               <Text style={styles.shieldEmoji}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
             </View>
           </View>
-          <Text style={styles.profileName}>{profile.name}</Text>
+          <Text style={[styles.profileName, { color: c.text }]}>{profile.name}</Text>
           <Text style={styles.profileSub}>
             Artisan Certifié Nova • {profile.certifId}
           </Text>
@@ -130,7 +132,7 @@ export function ArtisanProfileScreen({
         </View>
 
         {/* Personal info */}
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: c.card }]}>
           <SectionHeader title="Informations personnelles" section="personal" />
           <EditableField label="Nom complet" value={profile.name} section="personal" />
           <EditableField label="Email" value={profile.email} section="personal" />
@@ -138,7 +140,7 @@ export function ArtisanProfileScreen({
         </View>
 
         {/* Company info */}
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: c.card }]}>
           <SectionHeader title="Informations entreprise" section="company" />
           <EditableField label="Raison sociale" value={company.name} section="company" />
           <EditableField label="SIRET" value={company.siret} section="company" />
@@ -148,7 +150,7 @@ export function ArtisanProfileScreen({
         </View>
 
         {/* Certifications */}
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: c.card }]}>
           <SectionHeader title="Assurances et certifications" section="certifs" />
           {certifications.map((c, i) => (
             <EditableField key={i} label={c.label} value={c.value} section="certifs" />
@@ -159,7 +161,7 @@ export function ArtisanProfileScreen({
         </View>
 
         {/* Menu rows */}
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: c.card }]}>
           {menuRows.map((item, i) => (
             <TouchableOpacity
               key={i}
@@ -177,7 +179,7 @@ export function ArtisanProfileScreen({
                 <MaterialCommunityIcons name={item.icon as any} size={16} color={Colors.forest} />
               </View>
               <View style={styles.menuContent}>
-                <Text style={styles.menuLabel}>{item.label}</Text>
+                <Text style={[styles.menuLabel, { color: c.text }]}>{item.label}</Text>
                 <Text style={styles.menuSub}>{item.sub}</Text>
               </View>
               <Text style={styles.menuChevron}>{"›"}</Text>
@@ -186,7 +188,7 @@ export function ArtisanProfileScreen({
         </View>
 
         {/* Logout */}
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: c.card }]}>
           <TouchableOpacity style={styles.logoutRow} onPress={() => (navigation as any).reset({ index: 0, routes: [{ name: "Auth" }] })}>
             <View style={styles.logoutIconWrap}>
               <Text style={styles.logoutIcon}><MaterialCommunityIcons name="logout" size={20} color={Colors.red} /></Text>

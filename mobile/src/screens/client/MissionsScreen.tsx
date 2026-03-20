@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar } from "../../components/ui";
+import { useTheme } from "../../hooks/useTheme";
 import type { ClientTabScreenProps } from "../../navigation/types";
 
 /* ── Types ── */
@@ -87,6 +88,7 @@ const missions: Mission[] = [
 export function ClientMissionsScreen({
   navigation,
 }: ClientTabScreenProps<"ClientMissions">) {
+  const { c } = useTheme();
   const [activeTab, setActiveTab] = useState<MissionStatus>("all");
 
   const filtered = useMemo(
@@ -101,6 +103,7 @@ export function ClientMissionsScreen({
     <TouchableOpacity
       style={[
         styles.missionCard,
+        { backgroundColor: c.card },
         item.status === "dispute" && styles.missionCardDispute,
       ]}
       activeOpacity={0.85}
@@ -113,8 +116,8 @@ export function ClientMissionsScreen({
         <View style={styles.missionInfo}>
           {/* Name + amount */}
           <View style={styles.missionTopRow}>
-            <Text style={styles.missionArtisan}>{item.artisan}</Text>
-            <Text style={styles.missionAmount}>{item.amount}</Text>
+            <Text style={[styles.missionArtisan, { color: c.text }]}>{item.artisan}</Text>
+            <Text style={[styles.missionAmount, { color: c.text }]}>{item.amount}</Text>
           </View>
 
           {/* Type */}
@@ -142,10 +145,10 @@ export function ClientMissionsScreen({
   );
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: c.bg }]} edges={["top"]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Mes missions</Text>
+        <Text style={[styles.headerTitle, { color: c.text }]}>Mes missions</Text>
       </View>
 
       {/* Filter pills */}
@@ -159,6 +162,7 @@ export function ClientMissionsScreen({
             key={t.id}
             style={[
               styles.tab,
+              activeTab !== t.id && { backgroundColor: c.card },
               activeTab === t.id && styles.tabActive,
             ]}
             onPress={() => setActiveTab(t.id)}

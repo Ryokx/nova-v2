@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge, Card, KPICard } from "../../components/ui";
+import { useTheme } from "../../hooks/useTheme";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
 
 /* ── Types ── */
@@ -42,6 +43,7 @@ const fabItems = [
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
+  const { c } = useTheme();
   const [avail, setAvail] = useState<AvailabilityStatus>("available");
   const [fabOpen, setFabOpen] = useState(false);
   const rotateAnim = useState(new Animated.Value(0))[0];
@@ -61,17 +63,17 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
   });
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: c.bg }]} edges={["top"]}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* ── Header ── */}
-        <View style={styles.headerBg}>
+        <View style={[styles.headerBg, { backgroundColor: c.surface }]}>
           <View style={styles.headerRow}>
             <View>
-              <Text style={styles.greeting}>Bonjour Jean-Michel</Text>
+              <Text style={[styles.greeting, { color: c.text }]}>Bonjour Jean-Michel</Text>
               <View style={styles.certifRow}>
                 <Text style={styles.certifIcon}><MaterialCommunityIcons name="shield-check" size={14} color={Colors.gold} /></Text>
                 <Text style={styles.certifText}>Certifié Nova • #2847</Text>
@@ -142,8 +144,8 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
         </View>
 
         {/* ── Urgent Request ── */}
-        <Text style={styles.sectionTitle}>Demandes urgentes</Text>
-        <View style={styles.urgentCard}>
+        <Text style={[styles.sectionTitle, { color: c.text }]}>Demandes urgentes</Text>
+        <View style={[styles.urgentCard, { backgroundColor: c.card }]}>
           <View style={styles.urgentTop}>
             <View style={styles.urgentLeft}>
               <View style={styles.urgentIconWrap}>
@@ -174,16 +176,16 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
         </View>
 
         {/* ── Upcoming RDV ── */}
-        <Text style={styles.sectionTitle}>Prochains RDV</Text>
+        <Text style={[styles.sectionTitle, { color: c.text }]}>Prochains RDV</Text>
         {upcomingRdvs.map((rdv, i) => (
           <TouchableOpacity
             key={i}
-            style={styles.rdvCard}
+            style={[styles.rdvCard, { backgroundColor: c.card }]}
             activeOpacity={0.85}
             onPress={() => navigation.navigate("RDVDetail", { rdvId: String(i) })}
           >
             <View>
-              <Text style={styles.rdvClient}>{rdv.client}</Text>
+              <Text style={[styles.rdvClient, { color: c.text }]}>{rdv.client}</Text>
               <Text style={styles.rdvType}>{rdv.type}</Text>
               <Text style={styles.rdvDate}>{rdv.date}</Text>
             </View>
@@ -200,7 +202,7 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
           {fabItems.map((item, i) => (
             <TouchableOpacity
               key={i}
-              style={styles.fabMenuItem}
+              style={[styles.fabMenuItem, { backgroundColor: c.card, borderColor: c.border }]}
               onPress={() => {
                 setFabOpen(false);
                 if (item.screen === "CreateQuote") {
@@ -211,7 +213,7 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
               }}
             >
               <MaterialCommunityIcons name={item.icon as any} size={16} color={Colors.forest} />
-              <Text style={styles.fabMenuLabel}>{item.label}</Text>
+              <Text style={[styles.fabMenuLabel, { color: c.text }]}>{item.label}</Text>
             </TouchableOpacity>
           ))}
         </View>

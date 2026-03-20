@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
+import { useTheme } from "../../hooks/useTheme";
 import type { ClientTabScreenProps } from "../../navigation/types";
 
 /* ── Profile data ── */
@@ -64,6 +65,7 @@ const initialContracts: ActiveContract[] = [
 export function ClientProfileScreen({
   navigation,
 }: ClientTabScreenProps<"ClientProfile">) {
+  const { c } = useTheme();
   const [profile, setProfile] = useState(defaultProfile);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState(defaultProfile);
@@ -110,7 +112,7 @@ export function ClientProfileScreen({
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: c.bg }]} edges={["top"]}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -118,7 +120,7 @@ export function ClientProfileScreen({
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Mon profil</Text>
+          <Text style={[styles.headerTitle, { color: c.text }]}>Mon profil</Text>
         </View>
 
         {/* Avatar + name */}
@@ -126,12 +128,12 @@ export function ClientProfileScreen({
           <View style={styles.avatar}>
             <Text style={styles.avatarInitials}>{profile.initials}</Text>
           </View>
-          <Text style={styles.profileName}>{profile.name}</Text>
+          <Text style={[styles.profileName, { color: c.text }]}>{profile.name}</Text>
           <Text style={styles.profileType}>Compte particulier</Text>
         </View>
 
         {/* Personal info card */}
-        <View style={styles.infoCard}>
+        <View style={[styles.infoCard, { backgroundColor: c.card }]}>
           <View style={styles.infoHeader}>
             <Text style={styles.infoHeaderTitle}>Informations personnelles</Text>
             <TouchableOpacity onPress={editing ? saveProfile : startEditing}>
@@ -175,7 +177,7 @@ export function ClientProfileScreen({
                   style={[styles.infoRow, i < arr.length - 1 && styles.infoRowBorder]}
                 >
                   <Text style={styles.infoLabel}>{label}</Text>
-                  <Text style={styles.infoValue}>{value}</Text>
+                  <Text style={[styles.infoValue, { color: c.text }]}>{value}</Text>
                 </View>
               ))}
             </>
@@ -184,7 +186,7 @@ export function ClientProfileScreen({
 
         {/* Active contracts */}
         {contracts.length > 0 && (
-          <View style={styles.contractsCard}>
+          <View style={[styles.contractsCard, { backgroundColor: c.card }]}>
             <View style={styles.contractsHeader}>
               <MaterialCommunityIcons name="file-document-check" size={16} color={Colors.forest} />
               <Text style={styles.contractsTitle}>Contrats actifs</Text>
@@ -218,7 +220,7 @@ export function ClientProfileScreen({
         )}
 
         {/* Menu card */}
-        <View style={styles.menuCard}>
+        <View style={[styles.menuCard, { backgroundColor: c.card }]}>
           {menuItems.map((item, i) => (
             <TouchableOpacity
               key={item.label}
@@ -233,7 +235,7 @@ export function ClientProfileScreen({
                 <MaterialCommunityIcons name={item.icon as any} size={16} color={Colors.forest} />
               </View>
               <View style={styles.menuContent}>
-                <Text style={styles.menuLabel}>{item.label}</Text>
+                <Text style={[styles.menuLabel, { color: c.text }]}>{item.label}</Text>
                 {item.value && (
                   <Text style={styles.menuValue}>{item.value}</Text>
                 )}
@@ -244,7 +246,7 @@ export function ClientProfileScreen({
         </View>
 
         {/* Danger card */}
-        <View style={styles.menuCard}>
+        <View style={[styles.menuCard, { backgroundColor: c.card }]}>
           <TouchableOpacity
             style={styles.menuRow}
             activeOpacity={0.7}
