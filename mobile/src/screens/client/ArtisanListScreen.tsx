@@ -63,7 +63,11 @@ const categoryLabels: Record<string, string> = {
   mason: "Maçon",
   heating: "Chauffagiste",
   painter: "Peintre",
+  all: "Tous les artisans",
 };
+
+// Flatten all artisans for "all" category
+const allArtisans = Object.values(artisansByCategory).flat();
 
 const sortOptions = [
   { id: "rating", label: "Note" },
@@ -92,7 +96,7 @@ export function ArtisanListScreen({
 }: RootStackScreenProps<"ArtisanListByCategory">) {
   const category = route.params.category;
   const catLabel = categoryLabels[category] || "Artisans";
-  const artisans = artisansByCategory[category] || artisansByCategory.plumber;
+  const artisans = category === "all" ? allArtisans : (artisansByCategory[category] || artisansByCategory.plumber);
   const [sort, setSort] = useState<SortId>("rating");
 
   const sorted = useMemo(() => {

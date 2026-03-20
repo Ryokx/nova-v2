@@ -21,7 +21,7 @@ const categories = [
   { id: "locksmith", label: "Serrurerie", emoji: "key", count: 29 },
   { id: "heating", label: "Chauffage", emoji: "fire", count: 31 },
   { id: "painter", label: "Peinture", emoji: "palette", count: 35 },
-  { id: "mason", label: "Maçonnerie", emoji: "wall", count: 22 },
+  { id: "all", label: "Autres", emoji: "dots-horizontal-circle", count: 120 },
 ];
 
 const topArtisans = [
@@ -168,9 +168,9 @@ export function ClientHomeScreen({
               style={styles.catCard}
               activeOpacity={0.8}
               onPress={() =>
-                navigation.navigate("ArtisanListByCategory", {
-                  category: cat.id,
-                })
+                cat.id === "all"
+                  ? navigation.navigate("AllCategories")
+                  : navigation.navigate("ArtisanListByCategory", { category: cat.id })
               }
             >
               <MaterialCommunityIcons name={cat.emoji as any} size={22} color={Colors.forest} />
