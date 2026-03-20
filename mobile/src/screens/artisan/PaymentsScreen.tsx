@@ -25,15 +25,16 @@ const escrowPayments = [
 ];
 
 const receivedPayments = [
-  { client: "Amélie R.", amount: "450,00€", date: "12 mars 2026" },
-  { client: "Luc D.", amount: "320,00€", date: "5 mars 2026" },
-  { client: "Marie T.", amount: "185,00€", date: "28 fév 2026" },
+  { client: "Amélie R.", amount: "450,00€", date: "12 mars 2026", ref: "VIR-2026-089", mission: "Réparation chauffe-eau", iban: "FR76 •••• •••• 4521", ht: "375,00€", tva: "75,00€" },
+  { client: "Luc D.", amount: "320,00€", date: "5 mars 2026", ref: "VIR-2026-082", mission: "Diagnostic fuite", iban: "FR76 •••• •••• 4521", ht: "266,67€", tva: "53,33€" },
+  { client: "Marie T.", amount: "185,00€", date: "28 fév 2026", ref: "VIR-2026-075", mission: "Remplacement joint", iban: "FR76 •••• •••• 4521", ht: "154,17€", tva: "30,83€" },
 ];
 
 export function ArtisanPaymentsScreen({
   navigation,
 }: ArtisanTabScreenProps<"ArtisanPayments">) {
   const [tab, setTab] = useState<PayTab>("escrow");
+  const [expandedReceived, setExpandedReceived] = useState<number | null>(null);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -103,16 +104,53 @@ export function ArtisanPaymentsScreen({
         {tab === "received" && (
           <>
             {receivedPayments.map((p, i) => (
-              <View key={i} style={styles.receivedCard}>
-                <View>
-                  <Text style={styles.payClient}>{p.client}</Text>
-                  <Text style={styles.receivedDate}>{p.date}</Text>
+              <TouchableOpacity
+                key={i}
+                style={[styles.receivedCard, expandedReceived === i && { borderColor: Colors.success + "40", borderWidth: 1.5 }]}
+                activeOpacity={0.85}
+                onPress={() => setExpandedReceived(expandedReceived === i ? null : i)}
+              >
+                <View style={styles.receivedTop}>
+                  <View>
+                    <Text style={styles.payClient}>{p.client}</Text>
+                    <Text style={styles.receivedDate}>{p.date}</Text>
+                  </View>
+                  <View style={styles.receivedRight}>
+                    <Text style={styles.receivedAmount}>{p.amount}</Text>
+                    <Text style={styles.receivedStatus}>Virement effectué ✓</Text>
+                  </View>
                 </View>
-                <View style={styles.receivedRight}>
-                  <Text style={styles.receivedAmount}>{p.amount}</Text>
-                  <Text style={styles.receivedStatus}>Virement effectué ✓</Text>
-                </View>
-              </View>
+
+                {expandedReceived === i && (
+                  <View style={styles.receivedDetail}>
+                    <View style={styles.receivedDetailRow}>
+                      <Text style={styles.receivedDetailLabel}>Référence</Text>
+                      <Text style={styles.receivedDetailValue}>{p.ref}</Text>
+                    </View>
+                    <View style={styles.receivedDetailRow}>
+                      <Text style={styles.receivedDetailLabel}>Mission</Text>
+                      <Text style={styles.receivedDetailValue}>{p.mission}</Text>
+                    </View>
+                    <View style={styles.receivedDetailRow}>
+                      <Text style={styles.receivedDetailLabel}>IBAN</Text>
+                      <Text style={styles.receivedDetailValue}>{p.iban}</Text>
+                    </View>
+                    <View style={styles.receivedDetailSep} />
+                    <View style={styles.receivedDetailRow}>
+                      <Text style={styles.receivedDetailLabel}>Montant HT</Text>
+                      <Text style={styles.receivedDetailValue}>{p.ht}</Text>
+                    </View>
+                    <View style={styles.receivedDetailRow}>
+                      <Text style={styles.receivedDetailLabel}>TVA (20%)</Text>
+                      <Text style={styles.receivedDetailValue}>{p.tva}</Text>
+                    </View>
+                    <View style={styles.receivedDetailRow}>
+                      <Text style={styles.receivedDetailLabel}>Total TTC</Text>
+                      <Text style={[styles.receivedDetailValue, { color: Colors.success, fontFamily: "DMMono_500Medium" }]}>{p.amount}</Text>
+                    </View>
+                  </View>
+                )}
+              </TouchableOpacity>
             ))}
           </>
         )}
@@ -238,11 +276,39 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingHorizontal: 16,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "rgba(10,22,40,0.04)",
+  },
+  receivedTop: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(10,22,40,0.04)",
+  },
+  receivedDetail: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: Colors.surface,
+  },
+  receivedDetailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 5,
+  },
+  receivedDetailLabel: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  receivedDetailValue: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 12,
+    color: Colors.navy,
+  },
+  receivedDetailSep: {
+    height: 1,
+    backgroundColor: Colors.surface,
+    marginVertical: 6,
   },
   receivedDate: {
     fontFamily: "DMSans_400Regular",

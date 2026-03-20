@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Switch,
+  TextInput,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -52,6 +54,8 @@ export function AccountingScreen({
     tiime: false,
   });
   const [autoExport, setAutoExport] = useState(true);
+  const [accountantEmail, setAccountantEmail] = useState("");
+  const [emailSaved, setEmailSaved] = useState(false);
   const [showSuccess, setShowSuccess] = useState<string | null>(null);
 
   const toggleConnect = (id: string) => {
@@ -170,6 +174,54 @@ export function AccountingScreen({
               thumbColor={Colors.white}
             />
           </View>
+
+          {/* Accountant email input */}
+          {autoExport && (
+            <View style={styles.accountantSection}>
+              <Text style={styles.accountantTitle}>Email du comptable</Text>
+              <Text style={styles.accountantDesc}>
+                Les nouvelles factures seront envoyées chaque jour à 10h à cette adresse.
+              </Text>
+              <View style={styles.accountantInputRow}>
+                <TextInput
+                  style={styles.accountantInput}
+                  placeholder="comptable@cabinet.fr"
+                  placeholderTextColor={Colors.textHint}
+                  value={accountantEmail}
+                  onChangeText={(text) => {
+                    setAccountantEmail(text);
+                    setEmailSaved(false);
+                  }}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                <TouchableOpacity
+                  style={[styles.accountantSaveBtn, (!accountantEmail || emailSaved) && { opacity: 0.5 }]}
+                  disabled={!accountantEmail || emailSaved}
+                  onPress={() => {
+                    setEmailSaved(true);
+                    Alert.alert(
+                      "Enregistré",
+                      `Les factures seront envoyées à ${accountantEmail} tous les jours à 10h si de nouvelles factures sont disponibles.`
+                    );
+                  }}
+                >
+                  <Text style={styles.accountantSaveBtnText}>
+                    {emailSaved ? "✓ Enregistré" : "Enregistrer"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              {emailSaved && (
+                <View style={styles.accountantConfirm}>
+                  <MaterialCommunityIcons name="check-circle" size={14} color={Colors.success} />
+                  <Text style={styles.accountantConfirmText}>
+                    Envoi quotidien à 10h activé — uniquement si nouvelles factures
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
 
           <Text style={styles.syncDataTitle}>Données synchronisées</Text>
           {syncData.map((d, i) => (
@@ -419,6 +471,66 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
   },
+  /* Accountant email */
+  accountantSection: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radii.lg,
+    padding: 14,
+    marginBottom: 14,
+  },
+  accountantTitle: {
+    fontFamily: "Manrope_700Bold",
+    fontSize: 13,
+    color: Colors.navy,
+    marginBottom: 2,
+  },
+  accountantDesc: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 11,
+    color: Colors.textSecondary,
+    lineHeight: 16,
+    marginBottom: 10,
+  },
+  accountantInputRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  accountantInput: {
+    flex: 1,
+    height: 44,
+    backgroundColor: Colors.white,
+    borderRadius: Radii.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: 12,
+    fontFamily: "DMSans_400Regular",
+    fontSize: 13,
+    color: Colors.navy,
+  },
+  accountantSaveBtn: {
+    backgroundColor: Colors.forest,
+    borderRadius: Radii.md,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+  },
+  accountantSaveBtnText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 12,
+    color: Colors.white,
+  },
+  accountantConfirm: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+  },
+  accountantConfirmText: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 11,
+    color: Colors.success,
+    flex: 1,
+  },
+
   syncDataTitle: {
     fontFamily: "Manrope_700Bold",
     fontSize: 13,
