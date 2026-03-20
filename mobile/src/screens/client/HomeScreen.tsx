@@ -64,15 +64,18 @@ export function ClientHomeScreen({
     }, 300);
   }, []);
 
+  const normalize = useCallback((s: string) =>
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), []);
+
   const searchResults = useMemo(() => {
     if (debouncedSearch.length < 2) return [];
-    const q = debouncedSearch.toLowerCase();
+    const q = normalize(debouncedSearch);
     return allArtisans.filter(
       (a) =>
-        a.name.toLowerCase().includes(q) ||
-        a.job.toLowerCase().includes(q)
+        normalize(a.name).includes(q) ||
+        normalize(a.job).includes(q)
     );
-  }, [debouncedSearch]);
+  }, [debouncedSearch, normalize]);
 
   const showResults = search.length >= 2;
 
