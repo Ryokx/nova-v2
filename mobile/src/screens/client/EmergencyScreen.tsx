@@ -13,10 +13,10 @@ import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ---- mock data ---- */
 const urgCategories = [
-  { id: "plumber", label: "Plomberie", icon: "\�\�" },
-  { id: "electrician", label: "\Électricit\é", icon: "\⚡" },
-  { id: "locksmith", label: "Serrurerie", icon: "\�\�" },
-  { id: "heating", label: "Chauffage", icon: "\�\�" },
+  { id: "plumber", label: "Plomberie", icon: "��" },
+  { id: "electrician", label: "Électricité", icon: "⚡" },
+  { id: "locksmith", label: "Serrurerie", icon: "��" },
+  { id: "heating", label: "Chauffage", icon: "��" },
   { id: "other", label: "Autre", icon: "+" },
 ];
 
@@ -70,7 +70,7 @@ const Stars = ({ rating, size = 13 }: { rating: number; size?: number }) => (
         key={i}
         style={{ fontSize: size, color: i <= rating ? Colors.gold : Colors.border }}
       >
-        {"\★"}
+        {"★"}
       </Text>
     ))}
   </View>
@@ -96,7 +96,7 @@ export function EmergencyScreen({
             style={styles.backBtn}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.backArrow}>{"\‹"}</Text>
+            <Text style={styles.backArrow}>{"‹"}</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Urgence 24h/24</Text>
         </View>
@@ -107,12 +107,12 @@ export function EmergencyScreen({
         >
           {/* Red gradient banner */}
           <View style={styles.redBanner}>
-            <Text style={styles.redBannerEmoji}>{"\⚡"}</Text>
+            <Text style={styles.redBannerEmoji}>{"⚡"}</Text>
             <Text style={styles.redBannerTitle}>
               Besoin d'une intervention urgente ?
             </Text>
             <Text style={styles.redBannerSub}>
-              S\électionnez le domaine concern\é
+              Sélectionnez le domaine concerné
             </Text>
           </View>
 
@@ -138,15 +138,15 @@ export function EmergencyScreen({
                       : `Artisans ${cat.label.toLowerCase()} disponibles`}
                   </Text>
                 </View>
-                <Text style={styles.chevron}>{"\›"}</Text>
+                <Text style={styles.chevron}>{"›"}</Text>
               </TouchableOpacity>
             ))}
 
             {/* Info notice */}
             <View style={styles.infoNotice}>
-              <Text style={styles.infoIcon}>{"\⏰"}</Text>
+              <Text style={styles.infoIcon}>{"⏰"}</Text>
               <Text style={styles.infoText}>
-                Temps de r\éponse moyen : 20 minutes. Intervention sous 2h
+                Temps de réponse moyen : 20 minutes. Intervention sous 2h
                 garantie.
               </Text>
             </View>
@@ -170,9 +170,9 @@ export function EmergencyScreen({
           style={styles.backBtn}
           onPress={() => setUrgCat(null)}
         >
-          <Text style={styles.backArrow}>{"\‹"}</Text>
+          <Text style={styles.backArrow}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Urgence \— {catLabel}</Text>
+        <Text style={styles.headerTitle}>Urgence — {catLabel}</Text>
       </View>
 
       <ScrollView
@@ -181,7 +181,7 @@ export function EmergencyScreen({
       >
         {/* Express banner */}
         <View style={styles.expressBanner}>
-          <Text style={{ fontSize: 18 }}>{"\⚡"}</Text>
+          <Text style={{ fontSize: 18 }}>{"⚡"}</Text>
           <View>
             <Text style={styles.expressBannerTitle}>Intervention express</Text>
             <Text style={styles.expressBannerSub}>
@@ -214,7 +214,7 @@ export function EmergencyScreen({
                   <View style={styles.artisanNameRow}>
                     <Text style={styles.artisanName}>{a.name}</Text>
                     <Badge
-                      label={"\�\�\️ Certifi\é Nova"}
+                      label={"��️ Certifié Nova"}
                       variant="certified"
                       size="sm"
                     />
@@ -223,9 +223,9 @@ export function EmergencyScreen({
                   <View style={styles.metaRow}>
                     <Stars rating={Math.round(a.rating)} size={13} />
                     <Text style={styles.ratingValue}>{a.rating}</Text>
-                    <Text style={styles.dot}>{"\•"}</Text>
+                    <Text style={styles.dot}>{"•"}</Text>
                     <Text style={styles.metaText}>{a.reviews} avis</Text>
-                    <Text style={styles.dot}>{"\•"}</Text>
+                    <Text style={styles.dot}>{"•"}</Text>
                     <Text style={styles.metaText}>{a.distance}</Text>
                   </View>
                 </View>
@@ -234,13 +234,13 @@ export function EmergencyScreen({
               {/* Response time + price bar */}
               <View style={styles.urgencyBar}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                  <Text style={{ fontSize: 13, color: Colors.red }}>{"\⏰"}</Text>
+                  <Text style={{ fontSize: 13, color: Colors.red }}>{"⏰"}</Text>
                   <Text style={styles.urgencyTime}>
                     Dispo en ~{a.responseTime}
                   </Text>
                 </View>
                 <Text style={styles.priceText}>
-                  {a.price}\€
+                  {a.price}€
                   <Text style={styles.priceUnit}>/h</Text>
                 </Text>
               </View>
@@ -255,7 +255,7 @@ export function EmergencyScreen({
                   }
                 >
                   <Text style={styles.redBtnText}>
-                    {"\⚡"} Intervention imm\édiate
+                    {"⚡"} Intervention immédiate
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -273,11 +273,11 @@ export function EmergencyScreen({
 
           {/* Trust footer */}
           <View style={styles.trustFooter}>
-            <Text style={styles.trustIcon}>{"\�\�\️"}</Text>
+            <Text style={styles.trustIcon}>{"��️"}</Text>
             <Text style={styles.trustText}>
-              Tarif urgence major\é. Paiement s\écuris\é par
-              s\équestre Nova \— l'artisan ne sera pay\é qu'apr\ès
-              validation par nos \équipes.
+              Tarif urgence majoré. Paiement sécurisé par
+              séquestre Nova — l'artisan ne sera payé qu'après
+              validation par nos équipes.
             </Text>
           </View>
         </View>

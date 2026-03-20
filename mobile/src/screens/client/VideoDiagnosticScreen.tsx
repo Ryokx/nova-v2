@@ -11,10 +11,10 @@ import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const tips = [
-  { icon: "\�\�", title: "Bon \éclairage", desc: "Allumez les lumi\ères, \évitez le contre-jour" },
-  { icon: "\�\�", title: "Montrez la zone compl\ète", desc: "Filmez large puis zoomez sur le probl\ème" },
-  { icon: "\�\�\️", title: "D\écrivez \à voix haute", desc: "Expliquez ce que vous voyez et depuis quand" },
-  { icon: "\⏱\️", title: "30 \à 60 secondes", desc: "Court et pr\écis, pas besoin de plus" },
+  { icon: "��", title: "Bon éclairage", desc: "Allumez les lumières, évitez le contre-jour" },
+  { icon: "��", title: "Montrez la zone complète", desc: "Filmez large puis zoomez sur le problème" },
+  { icon: "��️", title: "Décrivez à voix haute", desc: "Expliquez ce que vous voyez et depuis quand" },
+  { icon: "⏱️", title: "30 à 60 secondes", desc: "Court et précis, pas besoin de plus" },
 ];
 
 const formatTime = (s: number) =>
@@ -56,9 +56,9 @@ export function VideoDiagnosticScreen({
             style={styles.backBtn}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.backArrow}>{"\‹"}</Text>
+            <Text style={styles.backArrow}>{"‹"}</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Vid\éo diagnostic</Text>
+          <Text style={styles.headerTitle}>Vidéo diagnostic</Text>
         </View>
 
         <ScrollView
@@ -68,18 +68,18 @@ export function VideoDiagnosticScreen({
           {/* Hero */}
           <View style={styles.heroSection}>
             <View style={styles.heroIcon}>
-              <Text style={{ fontSize: 36 }}>{"\�\�"}</Text>
+              <Text style={{ fontSize: 36 }}>{"��"}</Text>
             </View>
-            <Text style={styles.heroTitle}>Filmez votre probl\ème</Text>
+            <Text style={styles.heroTitle}>Filmez votre problème</Text>
             <Text style={styles.heroDesc}>
-              L'artisan pourra \évaluer la situation avant de se d\éplacer et
-              pr\éparer le mat\ériel n\écessaire.
+              L'artisan pourra évaluer la situation avant de se déplacer et
+              préparer le matériel nécessaire.
             </Text>
           </View>
 
           {/* Tips */}
           <Text style={styles.sectionTitle}>
-            Conseils pour une bonne vid\éo
+            Conseils pour une bonne vidéo
           </Text>
           {tips.map((tip, i) => (
             <View key={i} style={styles.tipRow}>
@@ -122,8 +122,8 @@ export function VideoDiagnosticScreen({
             <View style={[styles.gridLine, { left: "33%", top: 0, bottom: 0, width: 1 }]} />
             <View style={[styles.gridLine, { left: "66%", top: 0, bottom: 0, width: 1 }]} />
           </View>
-          <Text style={{ fontSize: 48, opacity: 0.2 }}>{"\�\�"}</Text>
-          <Text style={styles.cameraLabel}>Aper\çu cam\éra</Text>
+          <Text style={{ fontSize: 48, opacity: 0.2 }}>{"��"}</Text>
+          <Text style={styles.cameraLabel}>Aperçu caméra</Text>
         </View>
 
         {/* Controls */}
@@ -146,7 +146,7 @@ export function VideoDiagnosticScreen({
             >
               <View style={styles.stopSquare} />
             </TouchableOpacity>
-            <Text style={styles.stopHint}>Appuyez pour arr\êter</Text>
+            <Text style={styles.stopHint}>Appuyez pour arrêter</Text>
           </View>
         </View>
       </View>
@@ -162,9 +162,9 @@ export function VideoDiagnosticScreen({
             style={styles.backBtn}
             onPress={() => setStage(0)}
           >
-            <Text style={styles.backArrow}>{"\‹"}</Text>
+            <Text style={styles.backArrow}>{"‹"}</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Aper\çu de la vid\éo</Text>
+          <Text style={styles.headerTitle}>Aperçu de la vidéo</Text>
         </View>
 
         <ScrollView
@@ -174,7 +174,7 @@ export function VideoDiagnosticScreen({
           {/* Video preview */}
           <View style={styles.videoPreview}>
             <Text style={{ fontSize: 40, color: "rgba(255,255,255,0.8)" }}>
-              {"\▶"}
+              {"▶"}
             </Text>
             <View style={styles.durationBadge}>
               <Text style={styles.durationText}>{formatTime(timer)}</Text>
@@ -184,11 +184,11 @@ export function VideoDiagnosticScreen({
           {/* Video info */}
           <View style={styles.infoCard}>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Dur\ée</Text>
+              <Text style={styles.infoLabel}>Durée</Text>
               <Text style={styles.infoValue}>{formatTime(timer)}</Text>
             </View>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Taille estim\ée</Text>
+              <Text style={styles.infoLabel}>Taille estimée</Text>
               <Text style={styles.infoValue}>
                 {Math.max(1, Math.round(timer * 0.8))} Mo
               </Text>
@@ -201,7 +201,7 @@ export function VideoDiagnosticScreen({
           </Text>
           <TextInput
             style={styles.noteInput}
-            placeholder="Ex: la fuite est sous l'\évier, c\ôt\é gauche..."
+            placeholder="Ex: la fuite est sous l'évier, côté gauche..."
             placeholderTextColor={Colors.textHint}
             multiline
             value={note}
@@ -214,8 +214,8 @@ export function VideoDiagnosticScreen({
             activeOpacity={0.85}
             onPress={() => setStage(3)}
           >
-            <Text style={{ fontSize: 16 }}>{"\✉\️"}</Text>
-            <Text style={styles.sendBtnText}>Envoyer \à l'artisan</Text>
+            <Text style={{ fontSize: 16 }}>{"✉️"}</Text>
+            <Text style={styles.sendBtnText}>Envoyer à l'artisan</Text>
           </TouchableOpacity>
 
           {/* Redo */}
@@ -224,7 +224,7 @@ export function VideoDiagnosticScreen({
             activeOpacity={0.85}
             onPress={() => setStage(0)}
           >
-            <Text style={styles.redoBtnText}>Refaire la vid\éo</Text>
+            <Text style={styles.redoBtnText}>Refaire la vidéo</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -235,17 +235,17 @@ export function VideoDiagnosticScreen({
   return (
     <View style={styles.successRoot}>
       <View style={styles.successCircle}>
-        <Text style={styles.successCheck}>{"\✓"}</Text>
+        <Text style={styles.successCheck}>{"✓"}</Text>
       </View>
-      <Text style={styles.successTitle}>Vid\éo envoy\ée !</Text>
+      <Text style={styles.successTitle}>Vidéo envoyée !</Text>
       <Text style={styles.successDesc}>
-        L'artisan va analyser votre vid\éo et pourra pr\éparer son
+        L'artisan va analyser votre vidéo et pourra préparer son
         intervention plus efficacement.
       </Text>
       <View style={styles.responseTimeBadge}>
-        <Text style={{ fontSize: 14 }}>{"\⏰"}</Text>
+        <Text style={{ fontSize: 14 }}>{"⏰"}</Text>
         <Text style={styles.responseTimeText}>
-          R\éponse estim\ée sous 2h
+          Réponse estimée sous 2h
         </Text>
       </View>
       <TouchableOpacity
@@ -254,7 +254,7 @@ export function VideoDiagnosticScreen({
         onPress={() => navigation.goBack()}
       >
         <Text style={styles.primaryBtnText}>
-          Retour \à la r\éservation
+          Retour à la réservation
         </Text>
       </TouchableOpacity>
     </View>

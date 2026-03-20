@@ -20,24 +20,24 @@ interface Service {
 }
 
 const services: Service[] = [
-  { id: "pennylane", name: "Pennylane", desc: "Comptabilit\é tout-en-un pour TPE/PME", color: "#6366F1", letter: "P" },
-  { id: "indy", name: "Indy", desc: "Comptabilit\é automatis\ée pour ind\épendants", color: "#3B82F6", letter: "I" },
-  { id: "quickbooks", name: "QuickBooks", desc: "Comptabilit\é et facturation internationale", color: "#2CA01C", letter: "Q" },
-  { id: "tiime", name: "Tiime", desc: "Comptabilit\é gratuite pour auto-entrepreneurs", color: "#0A1628", letter: "T" },
+  { id: "pennylane", name: "Pennylane", desc: "Comptabilité tout-en-un pour TPE/PME", color: "#6366F1", letter: "P" },
+  { id: "indy", name: "Indy", desc: "Comptabilité automatisée pour indépendants", color: "#3B82F6", letter: "I" },
+  { id: "quickbooks", name: "QuickBooks", desc: "Comptabilité et facturation internationale", color: "#2CA01C", letter: "Q" },
+  { id: "tiime", name: "Tiime", desc: "Comptabilité gratuite pour auto-entrepreneurs", color: "#0A1628", letter: "T" },
 ];
 
 const syncData = [
-  { label: "Factures \émises", desc: "Envoy\ées automatiquement \à votre logiciel" },
-  { label: "Paiements re\çus", desc: "Montants, dates et commissions Nova" },
-  { label: "Commissions Nova", desc: "Ligne de charge s\épar\ée pour la comptabilit\é" },
-  { label: "TVA collect\ée", desc: "Calcul automatique par taux applicable" },
+  { label: "Factures émises", desc: "Envoyées automatiquement à votre logiciel" },
+  { label: "Paiements reçus", desc: "Montants, dates et commissions Nova" },
+  { label: "Commissions Nova", desc: "Ligne de charge séparée pour la comptabilité" },
+  { label: "TVA collectée", desc: "Calcul automatique par taux applicable" },
 ];
 
 const monthlyRecap = [
-  { label: "Revenus bruts", value: "4 820,00 \€", color: Colors.navy, bold: false },
-  { label: "Commission Nova", value: "- 482,00 \€", color: Colors.red, bold: false },
-  { label: "Revenus nets", value: "4 338,00 \€", color: Colors.forest, bold: true },
-  { label: "TVA collect\ée", value: "803,33 \€", color: Colors.textSecondary, bold: false },
+  { label: "Revenus bruts", value: "4 820,00 €", color: Colors.navy, bold: false },
+  { label: "Commission Nova", value: "- 482,00 €", color: Colors.red, bold: false },
+  { label: "Revenus nets", value: "4 338,00 €", color: Colors.forest, bold: true },
+  { label: "TVA collectée", value: "803,33 €", color: Colors.textSecondary, bold: false },
   { label: "Nombre de factures", value: "12", color: Colors.textSecondary, bold: false },
 ];
 
@@ -67,9 +67,9 @@ export function AccountingScreen({
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.backIcon}>{"\‹"}</Text>
+          <Text style={styles.backIcon}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Comptabilit\é</Text>
+        <Text style={styles.headerTitle}>Comptabilité</Text>
       </View>
 
       <ScrollView
@@ -79,11 +79,11 @@ export function AccountingScreen({
       >
         {/* Explainer banner */}
         <View style={styles.explainer}>
-          <Text style={styles.explainerIcon}>{"\�\�"}</Text>
+          <Text style={styles.explainerIcon}>{"��"}</Text>
           <View style={styles.explainerContent}>
-            <Text style={styles.explainerTitle}>Simplifiez votre comptabilit\é</Text>
+            <Text style={styles.explainerTitle}>Simplifiez votre comptabilité</Text>
             <Text style={styles.explainerDesc}>
-              Connectez votre logiciel comptable. Vos factures, paiements et commissions sont envoy\és automatiquement.
+              Connectez votre logiciel comptable. Vos factures, paiements et commissions sont envoyés automatiquement.
             </Text>
           </View>
         </View>
@@ -109,7 +109,7 @@ export function AccountingScreen({
                     <Text style={styles.serviceName}>{s.name}</Text>
                     {isConn && (
                       <View style={styles.connectedBadge}>
-                        <Text style={styles.connectedText}>CONNECT\É</Text>
+                        <Text style={styles.connectedText}>CONNECTÉ</Text>
                       </View>
                     )}
                   </View>
@@ -129,9 +129,9 @@ export function AccountingScreen({
                     ]}
                   >
                     {showSuccess === s.id
-                      ? "\✓ Connect\é"
+                      ? "✓ Connecté"
                       : isConn
-                      ? "D\éconnecter"
+                      ? "Déconnecter"
                       : "Connecter"}
                   </Text>
                 </TouchableOpacity>
@@ -140,12 +140,12 @@ export function AccountingScreen({
               {isConn && (
                 <View style={styles.syncInfo}>
                   <View>
-                    <Text style={styles.syncLabel}>Derni\ère synchronisation</Text>
-                    <Text style={styles.syncDate}>Aujourd'hui \à 14:32</Text>
+                    <Text style={styles.syncLabel}>Dernière synchronisation</Text>
+                    <Text style={styles.syncDate}>Aujourd'hui à 14:32</Text>
                   </View>
                   <View style={styles.syncStatus}>
-                    <Text style={styles.syncStatusIcon}>{"\✓"}</Text>
-                    <Text style={styles.syncStatusText}>\À jour</Text>
+                    <Text style={styles.syncStatusIcon}>{"✓"}</Text>
+                    <Text style={styles.syncStatusText}>À jour</Text>
                   </View>
                 </View>
               )}
@@ -170,13 +170,13 @@ export function AccountingScreen({
             />
           </View>
 
-          <Text style={styles.syncDataTitle}>Donn\ées synchronis\ées</Text>
+          <Text style={styles.syncDataTitle}>Données synchronisées</Text>
           {syncData.map((d, i) => (
             <View
               key={i}
               style={[styles.syncDataRow, i > 0 && styles.syncDataRowBorder]}
             >
-              <Text style={styles.syncCheckIcon}>{"\✓"}</Text>
+              <Text style={styles.syncCheckIcon}>{"✓"}</Text>
               <View style={styles.syncDataInfo}>
                 <Text style={styles.syncDataLabel}>{d.label}</Text>
                 <Text style={styles.syncDataDesc}>{d.desc}</Text>
@@ -189,8 +189,8 @@ export function AccountingScreen({
         <Text style={styles.sectionTitleSmall}>Export manuel</Text>
         <View style={styles.exportRow}>
           {[
-            { label: "Export CSV", icon: "\�\�", desc: "Toutes les donn\ées" },
-            { label: "Export PDF", icon: "\�\�", desc: "R\écapitulatif mensuel" },
+            { label: "Export CSV", icon: "��", desc: "Toutes les données" },
+            { label: "Export PDF", icon: "��", desc: "Récapitulatif mensuel" },
           ].map((e, i) => (
             <TouchableOpacity key={i} style={styles.exportBtn}>
               <Text style={styles.exportIcon}>{e.icon}</Text>
@@ -202,7 +202,7 @@ export function AccountingScreen({
 
         {/* Monthly recap */}
         <View style={styles.recapCard}>
-          <Text style={styles.recapTitle}>R\écapitulatif mars 2026</Text>
+          <Text style={styles.recapTitle}>Récapitulatif mars 2026</Text>
           {monthlyRecap.map((r, i) => (
             <View
               key={i}

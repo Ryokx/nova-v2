@@ -14,17 +14,17 @@ import type { ClientTabScreenProps } from "../../navigation/types";
 
 /* ── Mock data ── */
 const categories = [
-  { id: "plumber", label: "Plomberie", emoji: "\�\�", count: 47 },
-  { id: "electrician", label: "\Électricit\é", emoji: "\⚡", count: 38 },
-  { id: "locksmith", label: "Serrurerie", emoji: "\�\�", count: 29 },
-  { id: "heating", label: "Chauffage", emoji: "\�\�", count: 31 },
-  { id: "painter", label: "Peinture", emoji: "\�\�", count: 35 },
-  { id: "mason", label: "Ma\çonnerie", emoji: "\�\�", count: 22 },
+  { id: "plumber", label: "Plomberie", emoji: "��", count: 47 },
+  { id: "electrician", label: "Électricité", emoji: "⚡", count: 38 },
+  { id: "locksmith", label: "Serrurerie", emoji: "��", count: 29 },
+  { id: "heating", label: "Chauffage", emoji: "��", count: 31 },
+  { id: "painter", label: "Peinture", emoji: "��", count: 35 },
+  { id: "mason", label: "Maçonnerie", emoji: "��", count: 22 },
 ];
 
 const topArtisans = [
   { id: "1", name: "Jean-Michel P.", job: "Plombier", rating: 4.9, reviews: 127, price: 65, initials: "JM", responseTime: "< 2h" },
-  { id: "2", name: "Sophie M.", job: "\Électricienne", rating: 4.8, reviews: 94, price: 70, initials: "SM", responseTime: "< 1h" },
+  { id: "2", name: "Sophie M.", job: "Électricienne", rating: 4.8, reviews: 94, price: 70, initials: "SM", responseTime: "< 1h" },
   { id: "3", name: "Karim B.", job: "Serrurier", rating: 5.0, reviews: 83, price: 60, initials: "KB", responseTime: "< 30min" },
   { id: "4", name: "Marie D.", job: "Peintre", rating: 4.7, reviews: 61, price: 55, initials: "MD", responseTime: "< 3h" },
   { id: "5", name: "Christophe D.", job: "Chauffagiste", rating: 4.9, reviews: 89, price: 75, initials: "CD", responseTime: "< 2h" },
@@ -43,19 +43,19 @@ export function ClientHomeScreen({
         {/* ── Header ── */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Bonjour Sophie \�\�</Text>
+            <Text style={styles.greeting}>Bonjour Sophie ��</Text>
           </View>
           <TouchableOpacity
             style={styles.bellBtn}
             onPress={() => navigation.navigate("ClientNotifications")}
           >
-            <Text style={styles.bellIcon}>{"\�\�"}</Text>
+            <Text style={styles.bellIcon}>{"��"}</Text>
           </TouchableOpacity>
         </View>
 
         {/* ── Search bar ── */}
         <TouchableOpacity style={styles.searchBar} activeOpacity={0.7}>
-          <Text style={styles.searchIcon}>{"\�\�"}</Text>
+          <Text style={styles.searchIcon}>{"��"}</Text>
           <Text style={styles.searchPlaceholder}>
             Rechercher un artisan...
           </Text>
@@ -87,7 +87,7 @@ export function ClientHomeScreen({
           onPress={() => navigation.navigate("Emergency")}
         >
           <View style={styles.emergencyIconWrap}>
-            <Text style={styles.emergencyEmoji}>{"\⚡"}</Text>
+            <Text style={styles.emergencyEmoji}>{"⚡"}</Text>
           </View>
           <View style={styles.emergencyTextWrap}>
             <Text style={styles.emergencyTitle}>Urgence 24h/24</Text>
@@ -96,12 +96,12 @@ export function ClientHomeScreen({
             </Text>
           </View>
           <View style={styles.emergencyArrow}>
-            <Text style={styles.emergencyArrowText}>{"\›"}</Text>
+            <Text style={styles.emergencyArrowText}>{"›"}</Text>
           </View>
         </TouchableOpacity>
 
         {/* ── Top rated section ── */}
-        <Text style={styles.sectionTitle}>Artisans les mieux not\és</Text>
+        <Text style={styles.sectionTitle}>Artisans les mieux notés</Text>
 
         <FlatList
           data={topArtisans}
@@ -128,25 +128,25 @@ export function ClientHomeScreen({
 
               {/* Rating */}
               <View style={styles.ratingRow}>
-                <Text style={styles.starIcon}>{"\⭐"}</Text>
+                <Text style={styles.starIcon}>{"⭐"}</Text>
                 <Text style={styles.ratingValue}>{item.rating}</Text>
                 <Text style={styles.ratingCount}>
-                  {"\•"} {item.reviews} avis
+                  {"•"} {item.reviews} avis
                 </Text>
               </View>
 
               {/* Badge */}
               <View style={{ marginBottom: 10 }}>
-                <Badge label="Certifi\é Nova" variant="certified" size="sm" />
+                <Badge label="Certifié Nova" variant="certified" size="sm" />
               </View>
 
               {/* Price + response */}
               <View style={styles.artisanBottom}>
                 <Text style={styles.responseTime}>
-                  R\épond en {item.responseTime}
+                  Répond en {item.responseTime}
                 </Text>
                 <Text style={styles.price}>
-                  {item.price}\€
+                  {item.price}€
                   <Text style={styles.priceUnit}>/h</Text>
                 </Text>
               </View>

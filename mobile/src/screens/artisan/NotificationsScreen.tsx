@@ -22,38 +22,38 @@ interface Notification {
 }
 
 const typeStyles: Record<NotifType, { bg: string; icon: string; accent: string }> = {
-  demande: { bg: "rgba(232,48,42,0.06)", icon: "\⚡", accent: Colors.red },
-  devis: { bg: "rgba(27,107,78,0.06)", icon: "\�\�", accent: Colors.forest },
-  payment: { bg: "rgba(34,200,138,0.06)", icon: "\�\�", accent: Colors.success },
-  rdv: { bg: "rgba(245,166,35,0.06)", icon: "\�\�", accent: Colors.gold },
-  info: { bg: "rgba(138,149,163,0.06)", icon: "\�\�\️", accent: Colors.textHint },
+  demande: { bg: "rgba(232,48,42,0.06)", icon: "⚡", accent: Colors.red },
+  devis: { bg: "rgba(27,107,78,0.06)", icon: "��", accent: Colors.forest },
+  payment: { bg: "rgba(34,200,138,0.06)", icon: "��", accent: Colors.success },
+  rdv: { bg: "rgba(245,166,35,0.06)", icon: "��", accent: Colors.gold },
+  info: { bg: "rgba(138,149,163,0.06)", icon: "��️", accent: Colors.textHint },
 };
 
 const notifications: Notification[] = [
   {
     id: 1, type: "demande", read: false, time: "14:32",
     title: "Nouvelle demande urgente",
-    desc: "Fuite d'eau urgente \— Secteur Paris 9e \— Intervention estim\ée : 1h",
+    desc: "Fuite d'eau urgente — Secteur Paris 9e — Intervention estimée : 1h",
   },
   {
     id: 2, type: "devis", read: false, time: "Il y a 1h",
-    title: "Devis accept\é par le client",
-    desc: "Pierre M. a accept\é votre devis #DEV-2026-089 \— 236,50\€. Paiement bloqu\é en s\équestre.",
+    title: "Devis accepté par le client",
+    desc: "Pierre M. a accepté votre devis #DEV-2026-089 — 236,50€. Paiement bloqué en séquestre.",
   },
   {
     id: 3, type: "payment", read: false, time: "Il y a 3h",
-    title: "Paiement lib\ér\é 450\€",
-    desc: "Nova a valid\é la mission pour Am\élie R. \— 450,00\€ vir\és sous 48h.",
+    title: "Paiement libéré 450€",
+    desc: "Nova a validé la mission pour Amélie R. — 450,00€ virés sous 48h.",
   },
   {
     id: 4, type: "rdv", read: true, time: "Hier",
     title: "Nouveau RDV Pierre M.",
-    desc: "Luc D. \— Diagnostic fuite, 18 mars \à 11h, 5 rue de Charonne, Paris 11e",
+    desc: "Luc D. — Diagnostic fuite, 18 mars à 11h, 5 rue de Charonne, Paris 11e",
   },
   {
     id: 5, type: "info", read: true, time: "Il y a 3 jours",
     title: "Rappel certification",
-    desc: "Votre certification Nova a \ét\é renouvel\ée jusqu'au 15 mars 2027.",
+    desc: "Votre certification Nova a été renouvelée jusqu'au 15 mars 2027.",
   },
 ];
 

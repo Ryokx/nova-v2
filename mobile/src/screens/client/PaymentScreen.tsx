@@ -14,9 +14,9 @@ type PaymentMethod = "cb" | "virement" | "apple";
 type Installment = "1x" | "3x" | "4x";
 
 const METHODS: { id: PaymentMethod; label: string; icon: string }[] = [
-  { id: "cb", label: "Carte bancaire", icon: "\�\�" },
-  { id: "virement", label: "Virement", icon: "\�\�" },
-  { id: "apple", label: "Apple Pay", icon: "\" },
+  { id: "cb", label: "Carte bancaire", icon: "��" },
+  { id: "virement", label: "Virement", icon: "��" },
+  { id: "apple", label: "Apple Pay", icon: "" },
 ];
 
 const INSTALLMENTS: {
@@ -25,9 +25,9 @@ const INSTALLMENTS: {
   amount: string;
   sub: string;
 }[] = [
-  { id: "1x", label: "1\×", amount: "320,00 \€", sub: "Paiement unique" },
-  { id: "3x", label: "3\×", amount: "106,67 \€", sub: "via Klarna" },
-  { id: "4x", label: "4\×", amount: "80,00 \€", sub: "via Klarna" },
+  { id: "1x", label: "1×", amount: "320,00 €", sub: "Paiement unique" },
+  { id: "3x", label: "3×", amount: "106,67 €", sub: "via Klarna" },
+  { id: "4x", label: "4×", amount: "80,00 €", sub: "via Klarna" },
 ];
 
 export function PaymentScreen({
@@ -44,7 +44,7 @@ export function PaymentScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\‹"}</Text>
+          <Text style={styles.backArrow}>{"‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Paiement sécurisé</Text>
       </View>
@@ -57,7 +57,7 @@ export function PaymentScreen({
         <EscrowStepper currentStep={0} />
 
         {/* Amount display */}
-        <Text style={styles.amount}>320,00\€</Text>
+        <Text style={styles.amount}>320,00€</Text>
 
         {/* Payment methods */}
         <Text style={styles.sectionLabel}>Mode de paiement</Text>
@@ -121,12 +121,12 @@ export function PaymentScreen({
         {installment !== "1x" && (
           <View style={styles.klarnaInfo}>
             <Text style={{ fontSize: 14, color: Colors.forest }}>
-              {"\✓"}
+              {"✓"}
             </Text>
             <Text style={styles.klarnaText}>
               {installment === "3x"
-                ? "3 prélèvements de 106,67 \€ \• Paiement géré par Klarna."
-                : "4 prélèvements de 80,00 \€ \• Paiement géré par Klarna."}
+                ? "3 prélèvements de 106,67 € • Paiement géré par Klarna."
+                : "4 prélèvements de 80,00 € • Paiement géré par Klarna."}
             </Text>
           </View>
         )}
@@ -161,7 +161,7 @@ export function PaymentScreen({
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={{ fontSize: 16 }}>{"\�\�\️"}</Text>
+          <Text style={{ fontSize: 16 }}>{"��️"}</Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.escrowInfoTitle}>
               Votre argent est sécurisé
@@ -175,7 +175,7 @@ export function PaymentScreen({
 
         {/* Pay button */}
         <Button
-          title={"\�\� Payer 320,00\€"}
+          title={"�� Payer 320,00€"}
           onPress={() =>
             navigation.navigate("Tracking", { missionId: "1" })
           }
@@ -191,7 +191,7 @@ export function PaymentScreen({
             "Séquestre garanti",
           ].map((t, i) => (
             <Text key={i} style={styles.securityText}>
-              {"\�\�"} {t}
+              {"��"} {t}
             </Text>
           ))}
         </View>

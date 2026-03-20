@@ -12,13 +12,13 @@ import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ---- mock line items ---- */
 const lineItems = [
-  { desc: "Robinet mitigeur", qty: "1", unit: "85,00\€", total: "85,00\€" },
-  { desc: "Main d'\œuvre", qty: "2h", unit: "65,00\€", total: "130,00\€" },
+  { desc: "Robinet mitigeur", qty: "1", unit: "85,00€", total: "85,00€" },
+  { desc: "Main d'œuvre", qty: "2h", unit: "65,00€", total: "130,00€" },
 ];
 
 const details = [
   { key: "Date d'intervention", value: "22 mars 2026" },
-  { key: "Validit\é du devis", value: "14 jours (expire le 31 mars)" },
+  { key: "Validité du devis", value: "14 jours (expire le 31 mars)" },
   { key: "Adresse", value: "12 rue de Rivoli, Paris 4e" },
 ];
 
@@ -32,19 +32,19 @@ export function DevisReceivedScreen({
     return (
       <View style={styles.successRoot}>
         <View style={styles.successCircle}>
-          <Text style={styles.successCheck}>{"\✓"}</Text>
+          <Text style={styles.successCheck}>{"✓"}</Text>
         </View>
-        <Text style={styles.successTitle}>Devis accept\é !</Text>
+        <Text style={styles.successTitle}>Devis accepté !</Text>
         <Text style={styles.successDesc}>
-          Vous allez \être redirig\é vers le paiement s\écuris\é
+          Vous allez être redirigé vers le paiement sécurisé
         </Text>
-        <Badge label={"\�\� Paiement S\écuris\é"} variant="default" />
+        <Badge label={"�� Paiement Sécurisé"} variant="default" />
         <TouchableOpacity
           style={styles.primaryBtn}
           activeOpacity={0.85}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.primaryBtnText}>Proc\éder au paiement</Text>
+          <Text style={styles.primaryBtnText}>Procéder au paiement</Text>
         </TouchableOpacity>
       </View>
     );
@@ -58,15 +58,15 @@ export function DevisReceivedScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\‹"}</Text>
+          <Text style={styles.backArrow}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Devis re\çu</Text>
+        <Text style={styles.headerTitle}>Devis reçu</Text>
       </View>
 
       {/* Sub-header with ref */}
       <View style={styles.subHeader}>
         <Text style={styles.devisRef}>#DEV-2026-089</Text>
-        <Text style={styles.devisTime}>Re\çu il y a 12 min</Text>
+        <Text style={styles.devisTime}>Reçu il y a 12 min</Text>
       </View>
 
       <ScrollView
@@ -79,10 +79,10 @@ export function DevisReceivedScreen({
           <View style={{ flex: 1 }}>
             <Text style={styles.artisanName}>Jean-Michel P.</Text>
             <Text style={styles.artisanSub}>
-              Plombier {"\•"} Certifi\é Nova
+              Plombier {"•"} Certifié Nova
             </Text>
           </View>
-          <Text style={{ fontSize: 20 }}>{"\�\�\️"}</Text>
+          <Text style={{ fontSize: 20 }}>{"��️"}</Text>
         </View>
 
         {/* Quote document */}
@@ -97,9 +97,9 @@ export function DevisReceivedScreen({
             {/* Table header */}
             <View style={styles.tableHeaderRow}>
               <Text style={[styles.tableHeaderCell, { flex: 2 }]}>
-                D\ésignation
+                Désignation
               </Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.5 }]}>Qt\é</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 0.5 }]}>Qté</Text>
               <Text style={[styles.tableHeaderCell, { flex: 1 }]}>P.U.</Text>
               <Text
                 style={[
@@ -135,15 +135,15 @@ export function DevisReceivedScreen({
           <View style={styles.totalsSection}>
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Sous-total HT</Text>
-              <Text style={styles.totalValue}>215,00\€</Text>
+              <Text style={styles.totalValue}>215,00€</Text>
             </View>
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>TVA (10%)</Text>
-              <Text style={styles.totalValue}>21,50\€</Text>
+              <Text style={styles.totalValue}>21,50€</Text>
             </View>
             <View style={[styles.totalRow, { marginTop: 6 }]}>
               <Text style={styles.grandTotalLabel}>Total TTC</Text>
-              <Text style={styles.grandTotalValue}>236,50\€</Text>
+              <Text style={styles.grandTotalValue}>236,50€</Text>
             </View>
           </View>
         </View>
@@ -168,17 +168,17 @@ export function DevisReceivedScreen({
         <View style={styles.messageCard}>
           <Text style={styles.messageLabel}>Message de l'artisan</Text>
           <Text style={styles.messageText}>
-            {"\«"} Bonjour, voici le devis pour l'intervention. N'h\ésitez
-            pas \à me contacter pour toute question. {"\»"}
+            {"«"} Bonjour, voici le devis pour l'intervention. N'hésitez
+            pas à me contacter pour toute question. {"»"}
           </Text>
         </View>
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={{ fontSize: 16 }}>{"\�\�"}</Text>
+          <Text style={{ fontSize: 16 }}>{"��"}</Text>
           <Text style={styles.escrowText}>
-            En acceptant ce devis, le montant sera bloqu\é en s\équestre.
-            L'artisan ne sera pay\é qu'apr\ès validation par Nova.
+            En acceptant ce devis, le montant sera bloqué en séquestre.
+            L'artisan ne sera payé qu'après validation par Nova.
           </Text>
         </View>
 

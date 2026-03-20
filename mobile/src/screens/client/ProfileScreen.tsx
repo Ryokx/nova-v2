@@ -12,7 +12,7 @@ import type { ClientTabScreenProps } from "../../navigation/types";
 
 /* ── Profile data ── */
 const profile = {
-  name: "Sophie Lef\èvre",
+  name: "Sophie Lefèvre",
   initials: "SL",
   email: "sophie.lefevre@email.com",
   phone: "06 12 34 56 78",
@@ -29,18 +29,18 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { icon: "\�\�", label: "Moyens de paiement", value: "Visa \•\•\•\• 6411", screen: "PaymentMethods" },
-  { icon: "\�\�", label: "S\équestre", value: "1 carte enregistr\ée", screen: "PaymentMethods" },
-  { icon: "\�\�", label: "Missions", value: "3 missions r\éalis\ées", screen: "ClientMissions" },
-  { icon: "\�\�", label: "Notifications", screen: "NotificationPreferences" },
-  { icon: "\⚙\️", label: "Param\ètres", screen: "Settings" },
-  { icon: "\�\�", label: "Support", value: "Par chat ou email", screen: "Support" },
-  { icon: "\�\�", label: "Inviter des proches", value: "Gagnez 20\€ par parrainage", screen: "Referral" },
+  { icon: "��", label: "Moyens de paiement", value: "Visa •••• 6411", screen: "PaymentMethods" },
+  { icon: "��", label: "Séquestre", value: "1 carte enregistrée", screen: "PaymentMethods" },
+  { icon: "��", label: "Missions", value: "3 missions réalisées", screen: "ClientMissions" },
+  { icon: "��", label: "Notifications", screen: "NotificationPreferences" },
+  { icon: "⚙️", label: "Paramètres", screen: "Settings" },
+  { icon: "��", label: "Support", value: "Par chat ou email", screen: "Support" },
+  { icon: "��", label: "Inviter des proches", value: "Gagnez 20€ par parrainage", screen: "Referral" },
 ];
 
 const dangerItem: MenuItem = {
-  icon: "\�\�",
-  label: "D\éconnexion",
+  icon: "��",
+  label: "Déconnexion",
   danger: true,
 };
 
@@ -88,7 +88,7 @@ export function ClientProfileScreen({
           {[
             ["Nom complet", profile.name],
             ["Email", profile.email],
-            ["T\él\éphone", profile.phone],
+            ["Téléphone", profile.phone],
             ["Adresse", profile.address],
           ].map(([label, value], i, arr) => (
             <View
@@ -125,7 +125,7 @@ export function ClientProfileScreen({
                   <Text style={styles.menuValue}>{item.value}</Text>
                 )}
               </View>
-              <Text style={styles.chevron}>{"\›"}</Text>
+              <Text style={styles.chevron}>{"›"}</Text>
             </TouchableOpacity>
           ))}
         </View>

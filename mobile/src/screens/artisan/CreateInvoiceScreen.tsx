@@ -14,14 +14,14 @@ import type { RootStackScreenProps } from "../../navigation/types";
 type SendOption = "email" | "pdf" | "both";
 
 const lineItems = [
-  { desc: "Remplacement robinet", qty: "1", pu: "85,00\€", total: "85,00\€" },
-  { desc: "Main d'\œuvre", qty: "2h", pu: "65,00\€", total: "130,00\€" },
+  { desc: "Remplacement robinet", qty: "1", pu: "85,00€", total: "85,00€" },
+  { desc: "Main d'œuvre", qty: "2h", pu: "65,00€", total: "130,00€" },
 ];
 
 const sendOptions: { id: SendOption; label: string }[] = [
-  { id: "email", label: "\�\� Email au client" },
-  { id: "pdf", label: "\�\� PDF \à t\él\écharger" },
-  { id: "both", label: "\�\� Les deux" },
+  { id: "email", label: "�� Email au client" },
+  { id: "pdf", label: "�� PDF à télécharger" },
+  { id: "both", label: "�� Les deux" },
 ];
 
 export function CreateInvoiceScreen({
@@ -34,9 +34,9 @@ export function CreateInvoiceScreen({
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.successContainer}>
-          <Text style={styles.successEmoji}>{"\✉\️"}</Text>
-          <Text style={styles.successTitle}>Facture envoy\ée !</Text>
-          <Text style={styles.successSub}>caroline.l@email.com \✓</Text>
+          <Text style={styles.successEmoji}>{"✉️"}</Text>
+          <Text style={styles.successTitle}>Facture envoyée !</Text>
+          <Text style={styles.successSub}>caroline.l@email.com ✓</Text>
           <Button
             title="Retour au tableau de bord"
             onPress={() => navigation.navigate("ArtisanTabs", { screen: "ArtisanHome" })}
@@ -55,12 +55,12 @@ export function CreateInvoiceScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backIcon}>{"\‹"}</Text>
+          <Text style={styles.backIcon}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Facture g\én\ér\ée</Text>
+        <Text style={styles.headerTitle}>Facture générée</Text>
       </View>
 
-      <Text style={styles.subtitle}>Suite \à la validation de votre mission</Text>
+      <Text style={styles.subtitle}>Suite à la validation de votre mission</Text>
 
       <ScrollView
         style={styles.scroll}
@@ -71,13 +71,13 @@ export function CreateInvoiceScreen({
         <View style={styles.invoiceCard}>
           {/* PAYE stamp */}
           <View style={styles.stamp}>
-            <Text style={styles.stampText}>PAY\É \✓</Text>
+            <Text style={styles.stampText}>PAYÉ ✓</Text>
           </View>
 
           {/* Header */}
           <View style={styles.docHeader}>
             <View style={styles.docHeaderLeft}>
-              <Text style={styles.docLogo}>{"\�\�\️"}</Text>
+              <Text style={styles.docLogo}>{"��️"}</Text>
               <Text style={styles.docLogoText}>Nova</Text>
             </View>
             <Text style={styles.invoiceId}>#FAC-2026-127</Text>
@@ -90,7 +90,7 @@ export function CreateInvoiceScreen({
               <Text style={styles.partyDetail}>SIRET: 123 456 789</Text>
             </View>
             <View style={styles.partyRight}>
-              <Text style={styles.partyName}>Caroline Lef\èvre</Text>
+              <Text style={styles.partyName}>Caroline Lefèvre</Text>
               <Text style={styles.partyDetail}>12 rue de Clichy</Text>
             </View>
           </View>
@@ -98,8 +98,8 @@ export function CreateInvoiceScreen({
           {/* Table */}
           <View style={styles.tableWrap}>
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderCell, { flex: 2 }]}>D\ésignation</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.5 }]}>Qt\é</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 2 }]}>Désignation</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 0.5 }]}>Qté</Text>
               <Text style={[styles.tableHeaderCell, { flex: 1 }]}>P.U.</Text>
               <Text style={[styles.tableHeaderCell, { flex: 1, textAlign: "right" }]}>Total</Text>
             </View>
@@ -115,12 +115,12 @@ export function CreateInvoiceScreen({
 
           {/* Totals */}
           <View style={styles.docTotals}>
-            <Text style={styles.docTotalSub}>Sous-total: 215,00\€ \• TVA: 21,50\€</Text>
-            <Text style={styles.docTotalTTC}>236,50\€ TTC</Text>
+            <Text style={styles.docTotalSub}>Sous-total: 215,00€ • TVA: 21,50€</Text>
+            <Text style={styles.docTotalTTC}>236,50€ TTC</Text>
           </View>
 
           <Text style={styles.legalSmall}>
-            TVA non applicable, art. 293 B du CGI. Paiement re\çu par Nova SAS.
+            TVA non applicable, art. 293 B du CGI. Paiement reçu par Nova SAS.
           </Text>
         </View>
 

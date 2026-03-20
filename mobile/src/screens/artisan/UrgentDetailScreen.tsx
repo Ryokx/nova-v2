@@ -13,9 +13,9 @@ import { Button } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const interventionDetails = [
-  { icon: "\�\�", label: "Secteur", value: "Paris 9e \— Quartier Clichy" },
-  { icon: "\�\�", label: "Dur\ée estim\ée", value: "1h environ" },
-  { icon: "\�\�", label: "Cat\égorie", value: "Plomberie" },
+  { icon: "��", label: "Secteur", value: "Paris 9e — Quartier Clichy" },
+  { icon: "��", label: "Durée estimée", value: "1h environ" },
+  { icon: "��", label: "Catégorie", value: "Plomberie" },
 ];
 
 const photos = ["Photo 1", "Photo 2"];
@@ -50,17 +50,17 @@ export function UrgentDetailScreen({
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.successContainer}>
           <View style={styles.successIcon}>
-            <Text style={styles.successCheck}>{"\✓"}</Text>
+            <Text style={styles.successCheck}>{"✓"}</Text>
           </View>
-          <Text style={styles.successTitle}>Intervention accept\ée !</Text>
+          <Text style={styles.successTitle}>Intervention acceptée !</Text>
           <Text style={styles.successDesc}>
-            Les coordonn\ées du client vous ont \ét\é envoy\ées.
+            Les coordonnées du client vous ont été envoyées.
           </Text>
           <Text style={styles.successSub}>
-            Rendez-vous sur place d\ès que possible.
+            Rendez-vous sur place dès que possible.
           </Text>
           <Button
-            title="Voir l'itin\éraire"
+            title="Voir l'itinéraire"
             onPress={() => navigation.navigate("RDVDetail", { rdvId: "urgent-1" })}
             style={styles.successBtn}
           />
@@ -77,7 +77,7 @@ export function UrgentDetailScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backIcon}>{"\‹"}</Text>
+          <Text style={styles.backIcon}>{"‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Demande d'intervention</Text>
       </View>
@@ -91,10 +91,10 @@ export function UrgentDetailScreen({
         <Animated.View
           style={[styles.urgencyBanner, { transform: [{ scale: pulseAnim }] }]}
         >
-          <Text style={styles.urgencyEmoji}>{"\⚡"}</Text>
+          <Text style={styles.urgencyEmoji}>{"⚡"}</Text>
           <View>
             <Text style={styles.urgencyTitle}>Intervention urgente</Text>
-            <Text style={styles.urgencySub}>Demande re\çue il y a 4 minutes</Text>
+            <Text style={styles.urgencySub}>Demande reçue il y a 4 minutes</Text>
           </View>
         </Animated.View>
 
@@ -113,11 +113,11 @@ export function UrgentDetailScreen({
 
         {/* Description */}
         <View style={styles.card}>
-          <Text style={styles.cardSubTitle}>Description du probl\ème</Text>
+          <Text style={styles.cardSubTitle}>Description du problème</Text>
           <Text style={styles.descText}>
-            Fuite importante sous l'\évier de la cuisine. L'eau coule en continu, le
-            robinet d'arr\êt est difficile d'acc\ès. Le client a coup\é l'arriv\ée d'eau
-            g\én\érale en attendant.
+            Fuite importante sous l'évier de la cuisine. L'eau coule en continu, le
+            robinet d'arrêt est difficile d'accès. Le client a coupé l'arrivée d'eau
+            générale en attendant.
           </Text>
         </View>
 
@@ -135,32 +135,32 @@ export function UrgentDetailScreen({
 
         {/* Remuneration */}
         <View style={styles.card}>
-          <Text style={styles.cardSubTitle}>R\émun\ération</Text>
+          <Text style={styles.cardSubTitle}>Rémunération</Text>
           <View style={styles.remuRow}>
             <Text style={styles.remuLabel}>Tarif horaire urgence</Text>
-            <Text style={styles.remuValue}>85\€/h</Text>
+            <Text style={styles.remuValue}>85€/h</Text>
           </View>
           <View style={styles.remuRow}>
-            <Text style={styles.remuLabel}>D\éplacement</Text>
+            <Text style={styles.remuLabel}>Déplacement</Text>
             <Text style={styles.remuIncluded}>Inclus</Text>
           </View>
         </View>
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={styles.escrowIcon}>{"\�\�"}</Text>
+          <Text style={styles.escrowIcon}>{"��"}</Text>
           <Text style={styles.escrowText}>
-            Le paiement sera s\écuris\é par s\équestre Nova. Vous serez pay\é apr\ès
-            validation par nos \équipes.
+            Le paiement sera sécurisé par séquestre Nova. Vous serez payé après
+            validation par nos équipes.
           </Text>
         </View>
 
         {/* Anonymisation notice */}
         <View style={styles.anonNotice}>
-          <Text style={styles.anonIcon}>{"\�\�\️"}</Text>
+          <Text style={styles.anonIcon}>{"��️"}</Text>
           <Text style={styles.anonText}>
-            L'identit\é et l'adresse exacte du client vous seront communiqu\ées
-            uniquement apr\ès acceptation de l'intervention.
+            L'identité et l'adresse exacte du client vous seront communiquées
+            uniquement après acceptation de l'intervention.
           </Text>
         </View>
 

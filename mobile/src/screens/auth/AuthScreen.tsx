@@ -20,26 +20,26 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 /* ── Onboarding slides data ── */
 const onboardingSlides = [
   {
-    icon: "\�\�",
-    title: "Paiement garanti par s\équestre",
+    icon: "��",
+    title: "Paiement garanti par séquestre",
     description:
-      "Le client paie avant l\’intervention. L\’argent est bloqu\é en s\équestre jusqu\’\à validation.",
+      "Le client paie avant l’intervention. L’argent est bloqué en séquestre jusqu’à validation.",
     accent: Colors.forest,
     bg: Colors.surface,
   },
   {
-    icon: "\�\�\️",
-    title: "Artisans certifi\és",
+    icon: "��️",
+    title: "Artisans certifiés",
     description:
-      "Chaque artisan est v\érifi\é : SIRET, assurance d\écennale, qualifications RGE. Z\éro mauvaise surprise.",
+      "Chaque artisan est vérifié : SIRET, assurance décennale, qualifications RGE. Zéro mauvaise surprise.",
     accent: Colors.gold,
     bg: "#FFF8ED",
   },
   {
-    icon: "\✅",
-    title: "Z\éro impay\é",
+    icon: "✅",
+    title: "Zéro impayé",
     description:
-      "Vous intervenez, Nova valide, vous \êtes pay\é sous 48h. Garanti.",
+      "Vous intervenez, Nova valide, vous êtes payé sous 48h. Garanti.",
     accent: Colors.success,
     bg: "#EDFFF6",
   },
@@ -150,10 +150,10 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
               style={styles.backBtn}
               onPress={() => setShowCreate(false)}
             >
-              <Text style={styles.backArrow}>{"\‹"}</Text>
+              <Text style={styles.backArrow}>{"‹"}</Text>
             </TouchableOpacity>
 
-            <Text style={styles.createTitle}>Cr\éer un compte</Text>
+            <Text style={styles.createTitle}>Créer un compte</Text>
             <Text style={styles.createSubtitle}>
               Rejoignez Nova en quelques secondes
             </Text>
@@ -200,18 +200,18 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
               <Input label="Nom de l'entreprise" placeholder="Raison sociale" />
             )}
             <Input label="Email" placeholder="Email" keyboardType="email-address" autoCapitalize="none" />
-            <Input label="T\él\éphone" placeholder="06 12 34 56 78" keyboardType="phone-pad" />
+            <Input label="Téléphone" placeholder="06 12 34 56 78" keyboardType="phone-pad" />
             <Input label="Mot de passe" placeholder="Mot de passe" secureTextEntry />
 
             {selectedRole === "artisan" && (
               <>
                 <Input label="SIRET" placeholder="123 456 789 00012" keyboardType="number-pad" />
-                <Input label="N\° d\écennale" placeholder="N\° assurance d\écennale" />
+                <Input label="N° décennale" placeholder="N° assurance décennale" />
               </>
             )}
 
             <Button
-              title="Cr\éer mon compte"
+              title="Créer mon compte"
               onPress={() => {
                 navigation.replace(
                   selectedRole === "client" ? "ClientTabs" : "ArtisanTabs",
@@ -224,8 +224,8 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
             />
 
             <Text style={styles.legalText}>
-              En cr\éant un compte, vous acceptez nos conditions
-              d\’utilisation et notre politique de confidentialit\é.
+              En créant un compte, vous acceptez nos conditions
+              d’utilisation et notre politique de confidentialité.
             </Text>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -248,11 +248,11 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
           {/* Logo */}
           <View style={styles.logoWrap}>
             <View style={styles.logoCircle}>
-              <Text style={styles.logoEmoji}>{"\�\�\️"}</Text>
+              <Text style={styles.logoEmoji}>{"��️"}</Text>
             </View>
             <Text style={styles.logoTitle}>Nova</Text>
             <Text style={styles.logoSubtitle}>
-              L&apos;artisan qu&apos;il vous faut. Certifi\é. Garanti.
+              L&apos;artisan qu&apos;il vous faut. Certifié. Garanti.
             </Text>
           </View>
 
@@ -278,7 +278,7 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
 
           {/* Forgot password */}
           <TouchableOpacity style={styles.forgotWrap}>
-            <Text style={styles.forgotText}>Mot de passe oubli\é ?</Text>
+            <Text style={styles.forgotText}>Mot de passe oublié ?</Text>
           </TouchableOpacity>
 
           {/* Login CTA */}
@@ -295,12 +295,12 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
             onPress={() => setShowCreate(true)}
             activeOpacity={0.85}
           >
-            <Text style={styles.createAccountText}>Cr\éer un compte</Text>
+            <Text style={styles.createAccountText}>Créer un compte</Text>
           </TouchableOpacity>
 
           {/* Demo mode */}
           <View style={styles.demoCard}>
-            <Text style={styles.demoLabel}>Mode d\émo</Text>
+            <Text style={styles.demoLabel}>Mode démo</Text>
             <View style={styles.demoRow}>
               <TouchableOpacity
                 style={styles.demoBtn}

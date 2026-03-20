@@ -27,18 +27,18 @@ export function CreateQuoteScreen({
   navigation,
 }: RootStackScreenProps<"CreateQuote">) {
   const [step, setStep] = useState(0);
-  const [clientName, setClientName] = useState("Caroline Lef\èvre");
+  const [clientName, setClientName] = useState("Caroline Lefèvre");
   const [clientEmail, setClientEmail] = useState("caroline.l@email.com");
   const [clientPhone, setClientPhone] = useState("06 12 34 56 78");
   const [clientAddress, setClientAddress] = useState("12 rue de Clichy, Paris 9e");
   const [selectedType, setSelectedType] = useState(0);
   const [lines, setLines] = useState<LineItem[]>([
     { desc: "Remplacement robinet mitigeur", qty: 1, unit: "u", price: 85 },
-    { desc: "Main d'\œuvre", qty: 2, unit: "h", price: 65 },
+    { desc: "Main d'œuvre", qty: 2, unit: "h", price: 65 },
   ]);
   const [validityIdx, setValidityIdx] = useState(1);
   const [message, setMessage] = useState(
-    "Bonjour Mme Lef\èvre, voici le devis pour l'intervention."
+    "Bonjour Mme Lefèvre, voici le devis pour l'intervention."
   );
 
   const total = lines.reduce((s, l) => s + l.qty * l.price, 0);
@@ -61,9 +61,9 @@ export function CreateQuoteScreen({
           style={styles.backBtn}
           onPress={() => (step > 0 ? setStep(step - 1) : navigation.goBack())}
         >
-          <Text style={styles.backIcon}>{"\‹"}</Text>
+          <Text style={styles.backIcon}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Cr\éer un devis</Text>
+        <Text style={styles.headerTitle}>Créer un devis</Text>
       </View>
 
       {/* Progress steps */}
@@ -102,7 +102,7 @@ export function CreateQuoteScreen({
             {[
               { label: "Nom du client", value: clientName, set: setClientName },
               { label: "Email", value: clientEmail, set: setClientEmail },
-              { label: "T\él\éphone", value: clientPhone, set: setClientPhone },
+              { label: "Téléphone", value: clientPhone, set: setClientPhone },
               { label: "Adresse", value: clientAddress, set: setClientAddress },
             ].map((f, i) => (
               <View key={i} style={styles.fieldWrap}>
@@ -157,15 +157,15 @@ export function CreateQuoteScreen({
                 <View style={styles.lineTop}>
                   <Text style={styles.lineDesc}>{l.desc || "(nouvelle ligne)"}</Text>
                   <TouchableOpacity onPress={() => removeLine(i)}>
-                    <Text style={styles.lineRemove}>{"\✕"}</Text>
+                    <Text style={styles.lineRemove}>{"✕"}</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.lineBottom}>
                   <Text style={styles.lineQtyPrice}>
-                    {l.qty} {l.unit} \× {l.price}\€
+                    {l.qty} {l.unit} × {l.price}€
                   </Text>
                   <Text style={styles.lineTotal}>
-                    {(l.qty * l.price).toFixed(2)}\€
+                    {(l.qty * l.price).toFixed(2)}€
                   </Text>
                 </View>
               </View>
@@ -178,9 +178,9 @@ export function CreateQuoteScreen({
             {/* Totals */}
             <View style={styles.totalsCard}>
               {[
-                { label: "Sous-total HT", value: `${total.toFixed(2)}\€`, bold: false },
-                { label: "TVA (10%)", value: `${tva.toFixed(2)}\€`, bold: false },
-                { label: "Total TTC", value: `${ttc.toFixed(2)}\€`, bold: true },
+                { label: "Sous-total HT", value: `${total.toFixed(2)}€`, bold: false },
+                { label: "TVA (10%)", value: `${tva.toFixed(2)}€`, bold: false },
+                { label: "Total TTC", value: `${ttc.toFixed(2)}€`, bold: true },
               ].map((row, i) => (
                 <View
                   key={i}
@@ -218,7 +218,7 @@ export function CreateQuoteScreen({
         {/* Step 2: Send */}
         {step === 2 && (
           <View>
-            <Text style={styles.fieldLabel}>Validit\é du devis</Text>
+            <Text style={styles.fieldLabel}>Validité du devis</Text>
             <View style={styles.validityRow}>
               {["7 jours", "14 jours", "30 jours"].map((d, i) => (
                 <TouchableOpacity
@@ -246,14 +246,14 @@ export function CreateQuoteScreen({
               multiline
               value={message}
               onChangeText={setMessage}
-              placeholder="Message personnalis\é au client..."
+              placeholder="Message personnalisé au client..."
               placeholderTextColor={Colors.textHint}
             />
 
             <View style={styles.escrowInfo}>
-              <Text style={styles.escrowIcon}>{"\�\�"}</Text>
+              <Text style={styles.escrowIcon}>{"��"}</Text>
               <Text style={styles.escrowText}>
-                Le client recevra le devis sur son espace Nova et paiera via s\équestre
+                Le client recevra le devis sur son espace Nova et paiera via séquestre
               </Text>
             </View>
 

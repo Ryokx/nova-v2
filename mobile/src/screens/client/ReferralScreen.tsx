@@ -15,34 +15,34 @@ import type { RootStackScreenProps } from "../../navigation/types";
 const REFERRAL_CODE = "NOVA-SL25";
 
 const shareButtons = [
-  { label: "WhatsApp", emoji: "\�\�", bg: "#25D366" },
-  { label: "SMS", emoji: "\�\�", bg: "#4A5568" },
-  { label: "Email", emoji: "\✉\️", bg: "#1B6B4E" },
-  { label: "Lien", emoji: "\�\�", bg: "#6B7280" },
+  { label: "WhatsApp", emoji: "��", bg: "#25D366" },
+  { label: "SMS", emoji: "��", bg: "#4A5568" },
+  { label: "Email", emoji: "✉️", bg: "#1B6B4E" },
+  { label: "Lien", emoji: "��", bg: "#6B7280" },
 ];
 
 const howItWorks = [
   {
     step: "1",
     title: "Partagez votre code",
-    desc: "Envoyez votre code \à un ami par WhatsApp, SMS ou email",
+    desc: "Envoyez votre code à un ami par WhatsApp, SMS ou email",
   },
   {
     step: "2",
     title: "Votre ami s'inscrit",
-    desc: "Il cr\ée son compte Nova avec votre code",
+    desc: "Il crée son compte Nova avec votre code",
   },
   {
     step: "3",
-    title: "Premi\ère intervention",
-    desc: "Quand il r\éalise sa premi\ère mission, vous gagnez tous les deux 20\€",
+    title: "Première intervention",
+    desc: "Quand il réalise sa première mission, vous gagnez tous les deux 20€",
   },
 ];
 
 const stats = [
-  { value: "3", label: "Invitations envoy\ées" },
+  { value: "3", label: "Invitations envoyées" },
   { value: "1", label: "Ami inscrit" },
-  { value: "20\€", label: "Cr\édit gagn\é" },
+  { value: "20€", label: "Crédit gagné" },
 ];
 
 export function ReferralScreen({
@@ -59,7 +59,7 @@ export function ReferralScreen({
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Rejoins Nova avec mon code ${REFERRAL_CODE} et gagne 20\€ de cr\édit sur ta premi\ère intervention ! https://nova.fr/r/${REFERRAL_CODE}`,
+        message: `Rejoins Nova avec mon code ${REFERRAL_CODE} et gagne 20€ de crédit sur ta première intervention ! https://nova.fr/r/${REFERRAL_CODE}`,
       });
     } catch {}
   };
@@ -72,7 +72,7 @@ export function ReferralScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\‹"}</Text>
+          <Text style={styles.backArrow}>{"‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Inviter des proches</Text>
       </View>
@@ -84,13 +84,13 @@ export function ReferralScreen({
         {/* Hero reward */}
         <View style={styles.hero}>
           <View style={styles.heroBlob} />
-          <Text style={styles.heroEmoji}>{"\�\�"}</Text>
+          <Text style={styles.heroEmoji}>{"��"}</Text>
           <Text style={styles.heroTitle}>
-            Gagnez 20\€ par parrainage
+            Gagnez 20€ par parrainage
           </Text>
           <Text style={styles.heroDesc}>
-            Invitez un ami. Quand il r\éalise sa premi\ère intervention via
-            Nova, vous recevez chacun 20\€ de cr\édit.
+            Invitez un ami. Quand il réalise sa première intervention via
+            Nova, vous recevez chacun 20€ de crédit.
           </Text>
         </View>
 
@@ -109,7 +109,7 @@ export function ReferralScreen({
             onPress={handleCopy}
           >
             <Text style={styles.copyBtnText}>
-              {copied ? "Copi\é \✓" : "Copier"}
+              {copied ? "Copié ✓" : "Copier"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -131,7 +131,7 @@ export function ReferralScreen({
         </View>
 
         {/* How it works */}
-        <Text style={styles.sectionTitle}>Comment \ça marche</Text>
+        <Text style={styles.sectionTitle}>Comment ça marche</Text>
         {howItWorks.map((s, i) => (
           <View key={i} style={styles.stepRow}>
             <View style={styles.stepCircle}>

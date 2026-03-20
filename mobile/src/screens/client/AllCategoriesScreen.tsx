@@ -10,18 +10,18 @@ import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const allCategories = [
-  { id: "plumber", label: "Plomberie", emoji: "\�\�", count: 47 },
-  { id: "electrician", label: "\Électricit\é", emoji: "\⚡", count: 38 },
-  { id: "locksmith", label: "Serrurerie", emoji: "\�\�", count: 29 },
-  { id: "heating", label: "Chauffage", emoji: "\�\�", count: 31 },
-  { id: "painter", label: "Peinture", emoji: "\�\�", count: 35 },
-  { id: "mason", label: "Ma\çonnerie", emoji: "\�\�", count: 22 },
-  { id: "tiler", label: "Carrelage", emoji: "\�\�", count: 21 },
-  { id: "carpenter", label: "Menuiserie", emoji: "\�\�", count: 18 },
-  { id: "ac", label: "Climatisation", emoji: "\❄\️", count: 24 },
-  { id: "glazier", label: "Vitrerie", emoji: "\�\�", count: 14 },
-  { id: "roofer", label: "Couverture", emoji: "\�\�", count: 12 },
-  { id: "gardener", label: "Jardinage", emoji: "\�\�", count: 26 },
+  { id: "plumber", label: "Plomberie", emoji: "��", count: 47 },
+  { id: "electrician", label: "Électricité", emoji: "⚡", count: 38 },
+  { id: "locksmith", label: "Serrurerie", emoji: "��", count: 29 },
+  { id: "heating", label: "Chauffage", emoji: "��", count: 31 },
+  { id: "painter", label: "Peinture", emoji: "��", count: 35 },
+  { id: "mason", label: "Maçonnerie", emoji: "��", count: 22 },
+  { id: "tiler", label: "Carrelage", emoji: "��", count: 21 },
+  { id: "carpenter", label: "Menuiserie", emoji: "��", count: 18 },
+  { id: "ac", label: "Climatisation", emoji: "❄️", count: 24 },
+  { id: "glazier", label: "Vitrerie", emoji: "��", count: 14 },
+  { id: "roofer", label: "Couverture", emoji: "��", count: 12 },
+  { id: "gardener", label: "Jardinage", emoji: "��", count: 26 },
 ];
 
 export function AllCategoriesScreen({
@@ -35,9 +35,9 @@ export function AllCategoriesScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\‹"}</Text>
+          <Text style={styles.backArrow}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Toutes les cat\égories</Text>
+        <Text style={styles.headerTitle}>Toutes les catégories</Text>
       </View>
 
       <ScrollView
@@ -45,7 +45,7 @@ export function AllCategoriesScreen({
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.countText}>
-          {allCategories.length} cat\égories disponibles
+          {allCategories.length} catégories disponibles
         </Text>
 
         <View style={styles.grid}>

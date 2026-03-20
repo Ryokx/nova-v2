@@ -13,36 +13,36 @@ import type { RootStackScreenProps } from "../../navigation/types";
 const plans = [
   {
     id: "chaudiere",
-    icon: "\�\�",
-    name: "Entretien chaudi\ère",
-    desc: "V\érification annuelle obligatoire, nettoyage, contr\ôle s\écurit\é, attestation d'entretien",
+    icon: "��",
+    name: "Entretien chaudière",
+    desc: "Vérification annuelle obligatoire, nettoyage, contrôle sécurité, attestation d'entretien",
     price: "120",
     freq: "1 visite / an",
     popular: false,
   },
   {
     id: "clim",
-    icon: "\❄\️",
+    icon: "❄️",
     name: "Entretien climatisation",
-    desc: "Nettoyage filtres, v\érification fluide, contr\ôle performance",
+    desc: "Nettoyage filtres, vérification fluide, contrôle performance",
     price: "150",
     freq: "1 visite / an",
     popular: false,
   },
   {
     id: "plomberie",
-    icon: "\�\�",
+    icon: "��",
     name: "Check-up plomberie",
-    desc: "Inspection canalisations, joints, robinetterie, d\étection fuites pr\éventive",
+    desc: "Inspection canalisations, joints, robinetterie, détection fuites préventive",
     price: "90",
     freq: "1 visite / an",
     popular: false,
   },
   {
     id: "complet",
-    icon: "\⭐",
-    name: "Pack S\ér\énit\é",
-    desc: "Chaudi\ère + climatisation + plomberie. Intervention prioritaire et tarif r\éduit",
+    icon: "⭐",
+    name: "Pack Sérénité",
+    desc: "Chaudière + climatisation + plomberie. Intervention prioritaire et tarif réduit",
     price: "299",
     freq: "3 visites / an",
     popular: true,
@@ -52,7 +52,7 @@ const plans = [
 const howItWorks = [
   { n: "1", t: "Souscription", d: "Vous choisissez un contrat et payez en ligne" },
   { n: "2", t: "Planification", d: "L'artisan vous propose une date d'intervention" },
-  { n: "3", t: "Intervention", d: "L'entretien est r\éalis\é. Vous validez sur l'app" },
+  { n: "3", t: "Intervention", d: "L'entretien est réalisé. Vous validez sur l'app" },
 ];
 
 export function MaintenanceContractScreen({
@@ -66,11 +66,11 @@ export function MaintenanceContractScreen({
     return (
       <View style={styles.successRoot}>
         <View style={styles.successCircle}>
-          <Text style={styles.successCheck}>{"\✓"}</Text>
+          <Text style={styles.successCheck}>{"✓"}</Text>
         </View>
         <Text style={styles.successTitle}>Contrat souscrit !</Text>
         <Text style={styles.successDesc}>
-          Jean-Michel P. vous contactera pour planifier la premi\ère
+          Jean-Michel P. vous contactera pour planifier la première
           intervention d'entretien.
         </Text>
         <TouchableOpacity
@@ -92,7 +92,7 @@ export function MaintenanceContractScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\‹"}</Text>
+          <Text style={styles.backArrow}>{"‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Contrat d'entretien</Text>
       </View>
@@ -107,21 +107,21 @@ export function MaintenanceContractScreen({
           <View>
             <Text style={styles.artisanName}>Jean-Michel P.</Text>
             <Text style={styles.artisanSub}>
-              Plombier-Chauffagiste {"\•"} Certifi\é Nova
+              Plombier-Chauffagiste {"•"} Certifié Nova
             </Text>
           </View>
         </View>
 
         {/* Explainer */}
         <View style={styles.explainerCard}>
-          <Text style={{ fontSize: 18 }}>{"\�\�\️"}</Text>
+          <Text style={{ fontSize: 18 }}>{"��️"}</Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.explainerTitle}>
-              Entretien planifi\é, esprit tranquille
+              Entretien planifié, esprit tranquille
             </Text>
             <Text style={styles.explainerDesc}>
-              Souscrivez un contrat annuel. L'artisan revient chaque ann\ée pour
-              entretenir vos \équipements. Paiement s\écuris\é par Nova.
+              Souscrivez un contrat annuel. L'artisan revient chaque année pour
+              entretenir vos équipements. Paiement sécurisé par Nova.
             </Text>
           </View>
         </View>
@@ -156,7 +156,7 @@ export function MaintenanceContractScreen({
                 <View style={styles.planNameRow}>
                   <Text style={styles.planName}>{plan.name}</Text>
                   <View style={{ alignItems: "flex-end" }}>
-                    <Text style={styles.planPrice}>{plan.price}\€</Text>
+                    <Text style={styles.planPrice}>{plan.price}€</Text>
                     <Text style={styles.planPriceUnit}>/an</Text>
                   </View>
                 </View>
@@ -167,10 +167,10 @@ export function MaintenanceContractScreen({
             {selectedPlan === plan.id && (
               <View style={styles.planSelected}>
                 <Text style={{ fontSize: 12, color: Colors.forest }}>
-                  {"\✓"}
+                  {"✓"}
                 </Text>
                 <Text style={styles.planSelectedText}>
-                  Paiement s\écuris\é par s\équestre Nova
+                  Paiement sécurisé par séquestre Nova
                 </Text>
               </View>
             )}
@@ -179,7 +179,7 @@ export function MaintenanceContractScreen({
 
         {/* How it works */}
         <Text style={[styles.sectionTitle, { marginTop: 16 }]}>
-          Comment \ça fonctionne
+          Comment ça fonctionne
         </Text>
         {howItWorks.map((s, i) => (
           <View key={i} style={styles.stepRow}>
@@ -203,7 +203,7 @@ export function MaintenanceContractScreen({
           onPress={() => selectedPlan && setSubscribed(true)}
           disabled={!selectedPlan}
         >
-          <Text style={{ fontSize: 14 }}>{"\�\�"}</Text>
+          <Text style={{ fontSize: 14 }}>{"��"}</Text>
           <Text
             style={[
               styles.subscribeBtnText,

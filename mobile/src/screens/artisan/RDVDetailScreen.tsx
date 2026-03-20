@@ -19,24 +19,24 @@ const rdv = {
   type: "Installation robinet",
   category: "Plomberie",
   date: "17 mars 2026",
-  time: "14h00 \– 16h00",
-  status: "Confirm\é",
+  time: "14h00 – 16h00",
+  status: "Confirmé",
   statusColor: Colors.forest,
   address: "23 rue du Faubourg Saint-Antoine",
   city: "75011 Paris",
-  floor: "3e \étage, code 45B12",
+  floor: "3e étage, code 45B12",
   phone: "06 45 67 89 01",
   notes:
-    "Robinet de cuisine \à remplacer. Le client fournit le nouveau robinet (Grohe).",
-  amount: "195,00\€",
+    "Robinet de cuisine à remplacer. Le client fournit le nouveau robinet (Grohe).",
+  amount: "195,00€",
   lat: 48.8529,
   lng: 2.3706,
 };
 
 const details = [
-  { icon: "\�\�", label: "Horaire", value: rdv.time },
-  { icon: "\�\�", label: "Cat\égorie", value: rdv.category },
-  { icon: "\�\�", label: "Montant devis", value: rdv.amount },
+  { icon: "��", label: "Horaire", value: rdv.time },
+  { icon: "��", label: "Catégorie", value: rdv.category },
+  { icon: "��", label: "Montant devis", value: rdv.amount },
 ];
 
 export function RDVDetailScreen({
@@ -53,9 +53,9 @@ export function RDVDetailScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backIcon}>{"\‹"}</Text>
+          <Text style={styles.backIcon}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>D\étail du rendez-vous</Text>
+        <Text style={styles.headerTitle}>Détail du rendez-vous</Text>
       </View>
 
       <ScrollView
@@ -84,7 +84,7 @@ export function RDVDetailScreen({
             style={styles.phoneBtn}
             onPress={() => Linking.openURL(`tel:${rdv.phone}`)}
           >
-            <Text style={styles.phoneEmoji}>{"\�\�"}</Text>
+            <Text style={styles.phoneEmoji}>{"��"}</Text>
           </TouchableOpacity>
         </View>
 
@@ -108,7 +108,7 @@ export function RDVDetailScreen({
         {/* Map placeholder */}
         <View style={styles.mapCard}>
           <View style={styles.mapPlaceholder}>
-            <Text style={styles.mapPlaceholderText}>{"\�\�\️"}</Text>
+            <Text style={styles.mapPlaceholderText}>{"��️"}</Text>
             <Text style={styles.mapStreet}>Rue du Fg Saint-Antoine</Text>
           </View>
           <View style={styles.mapInfo}>
@@ -124,14 +124,14 @@ export function RDVDetailScreen({
             style={styles.navBtn}
             onPress={() => Linking.openURL(wazeUrl)}
           >
-            <Text style={styles.navIcon}>{"\�\�"}</Text>
+            <Text style={styles.navIcon}>{"��"}</Text>
             <Text style={styles.navLabel}>Ouvrir dans Waze</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navBtn}
             onPress={() => Linking.openURL(gmapsUrl)}
           >
-            <Text style={styles.navIcon}>{"\�\�"}</Text>
+            <Text style={styles.navIcon}>{"��"}</Text>
             <Text style={styles.navLabel}>Google Maps</Text>
           </TouchableOpacity>
         </View>
@@ -144,16 +144,16 @@ export function RDVDetailScreen({
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={styles.escrowIcon}>{"\�\�"}</Text>
+          <Text style={styles.escrowIcon}>{"��"}</Text>
           <Text style={styles.escrowText}>
-            Paiement de {rdv.amount} bloqu\é en s\équestre Nova
+            Paiement de {rdv.amount} bloqué en séquestre Nova
           </Text>
         </View>
 
         {/* Actions */}
         <Button
-          title="Confirmer mon arriv\ée"
-          onPress={() => Alert.alert("Confirm\é", "Votre arriv\ée a \ét\é confirm\ée au client.")}
+          title="Confirmer mon arrivée"
+          onPress={() => Alert.alert("Confirmé", "Votre arrivée a été confirmée au client.")}
           fullWidth
           size="lg"
         />

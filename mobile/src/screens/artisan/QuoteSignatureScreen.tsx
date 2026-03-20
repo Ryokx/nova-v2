@@ -14,8 +14,8 @@ import { Button, Badge } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const lineItems = [
-  { desc: "Remplacement robinet", qty: "1", pu: "85,00\€", total: "85,00\€" },
-  { desc: "Main d'\œuvre", qty: "2h", pu: "65,00\€", total: "130,00\€" },
+  { desc: "Remplacement robinet", qty: "1", pu: "85,00€", total: "85,00€" },
+  { desc: "Main d'œuvre", qty: "2h", pu: "65,00€", total: "130,00€" },
 ];
 
 export function QuoteSignatureScreen({
@@ -41,11 +41,11 @@ export function QuoteSignatureScreen({
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.successContainer}>
           <View style={styles.successIcon}>
-            <Text style={styles.successCheck}>{"\✓"}</Text>
+            <Text style={styles.successCheck}>{"✓"}</Text>
           </View>
-          <Text style={styles.successTitle}>Devis sign\é !</Text>
-          <Text style={styles.successSub}>Paiement s\écuris\é par Nova</Text>
-          <Badge label="\�\� Paiement S\écuris\é" variant="default" size="md" />
+          <Text style={styles.successTitle}>Devis signé !</Text>
+          <Text style={styles.successSub}>Paiement sécurisé par Nova</Text>
+          <Badge label="�� Paiement Sécurisé" variant="default" size="md" />
           <Button
             title="Voir mes paiements"
             onPress={() => navigation.navigate("ArtisanTabs", { screen: "ArtisanPayments" })}
@@ -64,9 +64,9 @@ export function QuoteSignatureScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backIcon}>{"\‹"}</Text>
+          <Text style={styles.backIcon}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Devis \à signer</Text>
+        <Text style={styles.headerTitle}>Devis à signer</Text>
       </View>
 
       <ScrollView
@@ -82,7 +82,7 @@ export function QuoteSignatureScreen({
           {/* Doc header */}
           <View style={styles.docHeader}>
             <View style={styles.docHeaderLeft}>
-              <Text style={styles.docLogo}>{"\�\�\️"}</Text>
+              <Text style={styles.docLogo}>{"��️"}</Text>
               <Text style={styles.docLogoText}>Nova</Text>
             </View>
             <Text style={styles.docType}>DEVIS</Text>
@@ -95,7 +95,7 @@ export function QuoteSignatureScreen({
               <Text style={styles.partyDetail}>SIRET: 123 456 789</Text>
             </View>
             <View style={styles.partyRight}>
-              <Text style={styles.partyName}>Caroline Lef\èvre</Text>
+              <Text style={styles.partyName}>Caroline Lefèvre</Text>
               <Text style={styles.partyDetail}>12 rue de Clichy</Text>
             </View>
           </View>
@@ -103,8 +103,8 @@ export function QuoteSignatureScreen({
           {/* Line items table */}
           <View style={styles.tableWrap}>
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderCell, { flex: 2 }]}>D\ésignation</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.5 }]}>Qt\é</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 2 }]}>Désignation</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 0.5 }]}>Qté</Text>
               <Text style={[styles.tableHeaderCell, { flex: 1 }]}>P.U.</Text>
               <Text style={[styles.tableHeaderCell, { flex: 1, textAlign: "right" }]}>Total</Text>
             </View>
@@ -120,8 +120,8 @@ export function QuoteSignatureScreen({
 
           {/* Totals */}
           <View style={styles.docTotals}>
-            <Text style={styles.docTotalSub}>Total HT: 215,00\€ \• TVA: 21,50\€</Text>
-            <Text style={styles.docTotalTTC}>236,50\€ TTC</Text>
+            <Text style={styles.docTotalSub}>Total HT: 215,00€ • TVA: 21,50€</Text>
+            <Text style={styles.docTotalTTC}>236,50€ TTC</Text>
           </View>
         </View>
 
@@ -143,7 +143,7 @@ export function QuoteSignatureScreen({
         {/* Legal */}
         <View style={styles.legalBox}>
           <Text style={styles.legalText}>
-            En signant, vous acceptez ce devis et autorisez Nova \à bloquer le montant en s\équestre.
+            En signant, vous acceptez ce devis et autorisez Nova à bloquer le montant en séquestre.
           </Text>
         </View>
 

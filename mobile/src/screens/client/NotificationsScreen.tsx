@@ -28,10 +28,10 @@ const typeConfig: Record<
   NotifType,
   { bg: string; iconEmoji: string; accent: string }
 > = {
-  devis: { bg: "rgba(27,107,78,0.06)", iconEmoji: "\�\�", accent: Colors.forest },
-  mission: { bg: "rgba(34,200,138,0.06)", iconEmoji: "\✅", accent: Colors.success },
-  paiement: { bg: "rgba(245,166,35,0.06)", iconEmoji: "\�\�", accent: Colors.gold },
-  info: { bg: "rgba(138,149,163,0.06)", iconEmoji: "\�\�\️", accent: Colors.textHint },
+  devis: { bg: "rgba(27,107,78,0.06)", iconEmoji: "��", accent: Colors.forest },
+  mission: { bg: "rgba(34,200,138,0.06)", iconEmoji: "✅", accent: Colors.success },
+  paiement: { bg: "rgba(245,166,35,0.06)", iconEmoji: "��", accent: Colors.gold },
+  info: { bg: "rgba(138,149,163,0.06)", iconEmoji: "��️", accent: Colors.textHint },
 };
 
 /* ── Mock data ── */
@@ -40,9 +40,9 @@ const notifications: Notification[] = [
     id: "1",
     type: "devis",
     read: false,
-    title: "Nouveau devis re\çu",
+    title: "Nouveau devis reçu",
     message:
-      "Jean-Michel P. vous a envoy\é un devis pour \« Remplacement robinet \» \— 236,50\€ TTC",
+      "Jean-Michel P. vous a envoyé un devis pour « Remplacement robinet » — 236,50€ TTC",
     time: "Il y a 12 min",
     action: "devis-1",
   },
@@ -50,18 +50,18 @@ const notifications: Notification[] = [
     id: "2",
     type: "mission",
     read: false,
-    title: "Mission confirm\ée",
+    title: "Mission confirmée",
     message:
-      "Votre rendez-vous avec Sophie M. est confirm\é pour demain \à 14h00",
+      "Votre rendez-vous avec Sophie M. est confirmé pour demain à 14h00",
     time: "Il y a 2h",
   },
   {
     id: "3",
     type: "paiement",
     read: true,
-    title: "Paiement valid\é par Nova",
+    title: "Paiement validé par Nova",
     message:
-      "Le paiement de 450,00\€ pour la mission avec Am\élie R. a \ét\é lib\ér\é",
+      "Le paiement de 450,00€ pour la mission avec Amélie R. a été libéré",
     time: "Hier",
   },
   {
@@ -70,7 +70,7 @@ const notifications: Notification[] = [
     read: true,
     title: "Bienvenue sur Nova",
     message:
-      "Votre compte est v\érifi\é. Vous pouvez maintenant rechercher des artisans certifi\és.",
+      "Votre compte est vérifié. Vous pouvez maintenant rechercher des artisans certifiés.",
     time: "Il y a 3 jours",
   },
 ];
@@ -121,7 +121,7 @@ export function ClientNotificationsScreen({
             <View style={styles.notifBottom}>
               <Text style={styles.notifTime}>{item.time}</Text>
               {item.action && (
-                <Text style={styles.notifAction}>Voir le devis \→</Text>
+                <Text style={styles.notifAction}>Voir le devis →</Text>
               )}
             </View>
           </View>

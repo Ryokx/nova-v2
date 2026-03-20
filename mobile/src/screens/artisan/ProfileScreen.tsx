@@ -25,12 +25,12 @@ const company = {
   siret: "123 456 789 00012",
   tva: "FR 12 123456789",
   address: "8 rue des Artisans, 75011 Paris",
-  ape: "4322A \— Plomberie",
+  ape: "4322A — Plomberie",
 };
 
 const certifications = [
-  { label: "Assurance d\écennale", value: "AXA Pro \— D\écennale n\°PLB-2024-8901", valid: true },
-  { label: "Certification RGE", value: "QualiPAC \— Exp. 12/2027", valid: true },
+  { label: "Assurance décennale", value: "AXA Pro — Décennale n°PLB-2024-8901", valid: true },
+  { label: "Certification RGE", value: "QualiPAC — Exp. 12/2027", valid: true },
 ];
 
 interface MenuRow {
@@ -42,14 +42,14 @@ interface MenuRow {
 }
 
 const menuRows: MenuRow[] = [
-  { icon: "\�\�", label: "Paiements", sub: "Historique et virements", screen: "ArtisanPayments" },
-  { icon: "\�\�", label: "Documents", sub: "Devis et factures", screen: "ArtisanDocuments" },
-  { icon: "\�\�", label: "Comptabilit\é", sub: "Connexion Pennylane, Indy, export auto", screen: "Accounting" },
-  { icon: "\�\�", label: "Clients", sub: "Carnet d'adresses et historique", screen: "ClientDirectory" },
-  { icon: "\�\�", label: "QR code", sub: "\À partager sur v\éhicule, cartes, devis", screen: "QRCodeProfile" },
-  { icon: "\�\�", label: "Inviter un artisan (20\€)", sub: "Gagnez 20\€ par parrainage", screen: "Referral" },
-  { icon: "\⚙\️", label: "Param\ètres", sub: "Compte et s\écurit\é", screen: "Settings" },
-  { icon: "\�\�", label: "Support", sub: "Par chat ou email", screen: "Support" },
+  { icon: "��", label: "Paiements", sub: "Historique et virements", screen: "ArtisanPayments" },
+  { icon: "��", label: "Documents", sub: "Devis et factures", screen: "ArtisanDocuments" },
+  { icon: "��", label: "Comptabilité", sub: "Connexion Pennylane, Indy, export auto", screen: "Accounting" },
+  { icon: "��", label: "Clients", sub: "Carnet d'adresses et historique", screen: "ClientDirectory" },
+  { icon: "��", label: "QR code", sub: "À partager sur véhicule, cartes, devis", screen: "QRCodeProfile" },
+  { icon: "��", label: "Inviter un artisan (20€)", sub: "Gagnez 20€ par parrainage", screen: "Referral" },
+  { icon: "⚙️", label: "Paramètres", sub: "Compte et sécurité", screen: "Settings" },
+  { icon: "��", label: "Support", sub: "Par chat ou email", screen: "Support" },
 ];
 
 type EditSection = "personal" | "company" | "certifs" | null;
@@ -96,7 +96,7 @@ export function ArtisanProfileScreen({
         style={styles.editBtn}
       >
         <Text style={styles.editBtnText}>
-          {editSection === section ? "Termin\é" : "\✏\️ Modifier"}
+          {editSection === section ? "Terminé" : "✏️ Modifier"}
         </Text>
       </TouchableOpacity>
     </View>
@@ -118,14 +118,14 @@ export function ArtisanProfileScreen({
           <View style={styles.avatarWrap}>
             <Avatar name={profile.name} size={72} radius={24} />
             <View style={styles.shieldBadge}>
-              <Text style={styles.shieldEmoji}>{"\�\�\️"}</Text>
+              <Text style={styles.shieldEmoji}>{"��️"}</Text>
             </View>
           </View>
           <Text style={styles.profileName}>{profile.name}</Text>
           <Text style={styles.profileSub}>
-            Artisan Certifi\é Nova \• {profile.certifId}
+            Artisan Certifié Nova • {profile.certifId}
           </Text>
-          <Badge label="Certifi\é Nova" variant="certified" size="md" />
+          <Badge label="Certifié Nova" variant="certified" size="md" />
         </View>
 
         {/* Personal info */}
@@ -133,7 +133,7 @@ export function ArtisanProfileScreen({
           <SectionHeader title="Informations personnelles" section="personal" />
           <EditableField label="Nom complet" value={profile.name} section="personal" />
           <EditableField label="Email" value={profile.email} section="personal" />
-          <EditableField label="T\él\éphone" value={profile.phone} section="personal" />
+          <EditableField label="Téléphone" value={profile.phone} section="personal" />
         </View>
 
         {/* Company info */}
@@ -141,9 +141,9 @@ export function ArtisanProfileScreen({
           <SectionHeader title="Informations entreprise" section="company" />
           <EditableField label="Raison sociale" value={company.name} section="company" />
           <EditableField label="SIRET" value={company.siret} section="company" />
-          <EditableField label="N\° TVA intracommunautaire" value={company.tva} section="company" />
-          <EditableField label="Code APE / Activit\é" value={company.ape} section="company" />
-          <EditableField label="Adresse du si\ège" value={company.address} section="company" />
+          <EditableField label="N° TVA intracommunautaire" value={company.tva} section="company" />
+          <EditableField label="Code APE / Activité" value={company.ape} section="company" />
+          <EditableField label="Adresse du siège" value={company.address} section="company" />
         </View>
 
         {/* Certifications */}
@@ -179,7 +179,7 @@ export function ArtisanProfileScreen({
                 <Text style={styles.menuLabel}>{item.label}</Text>
                 <Text style={styles.menuSub}>{item.sub}</Text>
               </View>
-              <Text style={styles.menuChevron}>{"\›"}</Text>
+              <Text style={styles.menuChevron}>{"›"}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -188,9 +188,9 @@ export function ArtisanProfileScreen({
         <View style={styles.card}>
           <TouchableOpacity style={styles.logoutRow} onPress={() => (navigation as any).reset({ index: 0, routes: [{ name: "Auth" }] })}>
             <View style={styles.logoutIconWrap}>
-              <Text style={styles.logoutIcon}>{"\�\�"}</Text>
+              <Text style={styles.logoutIcon}>{"��"}</Text>
             </View>
-            <Text style={styles.logoutText}>Se d\éconnecter</Text>
+            <Text style={styles.logoutText}>Se déconnecter</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

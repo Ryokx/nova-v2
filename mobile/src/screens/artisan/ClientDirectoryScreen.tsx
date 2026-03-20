@@ -14,16 +14,16 @@ import { Avatar } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const clients = [
-  { id: 1, name: "Pierre Martin", initials: "PM", phone: "06 12 34 56 78", missions: 4, lastDate: "15 mars 2026", total: "1 280\€" },
-  { id: 2, name: "Sophie Lef\èvre", initials: "SL", phone: "06 98 76 54 32", missions: 2, lastDate: "10 mars 2026", total: "475\€" },
-  { id: 3, name: "Caroline Durand", initials: "CD", phone: "06 45 67 89 01", missions: 1, lastDate: "2 mars 2026", total: "280\€" },
-  { id: 4, name: "Antoine Moreau", initials: "AM", phone: "06 23 45 67 89", missions: 3, lastDate: "22 f\év 2026", total: "950\€" },
+  { id: 1, name: "Pierre Martin", initials: "PM", phone: "06 12 34 56 78", missions: 4, lastDate: "15 mars 2026", total: "1 280€" },
+  { id: 2, name: "Sophie Lefèvre", initials: "SL", phone: "06 98 76 54 32", missions: 2, lastDate: "10 mars 2026", total: "475€" },
+  { id: 3, name: "Caroline Durand", initials: "CD", phone: "06 45 67 89 01", missions: 1, lastDate: "2 mars 2026", total: "280€" },
+  { id: 4, name: "Antoine Moreau", initials: "AM", phone: "06 23 45 67 89", missions: 3, lastDate: "22 fév 2026", total: "950€" },
 ];
 
 const stats = [
   { v: "4", l: "Clients" },
   { v: "10", l: "Missions" },
-  { v: "2 985\€", l: "CA" },
+  { v: "2 985€", l: "CA" },
 ];
 
 export function ClientDirectoryScreen({
@@ -46,7 +46,7 @@ export function ClientDirectoryScreen({
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.backIcon}>{"\‹"}</Text>
+          <Text style={styles.backIcon}>{"‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Mes clients</Text>
       </View>
@@ -58,7 +58,7 @@ export function ClientDirectoryScreen({
       >
         {/* Search */}
         <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}>{"\�\�"}</Text>
+          <Text style={styles.searchIcon}>{"��"}</Text>
           <TextInput
             style={styles.searchInput}
             value={search}
@@ -84,10 +84,10 @@ export function ClientDirectoryScreen({
 
         {filtered.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>{"\�\�"}</Text>
-            <Text style={styles.emptyTitle}>Aucun r\ésultat</Text>
+            <Text style={styles.emptyIcon}>{"��"}</Text>
+            <Text style={styles.emptyTitle}>Aucun résultat</Text>
             <Text style={styles.emptyDesc}>
-              Aucun client ne correspond \à votre recherche.
+              Aucun client ne correspond à votre recherche.
             </Text>
           </View>
         )}
@@ -98,7 +98,7 @@ export function ClientDirectoryScreen({
             <View style={styles.clientInfo}>
               <Text style={styles.clientName}>{c.name}</Text>
               <Text style={styles.clientSub}>
-                {c.missions} mission{c.missions > 1 ? "s" : ""} \• Dernier : {c.lastDate}
+                {c.missions} mission{c.missions > 1 ? "s" : ""} • Dernier : {c.lastDate}
               </Text>
               <Text style={styles.clientPhone}>{c.phone}</Text>
             </View>
@@ -109,10 +109,10 @@ export function ClientDirectoryScreen({
                   style={styles.smallBtn}
                   onPress={() => Linking.openURL(`tel:${c.phone}`)}
                 >
-                  <Text style={styles.smallBtnIcon}>{"\�\�"}</Text>
+                  <Text style={styles.smallBtnIcon}>{"��"}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.smallBtn}>
-                  <Text style={styles.smallBtnIcon}>{"\�\�"}</Text>
+                  <Text style={styles.smallBtnIcon}>{"��"}</Text>
                 </TouchableOpacity>
               </View>
             </View>

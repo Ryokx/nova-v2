@@ -30,45 +30,45 @@ interface DocItem {
 const docs: Record<DocTab, DocItem[]> = {
   devis: [
     {
-      id: "#DEV-2026-089", client: "Caroline Lef\èvre", clientAddr: "12 rue de Clichy, 75009 Paris",
-      date: "17 mars 2026", amount: "236,50\€", ht: "215,00\€", tva: "21,50\€",
-      status: "Accept\é", sColor: Colors.success,
-      lines: [["Remplacement robinet mitigeur", "1", "85,00\€", "85,00\€"], ["Main d'\œuvre", "2h", "65,00\€", "130,00\€"]],
+      id: "#DEV-2026-089", client: "Caroline Lefèvre", clientAddr: "12 rue de Clichy, 75009 Paris",
+      date: "17 mars 2026", amount: "236,50€", ht: "215,00€", tva: "21,50€",
+      status: "Accepté", sColor: Colors.success,
+      lines: [["Remplacement robinet mitigeur", "1", "85,00€", "85,00€"], ["Main d'œuvre", "2h", "65,00€", "130,00€"]],
       validity: "14 jours",
     },
     {
       id: "#DEV-2026-085", client: "Pierre Martin", clientAddr: "5 rue de Charonne, 75011 Paris",
-      date: "10 mars 2026", amount: "890,00\€", ht: "809,09\€", tva: "80,91\€",
+      date: "10 mars 2026", amount: "890,00€", ht: "809,09€", tva: "80,91€",
       status: "En attente", sColor: Colors.gold,
-      lines: [["Installation cumulus 200L", "1", "450,00\€", "450,00\€"], ["Raccordement plomberie", "1", "200,00\€", "200,00\€"], ["Main d'\œuvre", "2h", "65,00\€", "130,00\€"]],
+      lines: [["Installation cumulus 200L", "1", "450,00€", "450,00€"], ["Raccordement plomberie", "1", "200,00€", "200,00€"], ["Main d'œuvre", "2h", "65,00€", "130,00€"]],
       validity: "30 jours",
     },
     {
-      id: "#DEV-2026-078", client: "Am\élie Renard", clientAddr: "23 bd Voltaire, 75011 Paris",
-      date: "28 f\év 2026", amount: "450,00\€", ht: "409,09\€", tva: "40,91\€",
-      status: "Refus\é", sColor: Colors.red,
-      lines: [["R\éparation chauffe-eau", "1", "250,00\€", "250,00\€"], ["Main d'\œuvre", "2h", "65,00\€", "130,00\€"]],
+      id: "#DEV-2026-078", client: "Amélie Renard", clientAddr: "23 bd Voltaire, 75011 Paris",
+      date: "28 fév 2026", amount: "450,00€", ht: "409,09€", tva: "40,91€",
+      status: "Refusé", sColor: Colors.red,
+      lines: [["Réparation chauffe-eau", "1", "250,00€", "250,00€"], ["Main d'œuvre", "2h", "65,00€", "130,00€"]],
       validity: "7 jours",
     },
   ],
   factures: [
     {
-      id: "#FAC-2026-127", client: "Am\élie Renard", clientAddr: "23 bd Voltaire, 75011 Paris",
-      date: "12 mars 2026", amount: "450,00\€", ht: "409,09\€", tva: "40,91\€",
-      status: "Pay\ée", sColor: Colors.success, paid: true,
-      lines: [["R\éparation chauffe-eau", "1", "250,00\€", "250,00\€"], ["Main d'\œuvre", "2h", "65,00\€", "130,00\€"]],
+      id: "#FAC-2026-127", client: "Amélie Renard", clientAddr: "23 bd Voltaire, 75011 Paris",
+      date: "12 mars 2026", amount: "450,00€", ht: "409,09€", tva: "40,91€",
+      status: "Payée", sColor: Colors.success, paid: true,
+      lines: [["Réparation chauffe-eau", "1", "250,00€", "250,00€"], ["Main d'œuvre", "2h", "65,00€", "130,00€"]],
     },
     {
       id: "#FAC-2026-119", client: "Luc Dupont", clientAddr: "8 rue de Lappe, 75011 Paris",
-      date: "5 mars 2026", amount: "320,00\€", ht: "290,91\€", tva: "29,09\€",
-      status: "Pay\ée", sColor: Colors.success, paid: true,
-      lines: [["R\éparation fuite", "1", "180,00\€", "180,00\€"], ["Main d'\œuvre", "1.5h", "65,00\€", "97,50\€"]],
+      date: "5 mars 2026", amount: "320,00€", ht: "290,91€", tva: "29,09€",
+      status: "Payée", sColor: Colors.success, paid: true,
+      lines: [["Réparation fuite", "1", "180,00€", "180,00€"], ["Main d'œuvre", "1.5h", "65,00€", "97,50€"]],
     },
     {
       id: "#FAC-2026-104", client: "Marie Torres", clientAddr: "14 rue Oberkampf, 75011 Paris",
-      date: "28 f\év 2026", amount: "185,00\€", ht: "168,18\€", tva: "16,82\€",
-      status: "Pay\ée", sColor: Colors.success, paid: true,
-      lines: [["D\ébouchage canalisation", "1", "120,00\€", "120,00\€"], ["Main d'\œuvre", "1h", "65,00\€", "65,00\€"]],
+      date: "28 fév 2026", amount: "185,00€", ht: "168,18€", tva: "16,82€",
+      status: "Payée", sColor: Colors.success, paid: true,
+      lines: [["Débouchage canalisation", "1", "120,00€", "120,00€"], ["Main d'œuvre", "1h", "65,00€", "65,00€"]],
     },
   ],
 };
@@ -88,10 +88,10 @@ export function ArtisanDocumentsScreen({
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={() => setSelectedDoc(null)}>
-            <Text style={styles.backIcon}>{"\‹"}</Text>
+            <Text style={styles.backIcon}>{"‹"}</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
-            {isDevis ? "D\étail du devis" : "D\étail de la facture"}
+            {isDevis ? "Détail du devis" : "Détail de la facture"}
           </Text>
         </View>
 
@@ -108,13 +108,13 @@ export function ArtisanDocumentsScreen({
           <View style={styles.docCard}>
             {d.paid && (
               <View style={styles.stamp}>
-                <Text style={styles.stampText}>PAY\É \✓</Text>
+                <Text style={styles.stampText}>PAYÉ ✓</Text>
               </View>
             )}
 
             <View style={styles.docHeader}>
               <View style={styles.docHeaderLeft}>
-                <Text style={styles.docLogo}>{"\�\�\️"}</Text>
+                <Text style={styles.docLogo}>{"��️"}</Text>
                 <Text style={styles.docLogoText}>Nova</Text>
               </View>
               <Text style={styles.docType}>{isDevis ? "DEVIS" : "FACTURE"}</Text>
@@ -136,14 +136,14 @@ export function ArtisanDocumentsScreen({
             {/* Date + validity */}
             <View style={styles.dateRow}>
               <Text style={styles.dateText}>Date : {d.date}</Text>
-              {d.validity && <Text style={styles.dateText}>Validit\é : {d.validity}</Text>}
+              {d.validity && <Text style={styles.dateText}>Validité : {d.validity}</Text>}
             </View>
 
             {/* Lines */}
             <View style={styles.tableWrap}>
               <View style={styles.tableHeader}>
-                <Text style={[styles.thCell, { flex: 2 }]}>D\ésignation</Text>
-                <Text style={[styles.thCell, { flex: 0.5 }]}>Qt\é</Text>
+                <Text style={[styles.thCell, { flex: 2 }]}>Désignation</Text>
+                <Text style={[styles.thCell, { flex: 0.5 }]}>Qté</Text>
                 <Text style={[styles.thCell, { flex: 1 }]}>P.U.</Text>
                 <Text style={[styles.thCell, { flex: 1, textAlign: "right" }]}>Total</Text>
               </View>
@@ -167,17 +167,17 @@ export function ArtisanDocumentsScreen({
 
           {/* Actions */}
           <TouchableOpacity style={styles.pdfBtn}>
-            <Text style={styles.pdfBtnIcon}>{"\�\�"}</Text>
-            <Text style={styles.pdfBtnText}>T\él\écharger en PDF</Text>
+            <Text style={styles.pdfBtnIcon}>{"��"}</Text>
+            <Text style={styles.pdfBtnText}>Télécharger en PDF</Text>
           </TouchableOpacity>
 
           <View style={styles.actionRow}>
             <TouchableOpacity style={styles.actionBtn}>
-              <Text style={styles.actionBtnIcon}>{"\�\�"}</Text>
+              <Text style={styles.actionBtnIcon}>{"��"}</Text>
               <Text style={styles.actionBtnText}>Envoyer au client</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionBtn}>
-              <Text style={styles.actionBtnIcon}>{"\�\�"}</Text>
+              <Text style={styles.actionBtnIcon}>{"��"}</Text>
               <Text style={styles.actionBtnText}>Dupliquer</Text>
             </TouchableOpacity>
           </View>
@@ -191,7 +191,7 @@ export function ArtisanDocumentsScreen({
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.backIcon}>{"\‹"}</Text>
+          <Text style={styles.backIcon}>{"‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Mes documents</Text>
       </View>

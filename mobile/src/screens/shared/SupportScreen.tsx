@@ -287,7 +287,7 @@ export function SupportScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\‹"}</Text>
+          <Text style={styles.backArrow}>{"‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Support</Text>
         <View style={styles.backBtn} />
@@ -325,7 +325,7 @@ export function SupportScreen({
           {/* Input bar */}
           <View style={styles.inputBar}>
             <TouchableOpacity style={styles.attachBtn} activeOpacity={0.7}>
-              <Text style={styles.attachIcon}>{"\�\�"}</Text>
+              <Text style={styles.attachIcon}>{"��"}</Text>
             </TouchableOpacity>
             <TextInput
               style={styles.chatInput}
@@ -345,7 +345,7 @@ export function SupportScreen({
               disabled={!chatInput.trim()}
               activeOpacity={0.7}
             >
-              <Text style={styles.sendIcon}>{"\↑"}</Text>
+              <Text style={styles.sendIcon}>{"↑"}</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -363,7 +363,7 @@ export function SupportScreen({
             /* Success state */
             <View style={styles.successContainer}>
               <View style={styles.successIconWrap}>
-                <Text style={styles.successIcon}>{"\✓"}</Text>
+                <Text style={styles.successIcon}>{"✓"}</Text>
               </View>
               <Text style={styles.successTitle}>Message envoyé !</Text>
               <Text style={styles.successDesc}>
@@ -441,7 +441,7 @@ export function SupportScreen({
                   Alert.alert("Upload", "Fonctionnalité à venir.")
                 }
               >
-                <Text style={styles.uploadIcon}>{"\�\�"}</Text>
+                <Text style={styles.uploadIcon}>{"��"}</Text>
                 <Text style={styles.uploadText}>
                   Appuyez pour ajouter une capture
                 </Text>

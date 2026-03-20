@@ -15,28 +15,28 @@ const cards = [
     type: "Visa" as const,
     last4: "6411",
     expiry: "09/28",
-    holder: "Sophie Lef\èvre",
+    holder: "Sophie Lefèvre",
   },
   {
     id: 1,
     type: "Mastercard" as const,
     last4: "8923",
     expiry: "03/27",
-    holder: "Sophie Lef\èvre",
+    holder: "Sophie Lefèvre",
   },
 ];
 
 const otherMethods = [
   {
     label: "Apple Pay",
-    sub: "Configur\é",
-    icon: "\",
+    sub: "Configuré",
+    icon: "",
     active: true,
   },
   {
     label: "Virement bancaire",
-    sub: "RIB non renseign\é",
-    icon: "\�\�",
+    sub: "RIB non renseigné",
+    icon: "��",
     active: false,
   },
 ];
@@ -68,7 +68,7 @@ export function PaymentMethodsScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\‹"}</Text>
+          <Text style={styles.backArrow}>{"‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Moyens de paiement</Text>
       </View>
@@ -78,7 +78,7 @@ export function PaymentMethodsScreen({
         showsVerticalScrollIndicator={false}
       >
         {/* Saved cards */}
-        <Text style={styles.sectionTitle}>Cartes enregistr\ées</Text>
+        <Text style={styles.sectionTitle}>Cartes enregistrées</Text>
         {cards.map((card) => (
           <TouchableOpacity
             key={card.id}
@@ -93,16 +93,16 @@ export function PaymentMethodsScreen({
             <View style={{ flex: 1 }}>
               <View style={styles.cardNameRow}>
                 <Text style={styles.cardName}>
-                  {card.type} {"\•\•\•\•"} {card.last4}
+                  {card.type} {"••••"} {card.last4}
                 </Text>
                 {defaultCard === card.id && (
                   <View style={styles.defaultBadge}>
-                    <Text style={styles.defaultBadgeText}>Par d\éfaut</Text>
+                    <Text style={styles.defaultBadgeText}>Par défaut</Text>
                   </View>
                 )}
               </View>
               <Text style={styles.cardSub}>
-                {card.holder} {"\•"} Exp. {card.expiry}
+                {card.holder} {"•"} Exp. {card.expiry}
               </Text>
             </View>
             <View
@@ -146,17 +146,17 @@ export function PaymentMethodsScreen({
                   {m.sub}
                 </Text>
               </View>
-              <Text style={styles.chevron}>{"\›"}</Text>
+              <Text style={styles.chevron}>{"›"}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Security info */}
         <View style={styles.securityInfo}>
-          <Text style={{ fontSize: 14 }}>{"\�\�"}</Text>
+          <Text style={{ fontSize: 14 }}>{"��"}</Text>
           <Text style={styles.securityText}>
-            Vos donn\ées bancaires sont chiffr\ées et s\écuris\ées.
-            Nova ne stocke pas vos num\éros de carte complets.
+            Vos données bancaires sont chiffrées et sécurisées.
+            Nova ne stocke pas vos numéros de carte complets.
           </Text>
         </View>
       </ScrollView>

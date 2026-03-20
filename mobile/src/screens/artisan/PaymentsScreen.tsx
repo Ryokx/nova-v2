@@ -13,20 +13,20 @@ import type { ArtisanTabScreenProps } from "../../navigation/types";
 type PayTab = "escrow" | "received" | "pending";
 
 const tabs: { id: PayTab; label: string }[] = [
-  { id: "escrow", label: "En s\équestre" },
-  { id: "received", label: "Re\çus" },
+  { id: "escrow", label: "En séquestre" },
+  { id: "received", label: "Reçus" },
   { id: "pending", label: "En attente" },
 ];
 
 const escrowPayments = [
-  { client: "Caroline L.", mission: "Remplacement robinet", amount: "236,50\€", days: 3 },
-  { client: "Pierre M.", mission: "Installation cumulus", amount: "890,00\€", days: 5 },
+  { client: "Caroline L.", mission: "Remplacement robinet", amount: "236,50€", days: 3 },
+  { client: "Pierre M.", mission: "Installation cumulus", amount: "890,00€", days: 5 },
 ];
 
 const receivedPayments = [
-  { client: "Am\élie R.", amount: "450,00\€", date: "12 mars 2026" },
-  { client: "Luc D.", amount: "320,00\€", date: "5 mars 2026" },
-  { client: "Marie T.", amount: "185,00\€", date: "28 f\év 2026" },
+  { client: "Amélie R.", amount: "450,00€", date: "12 mars 2026" },
+  { client: "Luc D.", amount: "320,00€", date: "5 mars 2026" },
+  { client: "Marie T.", amount: "185,00€", date: "28 fév 2026" },
 ];
 
 export function ArtisanPaymentsScreen({
@@ -67,9 +67,9 @@ export function ArtisanPaymentsScreen({
         {tab === "escrow" && (
           <>
             <View style={styles.infoBanner}>
-              <Text style={styles.infoBannerIcon}>{"\�\�"}</Text>
+              <Text style={styles.infoBannerIcon}>{"��"}</Text>
               <Text style={styles.infoBannerText}>
-                Fonds s\écuris\és chez Nova. Virement sous 48h apr\ès validation par nos \équipes.
+                Fonds sécurisés chez Nova. Virement sous 48h après validation par nos équipes.
               </Text>
             </View>
             {escrowPayments.map((m, i) => (
@@ -109,7 +109,7 @@ export function ArtisanPaymentsScreen({
                 </View>
                 <View style={styles.receivedRight}>
                   <Text style={styles.receivedAmount}>{p.amount}</Text>
-                  <Text style={styles.receivedStatus}>Virement effectu\é \✓</Text>
+                  <Text style={styles.receivedStatus}>Virement effectué ✓</Text>
                 </View>
               </View>
             ))}
@@ -119,7 +119,7 @@ export function ArtisanPaymentsScreen({
         {/* Pending — empty state */}
         {tab === "pending" && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>{"\�\�"}</Text>
+            <Text style={styles.emptyIcon}>{"��"}</Text>
             <Text style={styles.emptyText}>Aucun paiement en attente</Text>
           </View>
         )}

@@ -14,11 +14,11 @@ import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ---- devis line items ---- */
 const lineItems = [
-  { label: "Remplacement siphon PVC", price: "45 \€" },
-  { label: "Joint flexible inox", price: "25 \€" },
-  { label: "Main d'\œuvre (2h)", price: "180 \€" },
-  { label: "D\éplacement", price: "40 \€" },
-  { label: "TVA (10%)", price: "30 \€" },
+  { label: "Remplacement siphon PVC", price: "45 €" },
+  { label: "Joint flexible inox", price: "25 €" },
+  { label: "Main d'œuvre (2h)", price: "180 €" },
+  { label: "Déplacement", price: "40 €" },
+  { label: "TVA (10%)", price: "30 €" },
 ];
 
 export function SignDevisScreen({
@@ -64,11 +64,11 @@ export function SignDevisScreen({
     return (
       <View style={styles.successRoot}>
         <View style={styles.successCircle}>
-          <Text style={styles.successCheck}>{"\✓"}</Text>
+          <Text style={styles.successCheck}>{"✓"}</Text>
         </View>
-        <Text style={styles.successTitle}>Devis sign\é !</Text>
+        <Text style={styles.successTitle}>Devis signé !</Text>
         <Text style={styles.successDesc}>
-          Il ne reste plus qu'\à bloquer le paiement en s\équestre pour
+          Il ne reste plus qu'à bloquer le paiement en séquestre pour
           confirmer l'intervention.
         </Text>
         <TouchableOpacity
@@ -77,7 +77,7 @@ export function SignDevisScreen({
           onPress={() => navigation.goBack()}
         >
           <Text style={styles.primaryBtnText}>
-            Proc\éder au paiement \— 320,00 \€
+            Procéder au paiement — 320,00 €
           </Text>
         </TouchableOpacity>
       </View>
@@ -92,7 +92,7 @@ export function SignDevisScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\‹"}</Text>
+          <Text style={styles.backArrow}>{"‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Signer le devis</Text>
       </View>
@@ -107,10 +107,10 @@ export function SignDevisScreen({
             <View>
               <Text style={styles.devisRef}>Devis #D-2026-089</Text>
               <Text style={styles.devisTitle}>
-                R\éparation fuite sous \évier
+                Réparation fuite sous évier
               </Text>
             </View>
-            <Text style={styles.devisTotal}>320 \€</Text>
+            <Text style={styles.devisTotal}>320 €</Text>
           </View>
           {lineItems.map((item, i) => (
             <View key={i} style={styles.lineItem}>
@@ -126,7 +126,7 @@ export function SignDevisScreen({
           <View>
             <Text style={styles.artisanName}>Jean-Michel Petit</Text>
             <Text style={styles.artisanSub}>
-              Plombier {"\•"} Certifi\é Nova #4521
+              Plombier {"•"} Certifié Nova #4521
             </Text>
           </View>
         </View>
@@ -175,8 +175,8 @@ export function SignDevisScreen({
         {/* Legal notice */}
         <Text style={styles.legalText}>
           En signant ce devis, vous acceptez les conditions de l'intervention et
-          autorisez le blocage de 320,00 \€ en s\équestre. Ce montant sera
-          lib\ér\é \à la validation de l'intervention.
+          autorisez le blocage de 320,00 € en séquestre. Ce montant sera
+          libéré à la validation de l'intervention.
         </Text>
 
         {/* Submit button */}
@@ -189,7 +189,7 @@ export function SignDevisScreen({
           onPress={() => hasDrawn && setSigned(true)}
           disabled={!hasDrawn}
         >
-          <Text style={styles.lockIcon}>{"\�\�"}</Text>
+          <Text style={styles.lockIcon}>{"��"}</Text>
           <Text
             style={[
               styles.submitBtnText,
