@@ -106,7 +106,7 @@ function TabIcon({ name, focused, badge }: { name: string; focused: boolean; bad
   const iconNames: Record<string, string> = {
     Accueil: "home",
     Notifs: "bell",
-    Missions: "briefcase",
+    Interventions: "briefcase",
     Profil: "account",
   };
 
@@ -158,8 +158,8 @@ export function ClientTabs() {
         name="ClientMissions"
         component={MissionsStackScreen}
         options={{
-          tabBarLabel: "Missions",
-          tabBarIcon: ({ focused }) => <TabIcon name="Missions" focused={focused} />,
+          tabBarLabel: "Interventions",
+          tabBarIcon: ({ focused }) => <TabIcon name="Interventions" focused={focused} />,
         }}
       />
       <Tab.Screen

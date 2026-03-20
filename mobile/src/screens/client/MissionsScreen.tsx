@@ -148,7 +148,7 @@ export function ClientMissionsScreen({
     <SafeAreaView style={[styles.safe, { backgroundColor: c.bg }]} edges={["top"]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: c.text }]}>Mes missions</Text>
+        <Text style={[styles.headerTitle, { color: c.text }]}>Interventions</Text>
       </View>
 
       {/* Filter pills */}
