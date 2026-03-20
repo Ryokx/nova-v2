@@ -71,7 +71,6 @@ const allArtisans = Object.values(artisansByCategory).flat();
 
 const sortOptions = [
   { id: "rating", label: "Note" },
-  { id: "price", label: "Prix" },
 ] as const;
 
 type SortId = (typeof sortOptions)[number]["id"];
@@ -122,10 +121,6 @@ export function ArtisanListScreen({
       <View style={{ flex: 1, minWidth: 0 }}>
         <View style={styles.nameRow}>
           <Text style={styles.artisanName}>{a.name}</Text>
-          <Text style={styles.priceText}>
-            {a.price}€
-            <Text style={styles.priceUnit}>/h</Text>
-          </Text>
         </View>
 
         <View style={styles.ratingRow}>

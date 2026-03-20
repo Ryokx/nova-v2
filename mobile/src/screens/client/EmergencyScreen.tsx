@@ -257,7 +257,7 @@ export function EmergencyScreen({
                 </View>
               </TouchableOpacity>
 
-              {/* Response time + price bar */}
+              {/* Response time */}
               <View style={styles.urgencyBar}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                   <MaterialCommunityIcons name="clock-alert" size={13} color={Colors.red} />
@@ -265,10 +265,6 @@ export function EmergencyScreen({
                     Dispo en ~{a.responseTime}
                   </Text>
                 </View>
-                <Text style={styles.priceText}>
-                  {a.price}€
-                  <Text style={styles.priceUnit}>/h</Text>
-                </Text>
               </View>
 
               {/* Action buttons */}

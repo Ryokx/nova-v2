@@ -124,22 +124,6 @@ export function ArtisanProfileScreen({
             <EscrowStepper currentStep={0} />
           </View>
 
-          {/* Pricing row */}
-          <View style={styles.pricingRow}>
-            <View style={styles.pricingCell}>
-              <Text style={styles.priceMono}>65€/h</Text>
-              <Text style={styles.priceSub}>Tarif</Text>
-            </View>
-            <View style={[styles.pricingCell, styles.pricingCellBorder]}>
-              <Text style={styles.priceGreen}>Offert</Text>
-              <Text style={styles.priceSub}>Déplacement</Text>
-            </View>
-            <View style={[styles.pricingCell, styles.pricingCellBorder]}>
-              <Text style={styles.priceForest}>Gratuit</Text>
-              <Text style={styles.priceSub}>Devis</Text>
-            </View>
-          </View>
-
           {/* Reviews */}
           <Text style={styles.sectionTitle}>Avis clients</Text>
           {reviews.map((r, i) => (

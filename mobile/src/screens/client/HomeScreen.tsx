@@ -248,12 +248,9 @@ export function ClientHomeScreen({
                     <Text style={[styles.searchResultName, { color: c.text }]}>{a.name}</Text>
                     <Text style={styles.searchResultJob}>{a.job}</Text>
                   </View>
-                  <View style={styles.searchResultRight}>
-                    <View style={styles.searchResultRating}>
-                      <MaterialCommunityIcons name="star" size={12} color={Colors.gold} />
-                      <Text style={styles.searchResultRatingText}>{a.rating}</Text>
-                    </View>
-                    <Text style={styles.searchResultPrice}>{a.price}€/h</Text>
+                  <View style={styles.searchResultRating}>
+                    <MaterialCommunityIcons name="star" size={12} color={Colors.gold} />
+                    <Text style={styles.searchResultRatingText}>{a.rating}</Text>
                   </View>
                 </TouchableOpacity>
               ))
@@ -319,16 +316,10 @@ export function ClientHomeScreen({
                 <Badge label="Certifié Nova" variant="certified" size="sm" />
               </View>
 
-              {/* Price + response */}
-              <View style={styles.artisanBottom}>
-                <Text style={styles.responseTime}>
-                  Répond en {item.responseTime}
-                </Text>
-                <Text style={styles.price}>
-                  {item.price}€
-                  <Text style={styles.priceUnit}>/h</Text>
-                </Text>
-              </View>
+              {/* Response time */}
+              <Text style={styles.responseTime}>
+                Répond en {item.responseTime}
+              </Text>
             </TouchableOpacity>
           )}
         />
