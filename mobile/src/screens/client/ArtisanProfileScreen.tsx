@@ -15,13 +15,13 @@ const reviews = [
   {
     name: "Caroline L.",
     rating: 5,
-    text: "Excellent travail, tres professionnel et ponctuel. Je recommande vivement !",
+    text: "Excellent travail, très professionnel et ponctuel. Je recommande vivement !",
     date: "Il y a 3 jours",
   },
   {
     name: "Pierre M.",
     rating: 5,
-    text: "Intervention rapide et soignee. Le sequestre Nova m'a rassure.",
+    text: "Intervention rapide et soignée. Le séquestre Nova m'a rassuré.",
     date: "Il y a 1 semaine",
   },
 ];
@@ -76,15 +76,15 @@ export function ArtisanProfileScreen({
         <View style={styles.contentCard}>
           {/* Badges */}
           <View style={styles.badgesRow}>
-            <Badge label="\u{1F6E1}\uFE0F Certifie Nova" variant="certified" size="sm" />
-            <Badge label="\uD83D\uDCCB Decennale" variant="success" size="sm" />
+            <Badge label="\u{1F6E1}\uFE0F Certifié Nova" variant="certified" size="sm" />
+            <Badge label="\uD83D\uDCCB Décennale" variant="success" size="sm" />
             <Badge label="\u26A1 RGE" variant="warning" size="sm" />
           </View>
 
           {/* Escrow explainer */}
           <View style={styles.escrowBox}>
             <Text style={styles.escrowTitle}>
-              {"\uD83D\uDD12"} Comment ca marche
+              {"\uD83D\uDD12"} Comment ça marche
             </Text>
             <EscrowStepper currentStep={0} />
           </View>
@@ -97,7 +97,7 @@ export function ArtisanProfileScreen({
             </View>
             <View style={[styles.pricingCell, styles.pricingCellBorder]}>
               <Text style={styles.priceGreen}>Offert</Text>
-              <Text style={styles.priceSub}>Deplacement</Text>
+              <Text style={styles.priceSub}>Déplacement</Text>
             </View>
             <View style={[styles.pricingCell, styles.pricingCellBorder]}>
               <Text style={styles.priceForest}>Gratuit</Text>
@@ -133,7 +133,7 @@ export function ArtisanProfileScreen({
                 Contrat d'entretien annuel
               </Text>
               <Text style={styles.maintenanceDesc}>
-                Chaudiere, climatisation, VMC — entretien planifie
+                Chaudière, climatisation, VMC — entretien planifié
               </Text>
             </View>
             <Text style={{ fontSize: 16, color: Colors.forest }}>{"\u203A"}</Text>
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   pricingCell: { flex: 1, alignItems: "center" },
   pricingCellBorder: { borderLeftWidth: 1, borderLeftColor: Colors.border },
   priceMono: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 22,
     fontWeight: "700",
     color: Colors.navy,

@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   stampText: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 20,
     color: "rgba(34,200,138,0.35)",
   },
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     color: Colors.navy,
   },
   invoiceId: {
-    fontFamily: "DMMono_600SemiBold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 11,
     color: Colors.forest,
   },
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
   },
   docTotalTTC: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 18,
     color: Colors.navy,
     marginTop: 4,

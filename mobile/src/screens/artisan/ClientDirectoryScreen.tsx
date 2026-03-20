@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(10,22,40,0.04)",
   },
   statValue: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 16,
     color: Colors.forest,
   },
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   },
   clientRight: { alignItems: "flex-end" },
   clientTotal: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 14,
     color: Colors.forest,
   },

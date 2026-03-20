@@ -49,7 +49,7 @@ export function ClientProfileScreen({
 }: ClientTabScreenProps<"ClientProfile">) {
   const handleMenuPress = (item: MenuItem) => {
     if (item.danger) {
-      navigation.navigate("Auth" as any);
+      navigation.reset({ index: 0, routes: [{ name: "Auth" as any }] });
       return;
     }
     if (item.screen) {

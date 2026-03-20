@@ -143,7 +143,7 @@ export function BookingScreen({
         {/* ====== STEP 1 : Details ====== */}
         {step === 1 && (
           <View>
-            <Text style={styles.stepTitle}>Choisissez un creneau</Text>
+            <Text style={styles.stepTitle}>Choisissez un créneau</Text>
             <View style={styles.slotsRow}>
               {TIME_SLOTS.map((s) => (
                 <TouchableOpacity
@@ -169,7 +169,7 @@ export function BookingScreen({
 
             <TextInput
               style={styles.textarea}
-              placeholder="Decrivez votre probleme..."
+              placeholder="Décrivez votre problème..."
               placeholderTextColor={Colors.textHint}
               multiline
               numberOfLines={4}
@@ -198,12 +198,12 @@ export function BookingScreen({
         {/* ====== STEP 2 : Confirmation ====== */}
         {step === 2 && (
           <View>
-            <Text style={styles.stepTitle}>Recapitulatif</Text>
+            <Text style={styles.stepTitle}>Récapitulatif</Text>
             <Card style={{ marginBottom: 16 }}>
               {[
                 ["Artisan", "Jean-Michel P."],
                 ["Date", `${selectedDay} mars 2026`],
-                ["Creneau", selectedSlot || "14h00"],
+                ["Créneau", selectedSlot || "14h00"],
                 ["Adresse", "12 rue de Rivoli, Paris 4e"],
               ].map(([k, v], i) => (
                 <View
@@ -223,7 +223,7 @@ export function BookingScreen({
             <View style={styles.escrowBadge}>
               <Text style={{ fontSize: 16 }}>{"\uD83D\uDD12"}</Text>
               <Text style={styles.escrowBadgeText}>
-                Aucun debit immediat — Nova controle et valide
+                Aucun débit immédiat — Nova contrôle et valide
               </Text>
             </View>
 

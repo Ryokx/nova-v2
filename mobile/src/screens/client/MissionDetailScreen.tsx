@@ -14,7 +14,7 @@ import type { RootStackScreenProps } from "../../navigation/types";
 const CHECKS = [
   "Le travail est conforme au devis",
   "Je suis satisfait de la prestation",
-  "Aucun dommage constate",
+  "Aucun dommage constaté",
 ];
 
 const Stars = ({
@@ -63,9 +63,9 @@ export function MissionDetailScreen({
         <View style={styles.successCircle}>
           <Text style={styles.successCheck}>{"\u2713"}</Text>
         </View>
-        <Text style={styles.successTitle}>Demande envoyee !</Text>
+        <Text style={styles.successTitle}>Demande envoyée !</Text>
         <Text style={styles.successDesc}>
-          Nova valide et libere le paiement sous 48h
+          Nova valide et libère le paiement sous 48h
         </Text>
         <Button
           title="Retour aux missions"
@@ -86,7 +86,7 @@ export function MissionDetailScreen({
         >
           <Text style={styles.backArrow}>{"\u2039"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail de la mission</Text>
+        <Text style={styles.headerTitle}>Détail de la mission</Text>
       </View>
 
       <ScrollView
@@ -103,7 +103,7 @@ export function MissionDetailScreen({
             <View>
               <Text style={styles.artisanName}>Jean-Michel P.</Text>
               <Text style={styles.artisanMeta}>
-                Reparation fuite {"\u2022"} Plomberie
+                Réparation fuite {"\u2022"} Plomberie
               </Text>
             </View>
           </View>
@@ -178,7 +178,7 @@ export function MissionDetailScreen({
         <View style={styles.validationInfo}>
           <Text style={{ fontSize: 16, color: "#0D7A52" }}>{"\u2713"}</Text>
           <Text style={styles.validationInfoText}>
-            Nova verifiera la mission avant de liberer 320\u20AC vers
+            Nova vérifiera la mission avant de libérer 320\u20AC vers
             Jean-Michel P.
           </Text>
         </View>
@@ -190,7 +190,7 @@ export function MissionDetailScreen({
           onPress={() => setValidated(true)}
         >
           <Text style={styles.validateBtnText}>
-            Valider et liberer le paiement
+            Valider et libérer le paiement
           </Text>
         </TouchableOpacity>
 
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   infoLabel: { fontSize: 12.5, color: Colors.textHint },
   infoValue: { fontSize: 12.5, fontWeight: "600", color: Colors.navy },
   infoValueMono: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 13,
     color: Colors.navy,
   },

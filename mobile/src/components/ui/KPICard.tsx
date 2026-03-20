@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   value: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 22,
     color: Colors.navy,
     marginBottom: 2,

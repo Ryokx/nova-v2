@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     color: Colors.textHint,
   },
   remuValue: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 16,
     color: Colors.navy,
   },

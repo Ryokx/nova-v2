@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
     color: Colors.red,
   },
   priceText: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 15,
     color: Colors.navy,
   },

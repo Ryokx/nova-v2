@@ -46,7 +46,7 @@ export function PaymentScreen({
         >
           <Text style={styles.backArrow}>{"\u2039"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Paiement securise</Text>
+        <Text style={styles.headerTitle}>Paiement sécurisé</Text>
       </View>
 
       <ScrollView
@@ -125,8 +125,8 @@ export function PaymentScreen({
             </Text>
             <Text style={styles.klarnaText}>
               {installment === "3x"
-                ? "3 prelevements de 106,67 \u20AC \u2022 Paiement gere par Klarna."
-                : "4 prelevements de 80,00 \u20AC \u2022 Paiement gere par Klarna."}
+                ? "3 prélèvements de 106,67 \u20AC \u2022 Paiement géré par Klarna."
+                : "4 prélèvements de 80,00 \u20AC \u2022 Paiement géré par Klarna."}
             </Text>
           </View>
         )}
@@ -135,7 +135,7 @@ export function PaymentScreen({
         {method === "cb" && (
           <View style={{ marginTop: 16 }}>
             <Input
-              label="Numero de carte"
+              label="Numéro de carte"
               placeholder="4242 4242 4242 4242"
               keyboardType="number-pad"
             />
@@ -164,11 +164,11 @@ export function PaymentScreen({
           <Text style={{ fontSize: 16 }}>{"\uD83D\uDEE1\uFE0F"}</Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.escrowInfoTitle}>
-              Votre argent est securise
+              Votre argent est sécurisé
             </Text>
             <Text style={styles.escrowInfoDesc}>
-              Le montant est bloque sur notre compte sequestre. L'artisan ne
-              sera paye qu'apres validation par nos equipes.
+              Le montant est bloqué sur notre compte séquestre. L'artisan ne
+              sera payé qu'après validation par nos équipes.
             </Text>
           </View>
         </View>
@@ -186,9 +186,9 @@ export function PaymentScreen({
         {/* Security row */}
         <View style={styles.securityRow}>
           {[
-            "Paiement securise SSL",
-            "Donnees chiffrees",
-            "Sequestre garanti",
+            "Paiement sécurisé SSL",
+            "Données chiffrées",
+            "Séquestre garanti",
           ].map((t, i) => (
             <Text key={i} style={styles.securityText}>
               {"\uD83D\uDD12"} {t}
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
 
   /* Amount */
   amount: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 28,
     fontWeight: "700",
     color: Colors.navy,

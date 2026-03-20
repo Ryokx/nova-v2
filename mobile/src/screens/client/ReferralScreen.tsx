@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   codeText: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 16,
     color: Colors.forest,
     letterSpacing: 1,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   stepNumber: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 13,
     color: Colors.forest,
   },
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.bgPage,
   },
   statValue: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 20,
     color: Colors.forest,
   },

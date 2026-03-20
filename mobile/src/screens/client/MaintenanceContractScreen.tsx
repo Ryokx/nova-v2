@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   planPrice: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 18,
     color: Colors.forest,
   },
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   stepNumber: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 11,
     color: Colors.forest,
   },

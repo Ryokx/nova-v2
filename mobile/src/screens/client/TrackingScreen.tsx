@@ -24,25 +24,25 @@ export function TrackingScreen({
 
   const steps: TimelineStep[] = [
     {
-      label: "Devis signe",
-      desc: "Le paiement est bloque en sequestre",
+      label: "Devis signé",
+      desc: "Le paiement est bloqué en séquestre",
       time: "14:02",
       done: true,
     },
     {
       label: "Artisan en route",
-      desc: "Marc D. arrive dans ~15 min",
+      desc: "Jean-Michel P. arrive dans ~15 min",
       time: "14:35",
       done: trackingStep >= 1,
     },
     {
       label: "Sur place",
-      desc: "L'intervention a commence",
+      desc: "L'intervention a commencé",
       time: trackingStep >= 2 ? "14:52" : "\u2014",
       done: trackingStep >= 2,
     },
     {
-      label: "Intervention terminee",
+      label: "Intervention terminée",
       desc: "En attente de votre validation",
       time: trackingStep >= 3 ? "15:40" : "\u2014",
       done: trackingStep >= 3,
@@ -66,11 +66,11 @@ export function TrackingScreen({
         {/* Artisan card */}
         <Card style={{ marginTop: 0 }}>
           <View style={styles.artisanRow}>
-            <Avatar name="Marc Dupont" size={52} radius={18} />
+            <Avatar name="Jean-Michel Petit" size={52} radius={18} />
             <View style={{ flex: 1 }}>
-              <Text style={styles.artisanName}>Marc Dupont</Text>
+              <Text style={styles.artisanName}>Jean-Michel Petit</Text>
               <Text style={styles.artisanMeta}>
-                Plombier {"\u2022"} Fuite sous evier
+                Plombier {"\u2022"} Fuite sous évier
               </Text>
             </View>
             <View style={styles.artisanActions}>
@@ -90,7 +90,7 @@ export function TrackingScreen({
               <View style={{ flex: 1 }}>
                 <Text style={styles.bannerGoldTitle}>En route vers vous</Text>
                 <Text style={styles.bannerGoldSub}>
-                  Arrivee estimee dans ~15 min
+                  Arrivée estimée dans ~15 min
                 </Text>
               </View>
             </View>
@@ -103,7 +103,7 @@ export function TrackingScreen({
                   Intervention en cours
                 </Text>
                 <Text style={styles.bannerGreenSub}>
-                  Marc est sur place depuis 14:52
+                  Jean-Michel est sur place depuis 14:52
                 </Text>
               </View>
             </View>
@@ -115,7 +115,7 @@ export function TrackingScreen({
               </Text>
               <View style={{ flex: 1 }}>
                 <Text style={styles.bannerGreenTitle}>
-                  Intervention terminee
+                  Intervention terminée
                 </Text>
                 <Text style={styles.bannerGreenSub}>
                   En attente de votre validation
@@ -180,14 +180,14 @@ export function TrackingScreen({
         <Card style={{ marginTop: 20 }}>
           <View style={styles.escrowHeader}>
             <Text style={{ fontSize: 14 }}>{"\uD83D\uDD12"}</Text>
-            <Text style={styles.escrowTitle}>Paiement en sequestre</Text>
+            <Text style={styles.escrowTitle}>Paiement en séquestre</Text>
           </View>
           <View style={styles.escrowAmountRow}>
-            <Text style={styles.escrowLabel}>Montant bloque</Text>
+            <Text style={styles.escrowLabel}>Montant bloqué</Text>
             <Text style={styles.escrowAmount}>320,00 \u20AC</Text>
           </View>
           <Text style={styles.escrowNote}>
-            Sera libere apres votre validation de l'intervention
+            Sera libéré après votre validation de l'intervention
           </Text>
         </Card>
 
@@ -195,7 +195,7 @@ export function TrackingScreen({
         <View style={styles.demoRow}>
           {[
             { label: "\u2192 Sur place", step: 2 },
-            { label: "\u2192 Termine", step: 3 },
+            { label: "\u2192 Terminé", step: 3 },
           ]
             .filter((b) => b.step > trackingStep)
             .map((b) => (
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   },
   timelineCheck: { color: Colors.white, fontSize: 12, fontWeight: "700" },
   timelineNum: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 10,
     fontWeight: "700",
     color: Colors.textSecondary,
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   },
   escrowLabel: { fontSize: 12, color: Colors.textSecondary },
   escrowAmount: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 18,
     fontWeight: "700",
     color: Colors.forest,

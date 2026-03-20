@@ -32,13 +32,13 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   },
   {
     id: "2",
-    text: "Bonjour, j'ai une question sur le paiement par sequestre.",
+    text: "Bonjour, j'ai une question sur le paiement par séquestre.",
     sender: "user",
     timestamp: "10:01",
   },
   {
     id: "3",
-    text: "Bien sur ! Le sequestre fonctionne ainsi : le client paie 100% a la signature du devis. L'argent est bloque jusqu'a validation de l'intervention. L'artisan est paye sous 48h apres validation.",
+    text: "Bien sûr ! Le séquestre fonctionne ainsi : le client paie 100% à la signature du devis. L'argent est bloqué jusqu'à validation de l'intervention. L'artisan est payé sous 48h après validation.",
     sender: "bot",
     timestamp: "10:01",
   },
@@ -250,7 +250,7 @@ export function SupportScreen({
     setTimeout(() => {
       const botMsg: ChatMessage = {
         id: String(Date.now() + 1),
-        text: "Merci pour votre message. Un conseiller va prendre le relais sous peu. En attendant, n'hesitez pas a preciser votre demande.",
+        text: "Merci pour votre message. Un conseiller va prendre le relais sous peu. En attendant, n'hésitez pas à préciser votre demande.",
         sender: "bot",
         timestamp: ts,
       };
@@ -266,7 +266,7 @@ export function SupportScreen({
 
   const sendEmail = () => {
     if (!emailBody.trim()) {
-      Alert.alert("Erreur", "Veuillez decrire votre probleme.");
+      Alert.alert("Erreur", "Veuillez décrire votre problème.");
       return;
     }
     setEmailSent(true);
@@ -331,7 +331,7 @@ export function SupportScreen({
               style={styles.chatInput}
               value={chatInput}
               onChangeText={setChatInput}
-              placeholder="Ecrivez votre message..."
+              placeholder="Écrivez votre message..."
               placeholderTextColor={Colors.textHint}
               multiline
               maxLength={1000}
@@ -365,10 +365,10 @@ export function SupportScreen({
               <View style={styles.successIconWrap}>
                 <Text style={styles.successIcon}>{"\u2713"}</Text>
               </View>
-              <Text style={styles.successTitle}>Message envoye !</Text>
+              <Text style={styles.successTitle}>Message envoyé !</Text>
               <Text style={styles.successDesc}>
-                Notre equipe vous repondra sous 24h par email. Vous recevrez une
-                notification lorsque votre ticket sera traite.
+                Notre équipe vous répondra sous 24h par email. Vous recevrez une
+                notification lorsque votre ticket sera traité.
               </Text>
               <TouchableOpacity
                 style={styles.newEmailBtn}
@@ -413,7 +413,7 @@ export function SupportScreen({
                 style={styles.textInput}
                 value={emailSubject}
                 onChangeText={setEmailSubject}
-                placeholder="Resume de votre demande"
+                placeholder="Résumé de votre demande"
                 placeholderTextColor={Colors.textHint}
               />
 
@@ -423,7 +423,7 @@ export function SupportScreen({
                 style={[styles.textInput, styles.textArea]}
                 value={emailBody}
                 onChangeText={setEmailBody}
-                placeholder="Decrivez votre probleme en detail..."
+                placeholder="Décrivez votre problème en détail..."
                 placeholderTextColor={Colors.textHint}
                 multiline
                 numberOfLines={6}
@@ -432,13 +432,13 @@ export function SupportScreen({
 
               {/* Screenshot upload */}
               <Text style={styles.fieldLabel}>
-                Capture d'ecran (optionnel)
+                Capture d'écran (optionnel)
               </Text>
               <TouchableOpacity
                 style={styles.uploadArea}
                 activeOpacity={0.7}
                 onPress={() =>
-                  Alert.alert("Upload", "Fonctionnalite a venir.")
+                  Alert.alert("Upload", "Fonctionnalité à venir.")
                 }
               >
                 <Text style={styles.uploadIcon}>{"\uD83D\uDCF7"}</Text>

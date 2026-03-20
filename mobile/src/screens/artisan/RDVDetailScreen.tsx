@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors, Radii, Shadows } from "../../constants/theme";
@@ -152,7 +153,7 @@ export function RDVDetailScreen({
         {/* Actions */}
         <Button
           title="Confirmer mon arriv\u00E9e"
-          onPress={() => {}}
+          onPress={() => Alert.alert("Confirm\u00e9", "Votre arriv\u00e9e a \u00e9t\u00e9 confirm\u00e9e au client.")}
           fullWidth
           size="lg"
         />

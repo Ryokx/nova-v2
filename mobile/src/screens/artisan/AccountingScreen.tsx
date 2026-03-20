@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   recapValueBold: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 15,
   },
 });

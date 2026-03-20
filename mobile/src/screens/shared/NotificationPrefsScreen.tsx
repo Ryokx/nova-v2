@@ -104,7 +104,7 @@ export function NotificationPrefsScreen({
         >
           <Text style={styles.backArrow}>{"\u2039"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Preferences de notifications</Text>
+        <Text style={styles.headerTitle}>Préférences de notifications</Text>
         <View style={styles.backBtn} />
       </View>
 
@@ -118,7 +118,7 @@ export function NotificationPrefsScreen({
           <PrefRow
             icon={"\uD83D\uDCBC"}
             label="Missions"
-            description="Nouvelles missions, mises a jour de statut"
+            description="Nouvelles missions, mises à jour de statut"
             value={alerts.missions}
             onValueChange={() => toggleAlert("missions")}
           />
@@ -126,7 +126,7 @@ export function NotificationPrefsScreen({
           <PrefRow
             icon={"\uD83D\uDCC4"}
             label="Devis"
-            description="Devis recus, signes, expires"
+            description="Devis reçus, signés, expirés"
             value={alerts.devis}
             onValueChange={() => toggleAlert("devis")}
           />
@@ -134,7 +134,7 @@ export function NotificationPrefsScreen({
           <PrefRow
             icon={"\uD83D\uDCB3"}
             label="Paiements"
-            description="Sequestre, versements, factures"
+            description="Séquestre, versements, factures"
             value={alerts.paiements}
             onValueChange={() => toggleAlert("paiements")}
           />
@@ -150,7 +150,7 @@ export function NotificationPrefsScreen({
           <PrefRow
             icon={"\u23F0"}
             label="Rappels"
-            description="Rendez-vous a venir, echeances"
+            description="Rendez-vous à venir, échéances"
             value={alerts.rappels}
             onValueChange={() => toggleAlert("rappels")}
           />
@@ -161,7 +161,7 @@ export function NotificationPrefsScreen({
           <PrefRow
             icon={"\uD83D\uDD14"}
             label="Push"
-            description="Notifications sur votre telephone"
+            description="Notifications sur votre téléphone"
             value={channels.push}
             onValueChange={() => toggleChannel("push")}
           />
@@ -169,7 +169,7 @@ export function NotificationPrefsScreen({
           <PrefRow
             icon={"\u2709\uFE0F"}
             label="Email"
-            description="Recapitulatifs et confirmations par email"
+            description="Récapitulatifs et confirmations par email"
             value={channels.email}
             onValueChange={() => toggleChannel("email")}
           />

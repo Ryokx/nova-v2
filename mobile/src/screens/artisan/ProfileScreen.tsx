@@ -186,7 +186,7 @@ export function ArtisanProfileScreen({
 
         {/* Logout */}
         <View style={styles.card}>
-          <TouchableOpacity style={styles.logoutRow}>
+          <TouchableOpacity style={styles.logoutRow} onPress={() => (navigation as any).reset({ index: 0, routes: [{ name: "Auth" }] })}>
             <View style={styles.logoutIconWrap}>
               <Text style={styles.logoutIcon}>{"\uD83D\uDEAA"}</Text>
             </View>

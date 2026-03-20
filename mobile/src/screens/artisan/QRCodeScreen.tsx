@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.bgPage,
   },
   statValue: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 18,
     color: Colors.forest,
   },

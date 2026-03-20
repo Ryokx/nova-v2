@@ -122,9 +122,9 @@ export function SignDevisScreen({
 
         {/* Artisan info */}
         <View style={styles.artisanRow}>
-          <Avatar name="Marc Dupont" size={40} radius={14} />
+          <Avatar name="Jean-Michel Petit" size={40} radius={14} />
           <View>
-            <Text style={styles.artisanName}>Marc Dupont</Text>
+            <Text style={styles.artisanName}>Jean-Michel Petit</Text>
             <Text style={styles.artisanSub}>
               Plombier {"\u2022"} Certifi\u00E9 Nova #4521
             </Text>
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     color: Colors.navy,
   },
   devisTotal: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 20,
     color: Colors.forest,
   },

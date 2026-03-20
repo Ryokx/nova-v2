@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: 16, paddingBottom: 100 },
 
   devisId: {
-    fontFamily: "DMMono_600SemiBold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 13,
     color: Colors.forest,
     textAlign: "center",
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
   },
   docTotalTTC: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 18,
     color: Colors.navy,
     marginTop: 4,

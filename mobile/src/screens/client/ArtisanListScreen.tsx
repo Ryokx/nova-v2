@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     color: Colors.navy,
   },
   priceText: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 14,
     color: Colors.forest,
   },

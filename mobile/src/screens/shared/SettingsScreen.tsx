@@ -17,24 +17,24 @@ import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ── Language options ── */
 const LANGUAGES = [
-  { code: "FR", label: "Francais" },
+  { code: "FR", label: "Français" },
   { code: "EN", label: "English" },
-  { code: "ES", label: "Espanol" },
+  { code: "ES", label: "Español" },
 ];
 
 /* ── Legal texts (mock) ── */
 const LEGAL_TEXTS: Record<string, { title: string; body: string }> = {
   cgu: {
-    title: "Conditions Generales d'Utilisation",
-    body: "Les presentes conditions generales d'utilisation (CGU) regissent l'acces et l'utilisation de la plateforme Nova. En accedant a la plateforme, vous acceptez sans reserve l'ensemble de ces conditions.\n\n1. Objet\nNova est une plateforme de mise en relation entre particuliers et artisans certifies. Elle propose un service de paiement par sequestre garantissant la securite des transactions.\n\n2. Inscription\nL'inscription est gratuite et ouverte a toute personne majeure. Les artisans doivent fournir les documents obligatoires : SIRET, assurance decennale et piece d'identite.\n\n3. Sequestre\nLe client paie 100% du montant du devis a la signature. Les fonds sont bloques en sequestre jusqu'a validation de l'intervention par le client. Une commission de 5% est prelevee sur chaque transaction.\n\n4. Responsabilites\nNova agit en tant qu'intermediaire et ne se substitue pas aux obligations respectives des parties. Les artisans restent seuls responsables de la qualite de leurs prestations.\n\n5. Donnees personnelles\nLes donnees sont traitees conformement a notre politique de confidentialite et au RGPD.",
+    title: "Conditions Générales d'Utilisation",
+    body: "Les présentes conditions générales d'utilisation (CGU) régissent l'accès et l'utilisation de la plateforme Nova. En accédant à la plateforme, vous acceptez sans réserve l'ensemble de ces conditions.\n\n1. Objet\nNova est une plateforme de mise en relation entre particuliers et artisans certifiés. Elle propose un service de paiement par séquestre garantissant la sécurité des transactions.\n\n2. Inscription\nL'inscription est gratuite et ouverte à toute personne majeure. Les artisans doivent fournir les documents obligatoires : SIRET, assurance décennale et pièce d'identité.\n\n3. Séquestre\nLe client paie 100% du montant du devis à la signature. Les fonds sont bloqués en séquestre jusqu'à validation de l'intervention par le client. Une commission de 5% est prélevée sur chaque transaction.\n\n4. Responsabilités\nNova agit en tant qu'intermédiaire et ne se substitue pas aux obligations respectives des parties. Les artisans restent seuls responsables de la qualité de leurs prestations.\n\n5. Données personnelles\nLes données sont traitées conformément à notre politique de confidentialité et au RGPD.",
   },
   confidentialite: {
-    title: "Politique de Confidentialite",
-    body: "Nova s'engage a proteger la vie privee de ses utilisateurs conformement au Reglement General sur la Protection des Donnees (RGPD).\n\n1. Donnees collectees\nNous collectons les donnees necessaires au fonctionnement du service : identite, coordonnees, documents professionnels (artisans), historique de transactions.\n\n2. Finalites\nLes donnees sont utilisees pour la mise en relation, la gestion des paiements par sequestre, les communications de service et l'amelioration de la plateforme.\n\n3. Conservation\nLes donnees sont conservees pendant la duree de votre compte et jusqu'a 5 ans apres sa suppression pour les obligations legales.\n\n4. Droits\nVous disposez des droits d'acces, de rectification, de suppression, de portabilite et d'opposition. Contactez support@nova.fr pour exercer vos droits.\n\n5. Securite\nNova utilise le chiffrement SSL/TLS, le sequestre bancaire securise et l'authentification a deux facteurs pour proteger vos donnees.",
+    title: "Politique de Confidentialité",
+    body: "Nova s'engage à protéger la vie privée de ses utilisateurs conformément au Règlement Général sur la Protection des Données (RGPD).\n\n1. Données collectées\nNous collectons les données nécessaires au fonctionnement du service : identité, coordonnées, documents professionnels (artisans), historique de transactions.\n\n2. Finalités\nLes données sont utilisées pour la mise en relation, la gestion des paiements par séquestre, les communications de service et l'amélioration de la plateforme.\n\n3. Conservation\nLes données sont conservées pendant la durée de votre compte et jusqu'à 5 ans après sa suppression pour les obligations légales.\n\n4. Droits\nVous disposez des droits d'accès, de rectification, de suppression, de portabilité et d'opposition. Contactez support@nova.fr pour exercer vos droits.\n\n5. Sécurité\nNova utilise le chiffrement SSL/TLS, le séquestre bancaire sécurisé et l'authentification à deux facteurs pour protéger vos données.",
   },
   mentions: {
-    title: "Mentions Legales",
-    body: "Editeur\nNova SAS\nCapital social : 50 000 EUR\nSiret : 123 456 789 00012\nSiege social : 42 rue de la Tech, 75008 Paris\n\nDirecteur de publication\nEmmanuel A. — Fondateur & CEO\n\nHebergement\nVercel Inc.\n340 S Lemon Ave #4133\nWalnut, CA 91789, USA\n\nContact\nsupport@nova.fr\n01 23 45 67 89",
+    title: "Mentions Légales",
+    body: "Éditeur\nNova SAS\nCapital social : 50 000 EUR\nSiret : 123 456 789 00012\nSiège social : 42 rue de la Tech, 75008 Paris\n\nDirecteur de publication\nEmmanuel A. — Fondateur & CEO\n\nHébergement\nVercel Inc.\n340 S Lemon Ave #4133\nWalnut, CA 91789, USA\n\nContact\nsupport@nova.fr\n01 23 45 67 89",
   },
 };
 
@@ -118,10 +118,10 @@ export function SettingsScreen({
       return;
     }
     if (newPwd.length < 8) {
-      Alert.alert("Erreur", "Le mot de passe doit contenir au moins 8 caracteres.");
+      Alert.alert("Erreur", "Le mot de passe doit contenir au moins 8 caractères.");
       return;
     }
-    Alert.alert("Succes", "Votre mot de passe a ete mis a jour.");
+    Alert.alert("Succès", "Votre mot de passe a été mis à jour.");
     setPasswordModal(false);
     setCurrentPwd("");
     setNewPwd("");
@@ -129,10 +129,10 @@ export function SettingsScreen({
   };
 
   const handleLogout = () => {
-    Alert.alert("Deconnexion", "Voulez-vous vraiment vous deconnecter ?", [
+    Alert.alert("Déconnexion", "Voulez-vous vraiment vous déconnecter ?", [
       { text: "Annuler", style: "cancel" },
       {
-        text: "Deconnexion",
+        text: "Déconnexion",
         style: "destructive",
         onPress: () => navigation.reset({ index: 0, routes: [{ name: "Auth" }] }),
       },
@@ -142,7 +142,7 @@ export function SettingsScreen({
   const handleDeleteAccount = () => {
     Alert.alert(
       "Supprimer mon compte",
-      "Cette action est irreversible. Toutes vos donnees seront supprimees definitivement.",
+      "Cette action est irréversible. Toutes vos données seront supprimées définitivement.",
       [
         { text: "Annuler", style: "cancel" },
         {
@@ -151,7 +151,7 @@ export function SettingsScreen({
           onPress: () => {
             Alert.alert(
               "Confirmation finale",
-              "Etes-vous absolument certain(e) ? Tapez 'SUPPRIMER' pour confirmer.",
+              "Êtes-vous absolument certain(e) ? Tapez 'SUPPRIMER' pour confirmer.",
               [
                 { text: "Annuler", style: "cancel" },
                 {
@@ -180,7 +180,7 @@ export function SettingsScreen({
         >
           <Text style={styles.backArrow}>{"\u2039"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Parametres</Text>
+        <Text style={styles.headerTitle}>Paramètres</Text>
         <View style={styles.backBtn} />
       </View>
 
@@ -205,8 +205,8 @@ export function SettingsScreen({
           />
         </SectionCard>
 
-        {/* Securite */}
-        <SectionCard title="Securite">
+        {/* Sécurité */}
+        <SectionCard title="Sécurité">
           <SettingRow
             icon={"\uD83D\uDD12"}
             label="Mot de passe"
@@ -227,8 +227,8 @@ export function SettingsScreen({
           />
         </SectionCard>
 
-        {/* Preferences */}
-        <SectionCard title="Preferences">
+        {/* Préférences */}
+        <SectionCard title="Préférences">
           <SettingRow
             icon={"\uD83C\uDF10"}
             label="Langue"
@@ -253,23 +253,23 @@ export function SettingsScreen({
           />
         </SectionCard>
 
-        {/* Legal */}
-        <SectionCard title="Legal">
+        {/* Légal */}
+        <SectionCard title="Légal">
           <SettingRow
             icon={"\uD83D\uDCC4"}
-            label="Conditions Generales d'Utilisation"
+            label="Conditions Générales d'Utilisation"
             onPress={() => setLegalModal("cgu")}
           />
           <View style={styles.rowDivider} />
           <SettingRow
             icon={"\uD83D\uDD10"}
-            label="Politique de Confidentialite"
+            label="Politique de Confidentialité"
             onPress={() => setLegalModal("confidentialite")}
           />
           <View style={styles.rowDivider} />
           <SettingRow
             icon={"\u2696\uFE0F"}
-            label="Mentions Legales"
+            label="Mentions Légales"
             onPress={() => setLegalModal("mentions")}
           />
         </SectionCard>
@@ -279,7 +279,7 @@ export function SettingsScreen({
           <Text style={styles.dangerTitle}>Zone de danger</Text>
           <SettingRow
             icon={"\uD83D\uDEAA"}
-            label="Deconnexion"
+            label="Déconnexion"
             onPress={handleLogout}
           />
           <View style={styles.rowDivider} />
@@ -326,7 +326,7 @@ export function SettingsScreen({
               secureTextEntry
               value={newPwd}
               onChangeText={setNewPwd}
-              placeholder="Minimum 8 caracteres"
+              placeholder="Minimum 8 caractères"
               placeholderTextColor={Colors.textHint}
             />
 

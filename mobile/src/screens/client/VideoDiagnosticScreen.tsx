@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.red,
   },
   timerText: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 24,
     color: Colors.white,
   },
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   recBadgeText: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 11,
     color: Colors.red,
   },
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
   },
   infoLabel: { fontSize: 12, color: Colors.textSecondary },
   infoValue: {
-    fontFamily: "DMMono_600SemiBold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 12,
     color: Colors.navy,
   },

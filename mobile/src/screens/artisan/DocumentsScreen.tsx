@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   listDocId: {
-    fontFamily: "DMMono_600SemiBold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 13,
     color: Colors.forest,
   },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     color: Colors.textHint,
   },
   listAmount: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 14,
     color: Colors.navy,
   },
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   docId: {
-    fontFamily: "DMMono_600SemiBold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 13,
     color: Colors.forest,
   },
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   stampText: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 20,
     color: "rgba(34,200,138,0.35)",
   },
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
   },
   totalTTC: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 20,
     color: Colors.navy,
     marginTop: 6,

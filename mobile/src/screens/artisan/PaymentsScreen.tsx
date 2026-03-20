@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     color: Colors.textHint,
   },
   payAmount: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 16,
     color: Colors.navy,
   },
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   receivedRight: { alignItems: "flex-end" },
   receivedAmount: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 15,
     color: Colors.success,
   },

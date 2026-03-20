@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     color: Colors.textHint,
   },
   lineTotal: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 13,
     color: Colors.navy,
   },
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     color: Colors.navy,
   },
   totalValue: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 13,
     color: Colors.navy,
   },

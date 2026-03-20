@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   devisRef: {
-    fontFamily: "DMMono_600SemiBold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 13,
     color: Colors.forest,
   },
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     color: Colors.navy,
   },
   grandTotalValue: {
-    fontFamily: "DMMono_700Bold",
+    fontFamily: "DMMono_500Medium",
     fontSize: 20,
     color: Colors.navy,
   },
