@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useMemo } from "react";
+import React, { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   FlatList,
   ScrollView,
   TextInput,
+  Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -50,10 +51,52 @@ const allArtisans = [
   { id: "13", name: "Mehdi Amrani", job: "Maçon", rating: 4.8, price: 60, category: "mason" },
 ];
 
+/* ── Live interventions ── */
+interface LiveIntervention {
+  id: string;
+  artisan: string;
+  type: string;
+  status: "en_route" | "on_site" | "finishing";
+  eta?: string;
+  startedAt?: string;
+  missionId: string;
+}
+
+const liveInterventions: LiveIntervention[] = [
+  {
+    id: "live-1",
+    artisan: "Jean-Michel P.",
+    type: "Réparation fuite",
+    status: "en_route",
+    eta: "~15 min",
+    missionId: "mission-active",
+  },
+];
+
+const statusConfig = {
+  en_route: { label: "En route", color: Colors.gold, icon: "truck-delivery" as const, bg: "rgba(245,166,35,0.08)" },
+  on_site: { label: "Sur place", color: Colors.forest, icon: "wrench" as const, bg: "rgba(27,107,78,0.08)" },
+  finishing: { label: "Finalisation", color: Colors.success, icon: "check-circle-outline" as const, bg: "rgba(34,200,138,0.08)" },
+};
+
 export function ClientHomeScreen({
   navigation,
 }: ClientTabScreenProps<"ClientHome">) {
   const { c } = useTheme();
+
+  // Pulse animation for live dot
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (liveInterventions.length === 0) return;
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 0.3, duration: 800, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulseAnim]);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -100,6 +143,44 @@ export function ClientHomeScreen({
             <Text style={styles.bellIcon}><MaterialCommunityIcons name="bell" size={22} color={c.text} /></Text>
           </TouchableOpacity>
         </View>
+
+        {/* ── Live interventions ── */}
+        {liveInterventions.length > 0 && (
+          <View style={styles.liveSection}>
+            {liveInterventions.map((live) => {
+              const sc = statusConfig[live.status];
+              return (
+                <TouchableOpacity
+                  key={live.id}
+                  style={[styles.liveCard, { backgroundColor: sc.bg, borderColor: sc.color + "30" }]}
+                  activeOpacity={0.85}
+                  onPress={() => navigation.navigate("Tracking", { missionId: live.missionId })}
+                >
+                  <View style={styles.liveLeft}>
+                    <View style={styles.liveDotWrap}>
+                      <Animated.View style={[styles.liveDot, { backgroundColor: sc.color, opacity: pulseAnim }]} />
+                    </View>
+                    <View style={styles.liveInfo}>
+                      <View style={styles.liveTopRow}>
+                        <Text style={styles.liveLabel}>EN DIRECT</Text>
+                        <View style={[styles.liveStatusBadge, { backgroundColor: sc.color + "20" }]}>
+                          <MaterialCommunityIcons name={sc.icon} size={12} color={sc.color} />
+                          <Text style={[styles.liveStatusText, { color: sc.color }]}>{sc.label}</Text>
+                        </View>
+                      </View>
+                      <Text style={[styles.liveArtisan, { color: c.text }]}>{live.artisan}</Text>
+                      <Text style={styles.liveType}>
+                        {live.type}
+                        {live.eta && <Text style={[styles.liveEta, { color: sc.color }]}> • {live.eta}</Text>}
+                      </Text>
+                    </View>
+                  </View>
+                  <MaterialCommunityIcons name="chevron-right" size={18} color={sc.color} />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
 
         {/* ── Search bar ── */}
         <View style={[styles.searchBar, { backgroundColor: c.card }]}>
@@ -290,6 +371,78 @@ const styles = StyleSheet.create({
   bellIcon: { fontSize: 18 },
 
   /* Search */
+  /* Live interventions */
+  liveSection: {
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  liveCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: 16,
+    padding: 14,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+    marginBottom: 6,
+  },
+  liveLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flex: 1,
+  },
+  liveDotWrap: {
+    width: 10,
+    height: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  liveDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  liveInfo: { flex: 1 },
+  liveTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 4,
+  },
+  liveLabel: {
+    fontFamily: "DMMono_500Medium",
+    fontSize: 9,
+    color: Colors.red,
+    letterSpacing: 1,
+  },
+  liveStatusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  liveStatusText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 10,
+  },
+  liveArtisan: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  liveType: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  liveEta: {
+    fontFamily: "DMMono_500Medium",
+    fontSize: 12,
+  },
+
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
