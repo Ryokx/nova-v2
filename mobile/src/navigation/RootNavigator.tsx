@@ -22,6 +22,7 @@ import { SignDevisScreen } from "../screens/client/SignDevisScreen";
 import { DevisReceivedScreen } from "../screens/client/DevisReceivedScreen";
 import { VideoDiagnosticScreen } from "../screens/client/VideoDiagnosticScreen";
 import { MaintenanceContractScreen } from "../screens/client/MaintenanceContractScreen";
+import { ContractDetailScreen } from "../screens/client/ContractDetailScreen";
 import { ReferralScreen } from "../screens/client/ReferralScreen";
 import { EmergencyScreen } from "../screens/client/EmergencyScreen";
 import { PaymentMethodsScreen } from "../screens/client/PaymentMethodsScreen";
@@ -73,6 +74,7 @@ export function RootNavigator() {
       <Stack.Screen name="Referral" component={ReferralScreen} />
       <Stack.Screen name="Emergency" component={EmergencyScreen} />
       <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
+      <Stack.Screen name="ContractDetail" component={ContractDetailScreen} />
 
       {/* Shared screens */}
       <Stack.Screen name="Support" component={SupportScreen} />

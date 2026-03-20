@@ -53,10 +53,11 @@ interface ActiveContract {
   price: string;
   artisan: string;
   since: string;
+  freq: string;
 }
 
 const initialContracts: ActiveContract[] = [
-  { id: "1", name: "Entretien chaudière", icon: "fire", price: "120€/an", artisan: "Jean-Michel P.", since: "20 mars 2026" },
+  { id: "1", name: "Entretien chaudière", icon: "fire", price: "120€", artisan: "Jean-Michel P.", since: "20 mars 2026", freq: "1 visite / an" },
 ];
 
 export function ClientProfileScreen({
@@ -148,22 +149,25 @@ export function ClientProfileScreen({
               <Text style={styles.contractsTitle}>Contrats actifs</Text>
             </View>
             {contracts.map((c, i) => (
-              <View key={c.id} style={[styles.contractRow, i > 0 && { borderTopWidth: 1, borderTopColor: Colors.surface }]}>
+              <TouchableOpacity
+                key={c.id}
+                style={[styles.contractRow, i > 0 && { borderTopWidth: 1, borderTopColor: Colors.surface }]}
+                activeOpacity={0.85}
+                onPress={() => (navigation as any).navigate("ContractDetail", {
+                  contractId: c.id, name: c.name, icon: c.icon,
+                  price: c.price, artisan: c.artisan, since: c.since, freq: c.freq,
+                })}
+              >
                 <View style={styles.contractIconWrap}>
                   <MaterialCommunityIcons name={c.icon as any} size={16} color={Colors.forest} />
                 </View>
                 <View style={styles.contractInfo}>
                   <Text style={styles.contractName}>{c.name}</Text>
-                  <Text style={styles.contractMeta}>{c.artisan} • {c.price}</Text>
+                  <Text style={styles.contractMeta}>{c.artisan} • {c.price}/an</Text>
                   <Text style={styles.contractSince}>Depuis le {c.since}</Text>
                 </View>
-                <TouchableOpacity
-                  style={styles.contractCancelBtn}
-                  onPress={() => cancelContract(c.id)}
-                >
-                  <Text style={styles.contractCancelText}>Annuler</Text>
-                </TouchableOpacity>
-              </View>
+                <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.textMuted} />
+              </TouchableOpacity>
             ))}
             <View style={styles.contractFooter}>
               <MaterialCommunityIcons name="shield-check" size={12} color={Colors.forest} />

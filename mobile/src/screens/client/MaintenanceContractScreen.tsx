@@ -45,6 +45,17 @@ export function MaintenanceContractScreen({
     setTimeout(() => {
       setProcessing(false);
       setStep("success");
+      // Ask if user wants contract sent by email
+      setTimeout(() => {
+        Alert.alert(
+          "Recevoir le contrat par email ?",
+          "Souhaitez-vous recevoir une copie du contrat à sophie.lefevre@email.com ?",
+          [
+            { text: "Non merci", style: "cancel" },
+            { text: "Oui, envoyer", onPress: () => Alert.alert("Envoyé ✓", "Le contrat a été envoyé à votre adresse email.") },
+          ]
+        );
+      }, 800);
     }, 1500);
   };
 

@@ -21,6 +21,7 @@ export type RootStackParamList = {
   DevisReceived: { devisId: string };
   VideoDialognostic: undefined;
   MaintenanceContract: undefined;
+  ContractDetail: { contractId: string; name: string; icon: string; price: string; artisan: string; since: string; freq: string };
   Referral: undefined;
   Emergency: undefined;
   PaymentMethods: undefined;
