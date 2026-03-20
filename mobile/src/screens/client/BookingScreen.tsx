@@ -181,7 +181,7 @@ export function BookingScreen({
 
             <TouchableOpacity style={styles.photoBtn} activeOpacity={0.7}>
               <Text style={styles.photoBtnText}>
-                <MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /> Ajouter des photos
+                <MaterialCommunityIcons name="camera" size={18} color={Colors.forest} /> Ajouter des photos
               </Text>
             </TouchableOpacity>
 
@@ -222,7 +222,7 @@ export function BookingScreen({
 
             {/* Escrow info */}
             <View style={styles.escrowBadge}>
-              <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+              <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="shield-lock" size={18} color={Colors.forest} /></Text>
               <Text style={styles.escrowBadgeText}>
                 Aucun débit immédiat — Nova contrôle et valide
               </Text>

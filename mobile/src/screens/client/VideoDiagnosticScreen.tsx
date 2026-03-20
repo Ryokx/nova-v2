@@ -69,7 +69,7 @@ export function VideoDiagnosticScreen({
           {/* Hero */}
           <View style={styles.heroSection}>
             <View style={styles.heroIcon}>
-              <Text style={{ fontSize: 36 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+              <Text style={{ fontSize: 36 }}><MaterialCommunityIcons name="video" size={36} color={Colors.red} /></Text>
             </View>
             <Text style={styles.heroTitle}>Filmez votre problème</Text>
             <Text style={styles.heroDesc}>
@@ -123,7 +123,7 @@ export function VideoDiagnosticScreen({
             <View style={[styles.gridLine, { left: "33%", top: 0, bottom: 0, width: 1 }]} />
             <View style={[styles.gridLine, { left: "66%", top: 0, bottom: 0, width: 1 }]} />
           </View>
-          <Text style={{ fontSize: 48, opacity: 0.2 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={{ fontSize: 48, opacity: 0.2 }}><MaterialCommunityIcons name="camera" size={48} color={Colors.white} /></Text>
           <Text style={styles.cameraLabel}>Aperçu caméra</Text>
         </View>
 

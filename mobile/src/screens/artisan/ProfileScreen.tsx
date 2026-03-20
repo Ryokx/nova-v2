@@ -189,7 +189,7 @@ export function ArtisanProfileScreen({
         <View style={styles.card}>
           <TouchableOpacity style={styles.logoutRow} onPress={() => (navigation as any).reset({ index: 0, routes: [{ name: "Auth" }] })}>
             <View style={styles.logoutIconWrap}>
-              <Text style={styles.logoutIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+              <Text style={styles.logoutIcon}><MaterialCommunityIcons name="logout" size={20} color={Colors.red} /></Text>
             </View>
             <Text style={styles.logoutText}>Se déconnecter</Text>
           </TouchableOpacity>

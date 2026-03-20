@@ -168,17 +168,17 @@ export function ArtisanDocumentsScreen({
 
           {/* Actions */}
           <TouchableOpacity style={styles.pdfBtn}>
-            <Text style={styles.pdfBtnIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+            <Text style={styles.pdfBtnIcon}><MaterialCommunityIcons name="file-pdf-box" size={16} color={Colors.forest} /></Text>
             <Text style={styles.pdfBtnText}>Télécharger en PDF</Text>
           </TouchableOpacity>
 
           <View style={styles.actionRow}>
             <TouchableOpacity style={styles.actionBtn}>
-              <Text style={styles.actionBtnIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+              <Text style={styles.actionBtnIcon}><MaterialCommunityIcons name="share-variant" size={16} color={Colors.forest} /></Text>
               <Text style={styles.actionBtnText}>Envoyer au client</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionBtn}>
-              <Text style={styles.actionBtnIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+              <Text style={styles.actionBtnIcon}><MaterialCommunityIcons name="content-copy" size={16} color={Colors.forest} /></Text>
               <Text style={styles.actionBtnText}>Dupliquer</Text>
             </TouchableOpacity>
           </View>

@@ -85,7 +85,7 @@ export function RDVDetailScreen({
             style={styles.phoneBtn}
             onPress={() => Linking.openURL(`tel:${rdv.phone}`)}
           >
-            <Text style={styles.phoneEmoji}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+            <Text style={styles.phoneEmoji}><MaterialCommunityIcons name="phone" size={20} color={Colors.forest} /></Text>
           </TouchableOpacity>
         </View>
 
@@ -125,14 +125,14 @@ export function RDVDetailScreen({
             style={styles.navBtn}
             onPress={() => Linking.openURL(wazeUrl)}
           >
-            <Text style={styles.navIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+            <Text style={styles.navIcon}><MaterialCommunityIcons name="navigation" size={18} color={Colors.white} /></Text>
             <Text style={styles.navLabel}>Ouvrir dans Waze</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navBtn}
             onPress={() => Linking.openURL(gmapsUrl)}
           >
-            <Text style={styles.navIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+            <Text style={styles.navIcon}><MaterialCommunityIcons name="google-maps" size={18} color={Colors.white} /></Text>
             <Text style={styles.navLabel}>Google Maps</Text>
           </TouchableOpacity>
         </View>
@@ -145,7 +145,7 @@ export function RDVDetailScreen({
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={styles.escrowIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={styles.escrowIcon}><MaterialCommunityIcons name="shield-lock" size={16} color={Colors.forest} /></Text>
           <Text style={styles.escrowText}>
             Paiement de {rdv.amount} bloqué en séquestre Nova
           </Text>

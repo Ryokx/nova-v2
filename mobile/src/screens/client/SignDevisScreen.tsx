@@ -190,7 +190,7 @@ export function SignDevisScreen({
           onPress={() => hasDrawn && setSigned(true)}
           disabled={!hasDrawn}
         >
-          <Text style={styles.lockIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={styles.lockIcon}><MaterialCommunityIcons name="lock" size={18} color={Colors.white} /></Text>
           <Text
             style={[
               styles.submitBtnText,

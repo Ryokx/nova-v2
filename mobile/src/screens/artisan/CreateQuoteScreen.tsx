@@ -252,7 +252,7 @@ export function CreateQuoteScreen({
             />
 
             <View style={styles.escrowInfo}>
-              <Text style={styles.escrowIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+              <Text style={styles.escrowIcon}><MaterialCommunityIcons name="shield-lock" size={18} color={Colors.forest} /></Text>
               <Text style={styles.escrowText}>
                 Le client recevra le devis sur son espace Nova et paiera via séquestre
               </Text>

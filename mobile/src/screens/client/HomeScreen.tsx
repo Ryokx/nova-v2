@@ -56,7 +56,7 @@ export function ClientHomeScreen({
 
         {/* ── Search bar ── */}
         <TouchableOpacity style={styles.searchBar} activeOpacity={0.7}>
-          <Text style={styles.searchIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={styles.searchIcon}><MaterialCommunityIcons name="magnify" size={18} color={Colors.textHint} /></Text>
           <Text style={styles.searchPlaceholder}>
             Rechercher un artisan...
           </Text>

@@ -88,7 +88,7 @@ export function ReportDisputeScreen({
 
         {/* Info banner */}
         <View style={styles.infoBanner}>
-          <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="camera-plus" size={20} color={Colors.forest} /></Text>
           <Text style={styles.infoText}>
             Le paiement de 320,00€ est bloqué en séquestre et ne sera
             pas versé à l'artisan tant que le litige n'est pas résolu.
@@ -133,7 +133,7 @@ export function ReportDisputeScreen({
         {/* Photo upload */}
         <Text style={styles.sectionTitle}>Photos (optionnel)</Text>
         <TouchableOpacity style={styles.uploadBtn} activeOpacity={0.85}>
-          <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="alert-circle" size={18} color={Colors.red} /></Text>
           <Text style={styles.uploadBtnText}>
             Ajouter des photos comme preuves
           </Text>

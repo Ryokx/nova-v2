@@ -76,10 +76,10 @@ export function TrackingScreen({
             </View>
             <View style={styles.artisanActions}>
               <TouchableOpacity style={styles.smallIconBtn} activeOpacity={0.7}>
-                <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+                <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="chat-outline" size={18} color={Colors.forest} /></Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.smallIconBtn} activeOpacity={0.7}>
-                <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+                <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="phone-outline" size={18} color={Colors.forest} /></Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -178,7 +178,7 @@ export function TrackingScreen({
         {/* Escrow info card */}
         <Card style={{ marginTop: 20 }}>
           <View style={styles.escrowHeader}>
-            <Text style={{ fontSize: 14 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+            <Text style={{ fontSize: 14 }}><MaterialCommunityIcons name="lock" size={16} color={Colors.lightSage} /></Text>
             <Text style={styles.escrowTitle}>Paiement en séquestre</Text>
           </View>
           <View style={styles.escrowAmountRow}>

@@ -154,7 +154,7 @@ export function PaymentMethodsScreen({
 
         {/* Security info */}
         <View style={styles.securityInfo}>
-          <Text style={{ fontSize: 14 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={{ fontSize: 14 }}><MaterialCommunityIcons name="shield-lock" size={16} color={Colors.forest} /></Text>
           <Text style={styles.securityText}>
             Vos données bancaires sont chiffrées et sécurisées.
             Nova ne stocke pas vos numéros de carte complets.

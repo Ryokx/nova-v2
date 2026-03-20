@@ -326,7 +326,7 @@ export function SupportScreen({
           {/* Input bar */}
           <View style={styles.inputBar}>
             <TouchableOpacity style={styles.attachBtn} activeOpacity={0.7}>
-              <Text style={styles.attachIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+              <Text style={styles.attachIcon}><MaterialCommunityIcons name="paperclip" size={20} color={Colors.textHint} /></Text>
             </TouchableOpacity>
             <TextInput
               style={styles.chatInput}
@@ -442,7 +442,7 @@ export function SupportScreen({
                   Alert.alert("Upload", "Fonctionnalité à venir.")
                 }
               >
-                <Text style={styles.uploadIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+                <Text style={styles.uploadIcon}><MaterialCommunityIcons name="image-plus" size={24} color={Colors.forest} /></Text>
                 <Text style={styles.uploadText}>
                   Appuyez pour ajouter une capture
                 </Text>

@@ -85,7 +85,7 @@ export function ReferralScreen({
         {/* Hero reward */}
         <View style={styles.hero}>
           <View style={styles.heroBlob} />
-          <Text style={styles.heroEmoji}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={styles.heroEmoji}><MaterialCommunityIcons name="gift" size={40} color={Colors.white} /></Text>
           <Text style={styles.heroTitle}>
             Gagnez 20€ par parrainage
           </Text>

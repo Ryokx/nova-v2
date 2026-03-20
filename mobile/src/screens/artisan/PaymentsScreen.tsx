@@ -68,7 +68,7 @@ export function ArtisanPaymentsScreen({
         {tab === "escrow" && (
           <>
             <View style={styles.infoBanner}>
-              <Text style={styles.infoBannerIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+              <Text style={styles.infoBannerIcon}><MaterialCommunityIcons name="shield-lock" size={18} color={Colors.forest} /></Text>
               <Text style={styles.infoBannerText}>
                 Fonds sécurisés chez Nova. Virement sous 48h après validation par nos équipes.
               </Text>
@@ -120,7 +120,7 @@ export function ArtisanPaymentsScreen({
         {/* Pending — empty state */}
         {tab === "pending" && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+            <Text style={styles.emptyIcon}><MaterialCommunityIcons name="clock-outline" size={32} color={Colors.textHint} /></Text>
             <Text style={styles.emptyText}>Aucun paiement en attente</Text>
           </View>
         )}

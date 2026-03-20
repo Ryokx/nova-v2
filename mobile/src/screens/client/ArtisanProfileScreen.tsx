@@ -85,7 +85,7 @@ export function ArtisanProfileScreen({
           {/* Escrow explainer */}
           <View style={styles.escrowBox}>
             <Text style={styles.escrowTitle}>
-              <MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /> Comment ça marche
+              <MaterialCommunityIcons name="information-outline" size={18} color={Colors.forest} /> Comment ça marche
             </Text>
             <EscrowStepper currentStep={0} />
           </View>
@@ -126,7 +126,7 @@ export function ArtisanProfileScreen({
           <TouchableOpacity style={styles.maintenanceCta} activeOpacity={0.8}>
             <View style={styles.maintenanceIcon}>
               <Text style={{ fontSize: 18, color: Colors.white }}>
-                <MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
+                <MaterialCommunityIcons name="file-document-outline" size={18} color={Colors.forest} />
               </Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -149,14 +149,14 @@ export function ArtisanProfileScreen({
           activeOpacity={0.8}
           onPress={() => {}}
         >
-          <Text style={styles.iconBtnText}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={styles.iconBtnText}><MaterialCommunityIcons name="chat-outline" size={18} color={Colors.forest} /></Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconBtn}
           activeOpacity={0.8}
           onPress={() => {}}
         >
-          <Text style={styles.iconBtnText}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={styles.iconBtnText}><MaterialCommunityIcons name="phone-outline" size={18} color={Colors.forest} /></Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.primaryBtn}
@@ -170,7 +170,7 @@ export function ArtisanProfileScreen({
           activeOpacity={0.85}
           onPress={() => navigation.navigate("Emergency")}
         >
-          <Text style={styles.dangerBtnText}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={styles.dangerBtnText}><MaterialCommunityIcons name="lightning-bolt" size={18} color={Colors.white} /></Text>
         </TouchableOpacity>
       </View>
     </View>

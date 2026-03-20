@@ -190,7 +190,7 @@ export function PaymentScreen({
             "Séquestre garanti",
           ].map((t, i) => (
             <Text key={i} style={styles.securityText}>
-              <MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /> {t}
+              <MaterialCommunityIcons name="check-circle" size={14} color={Colors.success} /> {t}
             </Text>
           ))}
         </View>

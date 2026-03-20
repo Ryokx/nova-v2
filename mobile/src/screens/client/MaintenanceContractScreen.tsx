@@ -204,7 +204,7 @@ export function MaintenanceContractScreen({
           onPress={() => selectedPlan && setSubscribed(true)}
           disabled={!selectedPlan}
         >
-          <Text style={{ fontSize: 14 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={{ fontSize: 14 }}><MaterialCommunityIcons name="shield-check" size={16} color={Colors.forest} /></Text>
           <Text
             style={[
               styles.subscribeBtnText,

@@ -149,7 +149,7 @@ export function UrgentDetailScreen({
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={styles.escrowIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={styles.escrowIcon}><MaterialCommunityIcons name="shield-lock" size={16} color={Colors.forest} /></Text>
           <Text style={styles.escrowText}>
             Le paiement sera sécurisé par séquestre Nova. Vous serez payé après
             validation par nos équipes.

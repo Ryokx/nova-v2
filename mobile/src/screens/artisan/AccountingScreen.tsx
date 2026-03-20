@@ -80,7 +80,7 @@ export function AccountingScreen({
       >
         {/* Explainer banner */}
         <View style={styles.explainer}>
-          <Text style={styles.explainerIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={styles.explainerIcon}><MaterialCommunityIcons name="calculator" size={20} color={Colors.forest} /></Text>
           <View style={styles.explainerContent}>
             <Text style={styles.explainerTitle}>Simplifiez votre comptabilité</Text>
             <Text style={styles.explainerDesc}>

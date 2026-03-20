@@ -176,7 +176,7 @@ export function DevisReceivedScreen({
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="shield-lock" size={18} color={Colors.forest} /></Text>
           <Text style={styles.escrowText}>
             En acceptant ce devis, le montant sera bloqué en séquestre.
             L'artisan ne sera payé qu'après validation par Nova.

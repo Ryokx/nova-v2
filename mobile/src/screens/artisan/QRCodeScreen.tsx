@@ -139,7 +139,7 @@ export function QRCodeScreen({
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.shareBtn}>
-            <Text style={styles.shareBtnText}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /> Partager</Text>
+            <Text style={styles.shareBtnText}><MaterialCommunityIcons name="share-variant" size={18} color={Colors.white} /> Partager</Text>
           </TouchableOpacity>
         </View>
 

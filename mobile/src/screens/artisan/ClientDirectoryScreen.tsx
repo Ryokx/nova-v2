@@ -59,7 +59,7 @@ export function ClientDirectoryScreen({
       >
         {/* Search */}
         <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+          <Text style={styles.searchIcon}><MaterialCommunityIcons name="magnify" size={18} color={Colors.textHint} /></Text>
           <TextInput
             style={styles.searchInput}
             value={search}
@@ -85,7 +85,7 @@ export function ClientDirectoryScreen({
 
         {filtered.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+            <Text style={styles.emptyIcon}><MaterialCommunityIcons name="account-group" size={32} color={Colors.textHint} /></Text>
             <Text style={styles.emptyTitle}>Aucun résultat</Text>
             <Text style={styles.emptyDesc}>
               Aucun client ne correspond à votre recherche.
@@ -110,10 +110,10 @@ export function ClientDirectoryScreen({
                   style={styles.smallBtn}
                   onPress={() => Linking.openURL(`tel:${c.phone}`)}
                 >
-                  <Text style={styles.smallBtnIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+                  <Text style={styles.smallBtnIcon}><MaterialCommunityIcons name="phone" size={16} color={Colors.forest} /></Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.smallBtn}>
-                  <Text style={styles.smallBtnIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
+                  <Text style={styles.smallBtnIcon}><MaterialCommunityIcons name="chat" size={16} color={Colors.forest} /></Text>
                 </TouchableOpacity>
               </View>
             </View>
