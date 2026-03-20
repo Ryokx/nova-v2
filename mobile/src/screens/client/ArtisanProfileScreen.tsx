@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Linking,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  FlatList,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
@@ -41,9 +47,37 @@ const Stars = ({ rating, size = 14 }: { rating: number; size?: number }) => (
   </View>
 );
 
+const initialMessages = [
+  { id: "1", from: "artisan", text: "Bonjour ! Comment puis-je vous aider ?", time: "14:30" },
+  { id: "2", from: "client", text: "Bonjour, j'ai une fuite sous l'évier de ma cuisine.", time: "14:31" },
+  { id: "3", from: "artisan", text: "Je peux passer demain matin pour un diagnostic gratuit. Ça vous convient ?", time: "14:32" },
+];
+
 export function ArtisanProfileScreen({
   navigation,
 }: RootStackScreenProps<"ArtisanProfile">) {
+  const [chatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState(initialMessages);
+  const [chatInput, setChatInput] = useState("");
+
+  const sendMessage = () => {
+    if (!chatInput.trim()) return;
+    const now = new Date();
+    const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
+    setMessages((prev) => [
+      ...prev,
+      { id: String(Date.now()), from: "client", text: chatInput.trim(), time },
+    ]);
+    setChatInput("");
+    // Simulate artisan auto-reply
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        { id: String(Date.now() + 1), from: "artisan", text: "Bien reçu, je reviens vers vous rapidement.", time },
+      ]);
+    }, 1500);
+  };
+
   return (
     <View style={styles.root}>
       <ScrollView
@@ -147,32 +181,105 @@ export function ArtisanProfileScreen({
         <TouchableOpacity
           style={styles.iconBtn}
           activeOpacity={0.8}
-          onPress={() => {}}
+          onPress={() => setChatOpen(true)}
         >
-          <Text style={styles.iconBtnText}><MaterialCommunityIcons name="chat-outline" size={18} color={Colors.forest} /></Text>
+          <MaterialCommunityIcons name="chat-outline" size={20} color={Colors.forest} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconBtn}
           activeOpacity={0.8}
-          onPress={() => {}}
+          onPress={() => Linking.openURL("tel:+33612345678")}
         >
-          <Text style={styles.iconBtnText}><MaterialCommunityIcons name="phone-outline" size={18} color={Colors.forest} /></Text>
+          <MaterialCommunityIcons name="phone-outline" size={20} color={Colors.forest} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.primaryBtn}
           activeOpacity={0.85}
           onPress={() => navigation.navigate("Booking", { artisanId: "1" })}
         >
-          <Text style={styles.primaryBtnText}>Prendre RDV</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.dangerBtn}
-          activeOpacity={0.85}
-          onPress={() => navigation.navigate("Emergency")}
-        >
-          <Text style={styles.dangerBtnText}><MaterialCommunityIcons name="lightning-bolt" size={18} color={Colors.white} /></Text>
+          <Text style={styles.primaryBtnText}>Prendre rendez-vous</Text>
         </TouchableOpacity>
       </View>
+
+      {/* ---------- Chat Modal ---------- */}
+      <Modal visible={chatOpen} animationType="slide" presentationStyle="pageSheet">
+        <KeyboardAvoidingView
+          style={styles.chatModal}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          {/* Chat header */}
+          <View style={styles.chatHeader}>
+            <TouchableOpacity onPress={() => setChatOpen(false)}>
+              <MaterialCommunityIcons name="arrow-left" size={22} color={Colors.navy} />
+            </TouchableOpacity>
+            <View style={styles.chatHeaderInfo}>
+              <Avatar name="Jean-Michel" size={32} radius={10} />
+              <View>
+                <Text style={styles.chatHeaderName}>Jean-Michel Petit</Text>
+                <View style={styles.chatOnlineRow}>
+                  <View style={styles.chatOnlineDot} />
+                  <Text style={styles.chatOnlineText}>En ligne</Text>
+                </View>
+              </View>
+            </View>
+            <TouchableOpacity onPress={() => { setChatOpen(false); Linking.openURL("tel:+33612345678"); }}>
+              <MaterialCommunityIcons name="phone" size={20} color={Colors.forest} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Messages */}
+          <FlatList
+            data={messages}
+            keyExtractor={(m) => m.id}
+            style={styles.chatMessages}
+            contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 16 }}
+            renderItem={({ item: m }) => (
+              <View
+                style={[
+                  styles.chatBubble,
+                  m.from === "client" ? styles.chatBubbleClient : styles.chatBubbleArtisan,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.chatBubbleText,
+                    m.from === "client" ? styles.chatBubbleTextClient : styles.chatBubbleTextArtisan,
+                  ]}
+                >
+                  {m.text}
+                </Text>
+                <Text
+                  style={[
+                    styles.chatTime,
+                    m.from === "client" ? styles.chatTimeClient : styles.chatTimeArtisan,
+                  ]}
+                >
+                  {m.time}
+                </Text>
+              </View>
+            )}
+          />
+
+          {/* Chat input */}
+          <View style={styles.chatInputBar}>
+            <TextInput
+              style={styles.chatInput}
+              placeholder="Écrire un message..."
+              placeholderTextColor={Colors.textHint}
+              value={chatInput}
+              onChangeText={setChatInput}
+              multiline
+            />
+            <TouchableOpacity
+              style={[styles.chatSendBtn, !chatInput.trim() && { opacity: 0.4 }]}
+              onPress={sendMessage}
+              disabled={!chatInput.trim()}
+            >
+              <MaterialCommunityIcons name="send" size={18} color={Colors.white} />
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
@@ -231,7 +338,7 @@ const styles = StyleSheet.create({
   },
 
   /* Badges */
-  badgesRow: { flexDirection: "row", gap: 6, marginBottom: 18, flexWrap: "wrap" },
+  badgesRow: { flexDirection: "row", gap: 6, marginBottom: 18, flexWrap: "wrap", justifyContent: "center" },
 
   /* Escrow box */
   escrowBox: {
@@ -351,7 +458,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  iconBtnText: { fontSize: 22 },
   primaryBtn: {
     flex: 1,
     height: 50,
@@ -361,15 +467,81 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     ...Shadows.md,
   },
-  primaryBtnText: { color: Colors.white, fontSize: 15, fontWeight: "600" },
-  dangerBtn: {
-    width: 50,
-    height: 50,
-    borderRadius: 14,
-    backgroundColor: Colors.red,
+  primaryBtnText: { color: Colors.white, fontSize: 15, fontFamily: "Manrope_700Bold" },
+
+  /* Chat modal */
+  chatModal: { flex: 1, backgroundColor: Colors.bgPage },
+  chatHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingTop: 54,
+    paddingHorizontal: 16,
+    paddingBottom: 14,
+    backgroundColor: Colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  chatHeaderInfo: { flex: 1, flexDirection: "row", alignItems: "center", gap: 10 },
+  chatHeaderName: { fontFamily: "DMSans_600SemiBold", fontSize: 15, color: Colors.navy },
+  chatOnlineRow: { flexDirection: "row", alignItems: "center", gap: 4 },
+  chatOnlineDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.success },
+  chatOnlineText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.success },
+  chatMessages: { flex: 1 },
+  chatBubble: {
+    maxWidth: "78%",
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginBottom: 8,
+  },
+  chatBubbleClient: {
+    backgroundColor: Colors.deepForest,
+    alignSelf: "flex-end",
+    borderBottomRightRadius: 4,
+  },
+  chatBubbleArtisan: {
+    backgroundColor: Colors.white,
+    alignSelf: "flex-start",
+    borderBottomLeftRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  chatBubbleText: { fontSize: 14, lineHeight: 20 },
+  chatBubbleTextClient: { color: Colors.white, fontFamily: "DMSans_400Regular" },
+  chatBubbleTextArtisan: { color: Colors.navy, fontFamily: "DMSans_400Regular" },
+  chatTime: { fontSize: 10, marginTop: 4 },
+  chatTimeClient: { color: "rgba(255,255,255,0.5)", textAlign: "right" },
+  chatTimeArtisan: { color: Colors.textMuted },
+  chatInputBar: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingBottom: 30,
+    backgroundColor: Colors.white,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  chatInput: {
+    flex: 1,
+    minHeight: 42,
+    maxHeight: 100,
+    backgroundColor: Colors.bgPage,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontFamily: "DMSans_400Regular",
+    fontSize: 14,
+    color: Colors.navy,
+  },
+  chatSendBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: Colors.forest,
     alignItems: "center",
     justifyContent: "center",
-    ...Shadows.md,
   },
-  dangerBtnText: { fontSize: 18, color: Colors.white },
 });
