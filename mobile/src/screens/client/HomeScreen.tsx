@@ -119,6 +119,24 @@ export function ClientHomeScreen({
           )}
         </View>
 
+        {/* ── Emergency banner ── */}
+        <TouchableOpacity
+          style={[styles.emergencyCard, { backgroundColor: c.card }]}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate("Emergency")}
+        >
+          <View style={styles.emergencyIconWrap}>
+            <MaterialCommunityIcons name="lightning-bolt" size={20} color={Colors.red} />
+          </View>
+          <View style={styles.emergencyTextWrap}>
+            <Text style={styles.emergencyTitle}>Urgence 24h/24</Text>
+            <Text style={styles.emergencyDesc}>Artisan en moins de 2h</Text>
+          </View>
+          <View style={styles.emergencyArrow}>
+            <Text style={styles.emergencyArrowText}>{"›"}</Text>
+          </View>
+        </TouchableOpacity>
+
         {/* ── Search results ── */}
         {showResults && (
           <View style={[styles.searchResults, { backgroundColor: c.card, borderColor: c.border }]}>
@@ -175,31 +193,10 @@ export function ClientHomeScreen({
                   : navigation.navigate("ArtisanListByCategory", { category: cat.id })
               }
             >
-              <MaterialCommunityIcons name={cat.emoji as any} size={22} color={Colors.forest} />
               <Text style={[styles.catLabel, { color: c.text }]}>{cat.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
-
-        {/* ── Emergency banner ── */}
-        <TouchableOpacity
-          style={[styles.emergencyCard, { backgroundColor: c.card }]}
-          activeOpacity={0.85}
-          onPress={() => navigation.navigate("Emergency")}
-        >
-          <View style={styles.emergencyIconWrap}>
-            <Text style={styles.emergencyEmoji}><MaterialCommunityIcons name="lightning-bolt" size={20} color={Colors.red} /></Text>
-          </View>
-          <View style={styles.emergencyTextWrap}>
-            <Text style={styles.emergencyTitle}>Urgence 24h/24</Text>
-            <Text style={styles.emergencyDesc}>
-              Artisan en moins de 2h
-            </Text>
-          </View>
-          <View style={styles.emergencyArrow}>
-            <Text style={styles.emergencyArrowText}>{"›"}</Text>
-          </View>
-        </TouchableOpacity>
 
         {/* ── Top rated section ── */}
         <Text style={[styles.sectionTitle, { color: c.text }]}>Artisans les mieux notés</Text>
