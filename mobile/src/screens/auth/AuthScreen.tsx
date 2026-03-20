@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  skipBtn: { position: "absolute", top: 16, right: 24, zIndex: 10 },
+  skipBtn: { position: "absolute", top: 56, right: 24, zIndex: 10 },
   skipText: {
     fontSize: 13,
     color: Colors.textSecondary,
