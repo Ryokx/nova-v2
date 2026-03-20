@@ -68,7 +68,7 @@ function SettingRow({
         </Text>
       </View>
       {right || (
-        <Text style={styles.chevron}>{"\u203A"}</Text>
+        <Text style={styles.chevron}>{"\›"}</Text>
       )}
     </TouchableOpacity>
   );
@@ -178,7 +178,7 @@ export function SettingsScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\u2039"}</Text>
+          <Text style={styles.backArrow}>{"\‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Paramètres</Text>
         <View style={styles.backBtn} />
@@ -192,7 +192,7 @@ export function SettingsScreen({
         {/* Apparence */}
         <SectionCard title="Apparence">
           <SettingRow
-            icon={"\uD83C\uDF19"}
+            icon={"\�\�"}
             label="Mode sombre"
             right={
               <Switch
@@ -208,13 +208,13 @@ export function SettingsScreen({
         {/* Sécurité */}
         <SectionCard title="Sécurité">
           <SettingRow
-            icon={"\uD83D\uDD12"}
+            icon={"\�\�"}
             label="Mot de passe"
             onPress={() => setPasswordModal(true)}
           />
           <View style={styles.rowDivider} />
           <SettingRow
-            icon={"\uD83D\uDEE1\uFE0F"}
+            icon={"\�\�\️"}
             label="Authentification 2FA"
             right={
               <Switch
@@ -230,7 +230,7 @@ export function SettingsScreen({
         {/* Préférences */}
         <SectionCard title="Préférences">
           <SettingRow
-            icon={"\uD83C\uDF10"}
+            icon={"\�\�"}
             label="Langue"
             right={
               <TouchableOpacity
@@ -238,14 +238,14 @@ export function SettingsScreen({
                 onPress={() => setLangModal(true)}
               >
                 <Text style={styles.langText}>{language}</Text>
-                <Text style={styles.chevronSmall}>{"\u203A"}</Text>
+                <Text style={styles.chevronSmall}>{"\›"}</Text>
               </TouchableOpacity>
             }
             onPress={() => setLangModal(true)}
           />
           <View style={styles.rowDivider} />
           <SettingRow
-            icon={"\uD83D\uDD52"}
+            icon={"\�\�"}
             label="Fuseau horaire"
             right={
               <Text style={styles.valueText}>Europe/Paris (UTC+1)</Text>
@@ -256,19 +256,19 @@ export function SettingsScreen({
         {/* Légal */}
         <SectionCard title="Légal">
           <SettingRow
-            icon={"\uD83D\uDCC4"}
+            icon={"\�\�"}
             label="Conditions Générales d'Utilisation"
             onPress={() => setLegalModal("cgu")}
           />
           <View style={styles.rowDivider} />
           <SettingRow
-            icon={"\uD83D\uDD10"}
+            icon={"\�\�"}
             label="Politique de Confidentialité"
             onPress={() => setLegalModal("confidentialite")}
           />
           <View style={styles.rowDivider} />
           <SettingRow
-            icon={"\u2696\uFE0F"}
+            icon={"\⚖\️"}
             label="Mentions Légales"
             onPress={() => setLegalModal("mentions")}
           />
@@ -278,13 +278,13 @@ export function SettingsScreen({
         <View style={styles.dangerCard}>
           <Text style={styles.dangerTitle}>Zone de danger</Text>
           <SettingRow
-            icon={"\uD83D\uDEAA"}
+            icon={"\�\�"}
             label="Déconnexion"
             onPress={handleLogout}
           />
           <View style={styles.rowDivider} />
           <SettingRow
-            icon={"\u26A0\uFE0F"}
+            icon={"\⚠\️"}
             label="Supprimer mon compte"
             onPress={handleDeleteAccount}
             danger
@@ -306,7 +306,7 @@ export function SettingsScreen({
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Modifier le mot de passe</Text>
               <TouchableOpacity onPress={() => setPasswordModal(false)}>
-                <Text style={styles.modalClose}>{"\u2715"}</Text>
+                <Text style={styles.modalClose}>{"\✕"}</Text>
               </TouchableOpacity>
             </View>
 
@@ -365,7 +365,7 @@ export function SettingsScreen({
                 {currentLegal?.title}
               </Text>
               <TouchableOpacity onPress={() => setLegalModal(null)}>
-                <Text style={styles.modalClose}>{"\u2715"}</Text>
+                <Text style={styles.modalClose}>{"\✕"}</Text>
               </TouchableOpacity>
             </View>
             <ScrollView
@@ -413,7 +413,7 @@ export function SettingsScreen({
                   {lang.label}
                 </Text>
                 {language === lang.code && (
-                  <Text style={styles.langCheck}>{"\u2713"}</Text>
+                  <Text style={styles.langCheck}>{"\✓"}</Text>
                 )}
               </TouchableOpacity>
             ))}

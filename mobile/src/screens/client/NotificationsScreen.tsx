@@ -28,10 +28,10 @@ const typeConfig: Record<
   NotifType,
   { bg: string; iconEmoji: string; accent: string }
 > = {
-  devis: { bg: "rgba(27,107,78,0.06)", iconEmoji: "\uD83D\uDCC4", accent: Colors.forest },
-  mission: { bg: "rgba(34,200,138,0.06)", iconEmoji: "\u2705", accent: Colors.success },
-  paiement: { bg: "rgba(245,166,35,0.06)", iconEmoji: "\uD83D\uDD12", accent: Colors.gold },
-  info: { bg: "rgba(138,149,163,0.06)", iconEmoji: "\uD83D\uDEE1\uFE0F", accent: Colors.textHint },
+  devis: { bg: "rgba(27,107,78,0.06)", iconEmoji: "\�\�", accent: Colors.forest },
+  mission: { bg: "rgba(34,200,138,0.06)", iconEmoji: "\✅", accent: Colors.success },
+  paiement: { bg: "rgba(245,166,35,0.06)", iconEmoji: "\�\�", accent: Colors.gold },
+  info: { bg: "rgba(138,149,163,0.06)", iconEmoji: "\�\�\️", accent: Colors.textHint },
 };
 
 /* ── Mock data ── */
@@ -40,9 +40,9 @@ const notifications: Notification[] = [
     id: "1",
     type: "devis",
     read: false,
-    title: "Nouveau devis re\u00e7u",
+    title: "Nouveau devis re\çu",
     message:
-      "Jean-Michel P. vous a envoy\u00e9 un devis pour \u00ab Remplacement robinet \u00bb \u2014 236,50\u20AC TTC",
+      "Jean-Michel P. vous a envoy\é un devis pour \« Remplacement robinet \» \— 236,50\€ TTC",
     time: "Il y a 12 min",
     action: "devis-1",
   },
@@ -50,18 +50,18 @@ const notifications: Notification[] = [
     id: "2",
     type: "mission",
     read: false,
-    title: "Mission confirm\u00e9e",
+    title: "Mission confirm\ée",
     message:
-      "Votre rendez-vous avec Sophie M. est confirm\u00e9 pour demain \u00e0 14h00",
+      "Votre rendez-vous avec Sophie M. est confirm\é pour demain \à 14h00",
     time: "Il y a 2h",
   },
   {
     id: "3",
     type: "paiement",
     read: true,
-    title: "Paiement valid\u00e9 par Nova",
+    title: "Paiement valid\é par Nova",
     message:
-      "Le paiement de 450,00\u20AC pour la mission avec Am\u00e9lie R. a \u00e9t\u00e9 lib\u00e9r\u00e9",
+      "Le paiement de 450,00\€ pour la mission avec Am\élie R. a \ét\é lib\ér\é",
     time: "Hier",
   },
   {
@@ -70,7 +70,7 @@ const notifications: Notification[] = [
     read: true,
     title: "Bienvenue sur Nova",
     message:
-      "Votre compte est v\u00e9rifi\u00e9. Vous pouvez maintenant rechercher des artisans certifi\u00e9s.",
+      "Votre compte est v\érifi\é. Vous pouvez maintenant rechercher des artisans certifi\és.",
     time: "Il y a 3 jours",
   },
 ];
@@ -121,7 +121,7 @@ export function ClientNotificationsScreen({
             <View style={styles.notifBottom}>
               <Text style={styles.notifTime}>{item.time}</Text>
               {item.action && (
-                <Text style={styles.notifAction}>Voir le devis \u2192</Text>
+                <Text style={styles.notifAction}>Voir le devis \→</Text>
               )}
             </View>
           </View>

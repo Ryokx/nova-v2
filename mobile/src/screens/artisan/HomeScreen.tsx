@@ -16,27 +16,27 @@ import type { ArtisanTabScreenProps } from "../../navigation/types";
 type AvailabilityStatus = "available" | "unavailable" | "urgency";
 
 const availOptions: { id: AvailabilityStatus; label: string }[] = [
-  { id: "available", label: "Disponible \uD83D\uDFE2" },
-  { id: "unavailable", label: "Indisponible \u26D4" },
-  { id: "urgency", label: "Urgences \u26A1" },
+  { id: "available", label: "Disponible \�\�" },
+  { id: "unavailable", label: "Indisponible \⛔" },
+  { id: "urgency", label: "Urgences \⚡" },
 ];
 
 const kpis = [
-  { label: "Revenus du mois", value: "4 820\u20AC", icon: "\uD83D\uDCB6" },
-  { label: "Missions en cours", value: "3", icon: "\uD83D\uDD27" },
-  { label: "Devis en attente", value: "2", icon: "\uD83D\uDCC4" },
-  { label: "Note moyenne", value: "\u2B50 4.9", icon: "\u2B50" },
+  { label: "Revenus du mois", value: "4 820\€", icon: "\�\�" },
+  { label: "Missions en cours", value: "3", icon: "\�\�" },
+  { label: "Devis en attente", value: "2", icon: "\�\�" },
+  { label: "Note moyenne", value: "\⭐ 4.9", icon: "\⭐" },
 ];
 
 const upcomingRdvs = [
-  { client: "Pierre M.", type: "Installation robinet", date: "Auj. 14h", status: "Confirm\u00E9", sColor: Colors.forest },
-  { client: "Am\u00E9lie R.", type: "R\u00E9paration chauffe-eau", date: "Dem. 9h", status: "En cours", sColor: Colors.success },
+  { client: "Pierre M.", type: "Installation robinet", date: "Auj. 14h", status: "Confirm\é", sColor: Colors.forest },
+  { client: "Am\élie R.", type: "R\éparation chauffe-eau", date: "Dem. 9h", status: "En cours", sColor: Colors.success },
   { client: "Luc D.", type: "Diagnostic fuite", date: "18 mars 11h", status: "En attente", sColor: Colors.gold },
 ];
 
 const fabItems = [
-  { label: "Cr\u00E9er un devis", icon: "\uD83D\uDCC4", screen: "CreateQuote" as const },
-  { label: "Nouvelle facture", icon: "\uD83D\uDCC4", screen: "CreateInvoice" as const },
+  { label: "Cr\éer un devis", icon: "\�\�", screen: "CreateQuote" as const },
+  { label: "Nouvelle facture", icon: "\�\�", screen: "CreateInvoice" as const },
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,10 +70,10 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
         <View style={styles.headerBg}>
           <View style={styles.headerRow}>
             <View>
-              <Text style={styles.greeting}>Bonjour Jean-Michel \uD83D\uDC4B</Text>
+              <Text style={styles.greeting}>Bonjour Jean-Michel \�\�</Text>
               <View style={styles.certifRow}>
-                <Text style={styles.certifIcon}>\uD83D\uDEE1\uFE0F</Text>
-                <Text style={styles.certifText}>Certifi\u00E9 Nova \u2022 #2847</Text>
+                <Text style={styles.certifIcon}>\�\�\️</Text>
+                <Text style={styles.certifText}>Certifi\é Nova \• #2847</Text>
               </View>
             </View>
             <View style={styles.headerRight}>
@@ -81,7 +81,7 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
                 style={styles.bellBtn}
                 onPress={() => navigation.navigate("ArtisanNotifications")}
               >
-                <Text style={styles.bellEmoji}>{"\uD83D\uDD14"}</Text>
+                <Text style={styles.bellEmoji}>{"\�\�"}</Text>
                 <View style={styles.bellBadge}>
                   <Text style={styles.bellBadgeText}>3</Text>
                 </View>
@@ -98,7 +98,7 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
 
         {/* ── Availability Toggle ── */}
         <Card style={styles.availCard}>
-          <Text style={styles.availLabel}>Disponibilit\u00E9</Text>
+          <Text style={styles.availLabel}>Disponibilit\é</Text>
           <View style={styles.availRow}>
             {availOptions.map((opt) => {
               const active = avail === opt.id;
@@ -146,12 +146,12 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
           <View style={styles.urgentTop}>
             <View style={styles.urgentLeft}>
               <View style={styles.urgentIconWrap}>
-                <Text style={styles.urgentIconText}>{"\u26A1"}</Text>
+                <Text style={styles.urgentIconText}>{"\⚡"}</Text>
               </View>
               <View>
                 <Text style={styles.urgentTitle}>Fuite d'eau urgente</Text>
                 <Text style={styles.urgentLocation}>Secteur Paris 9e</Text>
-                <Text style={styles.urgentDuration}>Intervention estim\u00E9e : 1h</Text>
+                <Text style={styles.urgentDuration}>Intervention estim\ée : 1h</Text>
               </View>
             </View>
             <Text style={styles.urgentTime}>Il y a 4 min</Text>
@@ -167,7 +167,7 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
               style={styles.urgentDetailBtn}
               onPress={() => navigation.navigate("UrgentDetail", { demandId: "1" })}
             >
-              <Text style={styles.urgentDetailText}>Voir d\u00E9tails</Text>
+              <Text style={styles.urgentDetailText}>Voir d\étails</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -13,14 +13,14 @@ import type { RootStackScreenProps } from "../../navigation/types";
 
 const reasons = [
   "Travail non conforme au devis",
-  "Dommages caus\u00E9s lors de l'intervention",
-  "Artisan ne s'est pas pr\u00E9sent\u00E9",
+  "Dommages caus\és lors de l'intervention",
+  "Artisan ne s'est pas pr\ésent\é",
   "Surfacturation par rapport au devis",
-  "Travail inachev\u00E9",
-  "Autre probl\u00E8me",
+  "Travail inachev\é",
+  "Autre probl\ème",
 ];
 
-const contactOptions = ["Email", "T\u00E9l\u00E9phone", "Les deux"];
+const contactOptions = ["Email", "T\él\éphone", "Les deux"];
 
 export function ReportDisputeScreen({
   navigation,
@@ -35,14 +35,14 @@ export function ReportDisputeScreen({
     return (
       <View style={styles.successRoot}>
         <View style={styles.successCircle}>
-          <Text style={styles.successCheck}>{"\u2713"}</Text>
+          <Text style={styles.successCheck}>{"\✓"}</Text>
         </View>
-        <Text style={styles.successTitle}>Litige signal\u00E9</Text>
+        <Text style={styles.successTitle}>Litige signal\é</Text>
         <Text style={styles.successDesc}>
-          Notre \u00E9quipe va examiner votre demande sous 24h.
+          Notre \équipe va examiner votre demande sous 24h.
         </Text>
         <Text style={styles.successSub}>
-          Le paiement reste bloqu\u00E9 en s\u00E9questre pendant l'examen.
+          Le paiement reste bloqu\é en s\équestre pendant l'examen.
         </Text>
         <TouchableOpacity
           style={styles.primaryBtn}
@@ -63,7 +63,7 @@ export function ReportDisputeScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\u2039"}</Text>
+          <Text style={styles.backArrow}>{"\‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Signaler un litige</Text>
       </View>
@@ -77,20 +77,20 @@ export function ReportDisputeScreen({
           <Avatar name="Jean-Michel P." size={42} radius={14} />
           <View style={{ flex: 1 }}>
             <Text style={styles.missionName}>
-              Jean-Michel P. {"\u2022"} Plomberie
+              Jean-Michel P. {"\•"} Plomberie
             </Text>
             <Text style={styles.missionSub}>
-              15 mars 2026 {"\u2022"} 320,00\u20AC
+              15 mars 2026 {"\•"} 320,00\€
             </Text>
           </View>
         </View>
 
         {/* Info banner */}
         <View style={styles.infoBanner}>
-          <Text style={{ fontSize: 16 }}>{"\uD83D\uDD12"}</Text>
+          <Text style={{ fontSize: 16 }}>{"\�\�"}</Text>
           <Text style={styles.infoText}>
-            Le paiement de 320,00\u20AC est bloqu\u00E9 en s\u00E9questre et ne sera
-            pas vers\u00E9 \u00E0 l'artisan tant que le litige n'est pas r\u00E9solu.
+            Le paiement de 320,00\€ est bloqu\é en s\équestre et ne sera
+            pas vers\é \à l'artisan tant que le litige n'est pas r\ésolu.
           </Text>
         </View>
 
@@ -118,11 +118,11 @@ export function ReportDisputeScreen({
 
         {/* Description */}
         <Text style={[styles.sectionTitle, { marginTop: 20 }]}>
-          D\u00E9crivez le probl\u00E8me
+          D\écrivez le probl\ème
         </Text>
         <TextInput
           style={styles.textarea}
-          placeholder="Expliquez en d\u00E9tail ce qui ne va pas..."
+          placeholder="Expliquez en d\étail ce qui ne va pas..."
           placeholderTextColor={Colors.textHint}
           multiline
           value={description}
@@ -132,7 +132,7 @@ export function ReportDisputeScreen({
         {/* Photo upload */}
         <Text style={styles.sectionTitle}>Photos (optionnel)</Text>
         <TouchableOpacity style={styles.uploadBtn} activeOpacity={0.85}>
-          <Text style={{ fontSize: 16 }}>{"\uD83D\uDCF7"}</Text>
+          <Text style={{ fontSize: 16 }}>{"\�\�"}</Text>
           <Text style={styles.uploadBtnText}>
             Ajouter des photos comme preuves
           </Text>
@@ -140,7 +140,7 @@ export function ReportDisputeScreen({
 
         {/* Contact preference */}
         <Text style={styles.sectionTitle}>
-          Comment souhaitez-vous \u00EAtre contact\u00E9 ?
+          Comment souhaitez-vous \être contact\é ?
         </Text>
         <View style={styles.contactRow}>
           {contactOptions.map((opt, i) => (
@@ -178,8 +178,8 @@ export function ReportDisputeScreen({
           <Text style={styles.submitBtnText}>Envoyer le signalement</Text>
         </TouchableOpacity>
         <Text style={styles.footerNote}>
-          Nova s'engage \u00E0 traiter votre demande sous 24h ouvr\u00E9es. Vous
-          recevrez une notification d\u00E8s qu'une d\u00E9cision sera prise.
+          Nova s'engage \à traiter votre demande sous 24h ouvr\ées. Vous
+          recevrez une notification d\ès qu'une d\écision sera prise.
         </Text>
       </ScrollView>
     </View>

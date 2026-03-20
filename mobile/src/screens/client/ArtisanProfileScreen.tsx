@@ -34,7 +34,7 @@ const Stars = ({ rating, size = 14 }: { rating: number; size?: number }) => (
         key={i}
         style={{ fontSize: size, color: i <= rating ? Colors.gold : Colors.border }}
       >
-        {"\u2605"}
+        {"\★"}
       </Text>
     ))}
   </View>
@@ -56,7 +56,7 @@ export function ArtisanProfileScreen({
             style={styles.backBtn}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.backArrow}>{"\u2039"}</Text>
+            <Text style={styles.backArrow}>{"\‹"}</Text>
           </TouchableOpacity>
 
           <View style={styles.avatarWrap}>
@@ -68,7 +68,7 @@ export function ArtisanProfileScreen({
           <View style={styles.ratingRow}>
             <Stars rating={5} size={15} />
             <Text style={styles.ratingValue}>4.9</Text>
-            <Text style={styles.ratingMissions}>{"\u2022"} 127 missions</Text>
+            <Text style={styles.ratingMissions}>{"\•"} 127 missions</Text>
           </View>
         </View>
 
@@ -76,15 +76,15 @@ export function ArtisanProfileScreen({
         <View style={styles.contentCard}>
           {/* Badges */}
           <View style={styles.badgesRow}>
-            <Badge label="\u{1F6E1}\uFE0F Certifié Nova" variant="certified" size="sm" />
-            <Badge label="\uD83D\uDCCB Décennale" variant="success" size="sm" />
-            <Badge label="\u26A1 RGE" variant="warning" size="sm" />
+            <Badge label="\u{1F6E1}\️ Certifié Nova" variant="certified" size="sm" />
+            <Badge label="\�\� Décennale" variant="success" size="sm" />
+            <Badge label="\⚡ RGE" variant="warning" size="sm" />
           </View>
 
           {/* Escrow explainer */}
           <View style={styles.escrowBox}>
             <Text style={styles.escrowTitle}>
-              {"\uD83D\uDD12"} Comment ça marche
+              {"\�\�"} Comment ça marche
             </Text>
             <EscrowStepper currentStep={0} />
           </View>
@@ -92,7 +92,7 @@ export function ArtisanProfileScreen({
           {/* Pricing row */}
           <View style={styles.pricingRow}>
             <View style={styles.pricingCell}>
-              <Text style={styles.priceMono}>65\u20AC/h</Text>
+              <Text style={styles.priceMono}>65\€/h</Text>
               <Text style={styles.priceSub}>Tarif</Text>
             </View>
             <View style={[styles.pricingCell, styles.pricingCellBorder]}>
@@ -125,7 +125,7 @@ export function ArtisanProfileScreen({
           <TouchableOpacity style={styles.maintenanceCta} activeOpacity={0.8}>
             <View style={styles.maintenanceIcon}>
               <Text style={{ fontSize: 18, color: Colors.white }}>
-                {"\uD83D\uDD54"}
+                {"\�\�"}
               </Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -136,7 +136,7 @@ export function ArtisanProfileScreen({
                 Chaudière, climatisation, VMC — entretien planifié
               </Text>
             </View>
-            <Text style={{ fontSize: 16, color: Colors.forest }}>{"\u203A"}</Text>
+            <Text style={{ fontSize: 16, color: Colors.forest }}>{"\›"}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -148,14 +148,14 @@ export function ArtisanProfileScreen({
           activeOpacity={0.8}
           onPress={() => {}}
         >
-          <Text style={styles.iconBtnText}>{"\uD83D\uDCAC"}</Text>
+          <Text style={styles.iconBtnText}>{"\�\�"}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconBtn}
           activeOpacity={0.8}
           onPress={() => {}}
         >
-          <Text style={styles.iconBtnText}>{"\uD83D\uDCDE"}</Text>
+          <Text style={styles.iconBtnText}>{"\�\�"}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.primaryBtn}
@@ -169,7 +169,7 @@ export function ArtisanProfileScreen({
           activeOpacity={0.85}
           onPress={() => navigation.navigate("Emergency")}
         >
-          <Text style={styles.dangerBtnText}>{"\uD83D\uDEA8"}</Text>
+          <Text style={styles.dangerBtnText}>{"\�\�"}</Text>
         </TouchableOpacity>
       </View>
     </View>

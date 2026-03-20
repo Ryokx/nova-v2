@@ -12,17 +12,17 @@ import { Colors, Radii, Shadows } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const usageTips = [
-  { icon: "\uD83D\uDE90", title: "V\u00E9hicule", desc: "Autocollant sur la porti\u00E8re ou le pare-brise arri\u00E8re" },
-  { icon: "\uD83D\uDCBC", title: "Cartes de visite", desc: "Imprimez le QR code au dos de vos cartes" },
-  { icon: "\uD83D\uDCC4", title: "Devis", desc: "Ajoutez-le en bas de vos documents papier" },
-  { icon: "\uD83D\uDCE7", title: "Signature email", desc: "Ins\u00E9rez le lien dans votre signature" },
-  { icon: "\uD83D\uDCF1", title: "R\u00E9seaux sociaux", desc: "Partagez-le sur votre profil pro" },
+  { icon: "\�\�", title: "V\éhicule", desc: "Autocollant sur la porti\ère ou le pare-brise arri\ère" },
+  { icon: "\�\�", title: "Cartes de visite", desc: "Imprimez le QR code au dos de vos cartes" },
+  { icon: "\�\�", title: "Devis", desc: "Ajoutez-le en bas de vos documents papier" },
+  { icon: "\�\�", title: "Signature email", desc: "Ins\érez le lien dans votre signature" },
+  { icon: "\�\�", title: "R\éseaux sociaux", desc: "Partagez-le sur votre profil pro" },
 ];
 
 const scanStats = [
   { v: "47", l: "Scans ce mois" },
   { v: "12", l: "Nouveaux clients" },
-  { v: "3", l: "Missions g\u00E9n\u00E9r\u00E9es" },
+  { v: "3", l: "Missions g\én\ér\ées" },
 ];
 
 // Generate a simplified QR-like grid pattern using react-native-svg
@@ -98,7 +98,7 @@ export function QRCodeScreen({
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.backIcon}>{"\u2039"}</Text>
+          <Text style={styles.backIcon}>{"\‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Mon QR code</Text>
       </View>
@@ -118,8 +118,8 @@ export function QRCodeScreen({
           <Text style={styles.qrTrade}>Plombier-Chauffagiste</Text>
 
           <View style={styles.certifBadge}>
-            <Text style={styles.certifEmoji}>{"\uD83D\uDEE1\uFE0F"}</Text>
-            <Text style={styles.certifText}>Certifi\u00E9 Nova #2847</Text>
+            <Text style={styles.certifEmoji}>{"\�\�\️"}</Text>
+            <Text style={styles.certifText}>Certifi\é Nova #2847</Text>
           </View>
 
           <View style={styles.urlWrap}>
@@ -134,16 +134,16 @@ export function QRCodeScreen({
             onPress={handleSave}
           >
             <Text style={styles.saveBtnText}>
-              {saved ? "\u2713 Enregistr\u00E9 !" : "\uD83D\uDCF7 Enregistrer l'image"}
+              {saved ? "\✓ Enregistr\é !" : "\�\� Enregistrer l'image"}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.shareBtn}>
-            <Text style={styles.shareBtnText}>{"\uD83D\uDD17"} Partager</Text>
+            <Text style={styles.shareBtnText}>{"\�\�"} Partager</Text>
           </TouchableOpacity>
         </View>
 
         {/* Usage tips */}
-        <Text style={styles.tipsTitle}>O\u00F9 utiliser votre QR code</Text>
+        <Text style={styles.tipsTitle}>O\ù utiliser votre QR code</Text>
         {usageTips.map((tip, i) => (
           <View key={i} style={styles.tipRow}>
             <View style={styles.tipIconWrap}>

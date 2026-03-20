@@ -102,7 +102,7 @@ export function NotificationPrefsScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\u2039"}</Text>
+          <Text style={styles.backArrow}>{"\‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Préférences de notifications</Text>
         <View style={styles.backBtn} />
@@ -116,7 +116,7 @@ export function NotificationPrefsScreen({
         {/* Alert types */}
         <SectionCard title="Types d'alertes">
           <PrefRow
-            icon={"\uD83D\uDCBC"}
+            icon={"\�\�"}
             label="Missions"
             description="Nouvelles missions, mises à jour de statut"
             value={alerts.missions}
@@ -124,7 +124,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"\uD83D\uDCC4"}
+            icon={"\�\�"}
             label="Devis"
             description="Devis reçus, signés, expirés"
             value={alerts.devis}
@@ -132,7 +132,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"\uD83D\uDCB3"}
+            icon={"\�\�"}
             label="Paiements"
             description="Séquestre, versements, factures"
             value={alerts.paiements}
@@ -140,7 +140,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"\uD83D\uDEA8"}
+            icon={"\�\�"}
             label="Urgences"
             description="Demandes urgentes, interventions critiques"
             value={alerts.urgences}
@@ -148,7 +148,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"\u23F0"}
+            icon={"\⏰"}
             label="Rappels"
             description="Rendez-vous à venir, échéances"
             value={alerts.rappels}
@@ -159,7 +159,7 @@ export function NotificationPrefsScreen({
         {/* Channels */}
         <SectionCard title="Canaux de notification">
           <PrefRow
-            icon={"\uD83D\uDD14"}
+            icon={"\�\�"}
             label="Push"
             description="Notifications sur votre téléphone"
             value={channels.push}
@@ -167,7 +167,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"\u2709\uFE0F"}
+            icon={"\✉\️"}
             label="Email"
             description="Récapitulatifs et confirmations par email"
             value={channels.email}
@@ -175,7 +175,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"\uD83D\uDCF1"}
+            icon={"\�\�"}
             label="SMS"
             description="Alertes critiques par SMS"
             value={channels.sms}

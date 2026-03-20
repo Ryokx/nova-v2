@@ -38,13 +38,13 @@ export function TrackingScreen({
     {
       label: "Sur place",
       desc: "L'intervention a commencé",
-      time: trackingStep >= 2 ? "14:52" : "\u2014",
+      time: trackingStep >= 2 ? "14:52" : "\—",
       done: trackingStep >= 2,
     },
     {
       label: "Intervention terminée",
       desc: "En attente de votre validation",
-      time: trackingStep >= 3 ? "15:40" : "\u2014",
+      time: trackingStep >= 3 ? "15:40" : "\—",
       done: trackingStep >= 3,
     },
   ];
@@ -58,7 +58,7 @@ export function TrackingScreen({
             style={styles.backBtn}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.backArrow}>{"\u2039"}</Text>
+            <Text style={styles.backArrow}>{"\‹"}</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Suivi intervention</Text>
         </View>
@@ -70,15 +70,15 @@ export function TrackingScreen({
             <View style={{ flex: 1 }}>
               <Text style={styles.artisanName}>Jean-Michel Petit</Text>
               <Text style={styles.artisanMeta}>
-                Plombier {"\u2022"} Fuite sous évier
+                Plombier {"\•"} Fuite sous évier
               </Text>
             </View>
             <View style={styles.artisanActions}>
               <TouchableOpacity style={styles.smallIconBtn} activeOpacity={0.7}>
-                <Text style={{ fontSize: 16 }}>{"\uD83D\uDCAC"}</Text>
+                <Text style={{ fontSize: 16 }}>{"\�\�"}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.smallIconBtn} activeOpacity={0.7}>
-                <Text style={{ fontSize: 16 }}>{"\uD83D\uDCDE"}</Text>
+                <Text style={{ fontSize: 16 }}>{"\�\�"}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -111,7 +111,7 @@ export function TrackingScreen({
           {trackingStep >= 3 && (
             <View style={styles.bannerGreen}>
               <Text style={{ fontSize: 16, color: Colors.success }}>
-                {"\u2713"}
+                {"\✓"}
               </Text>
               <View style={{ flex: 1 }}>
                 <Text style={styles.bannerGreenTitle}>
@@ -144,7 +144,7 @@ export function TrackingScreen({
                 ]}
               >
                 {s.done ? (
-                  <Text style={styles.timelineCheck}>{"\u2713"}</Text>
+                  <Text style={styles.timelineCheck}>{"\✓"}</Text>
                 ) : (
                   <Text style={styles.timelineNum}>{i + 1}</Text>
                 )}
@@ -179,12 +179,12 @@ export function TrackingScreen({
         {/* Escrow info card */}
         <Card style={{ marginTop: 20 }}>
           <View style={styles.escrowHeader}>
-            <Text style={{ fontSize: 14 }}>{"\uD83D\uDD12"}</Text>
+            <Text style={{ fontSize: 14 }}>{"\�\�"}</Text>
             <Text style={styles.escrowTitle}>Paiement en séquestre</Text>
           </View>
           <View style={styles.escrowAmountRow}>
             <Text style={styles.escrowLabel}>Montant bloqué</Text>
-            <Text style={styles.escrowAmount}>320,00 \u20AC</Text>
+            <Text style={styles.escrowAmount}>320,00 \€</Text>
           </View>
           <Text style={styles.escrowNote}>
             Sera libéré après votre validation de l'intervention
@@ -194,8 +194,8 @@ export function TrackingScreen({
         {/* Demo advance buttons */}
         <View style={styles.demoRow}>
           {[
-            { label: "\u2192 Sur place", step: 2 },
-            { label: "\u2192 Terminé", step: 3 },
+            { label: "\→ Sur place", step: 2 },
+            { label: "\→ Terminé", step: 3 },
           ]
             .filter((b) => b.step > trackingStep)
             .map((b) => (

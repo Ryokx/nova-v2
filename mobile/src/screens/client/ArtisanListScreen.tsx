@@ -39,7 +39,7 @@ const artisansByCategory: Record<
   ],
   locksmith: [
     { id: "3", name: "Karim B.", rating: 5.0, reviews: 83, price: 60, initials: "KB", responseTime: "< 30min", missions: 83, available: true },
-    { id: "11", name: "\u00C9ric F.", rating: 4.7, reviews: 45, price: 65, initials: "EF", responseTime: "< 1h", missions: 45, available: true },
+    { id: "11", name: "\Éric F.", rating: 4.7, reviews: 45, price: 65, initials: "EF", responseTime: "< 1h", missions: 45, available: true },
   ],
   mason: [
     { id: "12", name: "Philippe C.", rating: 4.6, reviews: 34, price: 55, initials: "PC", responseTime: "< 4h", missions: 34, available: true },
@@ -57,9 +57,9 @@ const artisansByCategory: Record<
 
 const categoryLabels: Record<string, string> = {
   plumber: "Plombier",
-  electrician: "\u00C9lectricien",
+  electrician: "\Électricien",
   locksmith: "Serrurier",
-  mason: "Ma\u00E7on",
+  mason: "Ma\çon",
   heating: "Chauffagiste",
   painter: "Peintre",
 };
@@ -80,7 +80,7 @@ const Stars = ({ rating, size = 13 }: { rating: number; size?: number }) => (
         key={i}
         style={{ fontSize: size, color: i <= rating ? Colors.gold : Colors.border }}
       >
-        {"\u2605"}
+        {"\★"}
       </Text>
     ))}
   </View>
@@ -120,7 +120,7 @@ export function ArtisanListScreen({
         <View style={styles.nameRow}>
           <Text style={styles.artisanName}>{a.name}</Text>
           <Text style={styles.priceText}>
-            {a.price}\u20AC
+            {a.price}\€
             <Text style={styles.priceUnit}>/h</Text>
           </Text>
         </View>
@@ -129,17 +129,17 @@ export function ArtisanListScreen({
           <Stars rating={Math.round(a.rating)} size={13} />
           <Text style={styles.ratingValue}>{a.rating}</Text>
           <Text style={styles.metaSep}>{a.reviews} avis</Text>
-          <Text style={styles.dot}>{"\u2022"}</Text>
+          <Text style={styles.dot}>{"\•"}</Text>
           <Text style={styles.metaSep}>{a.missions} missions</Text>
         </View>
 
         <View style={styles.badgeRow}>
           <Badge
-            label={"\uD83D\uDEE1\uFE0F Certifi\u00E9 Nova"}
+            label={"\�\�\️ Certifi\é Nova"}
             variant="certified"
             size="sm"
           />
-          <Text style={styles.responseText}>R\u00E9pond en {a.responseTime}</Text>
+          <Text style={styles.responseText}>R\épond en {a.responseTime}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -153,7 +153,7 @@ export function ArtisanListScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\u2039"}</Text>
+          <Text style={styles.backArrow}>{"\‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{catLabel}</Text>
       </View>
@@ -195,10 +195,10 @@ export function ArtisanListScreen({
         showsVerticalScrollIndicator={false}
         ListFooterComponent={
           <View style={styles.trustFooter}>
-            <Text style={styles.trustIcon}>{"\uD83D\uDEE1\uFE0F"}</Text>
+            <Text style={styles.trustIcon}>{"\�\�\️"}</Text>
             <Text style={styles.trustText}>
-              Tous les artisans Nova sont v\u00E9rifi\u00E9s, assur\u00E9s et soumis au
-              paiement s\u00E9curis\u00E9 par s\u00E9questre.
+              Tous les artisans Nova sont v\érifi\és, assur\és et soumis au
+              paiement s\écuris\é par s\équestre.
             </Text>
           </View>
         }

@@ -66,7 +66,7 @@ export function BookingScreen({
           style={styles.backBtn}
           onPress={() => (step > 0 ? setStep(step - 1) : navigation.goBack())}
         >
-          <Text style={styles.backArrow}>{"\u2039"}</Text>
+          <Text style={styles.backArrow}>{"\‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Prise de rendez-vous</Text>
       </View>
@@ -180,7 +180,7 @@ export function BookingScreen({
 
             <TouchableOpacity style={styles.photoBtn} activeOpacity={0.7}>
               <Text style={styles.photoBtnText}>
-                {"\uD83D\uDCF7"} Ajouter des photos
+                {"\�\�"} Ajouter des photos
               </Text>
             </TouchableOpacity>
 
@@ -221,7 +221,7 @@ export function BookingScreen({
 
             {/* Escrow info */}
             <View style={styles.escrowBadge}>
-              <Text style={{ fontSize: 16 }}>{"\uD83D\uDD12"}</Text>
+              <Text style={{ fontSize: 16 }}>{"\�\�"}</Text>
               <Text style={styles.escrowBadgeText}>
                 Aucun débit immédiat — Nova contrôle et valide
               </Text>

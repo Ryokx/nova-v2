@@ -35,7 +35,7 @@ const Stars = ({
             color: i <= rating ? Colors.gold : Colors.border,
           }}
         >
-          {"\u2605"}
+          {"\★"}
         </Text>
       </TouchableOpacity>
     ))}
@@ -61,7 +61,7 @@ export function MissionDetailScreen({
     return (
       <View style={styles.successRoot}>
         <View style={styles.successCircle}>
-          <Text style={styles.successCheck}>{"\u2713"}</Text>
+          <Text style={styles.successCheck}>{"\✓"}</Text>
         </View>
         <Text style={styles.successTitle}>Demande envoyée !</Text>
         <Text style={styles.successDesc}>
@@ -84,7 +84,7 @@ export function MissionDetailScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\u2039"}</Text>
+          <Text style={styles.backArrow}>{"\‹"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Détail de la mission</Text>
       </View>
@@ -103,7 +103,7 @@ export function MissionDetailScreen({
             <View>
               <Text style={styles.artisanName}>Jean-Michel P.</Text>
               <Text style={styles.artisanMeta}>
-                Réparation fuite {"\u2022"} Plomberie
+                Réparation fuite {"\•"} Plomberie
               </Text>
             </View>
           </View>
@@ -119,16 +119,16 @@ export function MissionDetailScreen({
           {/* Financial breakdown */}
           <View style={[styles.infoRow, { borderTopWidth: 1, borderTopColor: Colors.surface }]}>
             <Text style={styles.infoLabel}>HT</Text>
-            <Text style={styles.infoValueMono}>266,67\u20AC</Text>
+            <Text style={styles.infoValueMono}>266,67\€</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>TVA (20%)</Text>
-            <Text style={styles.infoValueMono}>53,33\u20AC</Text>
+            <Text style={styles.infoValueMono}>53,33\€</Text>
           </View>
           <View style={[styles.infoRow, { borderTopWidth: 1, borderTopColor: Colors.surface }]}>
             <Text style={[styles.infoLabel, { fontWeight: "700" }]}>Total TTC</Text>
             <Text style={[styles.infoValueMono, { fontSize: 16, fontWeight: "700" }]}>
-              320,00\u20AC
+              320,00\€
             </Text>
           </View>
         </Card>
@@ -147,7 +147,7 @@ export function MissionDetailScreen({
           >
             <View style={[styles.checkbox, checks[i] && styles.checkboxSel]}>
               {checks[i] && (
-                <Text style={styles.checkMark}>{"\u2713"}</Text>
+                <Text style={styles.checkMark}>{"\✓"}</Text>
               )}
             </View>
             <Text style={styles.checkText}>{text}</Text>
@@ -176,9 +176,9 @@ export function MissionDetailScreen({
 
         {/* Validation info */}
         <View style={styles.validationInfo}>
-          <Text style={{ fontSize: 16, color: "#0D7A52" }}>{"\u2713"}</Text>
+          <Text style={{ fontSize: 16, color: "#0D7A52" }}>{"\✓"}</Text>
           <Text style={styles.validationInfoText}>
-            Nova vérifiera la mission avant de libérer 320\u20AC vers
+            Nova vérifiera la mission avant de libérer 320\€ vers
             Jean-Michel P.
           </Text>
         </View>
@@ -203,7 +203,7 @@ export function MissionDetailScreen({
           }
         >
           <Text style={styles.disputeBtnText}>
-            {"\u26A0\uFE0F"} Signaler un litige
+            {"\⚠\️"} Signaler un litige
           </Text>
         </TouchableOpacity>
       </ScrollView>

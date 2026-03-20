@@ -10,18 +10,18 @@ import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const allCategories = [
-  { id: "plumber", label: "Plomberie", emoji: "\uD83D\uDD27", count: 47 },
-  { id: "electrician", label: "\u00C9lectricit\u00E9", emoji: "\u26A1", count: 38 },
-  { id: "locksmith", label: "Serrurerie", emoji: "\uD83D\uDD11", count: 29 },
-  { id: "heating", label: "Chauffage", emoji: "\uD83D\uDD25", count: 31 },
-  { id: "painter", label: "Peinture", emoji: "\uD83C\uDFA8", count: 35 },
-  { id: "mason", label: "Ma\u00E7onnerie", emoji: "\uD83E\uDDF1", count: 22 },
-  { id: "tiler", label: "Carrelage", emoji: "\uD83D\uDD33", count: 21 },
-  { id: "carpenter", label: "Menuiserie", emoji: "\uD83E\uDE9A", count: 18 },
-  { id: "ac", label: "Climatisation", emoji: "\u2744\uFE0F", count: 24 },
-  { id: "glazier", label: "Vitrerie", emoji: "\uD83E\uDE9F", count: 14 },
-  { id: "roofer", label: "Couverture", emoji: "\uD83C\uDFE0", count: 12 },
-  { id: "gardener", label: "Jardinage", emoji: "\uD83C\uDF3F", count: 26 },
+  { id: "plumber", label: "Plomberie", emoji: "\�\�", count: 47 },
+  { id: "electrician", label: "\Électricit\é", emoji: "\⚡", count: 38 },
+  { id: "locksmith", label: "Serrurerie", emoji: "\�\�", count: 29 },
+  { id: "heating", label: "Chauffage", emoji: "\�\�", count: 31 },
+  { id: "painter", label: "Peinture", emoji: "\�\�", count: 35 },
+  { id: "mason", label: "Ma\çonnerie", emoji: "\�\�", count: 22 },
+  { id: "tiler", label: "Carrelage", emoji: "\�\�", count: 21 },
+  { id: "carpenter", label: "Menuiserie", emoji: "\�\�", count: 18 },
+  { id: "ac", label: "Climatisation", emoji: "\❄\️", count: 24 },
+  { id: "glazier", label: "Vitrerie", emoji: "\�\�", count: 14 },
+  { id: "roofer", label: "Couverture", emoji: "\�\�", count: 12 },
+  { id: "gardener", label: "Jardinage", emoji: "\�\�", count: 26 },
 ];
 
 export function AllCategoriesScreen({
@@ -35,9 +35,9 @@ export function AllCategoriesScreen({
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backArrow}>{"\u2039"}</Text>
+          <Text style={styles.backArrow}>{"\‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Toutes les cat\u00E9gories</Text>
+        <Text style={styles.headerTitle}>Toutes les cat\égories</Text>
       </View>
 
       <ScrollView
@@ -45,7 +45,7 @@ export function AllCategoriesScreen({
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.countText}>
-          {allCategories.length} cat\u00E9gories disponibles
+          {allCategories.length} cat\égories disponibles
         </Text>
 
         <View style={styles.grid}>
