@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
@@ -114,7 +115,7 @@ export function ArtisanDocumentsScreen({
 
             <View style={styles.docHeader}>
               <View style={styles.docHeaderLeft}>
-                <Text style={styles.docLogo}>{"��️"}</Text>
+                <Text style={styles.docLogo}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
                 <Text style={styles.docLogoText}>Nova</Text>
               </View>
               <Text style={styles.docType}>{isDevis ? "DEVIS" : "FACTURE"}</Text>
@@ -167,17 +168,17 @@ export function ArtisanDocumentsScreen({
 
           {/* Actions */}
           <TouchableOpacity style={styles.pdfBtn}>
-            <Text style={styles.pdfBtnIcon}>{"��"}</Text>
+            <Text style={styles.pdfBtnIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
             <Text style={styles.pdfBtnText}>Télécharger en PDF</Text>
           </TouchableOpacity>
 
           <View style={styles.actionRow}>
             <TouchableOpacity style={styles.actionBtn}>
-              <Text style={styles.actionBtnIcon}>{"��"}</Text>
+              <Text style={styles.actionBtnIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
               <Text style={styles.actionBtnText}>Envoyer au client</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionBtn}>
-              <Text style={styles.actionBtnIcon}>{"��"}</Text>
+              <Text style={styles.actionBtnIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
               <Text style={styles.actionBtnText}>Dupliquer</Text>
             </TouchableOpacity>
           </View>

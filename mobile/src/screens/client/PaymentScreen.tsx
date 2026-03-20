@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Button, Card, EscrowStepper, Input } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -14,8 +15,8 @@ type PaymentMethod = "cb" | "virement" | "apple";
 type Installment = "1x" | "3x" | "4x";
 
 const METHODS: { id: PaymentMethod; label: string; icon: string }[] = [
-  { id: "cb", label: "Carte bancaire", icon: "��" },
-  { id: "virement", label: "Virement", icon: "��" },
+  { id: "cb", label: "Carte bancaire", icon: "credit-card" },
+  { id: "virement", label: "Virement", icon: "bank" },
   { id: "apple", label: "Apple Pay", icon: "" },
 ];
 
@@ -120,9 +121,7 @@ export function PaymentScreen({
 
         {installment !== "1x" && (
           <View style={styles.klarnaInfo}>
-            <Text style={{ fontSize: 14, color: Colors.forest }}>
-              {"✓"}
-            </Text>
+            <MaterialCommunityIcons name="check-circle" size={14} color={Colors.forest} />
             <Text style={styles.klarnaText}>
               {installment === "3x"
                 ? "3 prélèvements de 106,67 € • Paiement géré par Klarna."
@@ -161,7 +160,7 @@ export function PaymentScreen({
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={{ fontSize: 16 }}>{"��️"}</Text>
+          <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.escrowInfoTitle}>
               Votre argent est sécurisé
@@ -175,7 +174,7 @@ export function PaymentScreen({
 
         {/* Pay button */}
         <Button
-          title={"�� Payer 320,00€"}
+          title={"Payer 320,00€"}
           onPress={() =>
             navigation.navigate("Tracking", { missionId: "1" })
           }
@@ -191,7 +190,7 @@ export function PaymentScreen({
             "Séquestre garanti",
           ].map((t, i) => (
             <Text key={i} style={styles.securityText}>
-              {"��"} {t}
+              <MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /> {t}
             </Text>
           ))}
         </View>

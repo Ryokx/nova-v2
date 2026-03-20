@@ -11,6 +11,7 @@ import {
   Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Button, Input } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -20,7 +21,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 /* ── Onboarding slides data ── */
 const onboardingSlides = [
   {
-    icon: "��",
+    icon: "lock",
     title: "Paiement garanti par séquestre",
     description:
       "Le client paie avant l’intervention. L’argent est bloqué en séquestre jusqu’à validation.",
@@ -28,7 +29,7 @@ const onboardingSlides = [
     bg: Colors.surface,
   },
   {
-    icon: "��️",
+    icon: "shield-check",
     title: "Artisans certifiés",
     description:
       "Chaque artisan est vérifié : SIRET, assurance décennale, qualifications RGE. Zéro mauvaise surprise.",
@@ -36,7 +37,7 @@ const onboardingSlides = [
     bg: "#FFF8ED",
   },
   {
-    icon: "✅",
+    icon: "check-circle",
     title: "Zéro impayé",
     description:
       "Vous intervenez, Nova valide, vous êtes payé sous 48h. Garanti.",
@@ -85,7 +86,7 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
             <View style={[styles.slideContainer, { width: SCREEN_WIDTH }]}>
               {/* Icon circle */}
               <View style={[styles.slideIconCircle, { backgroundColor: Colors.surface }]}>
-                <Text style={styles.slideIconEmoji}>{item.icon}</Text>
+                <MaterialCommunityIcons name={item.icon as any} size={40} color={item.accent} />
               </View>
               {/* Title */}
               <Text style={styles.slideTitle}>{item.title}</Text>
@@ -248,7 +249,7 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
           {/* Logo */}
           <View style={styles.logoWrap}>
             <View style={styles.logoCircle}>
-              <Text style={styles.logoEmoji}>{"��️"}</Text>
+              <Text style={styles.logoEmoji}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
             </View>
             <Text style={styles.logoTitle}>Nova</Text>
             <Text style={styles.logoSubtitle}>

@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import type { ClientTabScreenProps } from "../../navigation/types";
 
@@ -29,17 +30,17 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { icon: "��", label: "Moyens de paiement", value: "Visa •••• 6411", screen: "PaymentMethods" },
-  { icon: "��", label: "Séquestre", value: "1 carte enregistrée", screen: "PaymentMethods" },
-  { icon: "��", label: "Missions", value: "3 missions réalisées", screen: "ClientMissions" },
-  { icon: "��", label: "Notifications", screen: "NotificationPreferences" },
-  { icon: "⚙️", label: "Paramètres", screen: "Settings" },
-  { icon: "��", label: "Support", value: "Par chat ou email", screen: "Support" },
-  { icon: "��", label: "Inviter des proches", value: "Gagnez 20€ par parrainage", screen: "Referral" },
+  { icon: "credit-card", label: "Moyens de paiement", value: "Visa •••• 6411", screen: "PaymentMethods" },
+  { icon: "lock", label: "Séquestre", value: "1 carte enregistrée", screen: "PaymentMethods" },
+  { icon: "briefcase", label: "Missions", value: "3 missions réalisées", screen: "ClientMissions" },
+  { icon: "bell", label: "Notifications", screen: "NotificationPreferences" },
+  { icon: "cog", label: "Paramètres", screen: "Settings" },
+  { icon: "help-circle", label: "Support", value: "Par chat ou email", screen: "Support" },
+  { icon: "gift", label: "Inviter des proches", value: "Gagnez 20€ par parrainage", screen: "Referral" },
 ];
 
 const dangerItem: MenuItem = {
-  icon: "��",
+  icon: "logout",
   label: "Déconnexion",
   danger: true,
 };
@@ -117,7 +118,7 @@ export function ClientProfileScreen({
               onPress={() => handleMenuPress(item)}
             >
               <View style={styles.menuIconWrap}>
-                <Text style={styles.menuIcon}>{item.icon}</Text>
+                <MaterialCommunityIcons name={item.icon as any} size={16} color={Colors.forest} />
               </View>
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>{item.label}</Text>
@@ -138,7 +139,7 @@ export function ClientProfileScreen({
             onPress={() => handleMenuPress(dangerItem)}
           >
             <View style={[styles.menuIconWrap, styles.menuIconDanger]}>
-              <Text style={styles.menuIcon}>{dangerItem.icon}</Text>
+              <MaterialCommunityIcons name={dangerItem.icon as any} size={16} color={Colors.red} />
             </View>
             <View style={styles.menuContent}>
               <Text style={[styles.menuLabel, styles.menuLabelDanger]}>

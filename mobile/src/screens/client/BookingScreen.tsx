@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Button, Card } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -180,7 +181,7 @@ export function BookingScreen({
 
             <TouchableOpacity style={styles.photoBtn} activeOpacity={0.7}>
               <Text style={styles.photoBtnText}>
-                {"��"} Ajouter des photos
+                <MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /> Ajouter des photos
               </Text>
             </TouchableOpacity>
 
@@ -221,7 +222,7 @@ export function BookingScreen({
 
             {/* Escrow info */}
             <View style={styles.escrowBadge}>
-              <Text style={{ fontSize: 16 }}>{"��"}</Text>
+              <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
               <Text style={styles.escrowBadgeText}>
                 Aucun débit immédiat — Nova contrôle et valide
               </Text>

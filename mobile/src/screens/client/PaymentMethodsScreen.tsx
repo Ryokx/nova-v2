@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
@@ -36,7 +37,7 @@ const otherMethods = [
   {
     label: "Virement bancaire",
     sub: "RIB non renseigné",
-    icon: "��",
+    icon: "bank",
     active: false,
   },
 ];
@@ -133,7 +134,7 @@ export function PaymentMethodsScreen({
               activeOpacity={0.85}
             >
               <View style={styles.otherIcon}>
-                <Text style={{ fontSize: 18 }}>{m.icon}</Text>
+                m.icon ? <MaterialCommunityIcons name={m.icon as any} size={18} color={Colors.navy} /> : null
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.otherLabel}>{m.label}</Text>
@@ -153,7 +154,7 @@ export function PaymentMethodsScreen({
 
         {/* Security info */}
         <View style={styles.securityInfo}>
-          <Text style={{ fontSize: 14 }}>{"��"}</Text>
+          <Text style={{ fontSize: 14 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <Text style={styles.securityText}>
             Vos données bancaires sont chiffrées et sécurisées.
             Nova ne stocke pas vos numéros de carte complets.

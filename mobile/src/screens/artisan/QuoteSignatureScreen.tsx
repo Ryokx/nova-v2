@@ -9,6 +9,7 @@ import {
   Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Button, Badge } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -45,7 +46,7 @@ export function QuoteSignatureScreen({
           </View>
           <Text style={styles.successTitle}>Devis signé !</Text>
           <Text style={styles.successSub}>Paiement sécurisé par Nova</Text>
-          <Badge label="�� Paiement Sécurisé" variant="default" size="md" />
+          <Badge label="Paiement Securise" variant="default" size="md" />
           <Button
             title="Voir mes paiements"
             onPress={() => navigation.navigate("ArtisanTabs", { screen: "ArtisanPayments" })}
@@ -82,7 +83,7 @@ export function QuoteSignatureScreen({
           {/* Doc header */}
           <View style={styles.docHeader}>
             <View style={styles.docHeaderLeft}>
-              <Text style={styles.docLogo}>{"��️"}</Text>
+              <Text style={styles.docLogo}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
               <Text style={styles.docLogoText}>Nova</Text>
             </View>
             <Text style={styles.docType}>DEVIS</Text>

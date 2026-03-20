@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -38,7 +39,7 @@ export function DevisReceivedScreen({
         <Text style={styles.successDesc}>
           Vous allez être redirigé vers le paiement sécurisé
         </Text>
-        <Badge label={"�� Paiement Sécurisé"} variant="default" />
+        <Badge label="Paiement Securise" variant="default" />
         <TouchableOpacity
           style={styles.primaryBtn}
           activeOpacity={0.85}
@@ -82,7 +83,7 @@ export function DevisReceivedScreen({
               Plombier {"•"} Certifié Nova
             </Text>
           </View>
-          <Text style={{ fontSize: 20 }}>{"��️"}</Text>
+          <Text style={{ fontSize: 20 }}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
         </View>
 
         {/* Quote document */}
@@ -175,7 +176,7 @@ export function DevisReceivedScreen({
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={{ fontSize: 16 }}>{"��"}</Text>
+          <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <Text style={styles.escrowText}>
             En acceptant ce devis, le montant sera bloqué en séquestre.
             L'artisan ne sera payé qu'après validation par Nova.

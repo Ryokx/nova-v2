@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge, Card, EscrowStepper } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -76,15 +77,15 @@ export function ArtisanProfileScreen({
         <View style={styles.contentCard}>
           {/* Badges */}
           <View style={styles.badgesRow}>
-            <Badge label="\u{1F6E1}️ Certifié Nova" variant="certified" size="sm" />
-            <Badge label="�� Décennale" variant="success" size="sm" />
-            <Badge label="⚡ RGE" variant="warning" size="sm" />
+            <Badge label="Certifie Nova" variant="certified" size="sm" />
+            <Badge label="Decennale" variant="success" size="sm" />
+            <Badge label="RGE" variant="warning" size="sm" />
           </View>
 
           {/* Escrow explainer */}
           <View style={styles.escrowBox}>
             <Text style={styles.escrowTitle}>
-              {"��"} Comment ça marche
+              <MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /> Comment ça marche
             </Text>
             <EscrowStepper currentStep={0} />
           </View>
@@ -125,7 +126,7 @@ export function ArtisanProfileScreen({
           <TouchableOpacity style={styles.maintenanceCta} activeOpacity={0.8}>
             <View style={styles.maintenanceIcon}>
               <Text style={{ fontSize: 18, color: Colors.white }}>
-                {"��"}
+                <MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
               </Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -148,14 +149,14 @@ export function ArtisanProfileScreen({
           activeOpacity={0.8}
           onPress={() => {}}
         >
-          <Text style={styles.iconBtnText}>{"��"}</Text>
+          <Text style={styles.iconBtnText}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconBtn}
           activeOpacity={0.8}
           onPress={() => {}}
         >
-          <Text style={styles.iconBtnText}>{"��"}</Text>
+          <Text style={styles.iconBtnText}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.primaryBtn}
@@ -169,7 +170,7 @@ export function ArtisanProfileScreen({
           activeOpacity={0.85}
           onPress={() => navigation.navigate("Emergency")}
         >
-          <Text style={styles.dangerBtnText}>{"��"}</Text>
+          <Text style={styles.dangerBtnText}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
         </TouchableOpacity>
       </View>
     </View>

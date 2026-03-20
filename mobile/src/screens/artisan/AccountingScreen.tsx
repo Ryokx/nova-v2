@@ -8,6 +8,7 @@ import {
   Switch,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
@@ -79,7 +80,7 @@ export function AccountingScreen({
       >
         {/* Explainer banner */}
         <View style={styles.explainer}>
-          <Text style={styles.explainerIcon}>{"��"}</Text>
+          <Text style={styles.explainerIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <View style={styles.explainerContent}>
             <Text style={styles.explainerTitle}>Simplifiez votre comptabilité</Text>
             <Text style={styles.explainerDesc}>
@@ -189,11 +190,11 @@ export function AccountingScreen({
         <Text style={styles.sectionTitleSmall}>Export manuel</Text>
         <View style={styles.exportRow}>
           {[
-            { label: "Export CSV", icon: "��", desc: "Toutes les données" },
-            { label: "Export PDF", icon: "��", desc: "Récapitulatif mensuel" },
+            { label: "Export CSV", icon: "file-document", desc: "Toutes les données" },
+            { label: "Export PDF", icon: "file-document", desc: "Récapitulatif mensuel" },
           ].map((e, i) => (
             <TouchableOpacity key={i} style={styles.exportBtn}>
-              <Text style={styles.exportIcon}>{e.icon}</Text>
+              <MaterialCommunityIcons name={e.icon as any} size={22} color={Colors.forest} />
               <Text style={styles.exportLabel}>{e.label}</Text>
               <Text style={styles.exportDesc}>{e.desc}</Text>
             </TouchableOpacity>

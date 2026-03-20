@@ -8,6 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar, Badge } from "../../components/ui";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
@@ -42,14 +43,14 @@ interface MenuRow {
 }
 
 const menuRows: MenuRow[] = [
-  { icon: "��", label: "Paiements", sub: "Historique et virements", screen: "ArtisanPayments" },
-  { icon: "��", label: "Documents", sub: "Devis et factures", screen: "ArtisanDocuments" },
-  { icon: "��", label: "Comptabilité", sub: "Connexion Pennylane, Indy, export auto", screen: "Accounting" },
-  { icon: "��", label: "Clients", sub: "Carnet d'adresses et historique", screen: "ClientDirectory" },
-  { icon: "��", label: "QR code", sub: "À partager sur véhicule, cartes, devis", screen: "QRCodeProfile" },
-  { icon: "��", label: "Inviter un artisan (20€)", sub: "Gagnez 20€ par parrainage", screen: "Referral" },
-  { icon: "⚙️", label: "Paramètres", sub: "Compte et sécurité", screen: "Settings" },
-  { icon: "��", label: "Support", sub: "Par chat ou email", screen: "Support" },
+  { icon: "cash", label: "Paiements", sub: "Historique et virements", screen: "ArtisanPayments" },
+  { icon: "file-document", label: "Documents", sub: "Devis et factures", screen: "ArtisanDocuments" },
+  { icon: "chart-bar", label: "Comptabilité", sub: "Connexion Pennylane, Indy, export auto", screen: "Accounting" },
+  { icon: "account-group", label: "Clients", sub: "Carnet d'adresses et historique", screen: "ClientDirectory" },
+  { icon: "qrcode", label: "QR code", sub: "À partager sur véhicule, cartes, devis", screen: "QRCodeProfile" },
+  { icon: "gift", label: "Inviter un artisan (20€)", sub: "Gagnez 20€ par parrainage", screen: "Referral" },
+  { icon: "cog", label: "Paramètres", sub: "Compte et sécurité", screen: "Settings" },
+  { icon: "help-circle", label: "Support", sub: "Par chat ou email", screen: "Support" },
 ];
 
 type EditSection = "personal" | "company" | "certifs" | null;
@@ -96,7 +97,7 @@ export function ArtisanProfileScreen({
         style={styles.editBtn}
       >
         <Text style={styles.editBtnText}>
-          {editSection === section ? "Terminé" : "✏️ Modifier"}
+          {editSection === section ? "Terminé" : "Modifier"}
         </Text>
       </TouchableOpacity>
     </View>
@@ -118,7 +119,7 @@ export function ArtisanProfileScreen({
           <View style={styles.avatarWrap}>
             <Avatar name={profile.name} size={72} radius={24} />
             <View style={styles.shieldBadge}>
-              <Text style={styles.shieldEmoji}>{"��️"}</Text>
+              <Text style={styles.shieldEmoji}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
             </View>
           </View>
           <Text style={styles.profileName}>{profile.name}</Text>
@@ -173,7 +174,7 @@ export function ArtisanProfileScreen({
               }}
             >
               <View style={styles.menuIconWrap}>
-                <Text style={styles.menuIcon}>{item.icon}</Text>
+                <MaterialCommunityIcons name={item.icon as any} size={16} color={Colors.forest} />
               </View>
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>{item.label}</Text>
@@ -188,7 +189,7 @@ export function ArtisanProfileScreen({
         <View style={styles.card}>
           <TouchableOpacity style={styles.logoutRow} onPress={() => (navigation as any).reset({ index: 0, routes: [{ name: "Auth" }] })}>
             <View style={styles.logoutIconWrap}>
-              <Text style={styles.logoutIcon}>{"��"}</Text>
+              <Text style={styles.logoutIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
             </View>
             <Text style={styles.logoutText}>Se déconnecter</Text>
           </TouchableOpacity>

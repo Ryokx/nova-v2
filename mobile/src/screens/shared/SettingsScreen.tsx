@@ -12,6 +12,7 @@ import {
   Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
@@ -46,7 +47,7 @@ function SettingRow({
   onPress,
   danger,
 }: {
-  icon: string;
+  icon: React.ReactNode;
   label: string;
   right?: React.ReactNode;
   onPress?: () => void;
@@ -60,7 +61,7 @@ function SettingRow({
       disabled={!onPress && !right}
     >
       <View style={styles.settingRowLeft}>
-        <Text style={styles.settingIcon}>{icon}</Text>
+        <MaterialCommunityIcons name={icon as any} size={18} color={Colors.navy} />
         <Text
           style={[styles.settingLabel, danger && styles.settingLabelDanger]}
         >
@@ -192,7 +193,7 @@ export function SettingsScreen({
         {/* Apparence */}
         <SectionCard title="Apparence">
           <SettingRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Mode sombre"
             right={
               <Switch
@@ -208,13 +209,13 @@ export function SettingsScreen({
         {/* Sécurité */}
         <SectionCard title="Sécurité">
           <SettingRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Mot de passe"
             onPress={() => setPasswordModal(true)}
           />
           <View style={styles.rowDivider} />
           <SettingRow
-            icon={"��️"}
+            icon={"shield-check"}
             label="Authentification 2FA"
             right={
               <Switch
@@ -230,7 +231,7 @@ export function SettingsScreen({
         {/* Préférences */}
         <SectionCard title="Préférences">
           <SettingRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Langue"
             right={
               <TouchableOpacity
@@ -245,7 +246,7 @@ export function SettingsScreen({
           />
           <View style={styles.rowDivider} />
           <SettingRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Fuseau horaire"
             right={
               <Text style={styles.valueText}>Europe/Paris (UTC+1)</Text>
@@ -256,19 +257,19 @@ export function SettingsScreen({
         {/* Légal */}
         <SectionCard title="Légal">
           <SettingRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Conditions Générales d'Utilisation"
             onPress={() => setLegalModal("cgu")}
           />
           <View style={styles.rowDivider} />
           <SettingRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Politique de Confidentialité"
             onPress={() => setLegalModal("confidentialite")}
           />
           <View style={styles.rowDivider} />
           <SettingRow
-            icon={"⚖️"}
+            icon={"scale-balance"}
             label="Mentions Légales"
             onPress={() => setLegalModal("mentions")}
           />
@@ -278,13 +279,13 @@ export function SettingsScreen({
         <View style={styles.dangerCard}>
           <Text style={styles.dangerTitle}>Zone de danger</Text>
           <SettingRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Déconnexion"
             onPress={handleLogout}
           />
           <View style={styles.rowDivider} />
           <SettingRow
-            icon={"⚠️"}
+            icon={"alert"}
             label="Supprimer mon compte"
             onPress={handleDeleteAccount}
             danger

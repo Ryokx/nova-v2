@@ -7,16 +7,17 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Svg, { Rect } from "react-native-svg";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const usageTips = [
-  { icon: "��", title: "Véhicule", desc: "Autocollant sur la portière ou le pare-brise arrière" },
-  { icon: "��", title: "Cartes de visite", desc: "Imprimez le QR code au dos de vos cartes" },
-  { icon: "��", title: "Devis", desc: "Ajoutez-le en bas de vos documents papier" },
-  { icon: "��", title: "Signature email", desc: "Insérez le lien dans votre signature" },
-  { icon: "��", title: "Réseaux sociaux", desc: "Partagez-le sur votre profil pro" },
+  { icon: "car", title: "Véhicule", desc: "Autocollant sur la portière ou le pare-brise arrière" },
+  { icon: "credit-card", title: "Cartes de visite", desc: "Imprimez le QR code au dos de vos cartes" },
+  { icon: "file-document", title: "Devis", desc: "Ajoutez-le en bas de vos documents papier" },
+  { icon: "email", title: "Signature email", desc: "Insérez le lien dans votre signature" },
+  { icon: "share", title: "Réseaux sociaux", desc: "Partagez-le sur votre profil pro" },
 ];
 
 const scanStats = [
@@ -118,7 +119,7 @@ export function QRCodeScreen({
           <Text style={styles.qrTrade}>Plombier-Chauffagiste</Text>
 
           <View style={styles.certifBadge}>
-            <Text style={styles.certifEmoji}>{"��️"}</Text>
+            <Text style={styles.certifEmoji}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
             <Text style={styles.certifText}>Certifié Nova #2847</Text>
           </View>
 
@@ -134,11 +135,11 @@ export function QRCodeScreen({
             onPress={handleSave}
           >
             <Text style={styles.saveBtnText}>
-              {saved ? "✓ Enregistré !" : "�� Enregistrer l'image"}
+              {saved ? "Enregistre !" : "Enregistrer l'image"}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.shareBtn}>
-            <Text style={styles.shareBtnText}>{"��"} Partager</Text>
+            <Text style={styles.shareBtnText}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /> Partager</Text>
           </TouchableOpacity>
         </View>
 
@@ -147,7 +148,7 @@ export function QRCodeScreen({
         {usageTips.map((tip, i) => (
           <View key={i} style={styles.tipRow}>
             <View style={styles.tipIconWrap}>
-              <Text style={styles.tipIcon}>{tip.icon}</Text>
+              <MaterialCommunityIcons name={tip.icon as any} size={18} color={Colors.forest} />
             </View>
             <View>
               <Text style={styles.tipTitle}>{tip.title}</Text>

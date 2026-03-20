@@ -12,6 +12,7 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
@@ -325,7 +326,7 @@ export function SupportScreen({
           {/* Input bar */}
           <View style={styles.inputBar}>
             <TouchableOpacity style={styles.attachBtn} activeOpacity={0.7}>
-              <Text style={styles.attachIcon}>{"��"}</Text>
+              <Text style={styles.attachIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
             </TouchableOpacity>
             <TextInput
               style={styles.chatInput}
@@ -441,7 +442,7 @@ export function SupportScreen({
                   Alert.alert("Upload", "Fonctionnalité à venir.")
                 }
               >
-                <Text style={styles.uploadIcon}>{"��"}</Text>
+                <Text style={styles.uploadIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
                 <Text style={styles.uploadText}>
                   Appuyez pour ajouter une capture
                 </Text>

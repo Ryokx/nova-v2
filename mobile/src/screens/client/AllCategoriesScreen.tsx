@@ -6,22 +6,23 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const allCategories = [
-  { id: "plumber", label: "Plomberie", emoji: "��", count: 47 },
-  { id: "electrician", label: "Électricité", emoji: "⚡", count: 38 },
-  { id: "locksmith", label: "Serrurerie", emoji: "��", count: 29 },
-  { id: "heating", label: "Chauffage", emoji: "��", count: 31 },
-  { id: "painter", label: "Peinture", emoji: "��", count: 35 },
-  { id: "mason", label: "Maçonnerie", emoji: "��", count: 22 },
-  { id: "tiler", label: "Carrelage", emoji: "��", count: 21 },
-  { id: "carpenter", label: "Menuiserie", emoji: "��", count: 18 },
-  { id: "ac", label: "Climatisation", emoji: "❄️", count: 24 },
-  { id: "glazier", label: "Vitrerie", emoji: "��", count: 14 },
-  { id: "roofer", label: "Couverture", emoji: "��", count: 12 },
-  { id: "gardener", label: "Jardinage", emoji: "��", count: 26 },
+  { id: "plumber", label: "Plomberie", emoji: "wrench", count: 47 },
+  { id: "electrician", label: "Électricité", emoji: "lightning-bolt", count: 38 },
+  { id: "locksmith", label: "Serrurerie", emoji: "key", count: 29 },
+  { id: "heating", label: "Chauffage", emoji: "fire", count: 31 },
+  { id: "painter", label: "Peinture", emoji: "palette", count: 35 },
+  { id: "mason", label: "Maçonnerie", emoji: "wall", count: 22 },
+  { id: "tiler", label: "Carrelage", emoji: "checkbox-blank-outline", count: 21 },
+  { id: "carpenter", label: "Menuiserie", emoji: "axe", count: 18 },
+  { id: "ac", label: "Climatisation", emoji: "snowflake", count: 24 },
+  { id: "glazier", label: "Vitrerie", emoji: "window-closed-variant", count: 14 },
+  { id: "roofer", label: "Couverture", emoji: "home-roof", count: 12 },
+  { id: "gardener", label: "Jardinage", emoji: "flower", count: 26 },
 ];
 
 export function AllCategoriesScreen({
@@ -61,7 +62,7 @@ export function AllCategoriesScreen({
               }
             >
               <View style={styles.iconWrap}>
-                <Text style={styles.emoji}>{cat.emoji}</Text>
+                <MaterialCommunityIcons name={cat.emoji as any} size={20} color={Colors.forest} />
               </View>
               <Text style={styles.catName}>{cat.label}</Text>
               <Text style={styles.catCount}>{cat.count} artisans</Text>

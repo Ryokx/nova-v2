@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
 
@@ -22,11 +23,11 @@ interface Notification {
 }
 
 const typeStyles: Record<NotifType, { bg: string; icon: string; accent: string }> = {
-  demande: { bg: "rgba(232,48,42,0.06)", icon: "⚡", accent: Colors.red },
-  devis: { bg: "rgba(27,107,78,0.06)", icon: "��", accent: Colors.forest },
-  payment: { bg: "rgba(34,200,138,0.06)", icon: "��", accent: Colors.success },
-  rdv: { bg: "rgba(245,166,35,0.06)", icon: "��", accent: Colors.gold },
-  info: { bg: "rgba(138,149,163,0.06)", icon: "��️", accent: Colors.textHint },
+  demande: { bg: "rgba(232,48,42,0.06)", icon: "lightning-bolt", accent: Colors.red },
+  devis: { bg: "rgba(27,107,78,0.06)", icon: "file-document", accent: Colors.forest },
+  payment: { bg: "rgba(34,200,138,0.06)", icon: "cash-check", accent: Colors.success },
+  rdv: { bg: "rgba(245,166,35,0.06)", icon: "calendar", accent: Colors.gold },
+  info: { bg: "rgba(138,149,163,0.06)", icon: "shield-check", accent: Colors.textHint },
 };
 
 const notifications: Notification[] = [
@@ -91,7 +92,7 @@ export function ArtisanNotificationsScreen({
               )}
               <View style={styles.notifRow}>
                 <View style={[styles.notifIconWrap, { backgroundColor: st.bg }]}>
-                  <Text style={styles.notifIconText}>{st.icon}</Text>
+                  <MaterialCommunityIcons name={st.icon as any} size={18} color={st.accent} />
                 </View>
                 <View style={styles.notifContent}>
                   <Text style={styles.notifTitle}>{n.title}</Text>

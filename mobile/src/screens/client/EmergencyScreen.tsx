@@ -7,16 +7,17 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge, Card } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ---- mock data ---- */
 const urgCategories = [
-  { id: "plumber", label: "Plomberie", icon: "��" },
-  { id: "electrician", label: "Électricité", icon: "⚡" },
-  { id: "locksmith", label: "Serrurerie", icon: "��" },
-  { id: "heating", label: "Chauffage", icon: "��" },
+  { id: "plumber", label: "Plomberie", icon: "wrench" },
+  { id: "electrician", label: "Électricité", icon: "lightning-bolt" },
+  { id: "locksmith", label: "Serrurerie", icon: "key" },
+  { id: "heating", label: "Chauffage", icon: "fire" },
   { id: "other", label: "Autre", icon: "+" },
 ];
 
@@ -107,7 +108,7 @@ export function EmergencyScreen({
         >
           {/* Red gradient banner */}
           <View style={styles.redBanner}>
-            <Text style={styles.redBannerEmoji}>{"⚡"}</Text>
+            <Text style={styles.redBannerEmoji}><MaterialCommunityIcons name="lightning-bolt" size={20} color={Colors.red} /></Text>
             <Text style={styles.redBannerTitle}>
               Besoin d'une intervention urgente ?
             </Text>
@@ -128,7 +129,7 @@ export function EmergencyScreen({
                 }
               >
                 <View style={styles.catIconWrap}>
-                  <Text style={styles.catIcon}>{cat.icon}</Text>
+                  <MaterialCommunityIcons name={cat.icon as any} size={22} color={Colors.red} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.catLabel}>{cat.label}</Text>
@@ -144,7 +145,7 @@ export function EmergencyScreen({
 
             {/* Info notice */}
             <View style={styles.infoNotice}>
-              <Text style={styles.infoIcon}>{"⏰"}</Text>
+              <Text style={styles.infoIcon}><MaterialCommunityIcons name="clock-alert" size={16} color={Colors.red} /></Text>
               <Text style={styles.infoText}>
                 Temps de réponse moyen : 20 minutes. Intervention sous 2h
                 garantie.
@@ -181,7 +182,7 @@ export function EmergencyScreen({
       >
         {/* Express banner */}
         <View style={styles.expressBanner}>
-          <Text style={{ fontSize: 18 }}>{"⚡"}</Text>
+          <MaterialCommunityIcons name="lightning-bolt" size={18} color={Colors.white} />
           <View>
             <Text style={styles.expressBannerTitle}>Intervention express</Text>
             <Text style={styles.expressBannerSub}>
@@ -214,7 +215,7 @@ export function EmergencyScreen({
                   <View style={styles.artisanNameRow}>
                     <Text style={styles.artisanName}>{a.name}</Text>
                     <Badge
-                      label={"��️ Certifié Nova"}
+                      label="Certifie Nova"
                       variant="certified"
                       size="sm"
                     />
@@ -234,7 +235,7 @@ export function EmergencyScreen({
               {/* Response time + price bar */}
               <View style={styles.urgencyBar}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                  <Text style={{ fontSize: 13, color: Colors.red }}>{"⏰"}</Text>
+                  <MaterialCommunityIcons name="clock-alert" size={13} color={Colors.red} />
                   <Text style={styles.urgencyTime}>
                     Dispo en ~{a.responseTime}
                   </Text>
@@ -255,7 +256,7 @@ export function EmergencyScreen({
                   }
                 >
                   <Text style={styles.redBtnText}>
-                    {"⚡"} Intervention immédiate
+                    <MaterialCommunityIcons name="lightning-bolt" size={20} color={Colors.red} /> Intervention immédiate
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -273,7 +274,7 @@ export function EmergencyScreen({
 
           {/* Trust footer */}
           <View style={styles.trustFooter}>
-            <Text style={styles.trustIcon}>{"��️"}</Text>
+            <Text style={styles.trustIcon}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
             <Text style={styles.trustText}>
               Tarif urgence majoré. Paiement sécurisé par
               séquestre Nova — l'artisan ne sera payé qu'après

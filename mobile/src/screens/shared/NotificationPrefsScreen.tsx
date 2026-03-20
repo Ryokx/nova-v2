@@ -8,6 +8,7 @@ import {
   Switch,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
@@ -26,7 +27,7 @@ function PrefRow({
   value,
   onValueChange,
 }: {
-  icon: string;
+  icon: React.ReactNode;
   label: string;
   description?: string;
   value: boolean;
@@ -35,7 +36,7 @@ function PrefRow({
   return (
     <View style={styles.prefRow}>
       <View style={styles.prefRowLeft}>
-        <Text style={styles.prefIcon}>{icon}</Text>
+        <MaterialCommunityIcons name={icon as any} size={20} color={Colors.forest} />
         <View style={styles.prefTextCol}>
           <Text style={styles.prefLabel}>{label}</Text>
           {description && (
@@ -116,7 +117,7 @@ export function NotificationPrefsScreen({
         {/* Alert types */}
         <SectionCard title="Types d'alertes">
           <PrefRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Missions"
             description="Nouvelles missions, mises à jour de statut"
             value={alerts.missions}
@@ -124,7 +125,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Devis"
             description="Devis reçus, signés, expirés"
             value={alerts.devis}
@@ -132,7 +133,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Paiements"
             description="Séquestre, versements, factures"
             value={alerts.paiements}
@@ -140,7 +141,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Urgences"
             description="Demandes urgentes, interventions critiques"
             value={alerts.urgences}
@@ -148,7 +149,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"⏰"}
+            icon=<MaterialCommunityIcons name="clock-alert" size={16} color={Colors.red} />
             label="Rappels"
             description="Rendez-vous à venir, échéances"
             value={alerts.rappels}
@@ -159,7 +160,7 @@ export function NotificationPrefsScreen({
         {/* Channels */}
         <SectionCard title="Canaux de notification">
           <PrefRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="Push"
             description="Notifications sur votre téléphone"
             value={channels.push}
@@ -167,7 +168,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"✉️"}
+            icon={"email"}
             label="Email"
             description="Récapitulatifs et confirmations par email"
             value={channels.email}
@@ -175,7 +176,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon={"��"}
+            icon=<MaterialCommunityIcons name="bell" size={22} color={Colors.navy} />
             label="SMS"
             description="Alertes critiques par SMS"
             value={channels.sms}

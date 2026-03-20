@@ -9,6 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar, Button } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -34,9 +35,9 @@ const rdv = {
 };
 
 const details = [
-  { icon: "��", label: "Horaire", value: rdv.time },
-  { icon: "��", label: "Catégorie", value: rdv.category },
-  { icon: "��", label: "Montant devis", value: rdv.amount },
+  { icon: "clock-outline", label: "Horaire", value: rdv.time },
+  { icon: "tag", label: "Catégorie", value: rdv.category },
+  { icon: "cash", label: "Montant devis", value: rdv.amount },
 ];
 
 export function RDVDetailScreen({
@@ -84,7 +85,7 @@ export function RDVDetailScreen({
             style={styles.phoneBtn}
             onPress={() => Linking.openURL(`tel:${rdv.phone}`)}
           >
-            <Text style={styles.phoneEmoji}>{"��"}</Text>
+            <Text style={styles.phoneEmoji}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           </TouchableOpacity>
         </View>
 
@@ -98,7 +99,7 @@ export function RDVDetailScreen({
                 i < details.length - 1 && styles.detailRowBorder,
               ]}
             >
-              <Text style={styles.detailIcon}>{d.icon}</Text>
+              <MaterialCommunityIcons name={d.icon as any} size={16} color={Colors.forest} />
               <Text style={styles.detailLabel}>{d.label}</Text>
               <Text style={styles.detailValue}>{d.value}</Text>
             </View>
@@ -108,7 +109,7 @@ export function RDVDetailScreen({
         {/* Map placeholder */}
         <View style={styles.mapCard}>
           <View style={styles.mapPlaceholder}>
-            <Text style={styles.mapPlaceholderText}>{"��️"}</Text>
+            <Text style={styles.mapPlaceholderText}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
             <Text style={styles.mapStreet}>Rue du Fg Saint-Antoine</Text>
           </View>
           <View style={styles.mapInfo}>
@@ -124,14 +125,14 @@ export function RDVDetailScreen({
             style={styles.navBtn}
             onPress={() => Linking.openURL(wazeUrl)}
           >
-            <Text style={styles.navIcon}>{"��"}</Text>
+            <Text style={styles.navIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
             <Text style={styles.navLabel}>Ouvrir dans Waze</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navBtn}
             onPress={() => Linking.openURL(gmapsUrl)}
           >
-            <Text style={styles.navIcon}>{"��"}</Text>
+            <Text style={styles.navIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
             <Text style={styles.navLabel}>Google Maps</Text>
           </TouchableOpacity>
         </View>
@@ -144,7 +145,7 @@ export function RDVDetailScreen({
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={styles.escrowIcon}>{"��"}</Text>
+          <Text style={styles.escrowIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <Text style={styles.escrowText}>
             Paiement de {rdv.amount} bloqué en séquestre Nova
           </Text>

@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
 
@@ -67,7 +68,7 @@ export function ArtisanPaymentsScreen({
         {tab === "escrow" && (
           <>
             <View style={styles.infoBanner}>
-              <Text style={styles.infoBannerIcon}>{"��"}</Text>
+              <Text style={styles.infoBannerIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
               <Text style={styles.infoBannerText}>
                 Fonds sécurisés chez Nova. Virement sous 48h après validation par nos équipes.
               </Text>
@@ -119,7 +120,7 @@ export function ArtisanPaymentsScreen({
         {/* Pending — empty state */}
         {tab === "pending" && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>{"��"}</Text>
+            <Text style={styles.emptyIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
             <Text style={styles.emptyText}>Aucun paiement en attente</Text>
           </View>
         )}

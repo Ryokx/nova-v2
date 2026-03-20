@@ -8,6 +8,7 @@ import {
   GestureResponderEvent,
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -189,7 +190,7 @@ export function SignDevisScreen({
           onPress={() => hasDrawn && setSigned(true)}
           disabled={!hasDrawn}
         >
-          <Text style={styles.lockIcon}>{"��"}</Text>
+          <Text style={styles.lockIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <Text
             style={[
               styles.submitBtnText,

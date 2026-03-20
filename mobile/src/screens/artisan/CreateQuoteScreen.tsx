@@ -8,6 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Button, Card } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -251,7 +252,7 @@ export function CreateQuoteScreen({
             />
 
             <View style={styles.escrowInfo}>
-              <Text style={styles.escrowIcon}>{"��"}</Text>
+              <Text style={styles.escrowIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
               <Text style={styles.escrowText}>
                 Le client recevra le devis sur son espace Nova et paiera via séquestre
               </Text>

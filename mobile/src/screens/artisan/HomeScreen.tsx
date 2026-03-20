@@ -8,6 +8,7 @@ import {
   Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge, Card, KPICard } from "../../components/ui";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
@@ -16,16 +17,16 @@ import type { ArtisanTabScreenProps } from "../../navigation/types";
 type AvailabilityStatus = "available" | "unavailable" | "urgency";
 
 const availOptions: { id: AvailabilityStatus; label: string }[] = [
-  { id: "available", label: "Disponible ��" },
-  { id: "unavailable", label: "Indisponible ⛔" },
-  { id: "urgency", label: "Urgences ⚡" },
+  { id: "available", label: "Disponible" },
+  { id: "unavailable", label: "Indisponible" },
+  { id: "urgency", label: "Urgences" },
 ];
 
 const kpis = [
-  { label: "Revenus du mois", value: "4 820€", icon: "��" },
-  { label: "Missions en cours", value: "3", icon: "��" },
-  { label: "Devis en attente", value: "2", icon: "��" },
-  { label: "Note moyenne", value: "⭐ 4.9", icon: "⭐" },
+  { label: "Revenus du mois", value: "4 820€", icon: "cash" },
+  { label: "Missions en cours", value: "3", icon: "briefcase" },
+  { label: "Devis en attente", value: "2", icon: "clipboard-text" },
+  { label: "Note moyenne", value: "4.9", icon: "star" },
 ];
 
 const upcomingRdvs = [
@@ -35,8 +36,8 @@ const upcomingRdvs = [
 ];
 
 const fabItems = [
-  { label: "Créer un devis", icon: "��", screen: "CreateQuote" as const },
-  { label: "Nouvelle facture", icon: "��", screen: "CreateInvoice" as const },
+  { label: "Créer un devis", icon: "file-edit", screen: "CreateQuote" as const },
+  { label: "Nouvelle facture", icon: "receipt", screen: "CreateInvoice" as const },
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,9 +71,9 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
         <View style={styles.headerBg}>
           <View style={styles.headerRow}>
             <View>
-              <Text style={styles.greeting}>Bonjour Jean-Michel ��</Text>
+              <Text style={styles.greeting}>Bonjour Jean-Michel</Text>
               <View style={styles.certifRow}>
-                <Text style={styles.certifIcon}>��️</Text>
+                <Text style={styles.certifIcon}><MaterialCommunityIcons name="shield-check" size={14} color={Colors.gold} /></Text>
                 <Text style={styles.certifText}>Certifié Nova • #2847</Text>
               </View>
             </View>
@@ -81,7 +82,7 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
                 style={styles.bellBtn}
                 onPress={() => navigation.navigate("ArtisanNotifications")}
               >
-                <Text style={styles.bellEmoji}>{"��"}</Text>
+                <Text style={styles.bellEmoji}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
                 <View style={styles.bellBadge}>
                   <Text style={styles.bellBadgeText}>3</Text>
                 </View>
@@ -146,7 +147,7 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
           <View style={styles.urgentTop}>
             <View style={styles.urgentLeft}>
               <View style={styles.urgentIconWrap}>
-                <Text style={styles.urgentIconText}>{"⚡"}</Text>
+                <Text style={styles.urgentIconText}><MaterialCommunityIcons name="lightning-bolt" size={20} color={Colors.red} /></Text>
               </View>
               <View>
                 <Text style={styles.urgentTitle}>Fuite d'eau urgente</Text>
@@ -209,7 +210,7 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
                 }
               }}
             >
-              <Text style={styles.fabMenuIcon}>{item.icon}</Text>
+              <MaterialCommunityIcons name={item.icon as any} size={16} color={Colors.forest} />
               <Text style={styles.fabMenuLabel}>{item.label}</Text>
             </TouchableOpacity>
           ))}

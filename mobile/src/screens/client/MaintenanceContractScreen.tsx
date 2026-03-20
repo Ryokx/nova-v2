@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -13,7 +14,7 @@ import type { RootStackScreenProps } from "../../navigation/types";
 const plans = [
   {
     id: "chaudiere",
-    icon: "��",
+    icon: "fire",
     name: "Entretien chaudière",
     desc: "Vérification annuelle obligatoire, nettoyage, contrôle sécurité, attestation d'entretien",
     price: "120",
@@ -22,7 +23,7 @@ const plans = [
   },
   {
     id: "clim",
-    icon: "❄️",
+    icon: "snowflake",
     name: "Entretien climatisation",
     desc: "Nettoyage filtres, vérification fluide, contrôle performance",
     price: "150",
@@ -31,7 +32,7 @@ const plans = [
   },
   {
     id: "plomberie",
-    icon: "��",
+    icon: "wrench",
     name: "Check-up plomberie",
     desc: "Inspection canalisations, joints, robinetterie, détection fuites préventive",
     price: "90",
@@ -40,7 +41,7 @@ const plans = [
   },
   {
     id: "complet",
-    icon: "⭐",
+    icon: "star",
     name: "Pack Sérénité",
     desc: "Chaudière + climatisation + plomberie. Intervention prioritaire et tarif réduit",
     price: "299",
@@ -114,7 +115,7 @@ export function MaintenanceContractScreen({
 
         {/* Explainer */}
         <View style={styles.explainerCard}>
-          <Text style={{ fontSize: 18 }}>{"��️"}</Text>
+          <Text style={{ fontSize: 18 }}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.explainerTitle}>
               Entretien planifié, esprit tranquille
@@ -150,7 +151,7 @@ export function MaintenanceContractScreen({
                   selectedPlan === plan.id && styles.planIconWrapSelected,
                 ]}
               >
-                <Text style={{ fontSize: 20 }}>{plan.icon}</Text>
+                <MaterialCommunityIcons name={plan.icon as any} size={20} color={Colors.forest} />
               </View>
               <View style={{ flex: 1 }}>
                 <View style={styles.planNameRow}>
@@ -203,7 +204,7 @@ export function MaintenanceContractScreen({
           onPress={() => selectedPlan && setSubscribed(true)}
           disabled={!selectedPlan}
         >
-          <Text style={{ fontSize: 14 }}>{"��"}</Text>
+          <Text style={{ fontSize: 14 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <Text
             style={[
               styles.subscribeBtnText,

@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Button } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -19,9 +20,9 @@ const lineItems = [
 ];
 
 const sendOptions: { id: SendOption; label: string }[] = [
-  { id: "email", label: "�� Email au client" },
-  { id: "pdf", label: "�� PDF à télécharger" },
-  { id: "both", label: "�� Les deux" },
+  { id: "email", label: "Email au client" },
+  { id: "pdf", label: "PDF a telecharger" },
+  { id: "both", label: "Les deux" },
 ];
 
 export function CreateInvoiceScreen({
@@ -34,7 +35,7 @@ export function CreateInvoiceScreen({
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.successContainer}>
-          <Text style={styles.successEmoji}>{"✉️"}</Text>
+          <MaterialCommunityIcons name="email-check" size={48} color={Colors.forest} />
           <Text style={styles.successTitle}>Facture envoyée !</Text>
           <Text style={styles.successSub}>caroline.l@email.com ✓</Text>
           <Button
@@ -77,7 +78,7 @@ export function CreateInvoiceScreen({
           {/* Header */}
           <View style={styles.docHeader}>
             <View style={styles.docHeaderLeft}>
-              <Text style={styles.docLogo}>{"��️"}</Text>
+              <Text style={styles.docLogo}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
               <Text style={styles.docLogoText}>Nova</Text>
             </View>
             <Text style={styles.invoiceId}>#FAC-2026-127</Text>

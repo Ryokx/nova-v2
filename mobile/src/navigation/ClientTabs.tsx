@@ -1,6 +1,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Text, StyleSheet } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "../constants/theme";
 import type { ClientTabParamList } from "./types";
 
@@ -13,18 +14,20 @@ import { ClientProfileScreen } from "../screens/client/ProfileScreen";
 const Tab = createBottomTabNavigator<ClientTabParamList>();
 
 function TabIcon({ name, focused, badge }: { name: string; focused: boolean; badge?: number }) {
-  const icons: Record<string, string> = {
-    Accueil: "🏠",
-    Notifs: "🔔",
-    Missions: "💼",
-    Profil: "👤",
+  const iconNames: Record<string, string> = {
+    Accueil: "home",
+    Notifs: "bell",
+    Missions: "briefcase",
+    Profil: "account",
   };
 
   return (
     <View style={styles.tabIcon}>
-      <Text style={[styles.icon, focused && styles.iconActive]}>
-        {icons[name] || "•"}
-      </Text>
+      <MaterialCommunityIcons
+        name={(iconNames[name] || "circle") as any}
+        size={22}
+        color={focused ? Colors.forest : Colors.textHint}
+      />
       {badge && badge > 0 && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{badge}</Text>

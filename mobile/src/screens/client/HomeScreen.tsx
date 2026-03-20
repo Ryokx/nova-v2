@@ -8,18 +8,19 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge } from "../../components/ui";
 import type { ClientTabScreenProps } from "../../navigation/types";
 
 /* ── Mock data ── */
 const categories = [
-  { id: "plumber", label: "Plomberie", emoji: "��", count: 47 },
-  { id: "electrician", label: "Électricité", emoji: "⚡", count: 38 },
-  { id: "locksmith", label: "Serrurerie", emoji: "��", count: 29 },
-  { id: "heating", label: "Chauffage", emoji: "��", count: 31 },
-  { id: "painter", label: "Peinture", emoji: "��", count: 35 },
-  { id: "mason", label: "Maçonnerie", emoji: "��", count: 22 },
+  { id: "plumber", label: "Plomberie", emoji: "wrench", count: 47 },
+  { id: "electrician", label: "Électricité", emoji: "lightning-bolt", count: 38 },
+  { id: "locksmith", label: "Serrurerie", emoji: "key", count: 29 },
+  { id: "heating", label: "Chauffage", emoji: "fire", count: 31 },
+  { id: "painter", label: "Peinture", emoji: "palette", count: 35 },
+  { id: "mason", label: "Maçonnerie", emoji: "wall", count: 22 },
 ];
 
 const topArtisans = [
@@ -43,19 +44,19 @@ export function ClientHomeScreen({
         {/* ── Header ── */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Bonjour Sophie ��</Text>
+            <Text style={styles.greeting}>Bonjour Sophie</Text>
           </View>
           <TouchableOpacity
             style={styles.bellBtn}
             onPress={() => navigation.navigate("ClientNotifications")}
           >
-            <Text style={styles.bellIcon}>{"��"}</Text>
+            <Text style={styles.bellIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           </TouchableOpacity>
         </View>
 
         {/* ── Search bar ── */}
         <TouchableOpacity style={styles.searchBar} activeOpacity={0.7}>
-          <Text style={styles.searchIcon}>{"��"}</Text>
+          <Text style={styles.searchIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <Text style={styles.searchPlaceholder}>
             Rechercher un artisan...
           </Text>
@@ -74,7 +75,7 @@ export function ClientHomeScreen({
                 })
               }
             >
-              <Text style={styles.catEmoji}>{cat.emoji}</Text>
+              <MaterialCommunityIcons name={cat.emoji as any} size={22} color={Colors.forest} />
               <Text style={styles.catLabel}>{cat.label}</Text>
             </TouchableOpacity>
           ))}
@@ -87,7 +88,7 @@ export function ClientHomeScreen({
           onPress={() => navigation.navigate("Emergency")}
         >
           <View style={styles.emergencyIconWrap}>
-            <Text style={styles.emergencyEmoji}>{"⚡"}</Text>
+            <Text style={styles.emergencyEmoji}><MaterialCommunityIcons name="lightning-bolt" size={20} color={Colors.red} /></Text>
           </View>
           <View style={styles.emergencyTextWrap}>
             <Text style={styles.emergencyTitle}>Urgence 24h/24</Text>
@@ -128,7 +129,7 @@ export function ClientHomeScreen({
 
               {/* Rating */}
               <View style={styles.ratingRow}>
-                <Text style={styles.starIcon}>{"⭐"}</Text>
+                <Text style={styles.starIcon}><MaterialCommunityIcons name="star" size={13} color={Colors.gold} /></Text>
                 <Text style={styles.ratingValue}>{item.rating}</Text>
                 <Text style={styles.ratingCount}>
                   {"•"} {item.reviews} avis

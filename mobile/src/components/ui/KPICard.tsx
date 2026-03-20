@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Card } from "./Card";
 import { Colors } from "../../constants/theme";
 
@@ -17,7 +18,7 @@ export function KPICard({ label, value, icon, sub, trend }: KPICardProps) {
       <View style={styles.header}>
         {icon && (
           <View style={styles.iconWrap}>
-            <Text style={styles.icon}>{icon}</Text>
+            <MaterialCommunityIcons name={icon as any} size={16} color={Colors.forest} />
           </View>
         )}
         {trend && (

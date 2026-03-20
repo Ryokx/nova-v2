@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar, Button, Card } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -75,10 +76,10 @@ export function TrackingScreen({
             </View>
             <View style={styles.artisanActions}>
               <TouchableOpacity style={styles.smallIconBtn} activeOpacity={0.7}>
-                <Text style={{ fontSize: 16 }}>{"��"}</Text>
+                <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.smallIconBtn} activeOpacity={0.7}>
-                <Text style={{ fontSize: 16 }}>{"��"}</Text>
+                <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -110,9 +111,7 @@ export function TrackingScreen({
           )}
           {trackingStep >= 3 && (
             <View style={styles.bannerGreen}>
-              <Text style={{ fontSize: 16, color: Colors.success }}>
-                {"✓"}
-              </Text>
+              <MaterialCommunityIcons name="check-circle" size={16} color={Colors.success} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.bannerGreenTitle}>
                   Intervention terminée
@@ -179,7 +178,7 @@ export function TrackingScreen({
         {/* Escrow info card */}
         <Card style={{ marginTop: 20 }}>
           <View style={styles.escrowHeader}>
-            <Text style={{ fontSize: 14 }}>{"��"}</Text>
+            <Text style={{ fontSize: 14 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
             <Text style={styles.escrowTitle}>Paiement en séquestre</Text>
           </View>
           <View style={styles.escrowAmountRow}>

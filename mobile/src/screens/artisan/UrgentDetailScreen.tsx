@@ -8,14 +8,15 @@ import {
   Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Button } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const interventionDetails = [
-  { icon: "��", label: "Secteur", value: "Paris 9e — Quartier Clichy" },
-  { icon: "��", label: "Durée estimée", value: "1h environ" },
-  { icon: "��", label: "Catégorie", value: "Plomberie" },
+  { icon: "map-marker", label: "Secteur", value: "Paris 9e — Quartier Clichy" },
+  { icon: "timer-outline", label: "Durée estimée", value: "1h environ" },
+  { icon: "tag", label: "Catégorie", value: "Plomberie" },
 ];
 
 const photos = ["Photo 1", "Photo 2"];
@@ -91,7 +92,7 @@ export function UrgentDetailScreen({
         <Animated.View
           style={[styles.urgencyBanner, { transform: [{ scale: pulseAnim }] }]}
         >
-          <Text style={styles.urgencyEmoji}>{"⚡"}</Text>
+          <Text style={styles.urgencyEmoji}><MaterialCommunityIcons name="lightning-bolt" size={20} color={Colors.red} /></Text>
           <View>
             <Text style={styles.urgencyTitle}>Intervention urgente</Text>
             <Text style={styles.urgencySub}>Demande reçue il y a 4 minutes</Text>
@@ -104,7 +105,7 @@ export function UrgentDetailScreen({
           <Text style={styles.cardMainTitle}>Fuite d'eau urgente</Text>
           {interventionDetails.map((d, i) => (
             <View key={i} style={styles.detailRow}>
-              <Text style={styles.detailIcon}>{d.icon}</Text>
+              <MaterialCommunityIcons name={d.icon as any} size={16} color={Colors.forest} />
               <Text style={styles.detailLabel}>{d.label}</Text>
               <Text style={styles.detailValue}>{d.value}</Text>
             </View>
@@ -148,7 +149,7 @@ export function UrgentDetailScreen({
 
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
-          <Text style={styles.escrowIcon}>{"��"}</Text>
+          <Text style={styles.escrowIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <Text style={styles.escrowText}>
             Le paiement sera sécurisé par séquestre Nova. Vous serez payé après
             validation par nos équipes.
@@ -157,7 +158,7 @@ export function UrgentDetailScreen({
 
         {/* Anonymisation notice */}
         <View style={styles.anonNotice}>
-          <Text style={styles.anonIcon}>{"��️"}</Text>
+          <Text style={styles.anonIcon}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
           <Text style={styles.anonText}>
             L'identité et l'adresse exacte du client vous seront communiquées
             uniquement après acceptation de l'intervention.

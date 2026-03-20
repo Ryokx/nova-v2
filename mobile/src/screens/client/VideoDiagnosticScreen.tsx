@@ -7,14 +7,15 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const tips = [
-  { icon: "��", title: "Bon éclairage", desc: "Allumez les lumières, évitez le contre-jour" },
-  { icon: "��", title: "Montrez la zone complète", desc: "Filmez large puis zoomez sur le problème" },
-  { icon: "��️", title: "Décrivez à voix haute", desc: "Expliquez ce que vous voyez et depuis quand" },
-  { icon: "⏱️", title: "30 à 60 secondes", desc: "Court et précis, pas besoin de plus" },
+  { icon: "lightbulb", title: "Bon éclairage", desc: "Allumez les lumières, évitez le contre-jour" },
+  { icon: "target", title: "Montrez la zone complète", desc: "Filmez large puis zoomez sur le problème" },
+  { icon: "shield-check", title: "Décrivez à voix haute", desc: "Expliquez ce que vous voyez et depuis quand" },
+  { icon: "timer-outline", title: "30 à 60 secondes", desc: "Court et précis, pas besoin de plus" },
 ];
 
 const formatTime = (s: number) =>
@@ -68,7 +69,7 @@ export function VideoDiagnosticScreen({
           {/* Hero */}
           <View style={styles.heroSection}>
             <View style={styles.heroIcon}>
-              <Text style={{ fontSize: 36 }}>{"��"}</Text>
+              <Text style={{ fontSize: 36 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
             </View>
             <Text style={styles.heroTitle}>Filmez votre problème</Text>
             <Text style={styles.heroDesc}>
@@ -84,7 +85,7 @@ export function VideoDiagnosticScreen({
           {tips.map((tip, i) => (
             <View key={i} style={styles.tipRow}>
               <View style={styles.tipIconWrap}>
-                <Text style={{ fontSize: 18 }}>{tip.icon}</Text>
+                <MaterialCommunityIcons name={tip.icon as any} size={18} color={Colors.forest} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.tipTitle}>{tip.title}</Text>
@@ -122,7 +123,7 @@ export function VideoDiagnosticScreen({
             <View style={[styles.gridLine, { left: "33%", top: 0, bottom: 0, width: 1 }]} />
             <View style={[styles.gridLine, { left: "66%", top: 0, bottom: 0, width: 1 }]} />
           </View>
-          <Text style={{ fontSize: 48, opacity: 0.2 }}>{"��"}</Text>
+          <Text style={{ fontSize: 48, opacity: 0.2 }}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <Text style={styles.cameraLabel}>Aperçu caméra</Text>
         </View>
 
@@ -214,7 +215,7 @@ export function VideoDiagnosticScreen({
             activeOpacity={0.85}
             onPress={() => setStage(3)}
           >
-            <Text style={{ fontSize: 16 }}>{"✉️"}</Text>
+            <MaterialCommunityIcons name="email" size={16} color={Colors.white} />
             <Text style={styles.sendBtnText}>Envoyer à l'artisan</Text>
           </TouchableOpacity>
 
@@ -243,7 +244,7 @@ export function VideoDiagnosticScreen({
         intervention plus efficacement.
       </Text>
       <View style={styles.responseTimeBadge}>
-        <Text style={{ fontSize: 14 }}>{"⏰"}</Text>
+        <MaterialCommunityIcons name="clock-alert" size={14} color={Colors.forest} />
         <Text style={styles.responseTimeText}>
           Réponse estimée sous 2h
         </Text>

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "../../constants/theme";
 
 interface EscrowStepperProps {
@@ -7,10 +8,10 @@ interface EscrowStepperProps {
 }
 
 const steps = [
-  { icon: "🔒", label: "Paiement\nbloqué" },
-  { icon: "🔧", label: "Mission\nen cours" },
+  { icon: "lock", label: "Paiement\nbloqué" },
+  { icon: "wrench", label: "Mission\nen cours" },
   { icon: "✓", label: "Nova\nvalide" },
-  { icon: "💰", label: "Artisan\npayé" },
+  { icon: "cash", label: "Artisan\npayé" },
 ];
 
 export function EscrowStepper({ currentStep }: EscrowStepperProps) {
@@ -30,7 +31,7 @@ export function EscrowStepper({ currentStep }: EscrowStepperProps) {
                 ]}
               >
                 <Text style={[styles.circleText, done && styles.circleTextDone]}>
-                  {done ? "✓" : step.icon}
+                  {done ? "✓" : <MaterialCommunityIcons name={step.icon as any} size={14} color={Colors.textSecondary} />}
                 </Text>
               </View>
               <Text

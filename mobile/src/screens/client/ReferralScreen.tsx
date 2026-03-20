@@ -8,6 +8,7 @@ import {
   Share,
   Platform,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -15,10 +16,10 @@ import type { RootStackScreenProps } from "../../navigation/types";
 const REFERRAL_CODE = "NOVA-SL25";
 
 const shareButtons = [
-  { label: "WhatsApp", emoji: "��", bg: "#25D366" },
-  { label: "SMS", emoji: "��", bg: "#4A5568" },
-  { label: "Email", emoji: "✉️", bg: "#1B6B4E" },
-  { label: "Lien", emoji: "��", bg: "#6B7280" },
+  { label: "WhatsApp", emoji: "whatsapp", bg: "#25D366" },
+  { label: "SMS", emoji: "message-text", bg: "#4A5568" },
+  { label: "Email", emoji: "email", bg: "#1B6B4E" },
+  { label: "Lien", emoji: "link-variant", bg: "#6B7280" },
 ];
 
 const howItWorks = [
@@ -84,7 +85,7 @@ export function ReferralScreen({
         {/* Hero reward */}
         <View style={styles.hero}>
           <View style={styles.heroBlob} />
-          <Text style={styles.heroEmoji}>{"��"}</Text>
+          <Text style={styles.heroEmoji}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <Text style={styles.heroTitle}>
             Gagnez 20€ par parrainage
           </Text>
@@ -124,7 +125,7 @@ export function ReferralScreen({
               activeOpacity={0.85}
               onPress={handleShare}
             >
-              <Text style={styles.shareEmoji}>{s.emoji}</Text>
+              <MaterialCommunityIcons name={s.emoji as any} size={20} color={Colors.white} />
               <Text style={styles.shareLabel}>{s.label}</Text>
             </TouchableOpacity>
           ))}

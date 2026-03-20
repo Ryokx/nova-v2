@@ -7,6 +7,7 @@ import {
   FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import type { ClientTabScreenProps } from "../../navigation/types";
 
@@ -28,10 +29,10 @@ const typeConfig: Record<
   NotifType,
   { bg: string; iconEmoji: string; accent: string }
 > = {
-  devis: { bg: "rgba(27,107,78,0.06)", iconEmoji: "��", accent: Colors.forest },
-  mission: { bg: "rgba(34,200,138,0.06)", iconEmoji: "✅", accent: Colors.success },
-  paiement: { bg: "rgba(245,166,35,0.06)", iconEmoji: "��", accent: Colors.gold },
-  info: { bg: "rgba(138,149,163,0.06)", iconEmoji: "��️", accent: Colors.textHint },
+  devis: { bg: "rgba(27,107,78,0.06)", iconEmoji: "file-document", accent: Colors.forest },
+  mission: { bg: "rgba(34,200,138,0.06)", iconEmoji: "check-circle", accent: Colors.success },
+  paiement: { bg: "rgba(245,166,35,0.06)", iconEmoji: "cash", accent: Colors.gold },
+  info: { bg: "rgba(138,149,163,0.06)", iconEmoji: "information", accent: Colors.textHint },
 };
 
 /* ── Mock data ── */
@@ -107,7 +108,7 @@ export function ClientNotificationsScreen({
         <View style={styles.notifRow}>
           {/* Icon circle */}
           <View style={[styles.iconCircle, { backgroundColor: config.bg }]}>
-            <Text style={styles.iconEmoji}>{config.iconEmoji}</Text>
+            <MaterialCommunityIcons name={config.iconEmoji as any} size={18} color={config.accent} />
           </View>
 
           <View style={styles.notifContent}>

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar, Button, Card, EscrowStepper } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -176,7 +177,7 @@ export function MissionDetailScreen({
 
         {/* Validation info */}
         <View style={styles.validationInfo}>
-          <Text style={{ fontSize: 16, color: "#0D7A52" }}>{"✓"}</Text>
+          <MaterialCommunityIcons name="check-circle" size={16} color="#0D7A52" />
           <Text style={styles.validationInfoText}>
             Nova vérifiera la mission avant de libérer 320€ vers
             Jean-Michel P.
@@ -203,7 +204,7 @@ export function MissionDetailScreen({
           }
         >
           <Text style={styles.disputeBtnText}>
-            {"⚠️"} Signaler un litige
+            Signaler un litige
           </Text>
         </TouchableOpacity>
       </ScrollView>

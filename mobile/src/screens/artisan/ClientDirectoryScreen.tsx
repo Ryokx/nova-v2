@@ -9,6 +9,7 @@ import {
   Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -58,7 +59,7 @@ export function ClientDirectoryScreen({
       >
         {/* Search */}
         <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}>{"��"}</Text>
+          <Text style={styles.searchIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
           <TextInput
             style={styles.searchInput}
             value={search}
@@ -84,7 +85,7 @@ export function ClientDirectoryScreen({
 
         {filtered.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>{"��"}</Text>
+            <Text style={styles.emptyIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
             <Text style={styles.emptyTitle}>Aucun résultat</Text>
             <Text style={styles.emptyDesc}>
               Aucun client ne correspond à votre recherche.
@@ -109,10 +110,10 @@ export function ClientDirectoryScreen({
                   style={styles.smallBtn}
                   onPress={() => Linking.openURL(`tel:${c.phone}`)}
                 >
-                  <Text style={styles.smallBtnIcon}>{"��"}</Text>
+                  <Text style={styles.smallBtnIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.smallBtn}>
-                  <Text style={styles.smallBtnIcon}>{"��"}</Text>
+                  <Text style={styles.smallBtnIcon}><MaterialCommunityIcons name="bell" size={22} color={Colors.navy} /></Text>
                 </TouchableOpacity>
               </View>
             </View>

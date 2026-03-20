@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
@@ -135,7 +136,7 @@ export function ArtisanListScreen({
 
         <View style={styles.badgeRow}>
           <Badge
-            label={"��️ Certifié Nova"}
+            label="Certifie Nova"
             variant="certified"
             size="sm"
           />
@@ -195,7 +196,7 @@ export function ArtisanListScreen({
         showsVerticalScrollIndicator={false}
         ListFooterComponent={
           <View style={styles.trustFooter}>
-            <Text style={styles.trustIcon}>{"��️"}</Text>
+            <Text style={styles.trustIcon}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
             <Text style={styles.trustText}>
               Tous les artisans Nova sont vérifiés, assurés et soumis au
               paiement sécurisé par séquestre.
