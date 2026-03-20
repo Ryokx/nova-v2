@@ -39,7 +39,7 @@ const tabs: { id: MissionStatus; label: string }[] = [
 /* ── Mock data ── */
 const missions: Mission[] = [
   {
-    id: "1",
+    id: "mission-active",
     artisan: "Jean-Michel P.",
     initials: "JM",
     type: "Plomberie — Réparation fuite",
@@ -50,7 +50,7 @@ const missions: Mission[] = [
     statusColor: Colors.gold,
   },
   {
-    id: "2",
+    id: "mission-completed",
     artisan: "Sophie M.",
     initials: "SM",
     type: "Électricité — Installation prise",
@@ -61,7 +61,7 @@ const missions: Mission[] = [
     statusColor: Colors.success,
   },
   {
-    id: "3",
+    id: "mission-validated",
     artisan: "Karim B.",
     initials: "KB",
     type: "Serrurerie — Remplacement serrure",
@@ -72,7 +72,7 @@ const missions: Mission[] = [
     statusColor: Colors.forest,
   },
   {
-    id: "4",
+    id: "mission-dispute",
     artisan: "Thomas R.",
     initials: "TR",
     type: "Plomberie — Fuite chauffe-eau",

@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -45,9 +46,43 @@ const dangerItem: MenuItem = {
   danger: true,
 };
 
+interface ActiveContract {
+  id: string;
+  name: string;
+  icon: string;
+  price: string;
+  artisan: string;
+  since: string;
+}
+
+const initialContracts: ActiveContract[] = [
+  { id: "1", name: "Entretien chaudière", icon: "fire", price: "120€/an", artisan: "Jean-Michel P.", since: "20 mars 2026" },
+];
+
 export function ClientProfileScreen({
   navigation,
 }: ClientTabScreenProps<"ClientProfile">) {
+  const [contracts, setContracts] = useState(initialContracts);
+
+  const cancelContract = (id: string) => {
+    const contract = contracts.find((c) => c.id === id);
+    Alert.alert(
+      "Annuler le contrat",
+      `Êtes-vous sûr de vouloir annuler le contrat « ${contract?.name} » ?\n\nSans engagement — aucun frais d'annulation.`,
+      [
+        { text: "Non, garder", style: "cancel" },
+        {
+          text: "Oui, annuler",
+          style: "destructive",
+          onPress: () => {
+            setContracts((prev) => prev.filter((c) => c.id !== id));
+            Alert.alert("Contrat annulé", "Le contrat a été annulé avec succès. Aucun prélèvement futur ne sera effectué.");
+          },
+        },
+      ]
+    );
+  };
+
   const handleMenuPress = (item: MenuItem) => {
     if (item.danger) {
       navigation.reset({ index: 0, routes: [{ name: "Auth" as any }] });
@@ -104,6 +139,38 @@ export function ClientProfileScreen({
             </View>
           ))}
         </View>
+
+        {/* Active contracts */}
+        {contracts.length > 0 && (
+          <View style={styles.contractsCard}>
+            <View style={styles.contractsHeader}>
+              <MaterialCommunityIcons name="file-document-check" size={16} color={Colors.forest} />
+              <Text style={styles.contractsTitle}>Contrats actifs</Text>
+            </View>
+            {contracts.map((c, i) => (
+              <View key={c.id} style={[styles.contractRow, i > 0 && { borderTopWidth: 1, borderTopColor: Colors.surface }]}>
+                <View style={styles.contractIconWrap}>
+                  <MaterialCommunityIcons name={c.icon as any} size={16} color={Colors.forest} />
+                </View>
+                <View style={styles.contractInfo}>
+                  <Text style={styles.contractName}>{c.name}</Text>
+                  <Text style={styles.contractMeta}>{c.artisan} • {c.price}</Text>
+                  <Text style={styles.contractSince}>Depuis le {c.since}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.contractCancelBtn}
+                  onPress={() => cancelContract(c.id)}
+                >
+                  <Text style={styles.contractCancelText}>Annuler</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+            <View style={styles.contractFooter}>
+              <MaterialCommunityIcons name="shield-check" size={12} color={Colors.forest} />
+              <Text style={styles.contractFooterText}>Sans engagement — annulable à tout moment</Text>
+            </View>
+          </View>
+        )}
 
         {/* Menu card */}
         <View style={styles.menuCard}>
@@ -241,6 +308,86 @@ const styles = StyleSheet.create({
     fontFamily: "DMSans_500Medium",
     fontSize: 14,
     color: Colors.navy,
+  },
+
+  /* Contracts */
+  contractsCard: {
+    backgroundColor: Colors.white,
+    borderRadius: Radii["3xl"],
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: "rgba(27,107,78,0.12)",
+  },
+  contractsHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 10,
+  },
+  contractsTitle: {
+    fontFamily: "DMSans_700Bold",
+    fontSize: 14,
+    color: Colors.navy,
+  },
+  contractRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 12,
+  },
+  contractIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: Radii.md,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  contractInfo: { flex: 1 },
+  contractName: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 13,
+    color: Colors.navy,
+  },
+  contractMeta: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 11,
+    color: Colors.textSecondary,
+    marginTop: 1,
+  },
+  contractSince: {
+    fontFamily: "DMMono_500Medium",
+    fontSize: 10,
+    color: Colors.textMuted,
+    marginTop: 2,
+  },
+  contractCancelBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: "rgba(232,48,42,0.06)",
+  },
+  contractCancelText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 11,
+    color: Colors.red,
+  },
+  contractFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: Colors.surface,
+  },
+  contractFooterText: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 11,
+    color: Colors.forest,
   },
 
   /* Menu card */
