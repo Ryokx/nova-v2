@@ -31,7 +31,7 @@ export function Input({ label, error, style, ...props }: InputProps) {
 }
 
 const styles = StyleSheet.create({
-  wrapper: { marginBottom: 10 },
+  wrapper: { marginBottom: 10, width: "100%" },
   label: {
     fontFamily: "DMSans_500Medium",
     fontSize: 13,
