@@ -219,9 +219,9 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   tab: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: Radii.sm,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
     backgroundColor: Colors.white,
     borderWidth: 1,
     borderColor: Colors.border,
@@ -232,8 +232,8 @@ const styles = StyleSheet.create({
     ...Shadows.sm,
   },
   tabText: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 12,
+    fontFamily: "DMSans_500Medium",
+    fontSize: 11,
     color: "#4A5568",
   },
   tabTextActive: { color: Colors.white },
