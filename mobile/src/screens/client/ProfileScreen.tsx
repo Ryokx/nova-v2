@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -13,7 +14,7 @@ import { Colors, Radii, Shadows } from "../../constants/theme";
 import type { ClientTabScreenProps } from "../../navigation/types";
 
 /* ── Profile data ── */
-const profile = {
+const defaultProfile = {
   name: "Sophie Lefèvre",
   initials: "SL",
   email: "sophie.lefevre@email.com",
@@ -63,7 +64,21 @@ const initialContracts: ActiveContract[] = [
 export function ClientProfileScreen({
   navigation,
 }: ClientTabScreenProps<"ClientProfile">) {
+  const [profile, setProfile] = useState(defaultProfile);
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState(defaultProfile);
   const [contracts, setContracts] = useState(initialContracts);
+
+  const startEditing = () => {
+    setEditForm({ ...profile });
+    setEditing(true);
+  };
+
+  const saveProfile = () => {
+    setProfile({ ...editForm });
+    setEditing(false);
+    Alert.alert("Profil mis à jour", "Vos coordonnées ont été enregistrées.");
+  };
 
   const cancelContract = (id: string) => {
     const contract = contracts.find((c) => c.id === id);
@@ -118,27 +133,53 @@ export function ClientProfileScreen({
         {/* Personal info card */}
         <View style={styles.infoCard}>
           <View style={styles.infoHeader}>
-            <Text style={styles.infoHeaderTitle}>
-              Informations personnelles
-            </Text>
+            <Text style={styles.infoHeaderTitle}>Informations personnelles</Text>
+            <TouchableOpacity onPress={editing ? saveProfile : startEditing}>
+              <Text style={styles.editBtn}>{editing ? "Enregistrer" : "Modifier"}</Text>
+            </TouchableOpacity>
           </View>
-          {[
-            ["Nom complet", profile.name],
-            ["Email", profile.email],
-            ["Téléphone", profile.phone],
-            ["Adresse", profile.address],
-          ].map(([label, value], i, arr) => (
-            <View
-              key={label}
-              style={[
-                styles.infoRow,
-                i < arr.length - 1 && styles.infoRowBorder,
-              ]}
-            >
-              <Text style={styles.infoLabel}>{label}</Text>
-              <Text style={styles.infoValue}>{value}</Text>
+
+          {editing ? (
+            <View style={styles.editForm}>
+              {[
+                { label: "Nom complet", key: "name" as const },
+                { label: "Email", key: "email" as const, keyboard: "email-address" as const },
+                { label: "Téléphone", key: "phone" as const, keyboard: "phone-pad" as const },
+                { label: "Adresse", key: "address" as const },
+              ].map((field) => (
+                <View key={field.key} style={styles.editField}>
+                  <Text style={styles.editFieldLabel}>{field.label}</Text>
+                  <TextInput
+                    style={styles.editFieldInput}
+                    value={editForm[field.key]}
+                    onChangeText={(text) => setEditForm((prev) => ({ ...prev, [field.key]: text }))}
+                    keyboardType={field.keyboard || "default"}
+                    autoCapitalize={field.key === "email" ? "none" : "sentences"}
+                  />
+                </View>
+              ))}
+              <TouchableOpacity style={styles.cancelEditBtn} onPress={() => setEditing(false)}>
+                <Text style={styles.cancelEditText}>Annuler</Text>
+              </TouchableOpacity>
             </View>
-          ))}
+          ) : (
+            <>
+              {[
+                ["Nom complet", profile.name],
+                ["Email", profile.email],
+                ["Téléphone", profile.phone],
+                ["Adresse", profile.address],
+              ].map(([label, value], i, arr) => (
+                <View
+                  key={label}
+                  style={[styles.infoRow, i < arr.length - 1 && styles.infoRowBorder]}
+                >
+                  <Text style={styles.infoLabel}>{label}</Text>
+                  <Text style={styles.infoValue}>{value}</Text>
+                </View>
+              ))}
+            </>
+          )}
         </View>
 
         {/* Active contracts */}
@@ -291,12 +332,41 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: Colors.surface,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   infoHeaderTitle: {
     fontFamily: "DMSans_700Bold",
     fontSize: 14,
     color: Colors.navy,
   },
+  editBtn: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 13,
+    color: Colors.forest,
+  },
+  editForm: { paddingTop: 8 },
+  editField: { marginBottom: 12 },
+  editFieldLabel: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 11,
+    color: Colors.textHint,
+    marginBottom: 4,
+  },
+  editFieldInput: {
+    height: 44,
+    backgroundColor: Colors.bgPage,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: 12,
+    fontFamily: "DMSans_500Medium",
+    fontSize: 14,
+    color: Colors.navy,
+  },
+  cancelEditBtn: { alignItems: "center", paddingVertical: 8 },
+  cancelEditText: { fontFamily: "DMSans_500Medium", fontSize: 13, color: Colors.textMuted },
   infoRow: { paddingVertical: 12 },
   infoRowBorder: {
     borderBottomWidth: 1,
