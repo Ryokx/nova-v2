@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
@@ -81,6 +82,30 @@ export function EmergencyScreen({
   navigation,
 }: RootStackScreenProps<"Emergency">) {
   const [urgCat, setUrgCat] = useState<string | null>(null);
+  const [confirmedArtisan, setConfirmedArtisan] = useState<string | null>(null);
+  const [urgCancelled, setUrgCancelled] = useState(false);
+
+  const handleUrgentBook = (artisanName: string) => {
+    setConfirmedArtisan(artisanName);
+  };
+
+  const handleUrgentCancel = () => {
+    Alert.alert(
+      "Annuler la demande urgente",
+      `Êtes-vous sûr de vouloir annuler l'intervention urgente ?\n\nLes frais de déplacement de 50,00€ (tarif urgence) restent à votre charge.`,
+      [
+        { text: "Non, garder", style: "cancel" },
+        {
+          text: "Oui, annuler (50€ de frais)",
+          style: "destructive",
+          onPress: () => {
+            setUrgCancelled(true);
+            Alert.alert("Demande annulée", "L'intervention urgente a été annulée. Les frais de déplacement urgence de 50,00€ ont été prélevés.");
+          },
+        },
+      ]
+    );
+  };
 
   const filtered =
     urgCat && urgCat !== "all"
@@ -251,12 +276,11 @@ export function EmergencyScreen({
                 <TouchableOpacity
                   style={styles.redBtn}
                   activeOpacity={0.85}
-                  onPress={() =>
-                    navigation.navigate("Booking", { artisanId: a.id })
-                  }
+                  onPress={() => handleUrgentBook(a.name)}
+                  disabled={!!confirmedArtisan}
                 >
                   <Text style={styles.redBtnText}>
-                    <MaterialCommunityIcons name="lightning-bolt" size={20} color={Colors.red} /> Intervention immédiate
+                    {confirmedArtisan === a.name ? "✓ Demande envoyée" : "Intervention immédiate"}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -271,6 +295,39 @@ export function EmergencyScreen({
               </View>
             </View>
           ))}
+
+          {/* Confirmed state with cancel option */}
+          {confirmedArtisan && !urgCancelled && (
+            <View style={styles.confirmedCard}>
+              <View style={styles.confirmedHeader}>
+                <MaterialCommunityIcons name="check-circle" size={20} color={Colors.success} />
+                <Text style={styles.confirmedTitle}>Demande envoyée</Text>
+              </View>
+              <Text style={styles.confirmedDesc}>
+                {confirmedArtisan} a été contacté et se rend vers vous. Paiement sécurisé par séquestre Nova.
+              </Text>
+              <TouchableOpacity style={styles.urgCancelBtn} onPress={handleUrgentCancel} activeOpacity={0.7}>
+                <MaterialCommunityIcons name="close-circle-outline" size={16} color={Colors.red} />
+                <Text style={styles.urgCancelBtnText}>Annuler la demande</Text>
+              </TouchableOpacity>
+              <View style={styles.urgCancelInfo}>
+                <MaterialCommunityIcons name="information-outline" size={13} color={Colors.textMuted} />
+                <Text style={styles.urgCancelInfoText}>
+                  En cas d'annulation, les frais de déplacement urgence de 50,00€ restent à votre charge.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {urgCancelled && (
+            <View style={styles.cancelledCard}>
+              <MaterialCommunityIcons name="close-circle" size={20} color={Colors.red} />
+              <Text style={styles.cancelledTitle}>Demande annulée</Text>
+              <Text style={styles.cancelledDesc}>
+                Frais de déplacement urgence de 50,00€ prélevés. Aucune autre facturation.
+              </Text>
+            </View>
+          )}
 
           {/* Trust footer */}
           <View style={styles.trustFooter}>
@@ -539,6 +596,33 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "DMSans_600SemiBold",
   },
+
+  /* Confirmed + cancel */
+  confirmedCard: {
+    backgroundColor: Colors.white, borderRadius: 16, padding: 16, marginBottom: 12,
+    borderWidth: 1.5, borderColor: "rgba(34,200,138,0.2)",
+  },
+  confirmedHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 },
+  confirmedTitle: { fontFamily: "Manrope_700Bold", fontSize: 15, color: Colors.success },
+  confirmedDesc: { fontFamily: "DMSans_400Regular", fontSize: 13, color: "#4A5568", lineHeight: 20, marginBottom: 12 },
+  urgCancelBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 6, paddingVertical: 10,
+  },
+  urgCancelBtnText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.red },
+  urgCancelInfo: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: "rgba(138,149,163,0.06)", borderRadius: 10, padding: 10, marginTop: 4,
+  },
+  urgCancelInfoText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textMuted, flex: 1 },
+
+  cancelledCard: {
+    backgroundColor: "rgba(232,48,42,0.04)", borderRadius: 16, padding: 16,
+    marginBottom: 12, borderWidth: 1, borderColor: "rgba(232,48,42,0.1)",
+    alignItems: "center",
+  },
+  cancelledTitle: { fontFamily: "Manrope_700Bold", fontSize: 15, color: Colors.red, marginTop: 6, marginBottom: 4 },
+  cancelledDesc: { fontFamily: "DMSans_400Regular", fontSize: 12, color: "#4A5568", textAlign: "center" },
 
   /* Trust footer */
   trustFooter: {

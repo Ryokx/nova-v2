@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
@@ -60,6 +61,28 @@ export function MissionDetailScreen({
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [validated, setValidated] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
+
+  const handleCancel = () => {
+    Alert.alert(
+      "Annuler l'intervention",
+      "Êtes-vous sûr de vouloir annuler cette intervention ?\n\nConformément aux conditions Nova, les frais de déplacement de 40,00€ restent à votre charge.",
+      [
+        { text: "Non, garder", style: "cancel" },
+        {
+          text: "Oui, annuler (40€ de frais)",
+          style: "destructive",
+          onPress: () => {
+            Alert.alert(
+              "Intervention annulée",
+              "L'intervention a été annulée. Les frais de déplacement de 40,00€ ont été prélevés. Le reste (280,00€) vous sera remboursé sous 3 à 5 jours.",
+            );
+            setCancelled(true);
+          },
+        },
+      ]
+    );
+  };
 
   const toggleCheck = (idx: number) => {
     const next = [...checks];
@@ -72,6 +95,41 @@ export function MissionDetailScreen({
     status === "completed" ? 2 :
     status === "validated" ? 3 :
     status === "dispute" ? 1 : 2;
+
+  /* ---------- Cancelled state ---------- */
+  if (cancelled) {
+    return (
+      <View style={styles.successRoot}>
+        <View style={[styles.successCircle, { backgroundColor: Colors.red }]}>
+          <MaterialCommunityIcons name="close" size={36} color={Colors.white} />
+        </View>
+        <Text style={styles.successTitle}>Intervention annulée</Text>
+        <Text style={styles.successDesc}>
+          Les frais de déplacement de 40,00€ ont été prélevés.{"\n"}Le reste de 280,00€ sera remboursé sous 3 à 5 jours.
+        </Text>
+        <View style={styles.cancelledBreakdown}>
+          <View style={styles.cancelledRow}>
+            <Text style={styles.cancelledLabel}>Montant total</Text>
+            <Text style={styles.cancelledValue}>320,00€</Text>
+          </View>
+          <View style={styles.cancelledRow}>
+            <Text style={styles.cancelledLabel}>Frais de déplacement</Text>
+            <Text style={[styles.cancelledValue, { color: Colors.red }]}>- 40,00€</Text>
+          </View>
+          <View style={[styles.cancelledRow, { borderTopWidth: 1, borderTopColor: Colors.surface, paddingTop: 8 }]}>
+            <Text style={[styles.cancelledLabel, { fontFamily: "DMSans_600SemiBold" }]}>Remboursement</Text>
+            <Text style={[styles.cancelledValue, { color: Colors.success }]}>280,00€</Text>
+          </View>
+        </View>
+        <Button
+          title="Retour aux missions"
+          onPress={() => navigation.navigate("ClientTabs", { screen: "ClientMissions" })}
+          size="lg"
+          fullWidth
+        />
+      </View>
+    );
+  }
 
   /* ---------- Success state ---------- */
   if (validated) {
@@ -174,6 +232,19 @@ export function MissionDetailScreen({
               fullWidth
               size="lg"
             />
+
+            {/* Cancel button */}
+            <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel} activeOpacity={0.7}>
+              <MaterialCommunityIcons name="close-circle-outline" size={16} color={Colors.red} />
+              <Text style={styles.cancelBtnText}>Annuler l'intervention</Text>
+            </TouchableOpacity>
+
+            <View style={styles.cancelInfo}>
+              <MaterialCommunityIcons name="information-outline" size={13} color={Colors.textMuted} />
+              <Text style={styles.cancelInfoText}>
+                En cas d'annulation, les frais de déplacement de 40,00€ restent à votre charge.
+              </Text>
+            </View>
           </View>
         )}
 
@@ -430,6 +501,30 @@ const styles = StyleSheet.create({
     padding: 12, marginBottom: 10, borderWidth: 1, borderColor: "rgba(232,48,42,0.1)",
   },
   disputeInfoText: { fontFamily: "DMSans_500Medium", fontSize: 12, color: "#4A5568", flex: 1 },
+
+  /* Cancel */
+  cancelBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 6, marginTop: 14, paddingVertical: 12,
+  },
+  cancelBtnText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.red },
+  cancelInfo: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: "rgba(138,149,163,0.06)", borderRadius: 10,
+    padding: 10, marginTop: 4,
+  },
+  cancelInfoText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textMuted, flex: 1 },
+
+  /* Cancelled state */
+  cancelledBreakdown: {
+    width: "100%", backgroundColor: Colors.white, borderRadius: 16,
+    padding: 16, marginBottom: 20, borderWidth: 1, borderColor: Colors.border,
+  },
+  cancelledRow: {
+    flexDirection: "row", justifyContent: "space-between", paddingVertical: 6,
+  },
+  cancelledLabel: { fontFamily: "DMSans_400Regular", fontSize: 13, color: Colors.textSecondary },
+  cancelledValue: { fontFamily: "DMMono_500Medium", fontSize: 13, color: Colors.navy },
 
   /* Section label */
   sectionLabel: { fontSize: 14, fontWeight: "600", color: Colors.navy, marginBottom: 10 },

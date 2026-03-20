@@ -61,7 +61,7 @@ function SettingRow({
       disabled={!onPress && !right}
     >
       <View style={styles.settingRowLeft}>
-        <MaterialCommunityIcons name={icon as any} size={18} color={Colors.navy} />
+        {icon}
         <Text
           style={[styles.settingLabel, danger && styles.settingLabelDanger]}
         >
