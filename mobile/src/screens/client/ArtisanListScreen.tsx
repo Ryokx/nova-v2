@@ -68,7 +68,6 @@ const categoryLabels: Record<string, string> = {
 const sortOptions = [
   { id: "rating", label: "Note" },
   { id: "price", label: "Prix" },
-  { id: "reviews", label: "Avis" },
 ] as const;
 
 type SortId = (typeof sortOptions)[number]["id"];
@@ -100,7 +99,6 @@ export function ArtisanListScreen({
     const copy = [...artisans];
     if (sort === "rating") copy.sort((a, b) => b.rating - a.rating);
     else if (sort === "price") copy.sort((a, b) => a.price - b.price);
-    else copy.sort((a, b) => b.reviews - a.reviews);
     return copy;
   }, [artisans, sort]);
 

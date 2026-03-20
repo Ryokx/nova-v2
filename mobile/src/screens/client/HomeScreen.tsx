@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback, useRef, useMemo } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -31,9 +32,50 @@ const topArtisans = [
   { id: "5", name: "Christophe D.", job: "Chauffagiste", rating: 4.9, reviews: 89, price: 75, initials: "CD", responseTime: "< 2h" },
 ];
 
+/* ── All artisans for search ── */
+const allArtisans = [
+  { id: "1", name: "Jean-Michel Petit", job: "Plombier", rating: 4.9, price: 65, category: "plumber" },
+  { id: "2", name: "Sophie Martin", job: "Électricienne", rating: 4.8, price: 70, category: "electrician" },
+  { id: "3", name: "Karim Benali", job: "Serrurier", rating: 5.0, price: 60, category: "locksmith" },
+  { id: "4", name: "Marie Dupont", job: "Peintre", rating: 4.7, price: 55, category: "painter" },
+  { id: "5", name: "Christophe Durand", job: "Chauffagiste", rating: 4.9, price: 75, category: "heating" },
+  { id: "6", name: "Fatima Hadj", job: "Plombier", rating: 4.8, price: 70, category: "plumber" },
+  { id: "7", name: "Thomas Richard", job: "Plombier", rating: 4.7, price: 60, category: "plumber" },
+  { id: "8", name: "Laurent Garcia", job: "Plombier", rating: 4.5, price: 55, category: "plumber" },
+  { id: "9", name: "David Leroy", job: "Électricien", rating: 4.6, price: 65, category: "electrician" },
+  { id: "10", name: "Amina Kaddouri", job: "Électricienne", rating: 4.9, price: 75, category: "electrician" },
+  { id: "11", name: "Éric Fabre", job: "Serrurier", rating: 4.7, price: 65, category: "locksmith" },
+  { id: "12", name: "Philippe Clément", job: "Maçon", rating: 4.6, price: 55, category: "mason" },
+  { id: "13", name: "Mehdi Amrani", job: "Maçon", rating: 4.8, price: 60, category: "mason" },
+];
+
 export function ClientHomeScreen({
   navigation,
 }: ClientTabScreenProps<"ClientHome">) {
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSearch = useCallback((text: string) => {
+    setSearch(text);
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      setDebouncedSearch(text);
+    }, 300);
+  }, []);
+
+  const searchResults = useMemo(() => {
+    if (debouncedSearch.length < 2) return [];
+    const q = debouncedSearch.toLowerCase();
+    return allArtisans.filter(
+      (a) =>
+        a.name.toLowerCase().includes(q) ||
+        a.job.toLowerCase().includes(q)
+    );
+  }, [debouncedSearch]);
+
+  const showResults = search.length >= 2;
+
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <ScrollView
@@ -55,12 +97,65 @@ export function ClientHomeScreen({
         </View>
 
         {/* ── Search bar ── */}
-        <TouchableOpacity style={styles.searchBar} activeOpacity={0.7}>
-          <Text style={styles.searchIcon}><MaterialCommunityIcons name="magnify" size={18} color={Colors.textHint} /></Text>
-          <Text style={styles.searchPlaceholder}>
-            Rechercher un artisan...
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.searchBar}>
+          <MaterialCommunityIcons name="magnify" size={18} color={Colors.textHint} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher un artisan..."
+            placeholderTextColor={Colors.textMuted}
+            value={search}
+            onChangeText={handleSearch}
+            autoCorrect={false}
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => { setSearch(""); setDebouncedSearch(""); }}>
+              <MaterialCommunityIcons name="close-circle" size={18} color={Colors.textHint} />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* ── Search results ── */}
+        {showResults && (
+          <View style={styles.searchResults}>
+            {searchResults.length === 0 && debouncedSearch.length >= 2 ? (
+              <View style={styles.searchEmpty}>
+                <Text style={styles.searchEmptyText}>
+                  Aucun artisan trouvé pour « {debouncedSearch} »
+                </Text>
+              </View>
+            ) : debouncedSearch.length < 2 ? (
+              <View style={styles.searchEmpty}>
+                <Text style={styles.searchEmptyText}>Recherche en cours...</Text>
+              </View>
+            ) : (
+              searchResults.map((a) => (
+                <TouchableOpacity
+                  key={a.id}
+                  style={styles.searchResultItem}
+                  activeOpacity={0.85}
+                  onPress={() => {
+                    setSearch("");
+                    setDebouncedSearch("");
+                    navigation.navigate("ArtisanProfile", { id: a.id });
+                  }}
+                >
+                  <Avatar name={a.name} size={36} radius={12} />
+                  <View style={styles.searchResultInfo}>
+                    <Text style={styles.searchResultName}>{a.name}</Text>
+                    <Text style={styles.searchResultJob}>{a.job}</Text>
+                  </View>
+                  <View style={styles.searchResultRight}>
+                    <View style={styles.searchResultRating}>
+                      <MaterialCommunityIcons name="star" size={12} color={Colors.gold} />
+                      <Text style={styles.searchResultRatingText}>{a.rating}</Text>
+                    </View>
+                    <Text style={styles.searchResultPrice}>{a.price}€/h</Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
+          </View>
+        )}
 
         {/* ── Categories 2x3 grid ── */}
         <View style={styles.catGrid}>
@@ -205,11 +300,69 @@ const styles = StyleSheet.create({
     gap: 10,
     ...Shadows.sm,
   },
-  searchIcon: { fontSize: 16 },
-  searchPlaceholder: {
+  searchInput: {
+    flex: 1,
     fontFamily: "DMSans_400Regular",
     fontSize: 15,
+    color: Colors.navy,
+    height: 44,
+    paddingVertical: 0,
+  },
+  searchResults: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    backgroundColor: Colors.white,
+    borderRadius: Radii.xl,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    overflow: "hidden",
+    ...Shadows.md,
+  },
+  searchEmpty: {
+    paddingVertical: 20,
+    alignItems: "center",
+  },
+  searchEmptyText: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 13,
     color: Colors.textMuted,
+  },
+  searchResultItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.surface,
+  },
+  searchResultInfo: { flex: 1 },
+  searchResultName: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 14,
+    color: Colors.navy,
+  },
+  searchResultJob: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  searchResultRight: { alignItems: "flex-end" },
+  searchResultRating: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+  },
+  searchResultRatingText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 12,
+    color: Colors.navy,
+  },
+  searchResultPrice: {
+    fontFamily: "DMMono_500Medium",
+    fontSize: 12,
+    color: Colors.forest,
+    marginTop: 2,
   },
 
   /* Categories grid */
