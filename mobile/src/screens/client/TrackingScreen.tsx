@@ -86,10 +86,11 @@ interface TimelineStep {
   done: boolean;
 }
 
+// Steps: 0=En route, 1=Sur place, 2=Devis signé, 3=Paiement bloqué, 4=Intervention en cours, 5=Intervention terminée, 6=Validation Nova, 7=Artisan payé
 export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">) {
-  const [trackingStep, setTrackingStep] = useState(1);
+  const [trackingStep, setTrackingStep] = useState(0);
   const [routeIndex, setRouteIndex] = useState(0);
-  const [mapHtml, setMapHtml] = useState(() => buildMapHtml(0, 1));
+  const [mapHtml, setMapHtml] = useState(() => buildMapHtml(0, 0));
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -105,12 +106,12 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
 
   // Simulate artisan movement
   useEffect(() => {
-    if (trackingStep !== 1) return;
+    if (trackingStep !== 0) return;
     const interval = setInterval(() => {
       setRouteIndex((prev) => {
         const next = prev + 1;
         if (next >= ROUTE.length) { clearInterval(interval); return prev; }
-        setMapHtml(buildMapHtml(next, 1));
+        setMapHtml(buildMapHtml(next, 0));
         return next;
       });
     }, 3000);
@@ -119,7 +120,7 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
 
   // Update map on step change
   useEffect(() => {
-    if (trackingStep >= 2) {
+    if (trackingStep >= 1) {
       setMapHtml(buildMapHtml(ROUTE.length - 1, trackingStep));
     }
   }, [trackingStep]);
@@ -127,10 +128,14 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
   const etaMinutes = Math.max(0, (ROUTE.length - 1 - routeIndex) * 2);
 
   const steps: TimelineStep[] = [
-    { label: "Devis signé", desc: "Paiement bloqué en séquestre", time: "14:02", done: true },
-    { label: "Artisan en route", desc: `Jean-Michel P. arrive dans ~${etaMinutes} min`, time: "14:35", done: trackingStep >= 1 },
-    { label: "Sur place", desc: "L'intervention a commencé", time: trackingStep >= 2 ? "14:52" : "—", done: trackingStep >= 2 },
-    { label: "Terminée", desc: "En attente de validation", time: trackingStep >= 3 ? "15:40" : "—", done: trackingStep >= 3 },
+    { label: "Artisan en route", desc: `Jean-Michel P. arrive dans ~${etaMinutes} min`, time: "14:20", done: trackingStep >= 0 },
+    { label: "Artisan sur place", desc: "L'artisan est arrivé chez vous", time: trackingStep >= 1 ? "14:35" : "—", done: trackingStep >= 1 },
+    { label: "Devis signé", desc: "Le devis a été établi et signé sur place", time: trackingStep >= 2 ? "14:45" : "—", done: trackingStep >= 2 },
+    { label: "Paiement bloqué", desc: "Montant bloqué en séquestre chez Nova", time: trackingStep >= 3 ? "14:46" : "—", done: trackingStep >= 3 },
+    { label: "Intervention en cours", desc: "L'artisan réalise les travaux", time: trackingStep >= 4 ? "14:50" : "—", done: trackingStep >= 4 },
+    { label: "Intervention terminée", desc: "Les travaux sont terminés", time: trackingStep >= 5 ? "15:40" : "—", done: trackingStep >= 5 },
+    { label: "Validation Nova", desc: "Nova vérifie la conformité", time: trackingStep >= 6 ? "15:45" : "—", done: trackingStep >= 6 },
+    { label: "Artisan payé", desc: "Le paiement est libéré à l'artisan", time: trackingStep >= 7 ? "15:50" : "—", done: trackingStep >= 7 },
   ];
 
   return (
@@ -148,7 +153,7 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
           <MaterialCommunityIcons name="arrow-left" size={20} color={Colors.navy} />
         </TouchableOpacity>
 
-        {trackingStep === 1 && (
+        {trackingStep === 0 && (
           <View style={styles.etaOverlay}>
             <Animated.View style={[styles.etaDot, { opacity: pulseAnim }]} />
             <Text style={styles.etaText}>
@@ -156,16 +161,38 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
             </Text>
           </View>
         )}
-        {trackingStep === 2 && (
+        {trackingStep === 1 && (
+          <View style={[styles.etaOverlay, { backgroundColor: "rgba(27,107,78,0.92)" }]}>
+            <MaterialCommunityIcons name="account-check" size={14} color={Colors.white} />
+            <Text style={[styles.etaText, { color: Colors.white }]}>Artisan sur place</Text>
+          </View>
+        )}
+        {(trackingStep === 2 || trackingStep === 3) && (
+          <View style={[styles.etaOverlay, { backgroundColor: "rgba(245,166,35,0.92)" }]}>
+            <MaterialCommunityIcons name="file-sign" size={14} color={Colors.white} />
+            <Text style={[styles.etaText, { color: Colors.white }]}>
+              {trackingStep === 2 ? "Devis signé" : "Paiement bloqué en séquestre"}
+            </Text>
+          </View>
+        )}
+        {trackingStep === 4 && (
           <View style={[styles.etaOverlay, { backgroundColor: "rgba(27,107,78,0.92)" }]}>
             <MaterialCommunityIcons name="wrench" size={14} color={Colors.white} />
             <Text style={[styles.etaText, { color: Colors.white }]}>Intervention en cours</Text>
           </View>
         )}
-        {trackingStep >= 3 && (
+        {trackingStep === 5 && (
           <View style={[styles.etaOverlay, { backgroundColor: "rgba(34,200,138,0.92)" }]}>
             <MaterialCommunityIcons name="check-circle" size={14} color={Colors.white} />
-            <Text style={[styles.etaText, { color: Colors.white }]}>Terminée — Validez ci-dessous</Text>
+            <Text style={[styles.etaText, { color: Colors.white }]}>Terminée — En attente de validation</Text>
+          </View>
+        )}
+        {trackingStep >= 6 && (
+          <View style={[styles.etaOverlay, { backgroundColor: "rgba(34,200,138,0.92)" }]}>
+            <MaterialCommunityIcons name="shield-check" size={14} color={Colors.white} />
+            <Text style={[styles.etaText, { color: Colors.white }]}>
+              {trackingStep === 6 ? "Nova vérifie..." : "Artisan payé ✓"}
+            </Text>
           </View>
         )}
       </View>
@@ -193,9 +220,9 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
               <View style={[styles.tlCircle, s.done && styles.tlCircleDone]}>
                 {s.done ? <Text style={styles.tlCheck}>✓</Text> : <Text style={styles.tlNum}>{i + 1}</Text>}
               </View>
-              {i < 3 && <View style={[styles.tlLine, s.done && styles.tlLineDone]} />}
+              {i < steps.length - 1 && <View style={[styles.tlLine, s.done && styles.tlLineDone]} />}
             </View>
-            <View style={[styles.tlContent, i < 3 && { paddingBottom: 14 }]}>
+            <View style={[styles.tlContent, i < steps.length - 1 && { paddingBottom: 12 }]}>
               <View style={styles.tlLabelRow}>
                 <Text style={[styles.tlLabel, s.done && { color: Colors.forest }]}>{s.label}</Text>
                 <Text style={styles.tlTime}>{s.time}</Text>
@@ -206,25 +233,48 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
         ))}
 
         <View style={styles.escrow}>
-          <MaterialCommunityIcons name="lock" size={14} color={Colors.forest} />
+          <MaterialCommunityIcons name={trackingStep >= 7 ? "lock-open" : "lock"} size={14} color={trackingStep >= 7 ? Colors.success : Colors.forest} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.escrowTitle}>320,00€ en séquestre</Text>
-            <Text style={styles.escrowNote}>Libéré après votre validation</Text>
+            <Text style={styles.escrowTitle}>
+              {trackingStep < 3 ? "En attente du devis" : trackingStep >= 7 ? "320,00€ libérés" : "320,00€ en séquestre"}
+            </Text>
+            <Text style={styles.escrowNote}>
+              {trackingStep < 3
+                ? "Le montant sera bloqué après signature du devis"
+                : trackingStep >= 7
+                ? "Le paiement a été versé à Jean-Michel P."
+                : "Libéré après validation de l'intervention"}
+            </Text>
           </View>
         </View>
 
         <View style={styles.demoRow}>
-          {[{ label: "→ Sur place", step: 2 }, { label: "→ Terminé", step: 3 }]
+          {[
+            { label: "Sur place", step: 1 },
+            { label: "Devis signé", step: 2 },
+            { label: "Paiement", step: 3 },
+            { label: "Intervention", step: 4 },
+            { label: "Terminée", step: 5 },
+            { label: "Validation", step: 6 },
+            { label: "Payé", step: 7 },
+          ]
             .filter(b => b.step > trackingStep)
+            .slice(0, 3)
             .map(b => (
               <TouchableOpacity key={b.step} onPress={() => setTrackingStep(b.step)} style={styles.demoBtn}>
-                <Text style={styles.demoBtnText}>Demo : {b.label}</Text>
+                <Text style={styles.demoBtnText}>→ {b.label}</Text>
               </TouchableOpacity>
             ))}
         </View>
 
-        {trackingStep >= 3 && (
+        {trackingStep === 5 && (
           <Button title="Valider l'intervention" onPress={() => navigation.navigate("MissionDetail", { id: "mission-completed" })} fullWidth size="lg" style={{ marginTop: 12 }} />
+        )}
+        {trackingStep >= 7 && (
+          <View style={styles.completedBanner}>
+            <MaterialCommunityIcons name="check-circle" size={18} color={Colors.success} />
+            <Text style={styles.completedText}>Processus terminé — Artisan payé</Text>
+          </View>
         )}
       </ScrollView>
     </View>
@@ -308,4 +358,22 @@ const styles = StyleSheet.create({
     borderColor: Colors.border, alignItems: "center",
   },
   demoBtnText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textSecondary },
+
+  completedBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "rgba(34,200,138,0.08)",
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: "rgba(34,200,138,0.2)",
+  },
+  completedText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 14,
+    color: Colors.success,
+  },
 });
