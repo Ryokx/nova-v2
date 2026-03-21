@@ -8,11 +8,11 @@ interface EscrowStepperProps {
 }
 
 const steps = [
-  { icon: "file-check", label: "Devis" },
-  { icon: "lock", label: "Séquestre" },
-  { icon: "wrench", label: "Travaux" },
-  { icon: "check-decagram", label: "Validé" },
-  { icon: "cash", label: "Payé" },
+  { icon: "file-check", label: "Devis\nvalidé" },
+  { icon: "lock", label: "Paiement\nbloqué" },
+  { icon: "wrench", label: "Travaux\nen cours" },
+  { icon: "check-decagram", label: "Nova\nvalide" },
+  { icon: "cash", label: "Artisan\npayé" },
 ];
 
 export function EscrowStepper({ currentStep }: EscrowStepperProps) {
@@ -32,7 +32,7 @@ export function EscrowStepper({ currentStep }: EscrowStepperProps) {
                 ]}
               >
                 <Text style={[styles.circleText, done && styles.circleTextDone]}>
-                  {done ? "✓" : <MaterialCommunityIcons name={step.icon as any} size={14} color={Colors.textSecondary} />}
+                  {done ? "✓" : <MaterialCommunityIcons name={step.icon as any} size={12} color={Colors.textSecondary} />}
                 </Text>
               </View>
               <Text
@@ -71,9 +71,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   circle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     borderWidth: 2,
     borderColor: Colors.border,
     alignItems: "center",
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     borderWidth: 2.5,
   },
   circleText: {
-    fontSize: 12,
+    fontSize: 10,
     color: Colors.textSecondary,
   },
   circleTextDone: {
@@ -98,10 +98,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "DMSans_500Medium",
-    fontSize: 10,
+    fontSize: 9,
     color: Colors.textHint,
     textAlign: "center",
-    marginTop: 5,
+    marginTop: 4,
+    lineHeight: 12,
   },
   labelDone: { color: Colors.success },
   labelActive: { color: Colors.forest },
@@ -109,8 +110,8 @@ const styles = StyleSheet.create({
     height: 2,
     flex: 1,
     backgroundColor: Colors.border,
-    marginTop: 14,
-    marginHorizontal: -4,
+    marginTop: 12,
+    marginHorizontal: -6,
   },
   lineDone: {
     backgroundColor: Colors.success,
