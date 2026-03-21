@@ -284,6 +284,7 @@ export function BookingScreen({
                 onPress={() => setStep(2)}
                 fullWidth
                 size="lg"
+                disabled={!selectedSlot}
               />
             </View>
           </View>
