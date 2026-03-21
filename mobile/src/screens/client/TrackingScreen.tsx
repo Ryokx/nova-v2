@@ -93,7 +93,6 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
   const [routeIndex, setRouteIndex] = useState(0);
   const [mapHtml, setMapHtml] = useState(() => buildMapHtml(0, 0));
   const [cancelled, setCancelled] = useState(false);
-  const [cancelPending, setCancelPending] = useState(false); // Waiting for artisan decision
   const startTimeRef = useRef(Date.now());
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -109,29 +108,16 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
 
   const handleCancel = () => {
     if (isEarlyCancel && trackingStep === 0) {
-      // Annulation < 5 min — artisan decides
+      // Annulation < 5 min — toujours gratuit
       Alert.alert(
         "Annuler l'intervention",
-        artisanConfig.deploymentFree
-          ? "Vous annulez moins de 5 minutes après la demande.\n\nLe déplacement est offert par cet artisan. Aucun frais ne sera facturé."
-          : "Vous annulez moins de 5 minutes après la demande.\n\nL'artisan sera notifié et décidera s'il applique des frais de déplacement ou non.\n\nSi l'artisan facture sans avoir parcouru de distance significative, Nova pourra annuler les frais et le pénaliser.",
+        "Vous annulez moins de 5 minutes après la demande.\n\nAucun frais ne sera facturé.",
         [
           { text: "Non, garder", style: "cancel" },
           {
             text: "Oui, annuler",
             style: "destructive",
-            onPress: () => {
-              if (artisanConfig.deploymentFree) {
-                setCancelled(true);
-              } else {
-                setCancelPending(true);
-                // Simulate artisan response after 3s
-                setTimeout(() => {
-                  setCancelPending(false);
-                  setCancelled(true);
-                }, 3000);
-              }
-            },
+            onPress: () => setCancelled(true),
           },
         ]
       );
@@ -354,7 +340,7 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
         )}
 
         {/* Cancel button — only before devis signed */}
-        {canCancel && !cancelled && !cancelPending && (
+        {canCancel && !cancelled && (
           <>
             <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel} activeOpacity={0.7}>
               <MaterialCommunityIcons name="close-circle-outline" size={16} color={Colors.red} />
@@ -366,30 +352,11 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
                 {trackingStep === 0 && artisanConfig.deploymentFree
                   ? "Déplacement offert par cet artisan. Annulation sans frais."
                   : trackingStep === 0
-                  ? `Frais de déplacement : ${artisanConfig.deploymentFee}€ (tarif fixé par l'artisan).`
+                  ? `Annulation gratuite dans les 5 premières minutes. Au-delà, frais de déplacement de ${artisanConfig.deploymentFee}€.`
                   : `L'artisan est sur place. Frais de déplacement de ${artisanConfig.deploymentFee}€ à votre charge.`}
               </Text>
             </View>
           </>
-        )}
-
-        {/* Pending artisan decision */}
-        {cancelPending && (
-          <View style={styles.pendingCard}>
-            <View style={styles.pendingSpinner}>
-              <MaterialCommunityIcons name="clock-outline" size={20} color={Colors.gold} />
-            </View>
-            <Text style={styles.pendingTitle}>En attente de l'artisan</Text>
-            <Text style={styles.pendingDesc}>
-              L'artisan a été notifié de votre demande d'annulation. Il va décider s'il applique des frais de déplacement.
-            </Text>
-            <View style={styles.pendingNotice}>
-              <MaterialCommunityIcons name="shield-check" size={13} color={Colors.forest} />
-              <Text style={styles.pendingNoticeText}>
-                Nova contrôle les abus : si l'artisan n'a parcouru que peu de distance, les frais pourront être annulés et l'artisan pénalisé.
-              </Text>
-            </View>
-          </View>
         )}
 
         {/* Cancelled state */}
@@ -399,8 +366,7 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
             <Text style={styles.cancelledTitle}>Intervention annulée</Text>
             {artisanConfig.deploymentFree || (isEarlyCancel && trackingStep === 0) ? (
               <Text style={styles.cancelledDesc}>
-                L'artisan a été prévenu.{"\n"}
-                {isEarlyCancel ? "L'artisan a choisi de ne pas facturer le déplacement." : "Aucun frais — déplacement offert."}
+                L'artisan a été prévenu.{"\n"}Aucun frais facturé.
               </Text>
             ) : (
               <>
@@ -513,22 +479,6 @@ const styles = StyleSheet.create({
     padding: 10, marginTop: 4,
   },
   cancelInfoText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textMuted, flex: 1 },
-  /* Pending artisan decision */
-  pendingCard: {
-    alignItems: "center", backgroundColor: "rgba(245,166,35,0.06)",
-    borderRadius: 16, padding: 20, marginTop: 16,
-    borderWidth: 1, borderColor: "rgba(245,166,35,0.15)",
-  },
-  pendingSpinner: { marginBottom: 8 },
-  pendingTitle: { fontFamily: "Manrope_700Bold", fontSize: 15, color: Colors.gold, marginBottom: 6 },
-  pendingDesc: { fontFamily: "DMSans_400Regular", fontSize: 13, color: "#4A5568", textAlign: "center", lineHeight: 20, marginBottom: 12 },
-  pendingNotice: {
-    flexDirection: "row", alignItems: "center", gap: 8,
-    backgroundColor: "rgba(27,107,78,0.05)", borderRadius: 12,
-    padding: 10, borderWidth: 1, borderColor: "rgba(27,107,78,0.1)",
-  },
-  pendingNoticeText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: "#14523B", flex: 1, lineHeight: 16 },
-
   cancelledCard: {
     alignItems: "center", backgroundColor: "rgba(232,48,42,0.04)",
     borderRadius: 16, padding: 20, marginTop: 16,

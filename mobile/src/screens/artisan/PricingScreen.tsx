@@ -220,8 +220,8 @@ export function ArtisanPricingScreen({
               <MaterialCommunityIcons name="information-outline" size={13} color={Colors.forest} />
               <Text style={styles.infoNoticeText}>
                 {profile.deploymentByKm
-                  ? "Le montant sera calculé automatiquement selon la distance entre vous et le client. En cas d'annulation, le palier correspondant s'applique."
-                  : "En cas d'annulation client après 5 min, ces frais sont facturés automatiquement. Si le client annule avant 5 min, vous serez notifié pour décider."}
+                  ? "Le montant sera calculé automatiquement selon la distance entre vous et le client. En cas d'annulation après 5 min, le palier correspondant s'applique."
+                  : "En cas d'annulation client après 5 min, ces frais sont facturés automatiquement. Avant 5 min, aucun frais n'est appliqué au client."}
               </Text>
             </View>
           </>
@@ -336,13 +336,13 @@ export function ArtisanPricingScreen({
           setProfile={setUrgent}
         />
 
-        {/* Anti-abuse notice */}
+        {/* Cancellation rules */}
         <View style={styles.abuseNotice}>
-          <MaterialCommunityIcons name="shield-alert" size={16} color={Colors.gold} />
+          <MaterialCommunityIcons name="information-outline" size={16} color={Colors.forest} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.abuseTitle}>Protection anti-abus</Text>
+            <Text style={styles.abuseTitle}>Règles d'annulation</Text>
             <Text style={styles.abuseDesc}>
-              Nova contrôle les frais de déplacement. Si un client annule rapidement et que vous n'avez parcouru que peu de distance, les frais pourront être annulés. Tout abus constaté entraînera une pénalité sur votre compte.
+              Si le client annule dans les 5 premières minutes, aucun frais ne lui est facturé. Au-delà de 5 min, vos frais de déplacement s'appliquent automatiquement. Le concept Nova fonctionne sous devis : l'artisan chiffre sur place.
             </Text>
           </View>
         </View>
