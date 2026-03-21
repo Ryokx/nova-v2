@@ -54,6 +54,11 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
   const [showCreate, setShowCreate] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
   const [selectedRole, setSelectedRole] = useState<"client" | "artisan">("client");
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPhone, setSignupPhone] = useState("");
+  const [signupPwd, setSignupPwd] = useState("");
+  const [signupConfirmPwd, setSignupConfirmPwd] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
   // Forgot password state
@@ -142,6 +147,29 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
     );
   }
 
+  // ── Validation helpers ──
+  const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+  const isValidPhone = (p: string) => /^(?:(?:\+33|0)\s?[1-9])(?:[\s.-]?\d{2}){4}$/.test(p.replace(/\s/g, ""));
+  const getPasswordStrength = (pwd: string): number => {
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (pwd.length >= 12) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+    return score; // 0-5
+  };
+  const strengthLabels = ["", "Très faible", "Faible", "Moyen", "Fort", "Très fort"];
+  const strengthColors = ["", Colors.red, "#E8302A", Colors.gold, Colors.forest, Colors.success];
+
+  const pwdStrength = getPasswordStrength(signupPwd);
+  const canSubmit = signupName.trim().length > 0
+    && isValidEmail(signupEmail)
+    && isValidPhone(signupPhone)
+    && pwdStrength >= 3
+    && signupPwd === signupConfirmPwd
+    && signupConfirmPwd.length > 0;
+
   // ── Signup form ──
   if (showCreate) {
     return (
@@ -205,13 +233,93 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
               </TouchableOpacity>
             </View>
 
-            <Input label="Nom complet" placeholder="Nom complet" />
+            {/* Nom * */}
+            <Input
+              label="Nom complet *"
+              placeholder="Nom complet"
+              value={signupName}
+              onChangeText={setSignupName}
+              error={signupName.length > 0 && signupName.trim().length < 2 ? "Nom requis" : undefined}
+            />
+
             {selectedRole === "artisan" && (
               <Input label="Nom de l'entreprise" placeholder="Raison sociale" />
             )}
-            <Input label="Email" placeholder="Email" keyboardType="email-address" autoCapitalize="none" />
-            <Input label="Téléphone" placeholder="06 12 34 56 78" keyboardType="phone-pad" />
-            <Input label="Mot de passe" placeholder="Mot de passe" secureTextEntry />
+
+            {/* Email * */}
+            <Input
+              label="Email *"
+              placeholder="exemple@email.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={signupEmail}
+              onChangeText={setSignupEmail}
+              error={signupEmail.length > 0 && !isValidEmail(signupEmail) ? "Format email invalide" : undefined}
+            />
+
+            {/* Téléphone * */}
+            <Input
+              label="Téléphone *"
+              placeholder="06 12 34 56 78"
+              keyboardType="phone-pad"
+              value={signupPhone}
+              onChangeText={setSignupPhone}
+              error={signupPhone.length > 3 && !isValidPhone(signupPhone) ? "Numéro invalide (format français)" : undefined}
+            />
+
+            {/* Mot de passe * */}
+            <Input
+              label="Mot de passe *"
+              placeholder="Mot de passe sécurisé"
+              secureTextEntry
+              value={signupPwd}
+              onChangeText={setSignupPwd}
+            />
+            {signupPwd.length > 0 && (
+              <View style={styles.pwdStrengthWrap}>
+                <View style={styles.pwdStrengthBar}>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <View
+                      key={i}
+                      style={[
+                        styles.pwdStrengthSegment,
+                        { backgroundColor: i <= pwdStrength ? strengthColors[pwdStrength] || Colors.border : Colors.border },
+                      ]}
+                    />
+                  ))}
+                </View>
+                <Text style={[styles.pwdStrengthLabel, { color: strengthColors[pwdStrength] || Colors.textMuted }]}>
+                  {strengthLabels[pwdStrength]}
+                </Text>
+                <View style={styles.pwdRequirements}>
+                  {[
+                    { ok: signupPwd.length >= 8, text: "8 caractères minimum" },
+                    { ok: /[A-Z]/.test(signupPwd), text: "1 majuscule" },
+                    { ok: /[0-9]/.test(signupPwd), text: "1 chiffre" },
+                    { ok: /[^A-Za-z0-9]/.test(signupPwd), text: "1 caractère spécial" },
+                  ].map((r, i) => (
+                    <View key={i} style={styles.pwdReqRow}>
+                      <MaterialCommunityIcons
+                        name={r.ok ? "check-circle" : "circle-outline"}
+                        size={14}
+                        color={r.ok ? Colors.success : Colors.textMuted}
+                      />
+                      <Text style={[styles.pwdReqText, r.ok && { color: Colors.success }]}>{r.text}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Confirmer mot de passe * */}
+            <Input
+              label="Confirmer le mot de passe *"
+              placeholder="Retapez votre mot de passe"
+              secureTextEntry
+              value={signupConfirmPwd}
+              onChangeText={setSignupConfirmPwd}
+              error={signupConfirmPwd.length > 0 && signupPwd !== signupConfirmPwd ? "Les mots de passe ne correspondent pas" : undefined}
+            />
 
             {selectedRole === "artisan" && (
               <>
@@ -230,6 +338,7 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
               }}
               size="lg"
               fullWidth
+              disabled={!canSubmit}
               style={{ marginTop: 8 }}
             />
 
@@ -682,6 +791,15 @@ const styles = StyleSheet.create({
     color: Colors.textHint,
     marginBottom: 24,
   },
+  /* Password strength */
+  pwdStrengthWrap: { marginTop: -4, marginBottom: 10 },
+  pwdStrengthBar: { flexDirection: "row", gap: 4, marginBottom: 6 },
+  pwdStrengthSegment: { flex: 1, height: 4, borderRadius: 2 },
+  pwdStrengthLabel: { fontFamily: "DMSans_600SemiBold", fontSize: 11, marginBottom: 6 },
+  pwdRequirements: { gap: 4 },
+  pwdReqRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  pwdReqText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textMuted },
+
   fieldLabel: {
     fontFamily: "DMSans_500Medium",
     fontSize: 12,
