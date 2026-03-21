@@ -134,6 +134,10 @@ export function ClientHomeScreen({
         {/* ── Header ── */}
         <View style={styles.header}>
           <View>
+            <View style={styles.novaWordmarkRow}>
+              <Text style={styles.novaWordmark}>Nova</Text>
+              <View style={styles.novaWordmarkDot} />
+            </View>
             <Text style={[styles.greeting, { color: c.text }]}>Bonjour Sophie</Text>
           </View>
           <View style={styles.headerActions}>
@@ -165,7 +169,7 @@ export function ClientHomeScreen({
               return (
                 <TouchableOpacity
                   key={live.id}
-                  style={[styles.liveCard, { backgroundColor: sc.bg, borderColor: sc.color + "30" }]}
+                  style={[styles.liveCard, { backgroundColor: sc.bg, borderColor: Colors.forest + "40", borderWidth: 2 }]}
                   activeOpacity={0.85}
                   onPress={() => navigation.navigate("Tracking", { missionId: live.missionId })}
                 >
@@ -255,10 +259,14 @@ export function ClientHomeScreen({
 
         {/* ── Categories 2x3 grid ── */}
         <View style={styles.catGrid}>
-          {categories.map((cat) => (
+          {categories.map((cat, catIndex) => (
             <TouchableOpacity
               key={cat.id}
-              style={[styles.catCard, { backgroundColor: c.card }]}
+              style={[
+                styles.catCard,
+                { backgroundColor: c.card },
+                catIndex % 2 === 0 && { backgroundColor: "rgba(27,107,78,0.03)" },
+              ]}
               activeOpacity={0.8}
               onPress={() =>
                 cat.id === "all"
@@ -266,6 +274,7 @@ export function ClientHomeScreen({
                   : navigation.navigate("ArtisanListByCategory", { category: cat.id })
               }
             >
+              <View style={styles.catAccentBar} />
               <View style={[styles.catIconWrap, { backgroundColor: c.surface }]}>
                 <MaterialCommunityIcons name={cat.emoji as any} size={18} color={Colors.forest} />
               </View>
@@ -301,12 +310,14 @@ export function ClientHomeScreen({
           contentContainerStyle={styles.artisanList}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={[styles.artisanCard, { backgroundColor: c.card }]}
+              style={[styles.artisanCard, { backgroundColor: c.card, overflow: "hidden" }]}
               activeOpacity={0.85}
               onPress={() =>
                 navigation.navigate("ArtisanProfile", { id: item.id })
               }
             >
+              {/* Subtle diagonal gradient overlay */}
+              <View style={styles.artisanGradientOverlay} />
               {/* Avatar row */}
               <View style={styles.artisanRow}>
                 <Avatar name={item.name} size={44} radius={14} />
@@ -359,9 +370,29 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 16,
   },
-  greeting: {
+  novaWordmarkRow: {
+    position: "relative" as const,
+    flexDirection: "row" as const,
+    alignItems: "flex-start" as const,
+    marginBottom: 2,
+  },
+  novaWordmark: {
     fontFamily: "Manrope_800ExtraBold",
-    fontSize: 22,
+    fontSize: 20,
+    color: Colors.deepForest,
+    letterSpacing: -0.3,
+  },
+  novaWordmarkDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: Colors.gold,
+    marginLeft: 1,
+    marginTop: 1,
+  },
+  greeting: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 16,
     color: Colors.navy,
   },
   headerActions: {
@@ -593,9 +624,22 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: Radii["2xl"],
     padding: 16,
+    paddingLeft: 19,
     borderWidth: 1,
     borderColor: "rgba(10,22,40,0.04)",
+    position: "relative" as const,
+    overflow: "hidden" as const,
     ...Shadows.sm,
+  },
+  catAccentBar: {
+    position: "absolute" as const,
+    left: 0,
+    top: 8,
+    bottom: 8,
+    width: 3,
+    borderRadius: 1.5,
+    backgroundColor: Colors.forest,
+    opacity: 0.5,
   },
   catEmoji: { fontSize: 22, marginBottom: 6 },
   catIconWrap: {
@@ -678,7 +722,19 @@ const styles = StyleSheet.create({
     width: 185,
     borderWidth: 1,
     borderColor: "rgba(10,22,40,0.04)",
+    position: "relative" as const,
     ...Shadows.sm,
+  },
+  artisanGradientOverlay: {
+    position: "absolute" as const,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 60,
+    backgroundColor: Colors.forest,
+    opacity: 0.04,
+    borderBottomLeftRadius: Radii["3xl"],
+    borderBottomRightRadius: Radii["3xl"],
   },
   artisanRow: {
     flexDirection: "row",

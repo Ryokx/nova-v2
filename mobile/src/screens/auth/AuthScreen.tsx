@@ -584,6 +584,9 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
           contentContainerStyle={styles.loginContent}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Watermark Nova wordmark behind form */}
+          <Text style={styles.novaWatermark}>Nova</Text>
+
           {/* Logo */}
           <View style={styles.logoWrap}>
             <View style={styles.novaLogoRow}>
@@ -748,6 +751,20 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 40,
     alignItems: "center",
+    position: "relative" as const,
+    overflow: "hidden" as const,
+  },
+  novaWatermark: {
+    position: "absolute" as const,
+    top: 80,
+    alignSelf: "center" as const,
+    fontFamily: "Manrope_800ExtraBold",
+    fontSize: 120,
+    color: Colors.deepForest,
+    opacity: 0.04,
+    letterSpacing: -4,
+    transform: [{ rotate: "-12deg" }],
+    zIndex: 0,
   },
   logoWrap: { alignItems: "center", marginBottom: 32 },
   novaLogoRow: {

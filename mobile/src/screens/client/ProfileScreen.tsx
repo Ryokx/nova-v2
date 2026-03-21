@@ -148,14 +148,18 @@ export function ClientProfileScreen({
 
         {/* Avatar + name */}
         <View style={styles.avatarSection}>
+          {/* Subtle curved gradient background */}
+          <View style={styles.avatarBgGradient} />
           <TouchableOpacity style={styles.avatarWrap} onPress={pickProfilePhoto} activeOpacity={0.85}>
-            {profilePhoto ? (
-              <Image source={{ uri: profilePhoto }} style={styles.avatarImage} />
-            ) : (
-              <View style={styles.avatar}>
-                <Text style={styles.avatarInitials}>{profile.initials}</Text>
-              </View>
-            )}
+            <View style={styles.avatarGoldRing}>
+              {profilePhoto ? (
+                <Image source={{ uri: profilePhoto }} style={styles.avatarImage} />
+              ) : (
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarInitials}>{profile.initials}</Text>
+                </View>
+              )}
+            </View>
             <View style={styles.avatarCameraBadge}>
               <MaterialCommunityIcons name="camera" size={12} color={Colors.white} />
             </View>
@@ -332,10 +336,28 @@ const styles = StyleSheet.create({
   avatarSection: {
     alignItems: "center",
     marginBottom: 24,
+    position: "relative",
+  },
+  avatarBgGradient: {
+    position: "absolute",
+    top: -20,
+    left: 0,
+    right: 0,
+    height: 120,
+    backgroundColor: Colors.deepForest,
+    opacity: 0.03,
+    borderBottomLeftRadius: 60,
+    borderBottomRightRadius: 60,
   },
   avatarWrap: {
     position: "relative",
     marginBottom: 12,
+  },
+  avatarGoldRing: {
+    borderWidth: 3,
+    borderColor: Colors.gold,
+    borderRadius: 27,
+    padding: 0,
   },
   avatar: {
     width: 80,

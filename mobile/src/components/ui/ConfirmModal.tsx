@@ -53,6 +53,9 @@ export function ConfirmModal({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.card}>
+          {/* Top accent line colored by type */}
+          <View style={[styles.topAccentLine, { backgroundColor: config.color }]} />
+
           {/* Icon */}
           <View style={[styles.iconCircle, { backgroundColor: config.bg }]}>
             <MaterialCommunityIcons name={iconName as any} size={28} color={config.color} />
@@ -101,6 +104,12 @@ export function ConfirmModal({
               </TouchableOpacity>
             )}
           </View>
+
+          {/* Nova wordmark */}
+          <View style={styles.novaWatermarkRow}>
+            <Text style={styles.novaWatermarkText}>Nova</Text>
+            <View style={styles.novaWatermarkDot} />
+          </View>
         </View>
       </View>
     </Modal>
@@ -120,9 +129,39 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 24,
     padding: 28,
-    paddingTop: 32,
+    paddingTop: 35,
     alignItems: "center",
+    overflow: "hidden" as const,
     ...Shadows.lg,
+  },
+  topAccentLine: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  novaWatermarkRow: {
+    flexDirection: "row" as const,
+    alignItems: "flex-start" as const,
+    marginTop: 16,
+    opacity: 0.3,
+  },
+  novaWatermarkText: {
+    fontFamily: "Manrope_800ExtraBold",
+    fontSize: 8,
+    color: Colors.textHint,
+    letterSpacing: -0.2,
+  },
+  novaWatermarkDot: {
+    width: 2.5,
+    height: 2.5,
+    borderRadius: 1.25,
+    backgroundColor: Colors.gold,
+    marginLeft: 0.5,
+    marginTop: 0.5,
   },
   iconCircle: {
     width: 56,

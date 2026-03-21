@@ -168,8 +168,8 @@ export function ArtisanTabs() {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: "rgba(255,255,255,0.95)",
-    borderTopWidth: 0.5,
-    borderTopColor: Colors.border,
+    borderTopWidth: 2,
+    borderTopColor: Colors.forest + "30",
     paddingTop: 8,
     paddingBottom: 24,
     height: 80,
