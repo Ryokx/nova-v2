@@ -23,6 +23,7 @@ import { ClientDirectoryScreen } from "../screens/artisan/ClientDirectoryScreen"
 import { QRCodeScreen } from "../screens/artisan/QRCodeScreen";
 import { AccountingScreen } from "../screens/artisan/AccountingScreen";
 import { ArtisanPricingScreen } from "../screens/artisan/PricingScreen";
+import { ReferralScreen } from "../screens/client/ReferralScreen";
 import { SupportScreen } from "../screens/shared/SupportScreen";
 import { SettingsScreen } from "../screens/shared/SettingsScreen";
 import { NotificationPrefsScreen } from "../screens/shared/NotificationPrefsScreen";
@@ -51,10 +52,7 @@ function addArtisanSharedScreens(Stack: ReturnType<typeof createNativeStackNavig
       <Stack.Screen name="Support" component={SupportScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="NotificationPreferences" component={NotificationPrefsScreen} />
-      <Stack.Screen name="Referral" component={({ navigation }: any) => {
-        const { ReferralScreen } = require("../screens/client/ReferralScreen");
-        return <ReferralScreen navigation={navigation} route={{ params: {} } as any} />;
-      }} />
+      <Stack.Screen name="Referral" component={ReferralScreen} />
     </>
   );
 }
