@@ -186,9 +186,7 @@ export function ArtisanProfileScreen({
           {/* Annual maintenance CTA */}
           <TouchableOpacity style={styles.maintenanceCta} activeOpacity={0.8} onPress={() => navigation.navigate("MaintenanceContract")}>
             <View style={styles.maintenanceIcon}>
-              <Text style={{ fontSize: 18, color: Colors.white }}>
-                <MaterialCommunityIcons name="file-document-outline" size={18} color={Colors.forest} />
-              </Text>
+              <MaterialCommunityIcons name="file-document-outline" size={20} color={Colors.white} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.maintenanceTitle}>
