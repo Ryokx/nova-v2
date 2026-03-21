@@ -62,6 +62,9 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [signupPwd, setSignupPwd] = useState("");
   const [signupConfirmPwd, setSignupConfirmPwd] = useState("");
+  const [signupCompany, setSignupCompany] = useState("");
+  const [signupSiret, setSignupSiret] = useState("");
+  const [signupDecennale, setSignupDecennale] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
   // Forgot password state
@@ -187,12 +190,17 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
   const strengthColors = ["", Colors.red, "#E8302A", Colors.gold, Colors.forest, Colors.success];
 
   const pwdStrength = getPasswordStrength(signupPwd);
-  const canSubmit = signupName.trim().length > 0
+  const isValidSiret = (s: string) => s.replace(/\s/g, "").length === 14;
+  const baseValid = signupName.trim().length > 0
     && isValidEmail(signupEmail)
     && isValidPhone(signupPhone)
     && pwdStrength >= 3
     && signupPwd === signupConfirmPwd
     && signupConfirmPwd.length > 0;
+  const artisanValid = selectedRole === "artisan"
+    ? signupCompany.trim().length > 0 && isValidSiret(signupSiret) && signupDecennale.trim().length > 0
+    : true;
+  const canSubmit = baseValid && artisanValid;
 
   // ── Signup form ──
   if (showCreate) {
@@ -267,7 +275,13 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
             />
 
             {selectedRole === "artisan" && (
-              <Input label="Nom de l'entreprise" placeholder="Raison sociale" />
+              <Input
+                label="Nom de l'entreprise *"
+                placeholder="Raison sociale"
+                value={signupCompany}
+                onChangeText={setSignupCompany}
+                error={signupCompany.length > 0 && signupCompany.trim().length < 2 ? "Nom d'entreprise requis" : undefined}
+              />
             )}
 
             {/* Email * */}
@@ -362,8 +376,21 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
 
             {selectedRole === "artisan" && (
               <>
-                <Input label="SIRET" placeholder="123 456 789 00012" keyboardType="number-pad" />
-                <Input label="N° décennale" placeholder="N° assurance décennale" />
+                <Input
+                  label="SIRET *"
+                  placeholder="123 456 789 00012"
+                  keyboardType="number-pad"
+                  value={signupSiret}
+                  onChangeText={setSignupSiret}
+                  error={signupSiret.length > 0 && !isValidSiret(signupSiret) ? "SIRET invalide (14 chiffres)" : undefined}
+                />
+                <Input
+                  label="N° assurance décennale *"
+                  placeholder="N° de votre assurance décennale"
+                  value={signupDecennale}
+                  onChangeText={setSignupDecennale}
+                  error={signupDecennale.length > 0 && signupDecennale.trim().length < 3 ? "Numéro requis" : undefined}
+                />
               </>
             )}
 
