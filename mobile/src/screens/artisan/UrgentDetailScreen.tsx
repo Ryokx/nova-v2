@@ -25,7 +25,7 @@ export function UrgentDetailScreen({
   navigation,
 }: RootStackScreenProps<"UrgentDetail">) {
   const [accepted, setAccepted] = useState(false);
-  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
+  const [modal, setModal] = useState<{ visible: boolean; type: "success" | "warning" | "danger" | "info"; title: string; message: string; actions: any[] }>({ visible: false, type: "info", title: "", message: "", actions: [] });
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
