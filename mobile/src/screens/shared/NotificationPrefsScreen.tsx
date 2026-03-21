@@ -36,7 +36,9 @@ function PrefRow({
   return (
     <View style={styles.prefRow}>
       <View style={styles.prefRowLeft}>
-        {icon}
+        <View style={styles.prefIconWrap}>
+          {icon}
+        </View>
         <View style={styles.prefTextCol}>
           <Text style={styles.prefLabel}>{label}</Text>
           {description && (
@@ -257,10 +259,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     marginRight: Spacing.md,
+    gap: 12,
   },
-  prefIcon: {
-    fontSize: 20,
-    marginRight: Spacing.md,
+  prefIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
   },
   prefTextCol: {
     flex: 1,
