@@ -8,11 +8,11 @@ interface EscrowStepperProps {
 }
 
 const steps = [
-  { icon: "file-check", label: "Devis\nvalidé" },
-  { icon: "lock", label: "Paiement\nbloqué" },
-  { icon: "wrench", label: "Mission\nen cours" },
-  { icon: "✓", label: "Nova\nvalide" },
-  { icon: "cash", label: "Artisan\npayé" },
+  { icon: "file-check", label: "Devis" },
+  { icon: "lock", label: "Séquestre" },
+  { icon: "wrench", label: "Travaux" },
+  { icon: "check-decagram", label: "Validé" },
+  { icon: "cash", label: "Payé" },
 ];
 
 export function EscrowStepper({ currentStep }: EscrowStepperProps) {
@@ -98,11 +98,10 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "DMSans_500Medium",
-    fontSize: 9,
+    fontSize: 10,
     color: Colors.textHint,
     textAlign: "center",
     marginTop: 5,
-    lineHeight: 12,
   },
   labelDone: { color: Colors.success },
   labelActive: { color: Colors.forest },
