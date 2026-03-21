@@ -10,7 +10,9 @@ import {
   TextInput,
   Platform,
 } from "react-native";
+import * as Localization from "expo-localization";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { useTheme } from "../../hooks/useTheme";
 import { ConfirmModal } from "../../components/ui";
@@ -96,7 +98,14 @@ export function SettingsScreen({
   /* theme */
   const { dark: darkMode, toggleDark, c } = useTheme();
   const [twoFA, setTwoFA] = useState(false);
-  const [language, setLanguage] = useState("FR");
+
+  // Detect device language
+  const deviceLocale = Localization.getLocales()[0];
+  const detectedLang = (deviceLocale?.languageCode || "fr").toUpperCase();
+  const [language, setLanguage] = useState(["FR", "EN", "ES"].includes(detectedLang) ? detectedLang : "FR");
+
+  // Detect timezone
+  const deviceTimezone = Localization.getCalendars()[0]?.timeZone || "Europe/Paris";
 
   /* modals */
   const [passwordModal, setPasswordModal] = useState(false);
@@ -194,10 +203,10 @@ export function SettingsScreen({
           style={[styles.backBtn, { backgroundColor: darkMode ? c.surface : "rgba(27,107,78,0.08)" }]}
           onPress={() => navigation.goBack()}
         >
-          <Text style={[styles.backArrow, { color: darkMode ? c.text : Colors.forest }]}>{"‹"}</Text>
+          <MaterialCommunityIcons name="arrow-left" size={20} color={darkMode ? c.text : Colors.forest} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: c.text }]}>Paramètres</Text>
-        <View style={styles.backBtn} />
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView
@@ -259,7 +268,7 @@ export function SettingsScreen({
           <SettingRow
             label="Fuseau horaire"
             right={
-              <Text style={styles.valueText}>Europe/Paris (UTC+1)</Text>
+              <Text style={styles.valueText}>{deviceTimezone}</Text>
             }
           />
         </SectionCard>

@@ -9,8 +9,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   FlatList,
-  Alert,
+  Image,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
@@ -22,6 +23,7 @@ type ChatMessage = {
   text: string;
   sender: "user" | "bot";
   timestamp: string;
+  attachment?: string;
 };
 
 const INITIAL_MESSAGES: ChatMessage[] = [
@@ -144,6 +146,9 @@ function ChatBubble({ message }: { message: ChatMessage }) {
           isUser ? chatStyles.bubbleUser : chatStyles.bubbleBot,
         ]}
       >
+        {message.attachment && (
+          <Image source={{ uri: message.attachment }} style={chatStyles.attachImage} />
+        )}
         <Text
           style={[
             chatStyles.bubbleText,
@@ -189,6 +194,12 @@ const chatStyles = StyleSheet.create({
   bubbleBot: {
     backgroundColor: Colors.surface,
     borderBottomLeftRadius: 4,
+  },
+  attachImage: {
+    width: 180,
+    height: 120,
+    borderRadius: 12,
+    marginBottom: 6,
   },
   bubbleText: {
     fontFamily: "DMSans_400Regular",
@@ -267,7 +278,8 @@ export function SupportScreen({
 
   const sendEmail = () => {
     if (!emailBody.trim()) {
-      Alert.alert("Erreur", "Veuillez décrire votre problème.");
+      // Validation: description required
+      return;
       return;
     }
     setEmailSent(true);
@@ -325,8 +337,31 @@ export function SupportScreen({
 
           {/* Input bar */}
           <View style={styles.inputBar}>
-            <TouchableOpacity style={styles.attachBtn} activeOpacity={0.7}>
-              <Text style={styles.attachIcon}><MaterialCommunityIcons name="paperclip" size={20} color={Colors.textHint} /></Text>
+            <TouchableOpacity
+              style={styles.attachBtn}
+              activeOpacity={0.7}
+              onPress={async () => {
+                const result = await ImagePicker.launchImageLibraryAsync({
+                  mediaTypes: ["images"],
+                  quality: 0.8,
+                });
+                if (!result.canceled) {
+                  const now = new Date();
+                  const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
+                  setMessages((prev) => [
+                    ...prev,
+                    { id: String(Date.now()), text: "📎 Pièce jointe", sender: "user", timestamp: time, attachment: result.assets[0].uri },
+                  ]);
+                  setTimeout(() => {
+                    setMessages((prev) => [
+                      ...prev,
+                      { id: String(Date.now() + 1), text: "Merci pour la pièce jointe. Je l'analyse et reviens vers vous.", sender: "bot", timestamp: time },
+                    ]);
+                  }, 1500);
+                }
+              }}
+            >
+              <MaterialCommunityIcons name="paperclip" size={20} color={Colors.textHint} />
             </TouchableOpacity>
             <TextInput
               style={styles.chatInput}
@@ -438,9 +473,12 @@ export function SupportScreen({
               <TouchableOpacity
                 style={styles.uploadArea}
                 activeOpacity={0.7}
-                onPress={() =>
-                  Alert.alert("Upload", "Fonctionnalité à venir.")
-                }
+                onPress={async () => {
+                  const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.8 });
+                  if (!result.canceled) {
+                    setEmailBody((prev) => prev + "\n[📎 Capture d'écran jointe]");
+                  }
+                }}
               >
                 <Text style={styles.uploadIcon}><MaterialCommunityIcons name="image-plus" size={24} color={Colors.forest} /></Text>
                 <Text style={styles.uploadText}>
