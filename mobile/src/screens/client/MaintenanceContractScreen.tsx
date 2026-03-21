@@ -26,6 +26,7 @@ export function MaintenanceContractScreen({
   navigation,
 }: RootStackScreenProps<"MaintenanceContract">) {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [activeContracts, setActiveContracts] = useState<string[]>(["chaudiere"]); // mock: chaudière already active
   const [step, setStep] = useState<Step>("plan");
   const [payMethod, setPayMethod] = useState<PayMethod>("card");
   const [cardNumber, setCardNumber] = useState("");
@@ -45,6 +46,7 @@ export function MaintenanceContractScreen({
     setTimeout(() => {
       setProcessing(false);
       setStep("success");
+      if (selectedPlan) setActiveContracts(prev => [...prev, selectedPlan]);
       // Ask if user wants contract sent by email
       setTimeout(() => {
         setModal({
@@ -283,25 +285,42 @@ export function MaintenanceContractScreen({
 
         {/* Plans */}
         <Text style={styles.sectionTitle}>Choisissez un contrat</Text>
-        {plans.map((p) => (
+        {plans.map((p) => {
+          const isActive = activeContracts.includes(p.id);
+          return (
           <TouchableOpacity
             key={p.id}
-            style={[styles.planCard, selectedPlan === p.id && styles.planCardSelected]}
+            style={[
+              styles.planCard,
+              selectedPlan === p.id && styles.planCardSelected,
+              isActive && styles.planCardActive,
+            ]}
             activeOpacity={0.85}
-            onPress={() => setSelectedPlan(p.id)}
+            onPress={() => !isActive && setSelectedPlan(p.id)}
+            disabled={isActive}
           >
-            {p.popular && (
+            {isActive && (
+              <View style={styles.activeBadge}>
+                <MaterialCommunityIcons name="check-circle" size={10} color={Colors.white} />
+                <Text style={styles.activeBadgeText}>ACTIF</Text>
+              </View>
+            )}
+            {!isActive && p.popular && (
               <View style={styles.popularBadge}>
                 <Text style={styles.popularText}>POPULAIRE</Text>
               </View>
             )}
             <View style={styles.planContent}>
-              <View style={[styles.planIconWrap, selectedPlan === p.id && styles.planIconWrapSelected]}>
-                <MaterialCommunityIcons name={p.icon as any} size={20} color={Colors.forest} />
+              <View style={[
+                styles.planIconWrap,
+                selectedPlan === p.id && styles.planIconWrapSelected,
+                isActive && styles.planIconWrapActive,
+              ]}>
+                <MaterialCommunityIcons name={p.icon as any} size={20} color={isActive ? Colors.white : Colors.forest} />
               </View>
               <View style={{ flex: 1 }}>
                 <View style={styles.planNameRow}>
-                  <Text style={styles.planName}>{p.name}</Text>
+                  <Text style={[styles.planName, isActive && { color: Colors.forest }]}>{p.name}</Text>
                   <View style={{ alignItems: "flex-end" }}>
                     <Text style={styles.planPrice}>{p.price}€</Text>
                     <Text style={styles.planPriceUnit}>/an</Text>
@@ -312,7 +331,8 @@ export function MaintenanceContractScreen({
               </View>
             </View>
           </TouchableOpacity>
-        ))}
+          );
+        })}
 
         {/* Subscribe button → goes to payment */}
         <TouchableOpacity
@@ -350,11 +370,21 @@ const styles = StyleSheet.create({
 
   planCard: { backgroundColor: Colors.white, borderRadius: 18, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: "rgba(10,22,40,0.06)", position: "relative" },
   planCardSelected: { borderWidth: 2, borderColor: Colors.forest, ...Shadows.sm },
+  planCardActive: { borderWidth: 2, borderColor: Colors.success, backgroundColor: "rgba(34,200,138,0.03)" },
+  activeBadge: {
+    position: "absolute", top: -1, right: 16,
+    backgroundColor: Colors.success,
+    paddingVertical: 3, paddingHorizontal: 10,
+    borderBottomLeftRadius: 8, borderBottomRightRadius: 8,
+    flexDirection: "row", alignItems: "center", gap: 4,
+  },
+  activeBadgeText: { fontSize: 9, fontFamily: "Manrope_700Bold", color: Colors.white },
   popularBadge: { position: "absolute", top: -1, right: 16, backgroundColor: Colors.gold, paddingVertical: 3, paddingHorizontal: 10, borderBottomLeftRadius: 8, borderBottomRightRadius: 8 },
   popularText: { fontSize: 9, fontFamily: "Manrope_700Bold", color: Colors.white },
   planContent: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
   planIconWrap: { width: 44, height: 44, borderRadius: 14, backgroundColor: Colors.bgPage, alignItems: "center", justifyContent: "center" },
   planIconWrapSelected: { backgroundColor: Colors.surface },
+  planIconWrapActive: { backgroundColor: Colors.success },
   planNameRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 },
   planName: { fontSize: 14, fontFamily: "Manrope_700Bold", color: Colors.navy, flex: 1 },
   planPrice: { fontFamily: "DMMono_500Medium", fontSize: 18, color: Colors.forest },
