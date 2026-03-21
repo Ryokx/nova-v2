@@ -34,7 +34,6 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { icon: "credit-card", label: "Moyens de paiement", value: "Visa •••• 6411", screen: "PaymentMethods" },
-  { icon: "lock", label: "Séquestre", value: "1 carte enregistrée", screen: "PaymentMethods" },
   { icon: "briefcase", label: "Missions", value: "3 missions réalisées", screen: "ClientMissions" },
   { icon: "bell", label: "Notifications", screen: "NotificationPreferences" },
   { icon: "cog", label: "Paramètres", screen: "Settings" },
