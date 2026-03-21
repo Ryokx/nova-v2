@@ -25,6 +25,7 @@ export type RootStackParamList = {
   Referral: undefined;
   Emergency: undefined;
   PaymentMethods: undefined;
+  InsuranceSimulator: undefined;
   Support: undefined;
   Settings: undefined;
   NotificationPreferences: undefined;

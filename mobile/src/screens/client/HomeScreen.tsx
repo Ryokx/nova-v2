@@ -274,6 +274,22 @@ export function ClientHomeScreen({
           ))}
         </View>
 
+        {/* ── Insurance simulator ── */}
+        <TouchableOpacity
+          style={[styles.insuranceCard, { backgroundColor: c.card }]}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate("InsuranceSimulator")}
+        >
+          <View style={styles.insuranceIconWrap}>
+            <MaterialCommunityIcons name="shield-search" size={22} color={Colors.forest} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.insuranceTitle, { color: c.text }]}>Mon assurance couvre-t-elle ?</Text>
+            <Text style={styles.insuranceDesc}>Vérifiez si votre sinistre est pris en charge</Text>
+          </View>
+          <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.textMuted} />
+        </TouchableOpacity>
+
         {/* ── Top rated section ── */}
         <Text style={[styles.sectionTitle, { color: c.text }]}>Artisans les mieux notés</Text>
 
@@ -400,6 +416,19 @@ const styles = StyleSheet.create({
     lineHeight: 12,
     includeFontPadding: false,
   },
+
+  /* Insurance card */
+  insuranceCard: {
+    flexDirection: "row", alignItems: "center", gap: 14,
+    marginHorizontal: 16, marginBottom: 20, padding: 16,
+    borderRadius: 18, borderWidth: 1, borderColor: "rgba(27,107,78,0.12)", ...Shadows.sm,
+  },
+  insuranceIconWrap: {
+    width: 48, height: 48, borderRadius: 16,
+    backgroundColor: Colors.surface, alignItems: "center", justifyContent: "center",
+  },
+  insuranceTitle: { fontFamily: "Manrope_700Bold", fontSize: 14 },
+  insuranceDesc: { fontFamily: "DMSans_400Regular", fontSize: 12, color: Colors.textSecondary, marginTop: 1 },
 
   /* Search */
   /* Live interventions */
