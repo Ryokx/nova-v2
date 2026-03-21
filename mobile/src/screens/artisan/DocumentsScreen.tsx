@@ -175,13 +175,29 @@ export function ArtisanDocumentsScreen({
           <View style={styles.actionRow}>
             <TouchableOpacity style={styles.actionBtn}>
               <Text style={styles.actionBtnIcon}><MaterialCommunityIcons name="share-variant" size={16} color={Colors.forest} /></Text>
-              <Text style={styles.actionBtnText}>Envoyer au client</Text>
+              <Text style={styles.actionBtnText}>Envoyer</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionBtn}>
               <Text style={styles.actionBtnIcon}><MaterialCommunityIcons name="content-copy" size={16} color={Colors.forest} /></Text>
               <Text style={styles.actionBtnText}>Dupliquer</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Devis complémentaire */}
+          {isDevis && (
+            <TouchableOpacity
+              style={styles.complementaryBtn}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate("CreateQuote")}
+            >
+              <MaterialCommunityIcons name="plus-circle-outline" size={18} color={Colors.forest} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.complementaryTitle}>Devis complémentaire</Text>
+                <Text style={styles.complementaryDesc}>Ajouter un devis au même dossier</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={16} color={Colors.textMuted} />
+            </TouchableOpacity>
+          )}
         </ScrollView>
       </SafeAreaView>
     );
@@ -529,6 +545,31 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   actionBtnIcon: { fontSize: 14 },
+
+  /* Complementary quote */
+  complementaryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: "rgba(27,107,78,0.04)",
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 12,
+    borderWidth: 1.5,
+    borderStyle: "dashed",
+    borderColor: "rgba(27,107,78,0.2)",
+  },
+  complementaryTitle: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 13,
+    color: Colors.forest,
+  },
+  complementaryDesc: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 11,
+    color: Colors.textSecondary,
+    marginTop: 1,
+  },
   actionBtnText: {
     fontFamily: "DMSans_600SemiBold",
     fontSize: 13,

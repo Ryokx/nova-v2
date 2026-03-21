@@ -28,6 +28,8 @@ export function CreateQuoteScreen({
   navigation,
 }: RootStackScreenProps<"CreateQuote">) {
   const [step, setStep] = useState(0);
+  const [isComplementary, setIsComplementary] = useState(false);
+  const [linkedDevis, setLinkedDevis] = useState<string | null>(null);
   const [clientName, setClientName] = useState("Caroline Lefèvre");
   const [clientEmail, setClientEmail] = useState("caroline.l@email.com");
   const [clientPhone, setClientPhone] = useState("06 12 34 56 78");
@@ -64,7 +66,7 @@ export function CreateQuoteScreen({
         >
           <Text style={styles.backIcon}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Créer un devis</Text>
+        <Text style={styles.headerTitle}>{isComplementary ? "Devis complémentaire" : "Créer un devis"}</Text>
       </View>
 
       {/* Progress steps */}
@@ -100,6 +102,48 @@ export function CreateQuoteScreen({
         {/* Step 0: Client */}
         {step === 0 && (
           <View>
+            {/* Complementary devis option */}
+            <TouchableOpacity
+              style={[
+                styles.complementaryToggle,
+                isComplementary && styles.complementaryToggleActive,
+              ]}
+              activeOpacity={0.85}
+              onPress={() => {
+                setIsComplementary(!isComplementary);
+                if (!isComplementary) setLinkedDevis("DEV-2026-089");
+                else setLinkedDevis(null);
+              }}
+            >
+              <MaterialCommunityIcons
+                name={isComplementary ? "link-variant" : "plus-circle-outline"}
+                size={18}
+                color={isComplementary ? Colors.forest : Colors.textSecondary}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.complementaryToggleTitle, isComplementary && { color: Colors.forest }]}>
+                  Devis complémentaire
+                </Text>
+                <Text style={styles.complementaryToggleDesc}>
+                  {isComplementary
+                    ? `Lié au dossier ${linkedDevis}`
+                    : "Lier ce devis à un dossier existant"}
+                </Text>
+              </View>
+              <View style={[styles.complementaryCheck, isComplementary && styles.complementaryCheckActive]}>
+                {isComplementary && <Text style={{ color: Colors.white, fontSize: 12, fontWeight: "700" }}>✓</Text>}
+              </View>
+            </TouchableOpacity>
+
+            {isComplementary && (
+              <View style={styles.complementaryInfo}>
+                <MaterialCommunityIcons name="information-outline" size={13} color={Colors.forest} />
+                <Text style={styles.complementaryInfoText}>
+                  Ce devis sera rattaché au même dossier. Le client recevra une notification et pourra accepter les deux devis séparément.
+                </Text>
+              </View>
+            )}
+
             {[
               { label: "Nom du client", value: clientName, set: setClientName },
               { label: "Email", value: clientEmail, set: setClientEmail },
@@ -324,6 +368,64 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: 16, paddingBottom: 100 },
 
   /* Fields */
+  /* Complementary toggle */
+  complementaryToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: Colors.white,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  complementaryToggleActive: {
+    backgroundColor: "rgba(27,107,78,0.04)",
+    borderColor: Colors.forest,
+    borderWidth: 1.5,
+  },
+  complementaryToggleTitle: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 14,
+    color: Colors.navy,
+  },
+  complementaryToggleDesc: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 11,
+    color: Colors.textSecondary,
+    marginTop: 1,
+  },
+  complementaryCheck: {
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  complementaryCheckActive: {
+    backgroundColor: Colors.forest,
+    borderColor: Colors.forest,
+  },
+  complementaryInfo: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    backgroundColor: "rgba(27,107,78,0.04)",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 14,
+  },
+  complementaryInfoText: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 11,
+    color: "#14523B",
+    flex: 1,
+    lineHeight: 16,
+  },
+
   fieldWrap: { marginBottom: 12 },
   fieldLabel: {
     fontFamily: "DMSans_400Regular",

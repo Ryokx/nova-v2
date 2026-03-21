@@ -308,9 +308,9 @@ export function BookingScreen({
 
             {/* Escrow info */}
             <View style={styles.escrowBadge}>
-              <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="shield-lock" size={18} color={Colors.forest} /></Text>
+              <MaterialCommunityIcons name="information-outline" size={16} color={Colors.forest} />
               <Text style={styles.escrowBadgeText}>
-                Aucun débit immédiat — Nova contrôle et valide
+                Aucun paiement maintenant — l'artisan établira le devis sur place après diagnostic
               </Text>
             </View>
 
@@ -323,13 +323,13 @@ export function BookingScreen({
                     visible: true,
                     type: "success",
                     title: "Rendez-vous confirmé",
-                    message: `Votre RDV avec Jean-Michel P. le ${selectedDay} mars à ${selectedSlot || "14h00"} est confirmé.\n\nVous allez être redirigé vers le paiement sécurisé.`,
+                    message: `Votre RDV avec Jean-Michel P. le ${selectedDay} mars à ${selectedSlot || "14h00"} est confirmé.\n\nL'artisan se déplacera, diagnostiquera et établira un devis sur place. Vous ne payez rien pour le moment.`,
                     actions: [
                       {
-                        label: "Procéder au paiement",
+                        label: "Voir mes interventions",
                         onPress: () => {
                           setModal(m => ({ ...m, visible: false }));
-                          navigation.navigate("Payment", { missionId: "1", amount: 320 });
+                          navigation.navigate("ClientTabs" as any, { screen: "ClientMissions" });
                         },
                       },
                     ],
