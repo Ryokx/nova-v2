@@ -143,7 +143,7 @@ export function ClientHomeScreen({
               onPress={() => navigation.navigate("Emergency")}
             >
               <MaterialCommunityIcons name="lightning-bolt" size={14} color={Colors.white} />
-              <Text style={styles.urgencyBtnText}>SOS</Text>
+              <Text style={styles.urgencyBtnText}>Urgence</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.bellBtn, { backgroundColor: c.card }]}
