@@ -6,7 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   Animated,
+  Switch,
+  Modal,
+  Dimensions,
 } from "react-native";
+import { WebView } from "react-native-webview";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
@@ -15,13 +19,31 @@ import { useTheme } from "../../hooks/useTheme";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
 
 /* ── Types ── */
-type AvailabilityStatus = "available" | "unavailable" | "urgency";
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
-const availOptions: { id: AvailabilityStatus; label: string }[] = [
-  { id: "available", label: "Disponible" },
-  { id: "unavailable", label: "Indisponible" },
-  { id: "urgency", label: "Urgences" },
+const RADIUS_OPTIONS = [
+  { id: 5, label: "5 km" },
+  { id: 10, label: "10 km" },
+  { id: 20, label: "20 km" },
+  { id: 30, label: "30 km" },
+  { id: 50, label: "50 km" },
 ];
+
+function buildRadiusMapHtml(radiusKm: number) {
+  const metersRadius = radiusKm * 1000;
+  return `<!DOCTYPE html><html><head>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>*{margin:0;padding:0}#map{width:100%;height:100vh}</style>
+</head><body><div id="map"></div><script>
+var map=L.map('map',{zoomControl:false,attributionControl:false}).setView([48.8566,2.3522],${radiusKm<=10?13:radiusKm<=20?12:11});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+L.circle([48.8566,2.3522],{radius:${metersRadius},color:'#E8302A',fillColor:'#E8302A',fillOpacity:0.08,weight:2}).addTo(map);
+var icon=L.divIcon({className:'',html:'<div style="width:16px;height:16px;border-radius:50%;background:#E8302A;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3)"></div>',iconSize:[16,16],iconAnchor:[8,8]});
+L.marker([48.8566,2.3522],{icon:icon}).addTo(map);
+</script></body></html>`;
+}
 
 const kpis = [
   { label: "Revenus du mois", value: "4 820€", icon: "cash" },
@@ -44,7 +66,11 @@ const fabItems = [
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
   const { c } = useTheme();
-  const [avail, setAvail] = useState<AvailabilityStatus>("available");
+  const [available, setAvailable] = useState(true);
+  const [urgencyOn, setUrgencyOn] = useState(false);
+  const [urgencyRadius, setUrgencyRadius] = useState(10);
+  const [urgencyModalVisible, setUrgencyModalVisible] = useState(false);
+  const [tempRadius, setTempRadius] = useState(10);
   const [fabOpen, setFabOpen] = useState(false);
   const rotateAnim = useState(new Animated.Value(0))[0];
 
@@ -99,35 +125,68 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        {/* ── Availability Toggle ── */}
-        <Card style={styles.availCard}>
-          <Text style={styles.availLabel}>Disponibilité</Text>
+        {/* ── Availability ── */}
+        <View style={[styles.availCard, { backgroundColor: c.card }]}>
+          {/* Standard availability */}
           <View style={styles.availRow}>
-            {availOptions.map((opt) => {
-              const active = avail === opt.id;
-              return (
-                <TouchableOpacity
-                  key={opt.id}
-                  activeOpacity={0.8}
-                  onPress={() => setAvail(opt.id)}
-                  style={[
-                    styles.availBtn,
-                    active && styles.availBtnActive,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.availBtnText,
-                      active && styles.availBtnTextActive,
-                    ]}
-                  >
-                    {opt.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+            <View style={[styles.availIconWrap, { backgroundColor: available ? "rgba(34,200,138,0.1)" : "rgba(138,149,163,0.1)" }]}>
+              <MaterialCommunityIcons name={available ? "check-circle" : "close-circle"} size={18} color={available ? Colors.success : Colors.textMuted} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.availTitle, { color: c.text }]}>Disponible</Text>
+              <Text style={styles.availDesc}>
+                {available ? "Vous recevez des demandes clients" : "Vous ne recevez aucune demande"}
+              </Text>
+            </View>
+            <Switch
+              value={available}
+              onValueChange={setAvailable}
+              trackColor={{ false: Colors.border, true: Colors.success }}
+              thumbColor={Colors.white}
+            />
           </View>
-        </Card>
+
+          <View style={styles.availDivider} />
+
+          {/* Urgency mode */}
+          <View style={styles.availRow}>
+            <View style={[styles.availIconWrap, { backgroundColor: urgencyOn ? "rgba(232,48,42,0.1)" : "rgba(138,149,163,0.1)" }]}>
+              <MaterialCommunityIcons name="lightning-bolt" size={18} color={urgencyOn ? Colors.red : Colors.textMuted} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.availTitle, { color: c.text }]}>Mode urgences</Text>
+              <Text style={styles.availDesc}>
+                {urgencyOn ? `Actif — rayon de ${urgencyRadius} km` : "Recevez des demandes urgentes"}
+              </Text>
+            </View>
+            <Switch
+              value={urgencyOn}
+              onValueChange={(v) => {
+                if (v) {
+                  setTempRadius(urgencyRadius);
+                  setUrgencyModalVisible(true);
+                } else {
+                  setUrgencyOn(false);
+                }
+              }}
+              trackColor={{ false: Colors.border, true: Colors.red }}
+              thumbColor={Colors.white}
+            />
+          </View>
+
+          {/* Urgency active info */}
+          {urgencyOn && (
+            <TouchableOpacity
+              style={styles.urgencyInfo}
+              activeOpacity={0.7}
+              onPress={() => { setTempRadius(urgencyRadius); setUrgencyModalVisible(true); }}
+            >
+              <MaterialCommunityIcons name="map-marker-radius" size={14} color={Colors.red} />
+              <Text style={styles.urgencyInfoText}>Périmètre : {urgencyRadius} km</Text>
+              <Text style={styles.urgencyInfoEdit}>Modifier</Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {/* ── KPIs 2x2 ── */}
         <View style={styles.kpiGrid}>
@@ -223,6 +282,76 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
       </Animated.View>
+      {/* ── Urgency Radius Modal ── */}
+      <Modal visible={urgencyModalVisible} animationType="slide" presentationStyle="pageSheet">
+        <View style={styles.modalRoot}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setUrgencyModalVisible(false)}>
+              <MaterialCommunityIcons name="close" size={22} color={Colors.navy} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Périmètre d'intervention</Text>
+            <View style={{ width: 22 }} />
+          </View>
+
+          {/* Map */}
+          <View style={styles.modalMap}>
+            <WebView
+              source={{ html: buildRadiusMapHtml(tempRadius) }}
+              style={{ flex: 1 }}
+              scrollEnabled={false}
+              javaScriptEnabled
+            />
+          </View>
+
+          {/* Radius selector */}
+          <View style={styles.modalContent}>
+            <Text style={styles.modalSectionTitle}>Rayon d'intervention urgences</Text>
+            <Text style={styles.modalSectionDesc}>
+              Vous recevrez les demandes urgentes dans ce périmètre autour de votre position.
+            </Text>
+
+            <View style={styles.radiusRow}>
+              {RADIUS_OPTIONS.map((r) => (
+                <TouchableOpacity
+                  key={r.id}
+                  style={[
+                    styles.radiusBtn,
+                    tempRadius === r.id && styles.radiusBtnActive,
+                  ]}
+                  onPress={() => setTempRadius(r.id)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[
+                    styles.radiusBtnText,
+                    tempRadius === r.id && styles.radiusBtnTextActive,
+                  ]}>
+                    {r.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.modalInfo}>
+              <MaterialCommunityIcons name="information-outline" size={14} color={Colors.forest} />
+              <Text style={styles.modalInfoText}>
+                Les interventions urgentes sont majorées (tarif défini dans vos paramètres). Vous pouvez être disponible pour les interventions classiques ET les urgences en même temps.
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.modalSaveBtn}
+              activeOpacity={0.85}
+              onPress={() => {
+                setUrgencyRadius(tempRadius);
+                setUrgencyOn(true);
+                setUrgencyModalVisible(false);
+              }}
+            >
+              <Text style={styles.modalSaveBtnText}>Activer le mode urgences — {tempRadius} km</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -281,35 +410,61 @@ const styles = StyleSheet.create({
   avatarBtn: {},
 
   /* Availability */
-  availCard: { marginHorizontal: 16, marginTop: -8 },
-  availLabel: {
-    fontFamily: "DMSans_500Medium",
-    fontSize: 11,
-    color: Colors.textHint,
-    marginBottom: 8,
+  /* Availability */
+  availCard: {
+    marginHorizontal: 16, marginTop: -8, borderRadius: Radii["2xl"],
+    padding: 16, borderWidth: 1, borderColor: "rgba(10,22,40,0.04)", ...Shadows.sm,
   },
-  availRow: { flexDirection: "row", gap: 6 },
-  availBtn: {
-    flex: 1,
-    paddingVertical: 9,
-    paddingHorizontal: 4,
-    borderRadius: Radii.md,
-    backgroundColor: Colors.bgPage,
-    borderWidth: 1,
-    borderColor: Colors.border,
+  availRow: {
+    flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 6,
+  },
+  availIconWrap: {
+    width: 36, height: 36, borderRadius: 12,
+    alignItems: "center", justifyContent: "center",
+  },
+  availTitle: { fontFamily: "DMSans_600SemiBold", fontSize: 14 },
+  availDesc: { fontFamily: "DMSans_400Regular", fontSize: 11.5, color: Colors.textSecondary, marginTop: 1 },
+  availDivider: { height: 1, backgroundColor: Colors.surface, marginVertical: 8 },
+  urgencyInfo: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: "rgba(232,48,42,0.05)", borderRadius: 10,
+    paddingHorizontal: 12, paddingVertical: 8, marginTop: 8,
+  },
+  urgencyInfoText: { fontFamily: "DMSans_500Medium", fontSize: 12, color: Colors.red, flex: 1 },
+  urgencyInfoEdit: { fontFamily: "DMSans_600SemiBold", fontSize: 12, color: Colors.red },
+
+  /* Urgency modal */
+  modalRoot: { flex: 1, backgroundColor: Colors.bgPage },
+  modalHeader: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingTop: 54, paddingHorizontal: 16, paddingBottom: 14,
+    backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.border,
+  },
+  modalTitle: { fontFamily: "Manrope_700Bold", fontSize: 17, color: Colors.navy },
+  modalMap: { height: SCREEN_WIDTH * 0.55, backgroundColor: "#E8F5EE" },
+  modalContent: { flex: 1, padding: 20 },
+  modalSectionTitle: { fontFamily: "Manrope_700Bold", fontSize: 16, color: Colors.navy, marginBottom: 4 },
+  modalSectionDesc: { fontFamily: "DMSans_400Regular", fontSize: 13, color: Colors.textSecondary, lineHeight: 20, marginBottom: 16 },
+  radiusRow: { flexDirection: "row", gap: 8, marginBottom: 16 },
+  radiusBtn: {
+    flex: 1, paddingVertical: 12, borderRadius: 12,
+    backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border,
     alignItems: "center",
   },
-  availBtnActive: {
-    backgroundColor: Colors.forest,
-    borderColor: Colors.forest,
-    ...Shadows.sm,
+  radiusBtnActive: { backgroundColor: Colors.red, borderColor: Colors.red },
+  radiusBtnText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: "#4A5568" },
+  radiusBtnTextActive: { color: Colors.white },
+  modalInfo: {
+    flexDirection: "row", alignItems: "flex-start", gap: 8,
+    backgroundColor: "rgba(27,107,78,0.04)", borderRadius: 12,
+    padding: 12, marginBottom: 20,
   },
-  availBtnText: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 11,
-    color: "#4A5568",
+  modalInfoText: { fontFamily: "DMSans_400Regular", fontSize: 12, color: "#14523B", flex: 1, lineHeight: 18 },
+  modalSaveBtn: {
+    height: 52, borderRadius: 16, backgroundColor: Colors.red,
+    alignItems: "center", justifyContent: "center", ...Shadows.md,
   },
-  availBtnTextActive: { color: Colors.white },
+  modalSaveBtnText: { fontFamily: "Manrope_700Bold", fontSize: 15, color: Colors.white },
 
   /* KPIs */
   kpiGrid: { paddingHorizontal: 16, marginTop: 14, gap: 10 },
