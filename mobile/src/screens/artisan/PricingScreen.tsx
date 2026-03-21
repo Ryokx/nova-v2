@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
-import type { RootStackScreenProps } from "../../navigation/types";
+// Navigation props typed as any for nested stack compatibility
 
 interface PricingProfile {
   deploymentFree: boolean;
@@ -23,7 +23,7 @@ interface PricingProfile {
 
 export function ArtisanPricingScreen({
   navigation,
-}: RootStackScreenProps<"ArtisanPricing">) {
+}: { navigation: any }) {
   // Classic intervention pricing
   const [classic, setClassic] = useState<PricingProfile>({
     deploymentFree: false,
