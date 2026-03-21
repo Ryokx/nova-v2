@@ -233,8 +233,8 @@ export function BookingScreen({
             </View>
 
             <TextInput
-              style={styles.textarea}
-              placeholder="Décrivez votre problème..."
+              style={[styles.textarea, description.length > 0 && description.trim().length < 40 && { borderColor: Colors.red }]}
+              placeholder="Décrivez votre problème (40 caractères min.)..."
               placeholderTextColor={Colors.textHint}
               multiline
               numberOfLines={4}
@@ -242,6 +242,9 @@ export function BookingScreen({
               value={description}
               onChangeText={setDescription}
             />
+            <Text style={[styles.charCount, description.trim().length >= 40 && { color: Colors.success }]}>
+              {description.trim().length}/40 caractères{description.trim().length < 40 ? " minimum" : " ✓"}
+            </Text>
 
             {/* Media picker buttons */}
             <View style={styles.mediaActions}>
@@ -284,7 +287,7 @@ export function BookingScreen({
                 onPress={() => setStep(2)}
                 fullWidth
                 size="lg"
-                disabled={!selectedSlot}
+                disabled={!selectedSlot || description.trim().length < 40}
               />
             </View>
           </View>
@@ -504,6 +507,15 @@ const styles = StyleSheet.create({
     height: 100,
     color: Colors.text,
     marginBottom: 12,
+  },
+
+  charCount: {
+    fontFamily: "DMMono_500Medium",
+    fontSize: 11,
+    color: Colors.textMuted,
+    textAlign: "right",
+    marginTop: -6,
+    marginBottom: 10,
   },
 
   /* Media picker */
