@@ -134,7 +134,7 @@ export function PaymentMethodsScreen({
               activeOpacity={0.85}
             >
               <View style={styles.otherIcon}>
-                m.icon ? <MaterialCommunityIcons name={m.icon as any} size={18} color={Colors.navy} /> : null
+                {m.icon ? <MaterialCommunityIcons name={m.icon as any} size={18} color={Colors.navy} /> : <MaterialCommunityIcons name="apple" size={18} color={Colors.navy} />}
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.otherLabel}>{m.label}</Text>
