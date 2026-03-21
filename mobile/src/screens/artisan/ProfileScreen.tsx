@@ -44,6 +44,7 @@ interface MenuRow {
 }
 
 const menuRows: MenuRow[] = [
+  { icon: "currency-eur", label: "Mes tarifs", sub: "Déplacement, devis, urgences", screen: "ArtisanPricing" },
   { icon: "cash", label: "Paiements", sub: "Historique et virements", screen: "ArtisanPayments" },
   { icon: "file-document", label: "Documents", sub: "Devis et factures", screen: "ArtisanDocuments" },
   { icon: "chart-bar", label: "Comptabilité", sub: "Connexion Pennylane, Indy, export auto", screen: "Accounting" },

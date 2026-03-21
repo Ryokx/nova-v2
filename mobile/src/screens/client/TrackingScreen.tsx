@@ -112,19 +112,25 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
       // Annulation < 5 min — artisan decides
       Alert.alert(
         "Annuler l'intervention",
-        "Vous annulez moins de 5 minutes après la demande.\n\nL'artisan sera notifié et décidera s'il applique des frais de déplacement ou non.",
+        artisanConfig.deploymentFree
+          ? "Vous annulez moins de 5 minutes après la demande.\n\nLe déplacement est offert par cet artisan. Aucun frais ne sera facturé."
+          : "Vous annulez moins de 5 minutes après la demande.\n\nL'artisan sera notifié et décidera s'il applique des frais de déplacement ou non.\n\nSi l'artisan facture sans avoir parcouru de distance significative, Nova pourra annuler les frais et le pénaliser.",
         [
           { text: "Non, garder", style: "cancel" },
           {
             text: "Oui, annuler",
             style: "destructive",
             onPress: () => {
-              setCancelPending(true);
-              // Simulate artisan response after 3s
-              setTimeout(() => {
-                setCancelPending(false);
+              if (artisanConfig.deploymentFree) {
                 setCancelled(true);
-              }, 3000);
+              } else {
+                setCancelPending(true);
+                // Simulate artisan response after 3s
+                setTimeout(() => {
+                  setCancelPending(false);
+                  setCancelled(true);
+                }, 3000);
+              }
             },
           },
         ]

@@ -39,6 +39,7 @@ export type RootStackParamList = {
   ClientDirectory: undefined;
   QRCodeProfile: undefined;
   Accounting: undefined;
+  ArtisanPricing: undefined;
 };
 
 // -- Client Tabs --
