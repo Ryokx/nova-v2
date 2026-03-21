@@ -142,20 +142,20 @@ export function SettingsScreen({
   const handleDeleteAccount = () => {
     Alert.alert(
       "Supprimer mon compte",
-      "Cette action est irréversible. Toutes vos données seront supprimées définitivement.",
+      "Êtes-vous sûr de vouloir supprimer votre compte ?\n\nToutes vos données seront définitivement supprimées :\n\n• Informations personnelles\n• Historique des interventions\n• Messages et conversations\n• Avis et évaluations\n• Moyens de paiement\n• Contrats d'entretien\n\nCette action est irréversible.",
       [
         { text: "Annuler", style: "cancel" },
         {
-          text: "Supprimer",
+          text: "Oui, supprimer mon compte",
           style: "destructive",
           onPress: () => {
             Alert.alert(
-              "Confirmation finale",
-              "Êtes-vous absolument certain(e) ? Tapez 'SUPPRIMER' pour confirmer.",
+              "Dernière confirmation",
+              "Votre compte et l'ensemble de vos données seront supprimés immédiatement. Vous ne pourrez plus y accéder.\n\nConfirmez-vous la suppression ?",
               [
-                { text: "Annuler", style: "cancel" },
+                { text: "Non, garder mon compte", style: "cancel" },
                 {
-                  text: "Confirmer",
+                  text: "Supprimer définitivement",
                   style: "destructive",
                   onPress: () =>
                     navigation.reset({ index: 0, routes: [{ name: "Auth" }] }),
@@ -266,11 +266,11 @@ export function SettingsScreen({
           />
         </SectionCard>
 
-        {/* Danger zone */}
+        {/* Account */}
         <View style={styles.dangerCard}>
-          <Text style={styles.dangerTitle}>Zone de danger</Text>
+          <Text style={styles.dangerTitle}>Mon compte</Text>
           <SettingRow
-            label="Déconnexion"
+            label="Se déconnecter"
             onPress={handleLogout}
           />
           <View style={styles.rowDivider} />
