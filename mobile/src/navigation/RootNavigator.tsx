@@ -8,8 +8,12 @@ import { ArtisanTabs } from "./ArtisanTabs";
 // Auth
 import { AuthScreen } from "../screens/auth/AuthScreen";
 
-// ArtisanProfile is the ONLY screen outside tabs (no tab bar)
+// Screens that open fullscreen without tab bar
 import { ArtisanProfileScreen } from "../screens/client/ArtisanProfileScreen";
+import { MaintenanceContractScreen } from "../screens/client/MaintenanceContractScreen";
+import { ContractDetailScreen } from "../screens/client/ContractDetailScreen";
+import { BookingScreen } from "../screens/client/BookingScreen";
+import { PaymentScreen } from "../screens/client/PaymentScreen";
 
 const Stack = createNativeStackNavigator<any>();
 
@@ -23,8 +27,12 @@ export function RootNavigator() {
       <Stack.Screen name="ClientTabs" component={ClientTabs} />
       <Stack.Screen name="ArtisanTabs" component={ArtisanTabs} />
 
-      {/* Artisan profile opens fullscreen without tab bar */}
+      {/* Screens accessible from ArtisanProfile (outside tabs) */}
       <Stack.Screen name="ArtisanProfile" component={ArtisanProfileScreen} />
+      <Stack.Screen name="MaintenanceContract" component={MaintenanceContractScreen} />
+      <Stack.Screen name="ContractDetail" component={ContractDetailScreen} />
+      <Stack.Screen name="Booking" component={BookingScreen} />
+      <Stack.Screen name="Payment" component={PaymentScreen} />
     </Stack.Navigator>
   );
 }
