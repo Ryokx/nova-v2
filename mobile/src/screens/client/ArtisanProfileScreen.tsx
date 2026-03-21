@@ -116,6 +116,42 @@ export function ArtisanProfileScreen({
             <Badge label="RGE" variant="warning" size="sm" />
           </View>
 
+          {/* Conditions tarifs */}
+          <View style={styles.conditionsCard}>
+            <View style={styles.conditionRow}>
+              <View style={[styles.conditionIconWrap, { backgroundColor: "rgba(34,200,138,0.08)" }]}>
+                <MaterialCommunityIcons name="truck-delivery" size={16} color={Colors.success} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.conditionLabel}>Déplacement</Text>
+                <Text style={styles.conditionValue}>Offert</Text>
+              </View>
+              <MaterialCommunityIcons name="check-circle" size={16} color={Colors.success} />
+            </View>
+            <View style={styles.conditionDivider} />
+            <View style={styles.conditionRow}>
+              <View style={[styles.conditionIconWrap, { backgroundColor: "rgba(34,200,138,0.08)" }]}>
+                <MaterialCommunityIcons name="file-document-edit" size={16} color={Colors.success} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.conditionLabel}>Devis</Text>
+                <Text style={styles.conditionValue}>Gratuit</Text>
+              </View>
+              <MaterialCommunityIcons name="check-circle" size={16} color={Colors.success} />
+            </View>
+            <View style={styles.conditionDivider} />
+            <View style={styles.conditionRow}>
+              <View style={[styles.conditionIconWrap, { backgroundColor: "rgba(27,107,78,0.08)" }]}>
+                <MaterialCommunityIcons name="shield-lock" size={16} color={Colors.forest} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.conditionLabel}>Paiement</Text>
+                <Text style={styles.conditionValue}>Séquestre Nova</Text>
+              </View>
+              <MaterialCommunityIcons name="check-circle" size={16} color={Colors.forest} />
+            </View>
+          </View>
+
           {/* Escrow explainer */}
           <View style={styles.escrowBox}>
             <Text style={styles.escrowTitle}>
@@ -325,6 +361,44 @@ const styles = StyleSheet.create({
   badgesRow: { flexDirection: "row", gap: 6, marginBottom: 18, flexWrap: "wrap", justifyContent: "center" },
 
   /* Escrow box */
+  /* Conditions */
+  conditionsCard: {
+    backgroundColor: Colors.bgPage,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 18,
+    borderWidth: 1,
+    borderColor: "rgba(10,22,40,0.03)",
+  },
+  conditionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 8,
+  },
+  conditionIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  conditionLabel: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  conditionValue: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 14,
+    color: Colors.navy,
+  },
+  conditionDivider: {
+    height: 1,
+    backgroundColor: "rgba(10,22,40,0.04)",
+    marginLeft: 46,
+  },
+
   escrowBox: {
     backgroundColor: "rgba(27,107,78,0.04)",
     borderRadius: 18,
