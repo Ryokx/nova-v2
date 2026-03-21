@@ -200,7 +200,7 @@ export function ClientHomeScreen({
           <MaterialCommunityIcons name="magnify" size={18} color={Colors.textHint} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Rechercher un artisan..."
+            placeholder="Artisan ou domaine (ex : chauffagiste)"
             placeholderTextColor={Colors.textMuted}
             value={search}
             onChangeText={handleSearch}

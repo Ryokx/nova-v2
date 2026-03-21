@@ -14,9 +14,16 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 // Navigation props typed as any for nested stack compatibility
 
+interface KmTier {
+  maxKm: string;
+  fee: string;
+}
+
 interface PricingProfile {
   deploymentFree: boolean;
   deploymentFee: string;
+  deploymentByKm: boolean;
+  kmTiers: KmTier[];
   quoteFree: boolean;
   quoteFee: string;
 }
@@ -24,18 +31,28 @@ interface PricingProfile {
 export function ArtisanPricingScreen({
   navigation,
 }: { navigation: any }) {
-  // Classic intervention pricing
   const [classic, setClassic] = useState<PricingProfile>({
     deploymentFree: false,
     deploymentFee: "40",
+    deploymentByKm: false,
+    kmTiers: [
+      { maxKm: "10", fee: "30" },
+      { maxKm: "20", fee: "50" },
+      { maxKm: "30", fee: "70" },
+    ],
     quoteFree: true,
     quoteFee: "0",
   });
 
-  // Urgent intervention pricing (majoré)
   const [urgent, setUrgent] = useState<PricingProfile>({
     deploymentFree: false,
     deploymentFee: "60",
+    deploymentByKm: false,
+    kmTiers: [
+      { maxKm: "10", fee: "50" },
+      { maxKm: "20", fee: "80" },
+      { maxKm: "30", fee: "110" },
+    ],
     quoteFree: true,
     quoteFee: "0",
   });
@@ -97,28 +114,117 @@ export function ArtisanPricingScreen({
         </View>
 
         {!profile.deploymentFree && (
-          <View style={styles.feeInputRow}>
-            <Text style={styles.feeInputLabel}>Montant du déplacement</Text>
-            <View style={styles.feeInputWrap}>
-              <TextInput
-                style={styles.feeInput}
-                value={profile.deploymentFee}
-                onChangeText={(t) => setProfile((p) => ({ ...p, deploymentFee: t.replace(/[^0-9]/g, "") }))}
-                keyboardType="number-pad"
-                maxLength={4}
-              />
-              <Text style={styles.feeUnit}>€</Text>
+          <>
+            {/* Mode: fixe ou par km */}
+            <View style={styles.deployModeRow}>
+              <TouchableOpacity
+                style={[styles.deployModeBtn, !profile.deploymentByKm && styles.deployModeBtnActive]}
+                onPress={() => setProfile((p) => ({ ...p, deploymentByKm: false }))}
+              >
+                <MaterialCommunityIcons name="cash" size={14} color={!profile.deploymentByKm ? Colors.white : Colors.textSecondary} />
+                <Text style={[styles.deployModeBtnText, !profile.deploymentByKm && styles.deployModeBtnTextActive]}>Tarif fixe</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.deployModeBtn, profile.deploymentByKm && styles.deployModeBtnActive]}
+                onPress={() => setProfile((p) => ({ ...p, deploymentByKm: true }))}
+              >
+                <MaterialCommunityIcons name="map-marker-distance" size={14} color={profile.deploymentByKm ? Colors.white : Colors.textSecondary} />
+                <Text style={[styles.deployModeBtnText, profile.deploymentByKm && styles.deployModeBtnTextActive]}>Par kilomètre</Text>
+              </TouchableOpacity>
             </View>
-          </View>
-        )}
 
-        {!profile.deploymentFree && (
-          <View style={styles.infoNotice}>
-            <MaterialCommunityIcons name="information-outline" size={13} color={Colors.forest} />
-            <Text style={styles.infoNoticeText}>
-              En cas d'annulation client après 5 min, ces frais sont facturés automatiquement. Si le client annule avant 5 min, vous serez notifié pour décider.
-            </Text>
-          </View>
+            {/* Tarif fixe */}
+            {!profile.deploymentByKm && (
+              <View style={styles.feeInputRow}>
+                <Text style={styles.feeInputLabel}>Montant fixe</Text>
+                <View style={styles.feeInputWrap}>
+                  <TextInput
+                    style={styles.feeInput}
+                    value={profile.deploymentFee}
+                    onChangeText={(t) => setProfile((p) => ({ ...p, deploymentFee: t.replace(/[^0-9]/g, "") }))}
+                    keyboardType="number-pad"
+                    maxLength={4}
+                  />
+                  <Text style={styles.feeUnit}>€</Text>
+                </View>
+              </View>
+            )}
+
+            {/* Tarif par km */}
+            {profile.deploymentByKm && (
+              <View style={styles.kmSection}>
+                <Text style={styles.kmSectionTitle}>Barème par distance</Text>
+                {profile.kmTiers.map((tier, i) => (
+                  <View key={i} style={styles.kmTierRow}>
+                    <View style={styles.kmTierLeft}>
+                      <Text style={styles.kmTierLabel}>Jusqu'à</Text>
+                      <View style={styles.kmTierInputWrap}>
+                        <TextInput
+                          style={styles.kmTierInput}
+                          value={tier.maxKm}
+                          onChangeText={(t) => {
+                            const tiers = [...profile.kmTiers];
+                            tiers[i] = { ...tiers[i]!, maxKm: t.replace(/[^0-9]/g, "") };
+                            setProfile((p) => ({ ...p, kmTiers: tiers }));
+                          }}
+                          keyboardType="number-pad"
+                          maxLength={3}
+                        />
+                        <Text style={styles.kmTierUnit}>km</Text>
+                      </View>
+                    </View>
+                    <View style={styles.kmTierRight}>
+                      <View style={styles.kmTierInputWrap}>
+                        <TextInput
+                          style={styles.kmTierInput}
+                          value={tier.fee}
+                          onChangeText={(t) => {
+                            const tiers = [...profile.kmTiers];
+                            tiers[i] = { ...tiers[i]!, fee: t.replace(/[^0-9]/g, "") };
+                            setProfile((p) => ({ ...p, kmTiers: tiers }));
+                          }}
+                          keyboardType="number-pad"
+                          maxLength={4}
+                        />
+                        <Text style={styles.kmTierUnit}>€</Text>
+                      </View>
+                      {profile.kmTiers.length > 1 && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            const tiers = profile.kmTiers.filter((_, j) => j !== i);
+                            setProfile((p) => ({ ...p, kmTiers: tiers }));
+                          }}
+                        >
+                          <MaterialCommunityIcons name="close-circle" size={18} color={Colors.textMuted} />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                ))}
+                <TouchableOpacity
+                  style={styles.addTierBtn}
+                  onPress={() => {
+                    const last = profile.kmTiers[profile.kmTiers.length - 1];
+                    const nextKm = String(Number(last?.maxKm || "0") + 10);
+                    const nextFee = String(Number(last?.fee || "0") + 20);
+                    setProfile((p) => ({ ...p, kmTiers: [...p.kmTiers, { maxKm: nextKm, fee: nextFee }] }));
+                  }}
+                >
+                  <MaterialCommunityIcons name="plus-circle-outline" size={16} color={Colors.forest} />
+                  <Text style={styles.addTierBtnText}>Ajouter un palier</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            <View style={styles.infoNotice}>
+              <MaterialCommunityIcons name="information-outline" size={13} color={Colors.forest} />
+              <Text style={styles.infoNoticeText}>
+                {profile.deploymentByKm
+                  ? "Le montant sera calculé automatiquement selon la distance entre vous et le client. En cas d'annulation, le palier correspondant s'applique."
+                  : "En cas d'annulation client après 5 min, ces frais sont facturés automatiquement. Si le client annule avant 5 min, vous serez notifié pour décider."}
+              </Text>
+            </View>
+          </>
         )}
       </View>
 
@@ -166,9 +272,22 @@ export function ArtisanPricingScreen({
         <View style={styles.recapRow}>
           <Text style={styles.recapLabel}>Déplacement</Text>
           <Text style={[styles.recapValue, { color: profile.deploymentFree ? Colors.success : Colors.navy }]}>
-            {profile.deploymentFree ? "Offert" : `${profile.deploymentFee}€`}
+            {profile.deploymentFree
+              ? "Offert"
+              : profile.deploymentByKm
+              ? `${profile.kmTiers[0]?.fee || "0"}€ — ${profile.kmTiers[profile.kmTiers.length - 1]?.fee || "0"}€`
+              : `${profile.deploymentFee}€`}
           </Text>
         </View>
+        {!profile.deploymentFree && profile.deploymentByKm && (
+          <View style={styles.recapKmDetail}>
+            {profile.kmTiers.map((t, i) => (
+              <Text key={i} style={styles.recapKmLine}>
+                {"≤ "}{t.maxKm} km → {t.fee}€
+              </Text>
+            ))}
+          </View>
+        )}
         <View style={styles.recapRow}>
           <Text style={styles.recapLabel}>Devis</Text>
           <Text style={[styles.recapValue, { color: profile.quoteFree ? Colors.success : Colors.navy }]}>
@@ -313,6 +432,49 @@ const styles = StyleSheet.create({
     textAlign: "center", fontFamily: "DMMono_500Medium", fontSize: 16, color: Colors.navy,
   },
   feeUnit: { fontFamily: "DMMono_500Medium", fontSize: 16, color: Colors.textSecondary },
+
+  /* Deploy mode selector */
+  deployModeRow: { flexDirection: "row", gap: 8, marginBottom: 12 },
+  deployModeBtn: {
+    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 6, paddingVertical: 10, borderRadius: 10,
+    backgroundColor: Colors.bgPage, borderWidth: 1, borderColor: Colors.border,
+  },
+  deployModeBtnActive: { backgroundColor: Colors.forest, borderColor: Colors.forest },
+  deployModeBtnText: { fontFamily: "DMSans_600SemiBold", fontSize: 12, color: Colors.textSecondary },
+  deployModeBtnTextActive: { color: Colors.white },
+
+  /* Km tiers */
+  kmSection: { marginTop: 4, marginBottom: 8 },
+  kmSectionTitle: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.navy, marginBottom: 10 },
+  kmTierRow: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    marginBottom: 8, gap: 12,
+  },
+  kmTierLeft: { flexDirection: "row", alignItems: "center", gap: 6 },
+  kmTierRight: { flexDirection: "row", alignItems: "center", gap: 8 },
+  kmTierLabel: { fontFamily: "DMSans_400Regular", fontSize: 12, color: Colors.textSecondary },
+  kmTierInputWrap: { flexDirection: "row", alignItems: "center", gap: 4 },
+  kmTierInput: {
+    width: 56, height: 36, backgroundColor: Colors.bgPage,
+    borderRadius: 8, borderWidth: 1, borderColor: Colors.border,
+    textAlign: "center", fontFamily: "DMMono_500Medium", fontSize: 14, color: Colors.navy,
+  },
+  kmTierUnit: { fontFamily: "DMMono_500Medium", fontSize: 13, color: Colors.textSecondary },
+  addTierBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 6, paddingVertical: 10, borderRadius: 10,
+    borderWidth: 1.5, borderStyle: "dashed", borderColor: "rgba(27,107,78,0.25)",
+    marginTop: 4,
+  },
+  addTierBtnText: { fontFamily: "DMSans_600SemiBold", fontSize: 12, color: Colors.forest },
+
+  /* Recap km detail */
+  recapKmDetail: {
+    backgroundColor: Colors.white, borderRadius: 8,
+    padding: 8, paddingHorizontal: 10, marginBottom: 4,
+  },
+  recapKmLine: { fontFamily: "DMMono_500Medium", fontSize: 11, color: Colors.textSecondary, lineHeight: 18 },
 
   /* Info notice */
   infoNotice: {
