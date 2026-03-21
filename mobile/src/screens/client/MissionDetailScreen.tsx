@@ -61,7 +61,25 @@ export function MissionDetailScreen({
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [validated, setValidated] = useState(false);
+  const [instantRelease, setInstantRelease] = useState(false);
   const [cancelled, setCancelled] = useState(false);
+
+  const handleInstantRelease = () => {
+    Alert.alert(
+      "Déblocage instantané",
+      "Vous confirmez que l'intervention et le prix sont conformes.\n\nLe paiement de 320,00€ sera immédiatement versé à l'artisan.\n\n⚠️ En débloquant le paiement vous-même, Nova ne pourra plus intervenir en cas de litige. Cette action est irréversible.",
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Je confirme, débloquer",
+          onPress: () => {
+            setInstantRelease(true);
+            setValidated(true);
+          },
+        },
+      ]
+    );
+  };
 
   const handleCancel = () => {
     Alert.alert(
@@ -135,15 +153,27 @@ export function MissionDetailScreen({
   if (validated) {
     return (
       <View style={styles.successRoot}>
-        <View style={styles.successCircle}>
+        <View style={[styles.successCircle, instantRelease && { backgroundColor: Colors.gold }]}>
           <Text style={styles.successCheck}>{"✓"}</Text>
         </View>
-        <Text style={styles.successTitle}>Demande envoyée !</Text>
-        <Text style={styles.successDesc}>
-          Nova valide et libère le paiement sous 48h
+        <Text style={styles.successTitle}>
+          {instantRelease ? "Paiement débloqué !" : "Demande envoyée !"}
         </Text>
+        <Text style={styles.successDesc}>
+          {instantRelease
+            ? "320,00€ versés immédiatement à Jean-Michel P."
+            : "Nova valide et libère le paiement sous 48h"}
+        </Text>
+        {instantRelease && (
+          <View style={styles.instantWarning}>
+            <MaterialCommunityIcons name="alert-outline" size={16} color={Colors.gold} />
+            <Text style={styles.instantWarningText}>
+              Vous avez débloqué le paiement vous-même. Nova ne peut plus intervenir en cas de litige sur cette intervention.
+            </Text>
+          </View>
+        )}
         <Button
-          title="Retour aux missions"
+          title="Retour aux interventions"
           onPress={() => navigation.navigate("ClientTabs", { screen: "ClientMissions" })}
           size="lg"
         />
@@ -301,6 +331,34 @@ export function MissionDetailScreen({
             >
               <Text style={styles.validateBtnText}>Valider et libérer le paiement</Text>
             </TouchableOpacity>
+
+            {/* OR separator */}
+            <View style={styles.orSeparator}>
+              <View style={styles.orLine} />
+              <Text style={styles.orText}>ou</Text>
+              <View style={styles.orLine} />
+            </View>
+
+            {/* Instant release */}
+            <TouchableOpacity
+              style={styles.instantBtn}
+              activeOpacity={0.85}
+              onPress={handleInstantRelease}
+            >
+              <MaterialCommunityIcons name="lock-open-variant" size={18} color={Colors.gold} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.instantBtnTitle}>Débloquer le paiement immédiatement</Text>
+                <Text style={styles.instantBtnDesc}>Sans attendre la vérification Nova</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.textMuted} />
+            </TouchableOpacity>
+
+            <View style={styles.instantDisclaimer}>
+              <MaterialCommunityIcons name="alert-outline" size={14} color={Colors.gold} />
+              <Text style={styles.instantDisclaimerText}>
+                En débloquant le paiement vous-même, vous confirmez que l'intervention et le prix sont conformes. Nova ne pourra plus intervenir en cas de litige. Cette action est définitive et irréversible.
+              </Text>
+            </View>
 
             {/* Dispute button */}
             <TouchableOpacity
@@ -560,6 +618,39 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: "rgba(34,200,138,0.15)",
   },
   validationInfoText: { fontSize: 13.5, fontWeight: "600", color: "#0D7A52", flex: 1 },
+
+  /* Or separator */
+  orSeparator: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    marginVertical: 14,
+  },
+  orLine: { flex: 1, height: 1, backgroundColor: Colors.border },
+  orText: { fontFamily: "DMSans_500Medium", fontSize: 12, color: Colors.textMuted },
+
+  /* Instant release */
+  instantBtn: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: "rgba(245,166,35,0.06)", borderRadius: 16,
+    padding: 16, borderWidth: 1.5, borderColor: "rgba(245,166,35,0.15)",
+    marginBottom: 8,
+  },
+  instantBtnTitle: { fontFamily: "DMSans_600SemiBold", fontSize: 14, color: Colors.navy },
+  instantBtnDesc: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textSecondary, marginTop: 1 },
+  instantDisclaimer: {
+    flexDirection: "row", alignItems: "flex-start", gap: 8,
+    backgroundColor: "rgba(245,166,35,0.04)", borderRadius: 12,
+    padding: 10, marginBottom: 14,
+  },
+  instantDisclaimerText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: "#92610A", flex: 1, lineHeight: 16 },
+
+  /* Instant warning (success state) */
+  instantWarning: {
+    flexDirection: "row", alignItems: "flex-start", gap: 8,
+    backgroundColor: "rgba(245,166,35,0.06)", borderRadius: 14,
+    padding: 14, marginBottom: 20, maxWidth: 320,
+    borderWidth: 1, borderColor: "rgba(245,166,35,0.12)",
+  },
+  instantWarningText: { fontFamily: "DMSans_400Regular", fontSize: 12, color: "#92610A", flex: 1, lineHeight: 18 },
 
   /* Validate button */
   validateBtn: {
