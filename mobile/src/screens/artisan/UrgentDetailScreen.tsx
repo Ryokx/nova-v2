@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
-import { Button } from "../../components/ui";
+import { Button, ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const interventionDetails = [
@@ -25,6 +25,7 @@ export function UrgentDetailScreen({
   navigation,
 }: RootStackScreenProps<"UrgentDetail">) {
   const [accepted, setAccepted] = useState(false);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -155,7 +156,16 @@ export function UrgentDetailScreen({
         {/* CTAs */}
         <TouchableOpacity
           style={styles.acceptBtn}
-          onPress={() => setAccepted(true)}
+          onPress={() => setModal({
+            visible: true,
+            type: "warning",
+            title: "Accepter l'intervention urgente ?",
+            message: "Vous vous engagez à intervenir dans les plus brefs délais.\n\nLe client sera notifié de votre acceptation et un itinéraire vous sera proposé.",
+            actions: [
+              { label: "Annuler", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
+              { label: "Accepter", onPress: () => { setModal(m => ({ ...m, visible: false })); setAccepted(true); } },
+            ],
+          })}
           activeOpacity={0.85}
         >
           <Text style={styles.acceptText}>Accepter l'intervention</Text>
@@ -168,6 +178,15 @@ export function UrgentDetailScreen({
           <Text style={styles.refuseText}>Refuser</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
     </SafeAreaView>
   );
 }

@@ -7,12 +7,11 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
-  Alert,
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Shadows } from "../../constants/theme";
-import { Avatar, Button } from "../../components/ui";
+import { Avatar, Button, ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -93,6 +92,7 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
   const [routeIndex, setRouteIndex] = useState(0);
   const [mapHtml, setMapHtml] = useState(() => buildMapHtml(0, 0));
   const [cancelled, setCancelled] = useState(false);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
   const startTimeRef = useRef(Date.now());
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -108,50 +108,41 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
 
   const handleCancel = () => {
     if (isEarlyCancel && trackingStep === 0) {
-      // Annulation < 5 min — toujours gratuit
-      Alert.alert(
-        "Annuler l'intervention",
-        "Vous annulez moins de 5 minutes après la demande.\n\nAucun frais ne sera facturé.",
-        [
-          { text: "Non, garder", style: "cancel" },
-          {
-            text: "Oui, annuler",
-            style: "destructive",
-            onPress: () => setCancelled(true),
-          },
-        ]
-      );
+      setModal({
+        visible: true,
+        type: "warning",
+        title: "Annuler l'intervention",
+        message: "Vous annulez moins de 5 minutes après la demande.\n\nAucun frais ne sera facturé.",
+        actions: [
+          { label: "Non, garder", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
+          { label: "Oui, annuler", variant: "danger", onPress: () => { setModal(m => ({ ...m, visible: false })); setCancelled(true); } },
+        ],
+      });
     } else if (trackingStep === 0) {
-      // En route, > 5 min — frais selon profil artisan
       const feeText = artisanConfig.deploymentFree
         ? "Le déplacement est offert par cet artisan. Aucun frais."
         : `Les frais de déplacement de ${artisanConfig.deploymentFee},00€ (tarif fixé par l'artisan) restent à votre charge.`;
-      Alert.alert(
-        "Annuler l'intervention",
-        `Êtes-vous sûr de vouloir annuler ?\n\n${feeText}`,
-        [
-          { text: "Non, garder", style: "cancel" },
-          {
-            text: artisanConfig.deploymentFree ? "Oui, annuler" : `Oui, annuler (${artisanConfig.deploymentFee}€)`,
-            style: "destructive",
-            onPress: () => setCancelled(true),
-          },
-        ]
-      );
+      setModal({
+        visible: true,
+        type: "warning",
+        title: "Annuler l'intervention",
+        message: `Êtes-vous sûr de vouloir annuler ?\n\n${feeText}`,
+        actions: [
+          { label: "Non, garder", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
+          { label: artisanConfig.deploymentFree ? "Oui, annuler" : `Oui, annuler (${artisanConfig.deploymentFee}€)`, variant: "danger", onPress: () => { setModal(m => ({ ...m, visible: false })); setCancelled(true); } },
+        ],
+      });
     } else {
-      // Sur place — frais obligatoires
-      Alert.alert(
-        "Annuler l'intervention",
-        `L'artisan est déjà sur place.\n\nLes frais de déplacement de ${artisanConfig.deploymentFee},00€ restent à votre charge.`,
-        [
-          { text: "Non, garder", style: "cancel" },
-          {
-            text: `Oui, annuler (${artisanConfig.deploymentFee}€)`,
-            style: "destructive",
-            onPress: () => setCancelled(true),
-          },
-        ]
-      );
+      setModal({
+        visible: true,
+        type: "danger",
+        title: "Annuler l'intervention",
+        message: `L'artisan est déjà sur place.\n\nLes frais de déplacement de ${artisanConfig.deploymentFee},00€ restent à votre charge.`,
+        actions: [
+          { label: "Non, garder", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
+          { label: `Oui, annuler (${artisanConfig.deploymentFee}€)`, variant: "danger", onPress: () => { setModal(m => ({ ...m, visible: false })); setCancelled(true); } },
+        ],
+      });
     }
   };
 
@@ -385,6 +376,15 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
           </View>
         )}
       </ScrollView>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
     </View>
   );
 }

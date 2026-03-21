@@ -8,12 +8,12 @@ import {
   Switch,
   Modal,
   TextInput,
-  Alert,
   Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { useTheme } from "../../hooks/useTheme";
+import { ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ── Language options ── */
@@ -102,6 +102,7 @@ export function SettingsScreen({
   const [passwordModal, setPasswordModal] = useState(false);
   const [legalModal, setLegalModal] = useState<string | null>(null);
   const [langModal, setLangModal] = useState(false);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
 
   /* password fields */
   const [currentPwd, setCurrentPwd] = useState("");
@@ -110,18 +111,18 @@ export function SettingsScreen({
 
   const handlePasswordSave = () => {
     if (!currentPwd || !newPwd || !confirmPwd) {
-      Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+      setModal({ visible: true, type: "danger", title: "Erreur", message: "Veuillez remplir tous les champs.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
       return;
     }
     if (newPwd !== confirmPwd) {
-      Alert.alert("Erreur", "Les mots de passe ne correspondent pas.");
+      setModal({ visible: true, type: "danger", title: "Erreur", message: "Les mots de passe ne correspondent pas.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
       return;
     }
     if (newPwd.length < 8) {
-      Alert.alert("Erreur", "Le mot de passe doit contenir au moins 8 caractères.");
+      setModal({ visible: true, type: "danger", title: "Erreur", message: "Le mot de passe doit contenir au moins 8 caractères.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
       return;
     }
-    Alert.alert("Succès", "Votre mot de passe a été mis à jour.");
+    setModal({ visible: true, type: "success", title: "Succès", message: "Votre mot de passe a été mis à jour.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
     setPasswordModal(false);
     setCurrentPwd("");
     setNewPwd("");
@@ -129,43 +130,58 @@ export function SettingsScreen({
   };
 
   const handleLogout = () => {
-    Alert.alert("Déconnexion", "Voulez-vous vraiment vous déconnecter ?", [
-      { text: "Annuler", style: "cancel" },
-      {
-        text: "Déconnexion",
-        style: "destructive",
-        onPress: () => navigation.reset({ index: 0, routes: [{ name: "Auth" }] }),
-      },
-    ]);
+    setModal({
+      visible: true,
+      type: "warning",
+      title: "Déconnexion",
+      message: "Voulez-vous vraiment vous déconnecter ?",
+      actions: [
+        { label: "Annuler", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
+        {
+          label: "Déconnexion",
+          variant: "danger",
+          onPress: () => {
+            setModal(m => ({ ...m, visible: false }));
+            navigation.reset({ index: 0, routes: [{ name: "Auth" }] });
+          },
+        },
+      ],
+    });
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      "Supprimer mon compte",
-      "Êtes-vous sûr de vouloir supprimer votre compte ?\n\nToutes vos données seront définitivement supprimées :\n\n• Informations personnelles\n• Historique des interventions\n• Messages et conversations\n• Avis et évaluations\n• Moyens de paiement\n• Contrats d'entretien\n\nCette action est irréversible.",
-      [
-        { text: "Annuler", style: "cancel" },
+    setModal({
+      visible: true,
+      type: "danger",
+      title: "Supprimer mon compte",
+      message: "Êtes-vous sûr de vouloir supprimer votre compte ?\n\nToutes vos données seront définitivement supprimées :\n\n• Informations personnelles\n• Historique des interventions\n• Messages et conversations\n• Avis et évaluations\n• Moyens de paiement\n• Contrats d'entretien\n\nCette action est irréversible.",
+      actions: [
+        { label: "Annuler", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
         {
-          text: "Oui, supprimer mon compte",
-          style: "destructive",
+          label: "Oui, supprimer mon compte",
+          variant: "danger",
           onPress: () => {
-            Alert.alert(
-              "Dernière confirmation",
-              "Votre compte et l'ensemble de vos données seront supprimés immédiatement. Vous ne pourrez plus y accéder.\n\nConfirmez-vous la suppression ?",
-              [
-                { text: "Non, garder mon compte", style: "cancel" },
+            setModal({
+              visible: true,
+              type: "danger",
+              title: "Dernière confirmation",
+              message: "Votre compte et l'ensemble de vos données seront supprimés immédiatement. Vous ne pourrez plus y accéder.\n\nConfirmez-vous la suppression ?",
+              actions: [
+                { label: "Non, garder mon compte", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
                 {
-                  text: "Supprimer définitivement",
-                  style: "destructive",
-                  onPress: () =>
-                    navigation.reset({ index: 0, routes: [{ name: "Auth" }] }),
+                  label: "Supprimer définitivement",
+                  variant: "danger",
+                  onPress: () => {
+                    setModal(m => ({ ...m, visible: false }));
+                    navigation.reset({ index: 0, routes: [{ name: "Auth" }] });
+                  },
                 },
-              ]
-            );
+              ],
+            });
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const currentLegal = legalModal ? LEGAL_TEXTS[legalModal] : null;
@@ -410,6 +426,15 @@ export function SettingsScreen({
           </View>
         </TouchableOpacity>
       </Modal>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
     </SafeAreaView>
   );
 }

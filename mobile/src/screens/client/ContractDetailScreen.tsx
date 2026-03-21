@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Modal,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
+import { ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 export function ContractDetailScreen({
@@ -18,20 +18,34 @@ export function ContractDetailScreen({
 }: RootStackScreenProps<"ContractDetail">) {
   const { name, icon, price, artisan, since, freq } = route.params;
   const [previewVisible, setPreviewVisible] = useState(false);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
 
   const handleDownload = () => {
-    Alert.alert("Téléchargement", "Le contrat a été téléchargé au format PDF dans vos fichiers.");
+    setModal({ visible: true, type: "success", title: "Téléchargement", message: "Le contrat a été téléchargé au format PDF dans vos fichiers.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
   };
 
   const handleSendEmail = () => {
-    Alert.alert(
-      "Envoyer par email",
-      "Le contrat sera envoyé à votre adresse email enregistrée.",
-      [
-        { text: "Annuler", style: "cancel" },
-        { text: "Envoyer", onPress: () => Alert.alert("Envoyé ✓", "Le contrat a été envoyé à sophie.lefevre@email.com") },
-      ]
-    );
+    setModal({
+      visible: true,
+      type: "info",
+      title: "Envoyer par email",
+      message: "Le contrat sera envoyé à votre adresse email enregistrée.",
+      actions: [
+        { label: "Annuler", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
+        {
+          label: "Envoyer",
+          onPress: () => {
+            setModal({
+              visible: true,
+              type: "success",
+              title: "Envoyé",
+              message: "Le contrat a été envoyé à sophie.lefevre@email.com",
+              actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }],
+            });
+          },
+        },
+      ],
+    });
   };
 
   return (
@@ -125,6 +139,15 @@ export function ContractDetailScreen({
           </Text>
         </View>
       </ScrollView>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
 
       {/* Contract Preview Modal */}
       <Modal visible={previewVisible} animationType="slide" presentationStyle="pageSheet">

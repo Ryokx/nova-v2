@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   Switch,
   TextInput,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
+import { ConfirmModal } from "../../components/ui";
 // Navigation props typed as any for nested stack compatibility
 
 interface KmTier {
@@ -58,10 +58,11 @@ export function ArtisanPricingScreen({
   });
 
   const [saved, setSaved] = useState(false);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
 
   const handleSave = () => {
     setSaved(true);
-    Alert.alert("Paramètres enregistrés", "Vos tarifs ont été mis à jour pour les interventions classiques et urgentes.");
+    setModal({ visible: true, type: "success", title: "Paramètres enregistrés", message: "Vos tarifs ont été mis à jour pour les interventions classiques et urgentes.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
     setTimeout(() => setSaved(false), 2000);
   };
 
@@ -363,6 +364,15 @@ export function ArtisanPricingScreen({
           )}
         </TouchableOpacity>
       </ScrollView>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
     </SafeAreaView>
   );
 }

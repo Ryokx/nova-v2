@@ -6,11 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Alert,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
-import { Avatar } from "../../components/ui";
+import { Avatar, ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const plans = [
@@ -33,12 +32,13 @@ export function MaintenanceContractScreen({
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvv, setCardCvv] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
 
   const plan = plans.find((p) => p.id === selectedPlan);
 
   const handlePay = () => {
     if (payMethod === "card" && (!cardNumber || !cardExpiry || !cardCvv)) {
-      Alert.alert("Informations manquantes", "Veuillez remplir tous les champs de la carte.");
+      setModal({ visible: true, type: "warning", title: "Informations manquantes", message: "Veuillez remplir tous les champs de la carte.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
       return;
     }
     setProcessing(true);
@@ -47,14 +47,27 @@ export function MaintenanceContractScreen({
       setStep("success");
       // Ask if user wants contract sent by email
       setTimeout(() => {
-        Alert.alert(
-          "Recevoir le contrat par email ?",
-          "Souhaitez-vous recevoir une copie du contrat à sophie.lefevre@email.com ?",
-          [
-            { text: "Non merci", style: "cancel" },
-            { text: "Oui, envoyer", onPress: () => Alert.alert("Envoyé ✓", "Le contrat a été envoyé à votre adresse email.") },
-          ]
-        );
+        setModal({
+          visible: true,
+          type: "info",
+          title: "Recevoir le contrat par email ?",
+          message: "Souhaitez-vous recevoir une copie du contrat à sophie.lefevre@email.com ?",
+          actions: [
+            { label: "Non merci", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
+            {
+              label: "Oui, envoyer",
+              onPress: () => {
+                setModal({
+                  visible: true,
+                  type: "success",
+                  title: "Envoyé",
+                  message: "Le contrat a été envoyé à votre adresse email.",
+                  actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }],
+                });
+              },
+            },
+          ],
+        });
       }, 800);
     }, 1500);
   };
@@ -103,6 +116,15 @@ export function MaintenanceContractScreen({
         <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.85} onPress={() => navigation.goBack()}>
           <Text style={styles.primaryBtnText}>Retour au profil</Text>
         </TouchableOpacity>
+
+        <ConfirmModal
+          visible={modal.visible}
+          onClose={() => setModal(m => ({ ...m, visible: false }))}
+          type={modal.type}
+          title={modal.title}
+          message={modal.message}
+          actions={modal.actions}
+        />
       </View>
     );
   }
@@ -215,6 +237,15 @@ export function MaintenanceContractScreen({
             <Text style={styles.securityText}>Données chiffrées • Paiement sécurisé SSL</Text>
           </View>
         </ScrollView>
+
+        <ConfirmModal
+          visible={modal.visible}
+          onClose={() => setModal(m => ({ ...m, visible: false }))}
+          type={modal.type}
+          title={modal.title}
+          message={modal.message}
+          actions={modal.actions}
+        />
       </View>
     );
   }

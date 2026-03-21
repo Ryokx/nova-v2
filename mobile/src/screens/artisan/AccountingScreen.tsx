@@ -7,11 +7,11 @@ import {
   ScrollView,
   Switch,
   TextInput,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
+import { ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 interface Service {
@@ -57,6 +57,7 @@ export function AccountingScreen({
   const [accountantEmail, setAccountantEmail] = useState("");
   const [emailSaved, setEmailSaved] = useState(false);
   const [showSuccess, setShowSuccess] = useState<string | null>(null);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
 
   const toggleConnect = (id: string) => {
     const wasConnected = connected[id];
@@ -201,10 +202,13 @@ export function AccountingScreen({
                   disabled={!accountantEmail || emailSaved}
                   onPress={() => {
                     setEmailSaved(true);
-                    Alert.alert(
-                      "Enregistré",
-                      `Les factures seront envoyées à ${accountantEmail} tous les jours à 10h si de nouvelles factures sont disponibles.`
-                    );
+                    setModal({
+                      visible: true,
+                      type: "success",
+                      title: "Enregistré",
+                      message: `Les factures seront envoyées à ${accountantEmail} tous les jours à 10h si de nouvelles factures sont disponibles.`,
+                      actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }],
+                    });
                   }}
                 >
                   <Text style={styles.accountantSaveBtnText}>
@@ -275,6 +279,15 @@ export function AccountingScreen({
           ))}
         </View>
       </ScrollView>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
     </SafeAreaView>
   );
 }

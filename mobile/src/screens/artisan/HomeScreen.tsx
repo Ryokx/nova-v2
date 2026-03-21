@@ -14,7 +14,7 @@ import { WebView } from "react-native-webview";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
-import { Avatar, Badge, Card, KPICard } from "../../components/ui";
+import { Avatar, Badge, Card, KPICard, ConfirmModal } from "../../components/ui";
 import { useTheme } from "../../hooks/useTheme";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
 
@@ -72,6 +72,7 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
   const [urgencyModalVisible, setUrgencyModalVisible] = useState(false);
   const [tempRadius, setTempRadius] = useState(10);
   const [fabOpen, setFabOpen] = useState(false);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
   const rotateAnim = useState(new Animated.Value(0))[0];
 
   const toggleFab = () => {
@@ -221,7 +222,16 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
           <View style={styles.urgentActions}>
             <TouchableOpacity
               style={styles.urgentAcceptBtn}
-              onPress={() => navigation.navigate("UrgentDetail", { demandId: "1" })}
+              onPress={() => setModal({
+                visible: true,
+                type: "warning",
+                title: "Accepter l'intervention urgente ?",
+                message: "Vous vous engagez à intervenir dans les plus brefs délais.\n\nLe client sera notifié de votre acceptation et un itinéraire vous sera proposé.",
+                actions: [
+                  { label: "Annuler", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
+                  { label: "Accepter", onPress: () => { setModal(m => ({ ...m, visible: false })); navigation.navigate("UrgentDetail", { demandId: "1" }); } },
+                ],
+              })}
             >
               <Text style={styles.urgentAcceptText}>Accepter</Text>
             </TouchableOpacity>
@@ -282,6 +292,15 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
       </Animated.View>
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
+
       {/* ── Urgency Radius Modal ── */}
       <Modal visible={urgencyModalVisible} animationType="slide" presentationStyle="pageSheet">
         <View style={styles.modalRoot}>

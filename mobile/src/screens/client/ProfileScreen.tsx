@@ -5,13 +5,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { useTheme } from "../../hooks/useTheme";
+import { ConfirmModal } from "../../components/ui";
 import type { ClientTabScreenProps } from "../../navigation/types";
 
 /* ── Profile data ── */
@@ -70,6 +70,7 @@ export function ClientProfileScreen({
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState(defaultProfile);
   const [contracts, setContracts] = useState(initialContracts);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
 
   const startEditing = () => {
     setEditForm({ ...profile });
@@ -79,26 +80,34 @@ export function ClientProfileScreen({
   const saveProfile = () => {
     setProfile({ ...editForm });
     setEditing(false);
-    Alert.alert("Profil mis à jour", "Vos coordonnées ont été enregistrées.");
+    setModal({ visible: true, type: "success", title: "Profil mis à jour", message: "Vos coordonnées ont été enregistrées.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
   };
 
   const cancelContract = (id: string) => {
     const contract = contracts.find((c) => c.id === id);
-    Alert.alert(
-      "Annuler le contrat",
-      `Êtes-vous sûr de vouloir annuler le contrat « ${contract?.name} » ?\n\nSans engagement — aucun frais d'annulation.`,
-      [
-        { text: "Non, garder", style: "cancel" },
+    setModal({
+      visible: true,
+      type: "danger",
+      title: "Annuler le contrat",
+      message: `Êtes-vous sûr de vouloir annuler le contrat « ${contract?.name} » ?\n\nSans engagement — aucun frais d'annulation.`,
+      actions: [
+        { label: "Non, garder", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
         {
-          text: "Oui, annuler",
-          style: "destructive",
+          label: "Oui, annuler",
+          variant: "danger",
           onPress: () => {
             setContracts((prev) => prev.filter((c) => c.id !== id));
-            Alert.alert("Contrat annulé", "Le contrat a été annulé avec succès. Aucun prélèvement futur ne sera effectué.");
+            setModal({
+              visible: true,
+              type: "success",
+              title: "Contrat annulé",
+              message: "Le contrat a été annulé avec succès. Aucun prélèvement futur ne sera effectué.",
+              actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }],
+            });
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const handleMenuPress = (item: MenuItem) => {
@@ -265,6 +274,15 @@ export function ClientProfileScreen({
 
         <View style={{ height: 24 }} />
       </ScrollView>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
     </SafeAreaView>
   );
 }

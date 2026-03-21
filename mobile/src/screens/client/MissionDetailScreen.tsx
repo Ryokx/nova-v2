@@ -6,11 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Alert,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
-import { Avatar, Button, Card, EscrowStepper } from "../../components/ui";
+import { Avatar, Button, Card, EscrowStepper, ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 type MissionStatus = "active" | "completed" | "validated" | "dispute";
@@ -63,43 +62,52 @@ export function MissionDetailScreen({
   const [validated, setValidated] = useState(false);
   const [instantRelease, setInstantRelease] = useState(false);
   const [cancelled, setCancelled] = useState(false);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
 
   const handleInstantRelease = () => {
-    Alert.alert(
-      "Déblocage instantané",
-      "Vous confirmez que l'intervention et le prix sont conformes.\n\nLe paiement de 320,00€ sera immédiatement versé à l'artisan.\n\n⚠️ En débloquant le paiement vous-même, Nova ne pourra plus intervenir en cas de litige. Cette action est irréversible.",
-      [
-        { text: "Annuler", style: "cancel" },
+    setModal({
+      visible: true,
+      type: "warning",
+      title: "Déblocage instantané",
+      message: "Vous confirmez que l'intervention et le prix sont conformes.\n\nLe paiement de 320,00€ sera immédiatement versé à l'artisan.\n\nEn débloquant le paiement vous-même, Nova ne pourra plus intervenir en cas de litige. Cette action est irréversible.",
+      actions: [
+        { label: "Annuler", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
         {
-          text: "Je confirme, débloquer",
+          label: "Je confirme, débloquer",
           onPress: () => {
+            setModal(m => ({ ...m, visible: false }));
             setInstantRelease(true);
             setValidated(true);
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const handleCancel = () => {
-    Alert.alert(
-      "Annuler l'intervention",
-      "Êtes-vous sûr de vouloir annuler cette intervention ?\n\nConformément aux conditions Nova, les frais de déplacement de 40,00€ restent à votre charge.",
-      [
-        { text: "Non, garder", style: "cancel" },
+    setModal({
+      visible: true,
+      type: "danger",
+      title: "Annuler l'intervention",
+      message: "Êtes-vous sûr de vouloir annuler cette intervention ?\n\nConformément aux conditions Nova, les frais de déplacement de 40,00€ restent à votre charge.",
+      actions: [
+        { label: "Non, garder", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
         {
-          text: "Oui, annuler (40€ de frais)",
-          style: "destructive",
+          label: "Oui, annuler (40€ de frais)",
+          variant: "danger",
           onPress: () => {
-            Alert.alert(
-              "Intervention annulée",
-              "L'intervention a été annulée. Les frais de déplacement de 40,00€ ont été prélevés. Le reste (280,00€) vous sera remboursé sous 3 à 5 jours.",
-            );
+            setModal({
+              visible: true,
+              type: "info",
+              title: "Intervention annulée",
+              message: "L'intervention a été annulée. Les frais de déplacement de 40,00€ ont été prélevés. Le reste (280,00€) vous sera remboursé sous 3 à 5 jours.",
+              actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }],
+            });
             setCancelled(true);
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const toggleCheck = (idx: number) => {
@@ -459,6 +467,15 @@ export function MissionDetailScreen({
           </View>
         )}
       </ScrollView>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
     </View>
   );
 }

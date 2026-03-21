@@ -6,11 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Alert,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
-import { Avatar, Badge, Card } from "../../components/ui";
+import { Avatar, Badge, Card, ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ---- mock data ---- */
@@ -84,27 +83,36 @@ export function EmergencyScreen({
   const [urgCat, setUrgCat] = useState<string | null>(null);
   const [confirmedArtisan, setConfirmedArtisan] = useState<string | null>(null);
   const [urgCancelled, setUrgCancelled] = useState(false);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
 
   const handleUrgentBook = (artisanName: string) => {
     setConfirmedArtisan(artisanName);
   };
 
   const handleUrgentCancel = () => {
-    Alert.alert(
-      "Annuler la demande urgente",
-      `Êtes-vous sûr de vouloir annuler l'intervention urgente ?\n\nLes frais de déplacement de 50,00€ (tarif urgence) restent à votre charge.`,
-      [
-        { text: "Non, garder", style: "cancel" },
+    setModal({
+      visible: true,
+      type: "danger",
+      title: "Annuler la demande urgente",
+      message: "Êtes-vous sûr de vouloir annuler l'intervention urgente ?\n\nLes frais de déplacement de 50,00€ (tarif urgence) restent à votre charge.",
+      actions: [
+        { label: "Non, garder", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
         {
-          text: "Oui, annuler (50€ de frais)",
-          style: "destructive",
+          label: "Oui, annuler (50€ de frais)",
+          variant: "danger",
           onPress: () => {
             setUrgCancelled(true);
-            Alert.alert("Demande annulée", "L'intervention urgente a été annulée. Les frais de déplacement urgence de 50,00€ ont été prélevés.");
+            setModal({
+              visible: true,
+              type: "info",
+              title: "Demande annulée",
+              message: "L'intervention urgente a été annulée. Les frais de déplacement urgence de 50,00€ ont été prélevés.",
+              actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }],
+            });
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const filtered =
@@ -178,6 +186,15 @@ export function EmergencyScreen({
             </View>
           </View>
         </ScrollView>
+
+        <ConfirmModal
+          visible={modal.visible}
+          onClose={() => setModal(m => ({ ...m, visible: false }))}
+          type={modal.type}
+          title={modal.title}
+          message={modal.message}
+          actions={modal.actions}
+        />
       </View>
     );
   }
@@ -336,6 +353,15 @@ export function EmergencyScreen({
           </View>
         </View>
       </ScrollView>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
     </View>
   );
 }

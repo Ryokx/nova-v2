@@ -7,12 +7,11 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
-  Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
-import { Button, Card } from "../../components/ui";
+import { Button, Card, ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const DAY_LABELS = ["L", "M", "M", "J", "V", "S", "D"];
@@ -63,6 +62,7 @@ export function BookingScreen({
   const [description, setDescription] = useState("");
   const [media, setMedia] = useState<{ uri: string; type: "image" | "video" }[]>([]);
   const [confirmed, setConfirmed] = useState(false);
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
 
   const pickFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -84,7 +84,7 @@ export function BookingScreen({
   const takePhoto = async () => {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert("Permission requise", "Autorisez l'accès à la caméra pour prendre une photo.");
+      setModal({ visible: true, type: "warning", title: "Permission requise", message: "Autorisez l'accès à la caméra pour prendre une photo.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -99,7 +99,7 @@ export function BookingScreen({
   const recordVideo = async () => {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert("Permission requise", "Autorisez l'accès à la caméra pour enregistrer une vidéo.");
+      setModal({ visible: true, type: "warning", title: "Permission requise", message: "Autorisez l'accès à la caméra pour enregistrer une vidéo.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -319,17 +319,21 @@ export function BookingScreen({
                 title="Confirmer le rendez-vous"
                 onPress={() => {
                   setConfirmed(true);
-                  Alert.alert(
-                    "Rendez-vous confirmé ✓",
-                    `Votre RDV avec Jean-Michel P. le ${selectedDay} mars à ${selectedSlot || "14h00"} est confirmé.\n\nVous allez être redirigé vers le paiement sécurisé.`,
-                    [
+                  setModal({
+                    visible: true,
+                    type: "success",
+                    title: "Rendez-vous confirmé",
+                    message: `Votre RDV avec Jean-Michel P. le ${selectedDay} mars à ${selectedSlot || "14h00"} est confirmé.\n\nVous allez être redirigé vers le paiement sécurisé.`,
+                    actions: [
                       {
-                        text: "Procéder au paiement",
-                        onPress: () =>
-                          navigation.navigate("Payment", { missionId: "1", amount: 320 }),
+                        label: "Procéder au paiement",
+                        onPress: () => {
+                          setModal(m => ({ ...m, visible: false }));
+                          navigation.navigate("Payment", { missionId: "1", amount: 320 });
+                        },
                       },
-                    ]
-                  );
+                    ],
+                  });
                 }}
                 fullWidth
                 size="lg"
@@ -343,6 +347,15 @@ export function BookingScreen({
           </View>
         )}
       </ScrollView>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
     </View>
   );
 }

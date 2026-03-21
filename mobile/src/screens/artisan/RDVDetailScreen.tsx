@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,12 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
-import { Avatar, Button } from "../../components/ui";
+import { Avatar, Button, ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const rdv = {
@@ -43,6 +42,7 @@ const details = [
 export function RDVDetailScreen({
   navigation,
 }: RootStackScreenProps<"RDVDetail">) {
+  const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
   const wazeUrl = `https://waze.com/ul?ll=${rdv.lat},${rdv.lng}&navigate=yes`;
   const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${rdv.lat},${rdv.lng}`;
 
@@ -154,7 +154,7 @@ export function RDVDetailScreen({
         {/* Actions */}
         <Button
           title="Confirmer mon arrivée"
-          onPress={() => Alert.alert("Confirmé", "Votre arrivée a été confirmée au client.")}
+          onPress={() => setModal({ visible: true, type: "success", title: "Confirmé", message: "Votre arrivée a été confirmée au client.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] })}
           fullWidth
           size="lg"
         />
@@ -162,6 +162,15 @@ export function RDVDetailScreen({
           <Text style={styles.cancelText}>Annuler le rendez-vous</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <ConfirmModal
+        visible={modal.visible}
+        onClose={() => setModal(m => ({ ...m, visible: false }))}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        actions={modal.actions}
+      />
     </SafeAreaView>
   );
 }
