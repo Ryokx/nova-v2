@@ -136,12 +136,25 @@ export function ClientHomeScreen({
           <View>
             <Text style={[styles.greeting, { color: c.text }]}>Bonjour Sophie</Text>
           </View>
-          <TouchableOpacity
-            style={[styles.bellBtn, { backgroundColor: c.card }]}
-            onPress={() => navigation.navigate("ClientNotifications")}
-          >
-            <Text style={styles.bellIcon}><MaterialCommunityIcons name="bell" size={22} color={c.text} /></Text>
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              style={styles.urgencyBtn}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate("Emergency")}
+            >
+              <MaterialCommunityIcons name="lightning-bolt" size={14} color={Colors.white} />
+              <Text style={styles.urgencyBtnText}>SOS</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.bellBtn, { backgroundColor: c.card }]}
+              onPress={() => navigation.navigate("ClientNotifications")}
+            >
+              <MaterialCommunityIcons name="bell" size={20} color={c.text} />
+              <View style={styles.bellBadge}>
+                <Text style={styles.bellBadgeText}>2</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* ── Live interventions ── */}
@@ -199,24 +212,6 @@ export function ClientHomeScreen({
             </TouchableOpacity>
           )}
         </View>
-
-        {/* ── Emergency banner ── */}
-        <TouchableOpacity
-          style={[styles.emergencyCard, { backgroundColor: c.card }]}
-          activeOpacity={0.85}
-          onPress={() => navigation.navigate("Emergency")}
-        >
-          <View style={styles.emergencyIconWrap}>
-            <MaterialCommunityIcons name="lightning-bolt" size={20} color={Colors.red} />
-          </View>
-          <View style={styles.emergencyTextWrap}>
-            <Text style={styles.emergencyTitle}>Urgence 24h/24</Text>
-            <Text style={styles.emergencyDesc}>Artisan en moins de 2h</Text>
-          </View>
-          <View style={styles.emergencyArrow}>
-            <Text style={styles.emergencyArrowText}>{"›"}</Text>
-          </View>
-        </TouchableOpacity>
 
         {/* ── Search results ── */}
         {showResults && (
@@ -350,16 +345,55 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: Colors.navy,
   },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  urgencyBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: Colors.red,
+    paddingHorizontal: 12,
+    height: 36,
+    borderRadius: 18,
+    ...Shadows.sm,
+  },
+  urgencyBtnText: {
+    fontFamily: "Manrope_700Bold",
+    fontSize: 12,
+    color: Colors.white,
+    letterSpacing: 0.5,
+  },
   bellBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: Radii.lg,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: Colors.white,
     alignItems: "center",
     justifyContent: "center",
+    position: "relative",
     ...Shadows.sm,
   },
-  bellIcon: { fontSize: 18 },
+  bellBadge: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: Colors.red,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: Colors.white,
+  },
+  bellBadgeText: {
+    fontFamily: "DMSans_700Bold",
+    fontSize: 8,
+    color: Colors.white,
+  },
 
   /* Search */
   /* Live interventions */
