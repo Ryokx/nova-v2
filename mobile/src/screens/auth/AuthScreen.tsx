@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -57,6 +58,8 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPhone, setSignupPhone] = useState("");
+  const [phoneCountry, setPhoneCountry] = useState({ code: "FR", flag: "🇫🇷", dial: "+33", placeholder: "6 12 34 56 78" });
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [signupPwd, setSignupPwd] = useState("");
   const [signupConfirmPwd, setSignupConfirmPwd] = useState("");
   const flatListRef = useRef<FlatList>(null);
@@ -147,9 +150,30 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
     );
   }
 
+  // ── Countries ──
+  const countries = [
+    { code: "FR", flag: "🇫🇷", dial: "+33", name: "France", placeholder: "6 12 34 56 78", phoneLen: 9 },
+    { code: "BE", flag: "🇧🇪", dial: "+32", name: "Belgique", placeholder: "470 12 34 56", phoneLen: 9 },
+    { code: "CH", flag: "🇨🇭", dial: "+41", name: "Suisse", placeholder: "79 123 45 67", phoneLen: 9 },
+    { code: "LU", flag: "🇱🇺", dial: "+352", name: "Luxembourg", placeholder: "621 123 456", phoneLen: 9 },
+    { code: "DE", flag: "🇩🇪", dial: "+49", name: "Allemagne", placeholder: "170 1234567", phoneLen: 10 },
+    { code: "ES", flag: "🇪🇸", dial: "+34", name: "Espagne", placeholder: "612 34 56 78", phoneLen: 9 },
+    { code: "IT", flag: "🇮🇹", dial: "+39", name: "Italie", placeholder: "320 123 4567", phoneLen: 10 },
+    { code: "PT", flag: "🇵🇹", dial: "+351", name: "Portugal", placeholder: "912 345 678", phoneLen: 9 },
+    { code: "GB", flag: "🇬🇧", dial: "+44", name: "Royaume-Uni", placeholder: "7911 123456", phoneLen: 10 },
+    { code: "NL", flag: "🇳🇱", dial: "+31", name: "Pays-Bas", placeholder: "6 12345678", phoneLen: 9 },
+    { code: "MA", flag: "🇲🇦", dial: "+212", name: "Maroc", placeholder: "6 12 34 56 78", phoneLen: 9 },
+    { code: "DZ", flag: "🇩🇿", dial: "+213", name: "Algérie", placeholder: "5 12 34 56 78", phoneLen: 9 },
+    { code: "TN", flag: "🇹🇳", dial: "+216", name: "Tunisie", placeholder: "20 123 456", phoneLen: 8 },
+  ];
+
   // ── Validation helpers ──
   const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
-  const isValidPhone = (p: string) => /^(?:(?:\+33|0)\s?[1-9])(?:[\s.-]?\d{2}){4}$/.test(p.replace(/\s/g, ""));
+  const currentCountry = countries.find(c => c.code === phoneCountry.code) || countries[0]!;
+  const isValidPhone = (p: string) => {
+    const digits = p.replace(/[\s.\-()]/g, "");
+    return digits.length >= (currentCountry.phoneLen || 8);
+  };
   const getPasswordStrength = (pwd: string): number => {
     let score = 0;
     if (pwd.length >= 8) score++;
@@ -258,14 +282,29 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
             />
 
             {/* Téléphone * */}
-            <Input
-              label="Téléphone *"
-              placeholder="06 12 34 56 78"
-              keyboardType="phone-pad"
-              value={signupPhone}
-              onChangeText={setSignupPhone}
-              error={signupPhone.length > 3 && !isValidPhone(signupPhone) ? "Numéro invalide (format français)" : undefined}
-            />
+            <View style={styles.phoneFieldWrap}>
+              <Text style={styles.phoneFieldLabel}>Téléphone *</Text>
+              <View style={styles.phoneRow}>
+                <TouchableOpacity
+                  style={styles.countryPickerBtn}
+                  onPress={() => setShowCountryPicker(true)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.countryFlag}>{phoneCountry.flag}</Text>
+                  <Text style={styles.countryDial}>{phoneCountry.dial}</Text>
+                  <MaterialCommunityIcons name="chevron-down" size={14} color={Colors.textMuted} />
+                </TouchableOpacity>
+                <View style={styles.phoneInputWrap}>
+                  <Input
+                    placeholder={phoneCountry.placeholder}
+                    keyboardType="phone-pad"
+                    value={signupPhone}
+                    onChangeText={setSignupPhone}
+                    error={signupPhone.length > 3 && !isValidPhone(signupPhone) ? "Numéro invalide" : undefined}
+                  />
+                </View>
+              </View>
+            </View>
 
             {/* Mot de passe * */}
             <Input
@@ -348,6 +387,46 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
             </Text>
           </ScrollView>
         </KeyboardAvoidingView>
+        {/* Country picker modal */}
+        <Modal visible={showCountryPicker} transparent animationType="fade">
+          <TouchableOpacity
+            style={styles.countryOverlay}
+            activeOpacity={1}
+            onPress={() => setShowCountryPicker(false)}
+          >
+            <View style={styles.countryModal}>
+              <View style={styles.countryModalHeader}>
+                <Text style={styles.countryModalTitle}>Indicatif téléphonique</Text>
+                <TouchableOpacity onPress={() => setShowCountryPicker(false)}>
+                  <MaterialCommunityIcons name="close" size={20} color={Colors.navy} />
+                </TouchableOpacity>
+              </View>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {countries.map((c) => (
+                  <TouchableOpacity
+                    key={c.code}
+                    style={[
+                      styles.countryItem,
+                      phoneCountry.code === c.code && styles.countryItemActive,
+                    ]}
+                    onPress={() => {
+                      setPhoneCountry({ code: c.code, flag: c.flag, dial: c.dial, placeholder: c.placeholder });
+                      setSignupPhone("");
+                      setShowCountryPicker(false);
+                    }}
+                  >
+                    <Text style={styles.countryItemFlag}>{c.flag}</Text>
+                    <Text style={styles.countryItemName}>{c.name}</Text>
+                    <Text style={styles.countryItemDial}>{c.dial}</Text>
+                    {phoneCountry.code === c.code && (
+                      <MaterialCommunityIcons name="check" size={16} color={Colors.forest} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </TouchableOpacity>
+        </Modal>
       </SafeAreaView>
     );
   }
@@ -791,6 +870,42 @@ const styles = StyleSheet.create({
     color: Colors.textHint,
     marginBottom: 24,
   },
+  /* Phone country picker */
+  phoneFieldWrap: { marginBottom: 10, width: "100%" },
+  phoneFieldLabel: { fontFamily: "DMSans_500Medium", fontSize: 13, color: Colors.textSecondary, marginBottom: 6 },
+  phoneRow: { flexDirection: "row", gap: 8, alignItems: "flex-start" },
+  countryPickerBtn: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    height: 48, paddingHorizontal: 12, borderRadius: 14,
+    backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border,
+  },
+  countryFlag: { fontSize: 20 },
+  countryDial: { fontFamily: "DMMono_500Medium", fontSize: 14, color: Colors.navy },
+  phoneInputWrap: { flex: 1 },
+
+  countryOverlay: {
+    flex: 1, backgroundColor: "rgba(10,22,40,0.5)",
+    justifyContent: "flex-end",
+  },
+  countryModal: {
+    backgroundColor: Colors.white, borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    maxHeight: "60%", paddingBottom: 30,
+  },
+  countryModalHeader: {
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+    padding: 20, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: Colors.surface,
+  },
+  countryModalTitle: { fontFamily: "Manrope_700Bold", fontSize: 17, color: Colors.navy },
+  countryItem: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    paddingVertical: 14, paddingHorizontal: 20,
+    borderBottomWidth: 1, borderBottomColor: Colors.surface,
+  },
+  countryItemActive: { backgroundColor: "rgba(27,107,78,0.04)" },
+  countryItemFlag: { fontSize: 22 },
+  countryItemName: { fontFamily: "DMSans_500Medium", fontSize: 15, color: Colors.navy, flex: 1 },
+  countryItemDial: { fontFamily: "DMMono_500Medium", fontSize: 14, color: Colors.textSecondary },
+
   /* Password strength */
   pwdStrengthWrap: { marginTop: -4, marginBottom: 10 },
   pwdStrengthBar: { flexDirection: "row", gap: 4, marginBottom: 6 },
