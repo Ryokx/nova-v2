@@ -36,7 +36,7 @@ function PrefRow({
   return (
     <View style={styles.prefRow}>
       <View style={styles.prefRowLeft}>
-        <MaterialCommunityIcons name={icon as any} size={20} color={Colors.forest} />
+        {icon}
         <View style={styles.prefTextCol}>
           <Text style={styles.prefLabel}>{label}</Text>
           {description && (
@@ -149,7 +149,7 @@ export function NotificationPrefsScreen({
           />
           <View style={styles.rowDivider} />
           <PrefRow
-            icon=<MaterialCommunityIcons name="clock-alert" size={16} color={Colors.red} />
+            icon={<MaterialCommunityIcons name="clock-alert" size={16} color={Colors.red} />}
             label="Rappels"
             description="Rendez-vous à venir, échéances"
             value={alerts.rappels}

@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Image,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
@@ -65,11 +67,24 @@ export function ClientProfileScreen({
   navigation,
 }: ClientTabScreenProps<"ClientProfile">) {
   const { c } = useTheme();
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [profile, setProfile] = useState(defaultProfile);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState(defaultProfile);
   const [contracts, setContracts] = useState(initialContracts);
   const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
+
+  const pickProfilePhoto = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled) {
+      setProfilePhoto(result.assets[0].uri);
+    }
+  };
 
   const startEditing = () => {
     setEditForm({ ...profile });
@@ -133,9 +148,18 @@ export function ClientProfileScreen({
 
         {/* Avatar + name */}
         <View style={styles.avatarSection}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarInitials}>{profile.initials}</Text>
-          </View>
+          <TouchableOpacity style={styles.avatarWrap} onPress={pickProfilePhoto} activeOpacity={0.85}>
+            {profilePhoto ? (
+              <Image source={{ uri: profilePhoto }} style={styles.avatarImage} />
+            ) : (
+              <View style={styles.avatar}>
+                <Text style={styles.avatarInitials}>{profile.initials}</Text>
+              </View>
+            )}
+            <View style={styles.avatarCameraBadge}>
+              <MaterialCommunityIcons name="camera" size={12} color={Colors.white} />
+            </View>
+          </TouchableOpacity>
           <Text style={[styles.profileName, { color: c.text }]}>{profile.name}</Text>
           <Text style={styles.profileType}>Compte particulier</Text>
         </View>
@@ -309,19 +333,41 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 24,
   },
+  avatarWrap: {
+    position: "relative",
+    marginBottom: 12,
+  },
   avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 22,
+    width: 80,
+    height: 80,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12,
     backgroundColor: Colors.forest,
     ...Shadows.md,
   },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    ...Shadows.md,
+  },
+  avatarCameraBadge: {
+    position: "absolute",
+    bottom: -2,
+    right: -2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.deepForest,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 3,
+    borderColor: Colors.white,
+  },
   avatarInitials: {
     fontFamily: "Manrope_700Bold",
-    fontSize: 22,
+    fontSize: 24,
     color: Colors.white,
   },
   profileName: {
