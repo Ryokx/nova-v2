@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Alert,
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -91,7 +92,27 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
   const [trackingStep, setTrackingStep] = useState(0);
   const [routeIndex, setRouteIndex] = useState(0);
   const [mapHtml, setMapHtml] = useState(() => buildMapHtml(0, 0));
+  const [cancelled, setCancelled] = useState(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  const canCancel = trackingStep <= 1; // Only before devis signed
+
+  const handleCancel = () => {
+    Alert.alert(
+      "Annuler l'intervention",
+      trackingStep === 0
+        ? "Êtes-vous sûr de vouloir annuler ?\n\nAucun frais ne sera facturé car l'artisan n'est pas encore arrivé."
+        : "Êtes-vous sûr de vouloir annuler ?\n\nL'artisan est déjà sur place. Les frais de déplacement de 40,00€ restent à votre charge.",
+      [
+        { text: "Non, garder", style: "cancel" },
+        {
+          text: trackingStep === 0 ? "Oui, annuler" : "Oui, annuler (40€)",
+          style: "destructive",
+          onPress: () => setCancelled(true),
+        },
+      ]
+    );
+  };
 
   useEffect(() => {
     const loop = Animated.loop(
@@ -276,6 +297,38 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
             <Text style={styles.completedText}>Processus terminé — Artisan payé</Text>
           </View>
         )}
+
+        {/* Cancel button — only before devis signed */}
+        {canCancel && !cancelled && (
+          <>
+            <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel} activeOpacity={0.7}>
+              <MaterialCommunityIcons name="close-circle-outline" size={16} color={Colors.red} />
+              <Text style={styles.cancelBtnText}>Annuler l'intervention</Text>
+            </TouchableOpacity>
+            <View style={styles.cancelInfo}>
+              <MaterialCommunityIcons name="information-outline" size={13} color={Colors.textMuted} />
+              <Text style={styles.cancelInfoText}>
+                {trackingStep === 0
+                  ? "Annulation gratuite tant que l'artisan n'est pas arrivé."
+                  : "L'artisan est sur place. En cas d'annulation, les frais de déplacement de 40€ restent à votre charge."}
+              </Text>
+            </View>
+          </>
+        )}
+
+        {/* Cancelled state */}
+        {cancelled && (
+          <View style={styles.cancelledCard}>
+            <MaterialCommunityIcons name="close-circle" size={22} color={Colors.red} />
+            <Text style={styles.cancelledTitle}>Intervention annulée</Text>
+            <Text style={styles.cancelledDesc}>
+              {trackingStep === 0
+                ? "Aucun frais facturé. L'artisan a été prévenu."
+                : "Frais de déplacement de 40,00€ prélevés. L'artisan a été prévenu."}
+            </Text>
+            <Button title="Retour à l'accueil" onPress={() => navigation.navigate("ClientTabs" as any)} fullWidth size="lg" style={{ marginTop: 12 }} />
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -358,6 +411,26 @@ const styles = StyleSheet.create({
     borderColor: Colors.border, alignItems: "center",
   },
   demoBtnText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textSecondary },
+
+  /* Cancel */
+  cancelBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 6, marginTop: 16, paddingVertical: 12,
+  },
+  cancelBtnText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.red },
+  cancelInfo: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: "rgba(138,149,163,0.06)", borderRadius: 10,
+    padding: 10, marginTop: 4,
+  },
+  cancelInfoText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textMuted, flex: 1 },
+  cancelledCard: {
+    alignItems: "center", backgroundColor: "rgba(232,48,42,0.04)",
+    borderRadius: 16, padding: 20, marginTop: 16,
+    borderWidth: 1, borderColor: "rgba(232,48,42,0.1)",
+  },
+  cancelledTitle: { fontFamily: "Manrope_700Bold", fontSize: 16, color: Colors.red, marginTop: 8, marginBottom: 4 },
+  cancelledDesc: { fontFamily: "DMSans_400Regular", fontSize: 13, color: "#4A5568", textAlign: "center", lineHeight: 20 },
 
   completedBanner: {
     flexDirection: "row",
