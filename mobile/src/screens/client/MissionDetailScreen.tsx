@@ -117,10 +117,10 @@ export function MissionDetailScreen({
   };
 
   const escrowStep =
-    status === "active" ? 1 :
-    status === "completed" ? 2 :
-    status === "validated" ? 3 :
-    status === "dispute" ? 1 : 2;
+    status === "active" ? 2 :
+    status === "completed" ? 3 :
+    status === "validated" ? 4 :
+    status === "dispute" ? 2 : 3;
 
   /* ---------- Cancelled state ---------- */
   if (cancelled) {

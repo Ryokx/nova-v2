@@ -8,6 +8,7 @@ interface EscrowStepperProps {
 }
 
 const steps = [
+  { icon: "file-check", label: "Devis\nvalidé" },
   { icon: "lock", label: "Paiement\nbloqué" },
   { icon: "wrench", label: "Mission\nen cours" },
   { icon: "✓", label: "Nova\nvalide" },
@@ -70,9 +71,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   circle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     borderWidth: 2,
     borderColor: Colors.border,
     alignItems: "center",
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
     borderWidth: 2.5,
   },
   circleText: {
-    fontSize: 14,
+    fontSize: 12,
     color: Colors.textSecondary,
   },
   circleTextDone: {
@@ -97,11 +98,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "DMSans_500Medium",
-    fontSize: 10,
+    fontSize: 9,
     color: Colors.textHint,
     textAlign: "center",
-    marginTop: 6,
-    lineHeight: 13,
+    marginTop: 5,
+    lineHeight: 12,
   },
   labelDone: { color: Colors.success },
   labelActive: { color: Colors.forest },
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
     height: 2,
     flex: 1,
     backgroundColor: Colors.border,
-    marginTop: 17,
+    marginTop: 14,
     marginHorizontal: -4,
   },
   lineDone: {
