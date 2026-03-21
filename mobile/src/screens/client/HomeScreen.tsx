@@ -266,6 +266,9 @@ export function ClientHomeScreen({
                   : navigation.navigate("ArtisanListByCategory", { category: cat.id })
               }
             >
+              <View style={[styles.catIconWrap, { backgroundColor: c.surface }]}>
+                <MaterialCommunityIcons name={cat.emoji as any} size={18} color={Colors.forest} />
+              </View>
               <Text style={[styles.catLabel, { color: c.text }]}>{cat.label}</Text>
             </TouchableOpacity>
           ))}
@@ -563,6 +566,15 @@ const styles = StyleSheet.create({
     ...Shadows.sm,
   },
   catEmoji: { fontSize: 22, marginBottom: 6 },
+  catIconWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+  },
   catLabel: {
     fontFamily: "DMSans_600SemiBold",
     fontSize: 14,
