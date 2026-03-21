@@ -22,5 +22,10 @@ const styles = StyleSheet.create({
     borderRadius: Radii["2xl"],
     borderWidth: 1,
     borderColor: Colors.border,
+    shadowColor: Colors.forest,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
 });
