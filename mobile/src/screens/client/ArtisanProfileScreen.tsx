@@ -116,39 +116,46 @@ export function ArtisanProfileScreen({
             <Badge label="RGE" variant="warning" size="sm" />
           </View>
 
-          {/* Conditions tarifs */}
+          {/* Conditions tarifs — Classique + Urgences */}
           <View style={styles.conditionsCard}>
-            <View style={styles.conditionRow}>
-              <View style={[styles.conditionIconWrap, { backgroundColor: "rgba(34,200,138,0.08)" }]}>
-                <MaterialCommunityIcons name="truck-delivery" size={16} color={Colors.success} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.conditionLabel}>Déplacement</Text>
-                <Text style={styles.conditionValue}>Offert</Text>
-              </View>
-              <MaterialCommunityIcons name="check-circle" size={16} color={Colors.success} />
+            <View style={styles.conditionsHeader}>
+              <MaterialCommunityIcons name="shield-lock" size={14} color={Colors.forest} />
+              <Text style={styles.conditionsHeaderText}>Paiement sécurisé par séquestre Nova</Text>
             </View>
-            <View style={styles.conditionDivider} />
-            <View style={styles.conditionRow}>
-              <View style={[styles.conditionIconWrap, { backgroundColor: "rgba(34,200,138,0.08)" }]}>
-                <MaterialCommunityIcons name="file-document-edit" size={16} color={Colors.success} />
+
+            {/* Two-column: Classique | Urgences */}
+            <View style={styles.conditionsCols}>
+              {/* Classique */}
+              <View style={styles.conditionsCol}>
+                <View style={[styles.conditionsColHeader, { backgroundColor: "rgba(27,107,78,0.08)" }]}>
+                  <MaterialCommunityIcons name="wrench" size={13} color={Colors.forest} />
+                  <Text style={[styles.conditionsColTitle, { color: Colors.forest }]}>Classique</Text>
+                </View>
+                <View style={styles.conditionItem}>
+                  <Text style={styles.conditionLabel}>Déplacement</Text>
+                  <Text style={[styles.conditionVal, { color: Colors.success }]}>Offert</Text>
+                </View>
+                <View style={styles.conditionItem}>
+                  <Text style={styles.conditionLabel}>Devis</Text>
+                  <Text style={[styles.conditionVal, { color: Colors.success }]}>Gratuit</Text>
+                </View>
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.conditionLabel}>Devis</Text>
-                <Text style={styles.conditionValue}>Gratuit</Text>
+
+              {/* Urgences */}
+              <View style={styles.conditionsCol}>
+                <View style={[styles.conditionsColHeader, { backgroundColor: "rgba(232,48,42,0.08)" }]}>
+                  <MaterialCommunityIcons name="lightning-bolt" size={13} color={Colors.red} />
+                  <Text style={[styles.conditionsColTitle, { color: Colors.red }]}>Urgences</Text>
+                </View>
+                <View style={styles.conditionItem}>
+                  <Text style={styles.conditionLabel}>Déplacement</Text>
+                  <Text style={[styles.conditionVal, { color: Colors.navy }]}>60€</Text>
+                </View>
+                <View style={styles.conditionItem}>
+                  <Text style={styles.conditionLabel}>Devis</Text>
+                  <Text style={[styles.conditionVal, { color: Colors.success }]}>Gratuit</Text>
+                </View>
               </View>
-              <MaterialCommunityIcons name="check-circle" size={16} color={Colors.success} />
-            </View>
-            <View style={styles.conditionDivider} />
-            <View style={styles.conditionRow}>
-              <View style={[styles.conditionIconWrap, { backgroundColor: "rgba(27,107,78,0.08)" }]}>
-                <MaterialCommunityIcons name="shield-lock" size={16} color={Colors.forest} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.conditionLabel}>Paiement</Text>
-                <Text style={styles.conditionValue}>Séquestre Nova</Text>
-              </View>
-              <MaterialCommunityIcons name="check-circle" size={16} color={Colors.forest} />
             </View>
           </View>
 
@@ -370,33 +377,57 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(10,22,40,0.03)",
   },
-  conditionRow: {
+  conditionsHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    paddingVertical: 8,
+    gap: 6,
+    marginBottom: 12,
   },
-  conditionIconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+  conditionsHeaderText: {
+    fontFamily: "DMSans_500Medium",
+    fontSize: 12,
+    color: Colors.forest,
+  },
+  conditionsCols: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  conditionsCol: {
+    flex: 1,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(10,22,40,0.04)",
+  },
+  conditionsColHeader: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 5,
+    paddingVertical: 7,
+  },
+  conditionsColTitle: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 11,
+  },
+  conditionItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(10,22,40,0.04)",
   },
   conditionLabel: {
     fontFamily: "DMSans_400Regular",
     fontSize: 12,
     color: Colors.textSecondary,
   },
-  conditionValue: {
+  conditionVal: {
     fontFamily: "DMSans_600SemiBold",
-    fontSize: 14,
-    color: Colors.navy,
-  },
-  conditionDivider: {
-    height: 1,
-    backgroundColor: "rgba(10,22,40,0.04)",
-    marginLeft: 46,
+    fontSize: 12,
   },
 
   escrowBox: {

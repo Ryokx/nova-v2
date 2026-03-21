@@ -50,7 +50,7 @@ export function Badge({ label, variant = "default", size = "sm" }: BadgeProps) {
 const styles = StyleSheet.create({
   badge: {
     borderRadius: Radii.full,
-    alignSelf: "flex-start",
+    alignSelf: "center",
   },
   text: {
     fontFamily: "DMSans_600SemiBold",
