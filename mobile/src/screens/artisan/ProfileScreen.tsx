@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Image,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
@@ -62,6 +64,19 @@ export function ArtisanProfileScreen({
 }: ArtisanTabScreenProps<"ArtisanProfile">) {
   const { c } = useTheme();
   const [editSection, setEditSection] = useState<EditSection>(null);
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+  const pickProfilePhoto = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled) {
+      setProfilePhoto(result.assets[0].uri);
+    }
+  };
 
   const EditableField = ({
     label,
@@ -119,12 +134,19 @@ export function ArtisanProfileScreen({
       >
         {/* Avatar */}
         <View style={styles.avatarSection}>
-          <View style={styles.avatarWrap}>
-            <Avatar name={profile.name} size={72} radius={24} />
+          <TouchableOpacity style={styles.avatarWrap} onPress={pickProfilePhoto} activeOpacity={0.8}>
+            {profilePhoto ? (
+              <Image source={{ uri: profilePhoto }} style={styles.avatarImage} />
+            ) : (
+              <Avatar name={profile.name} size={72} radius={24} />
+            )}
             <View style={styles.shieldBadge}>
               <Text style={styles.shieldEmoji}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
             </View>
-          </View>
+            <View style={styles.cameraBadge}>
+              <MaterialCommunityIcons name="camera" size={12} color={Colors.white} />
+            </View>
+          </TouchableOpacity>
           <Text style={[styles.profileName, { color: c.text }]}>{profile.name}</Text>
           <Text style={styles.profileSub}>
             Artisan Certifié Nova • {profile.certifId}
@@ -215,7 +237,21 @@ const styles = StyleSheet.create({
 
   /* Avatar section */
   avatarSection: { alignItems: "center", marginBottom: 24 },
-  avatarWrap: { position: "relative", marginBottom: 12 },
+  avatarWrap: { position: "relative", marginBottom: 12, width: 72, height: 72 },
+  avatarImage: { width: 72, height: 72, borderRadius: 24 },
+  cameraBadge: {
+    position: "absolute",
+    bottom: -2,
+    left: -2,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: Colors.deepForest,
+    borderWidth: 2,
+    borderColor: Colors.white,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   shieldBadge: {
     position: "absolute",
     bottom: -4,

@@ -396,6 +396,9 @@ const styles = StyleSheet.create({
     fontFamily: "DMSans_700Bold",
     fontSize: 8,
     color: Colors.white,
+    textAlign: "center",
+    lineHeight: 12,
+    includeFontPadding: false,
   },
 
   /* Search */

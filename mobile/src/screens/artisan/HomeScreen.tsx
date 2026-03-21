@@ -73,6 +73,9 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
   const [tempRadius, setTempRadius] = useState(10);
   const [fabOpen, setFabOpen] = useState(false);
   const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
+  const [planningModal, setPlanningModal] = useState(false);
+  const [weekDays, setWeekDays] = useState<Record<string, boolean>>({ lun: true, mar: true, mer: true, jeu: true, ven: true, sam: false, dim: false });
+  const [blockedDates, setBlockedDates] = useState(["25 mars 2026", "28 mars 2026"]);
   const rotateAnim = useState(new Animated.Value(0))[0];
 
   const toggleFab = () => {
@@ -189,6 +192,24 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
           )}
         </View>
 
+        {/* ── Planning card ── */}
+        <TouchableOpacity
+          style={[styles.planningCard, { backgroundColor: c.card }]}
+          activeOpacity={0.85}
+          onPress={() => setPlanningModal(true)}
+        >
+          <View style={styles.planningIconWrap}>
+            <MaterialCommunityIcons name="calendar-edit" size={18} color={Colors.forest} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.planningTitle, { color: c.text }]}>Gérer mon planning</Text>
+            <Text style={styles.planningSub}>
+              {Object.values(weekDays).filter((v) => !v).length + blockedDates.length} jour(s) bloqué(s)
+            </Text>
+          </View>
+          <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.textMuted} />
+        </TouchableOpacity>
+
         {/* ── KPIs 2x2 ── */}
         <View style={styles.kpiGrid}>
           <View style={styles.kpiRow}>
@@ -300,6 +321,69 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
         message={modal.message}
         actions={modal.actions}
       />
+
+      {/* ── Planning Modal ── */}
+      <Modal visible={planningModal} animationType="slide" presentationStyle="pageSheet">
+        <View style={styles.modalRoot}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setPlanningModal(false)}>
+              <MaterialCommunityIcons name="close" size={22} color={Colors.navy} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Jours indisponibles</Text>
+            <View style={{ width: 22 }} />
+          </View>
+
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
+            {/* Weekly schedule */}
+            <Text style={styles.planningSectionTitle}>Jours permanents</Text>
+            <Text style={styles.planningSectionDesc}>
+              Désactivez les jours où vous ne travaillez pas habituellement.
+            </Text>
+            {(["lun", "mar", "mer", "jeu", "ven", "sam", "dim"] as const).map((day) => {
+              const labels: Record<string, string> = { lun: "Lun", mar: "Mar", mer: "Mer", jeu: "Jeu", ven: "Ven", sam: "Sam", dim: "Dim" };
+              return (
+                <View key={day} style={styles.weekDayRow}>
+                  <Text style={styles.weekDayLabel}>{labels[day]}</Text>
+                  <Switch
+                    value={weekDays[day]}
+                    onValueChange={(v) => setWeekDays((prev) => ({ ...prev, [day]: v }))}
+                    trackColor={{ false: Colors.border, true: Colors.success }}
+                    thumbColor={Colors.white}
+                  />
+                </View>
+              );
+            })}
+
+            {/* Exceptional days */}
+            <Text style={[styles.planningSectionTitle, { marginTop: 24 }]}>Jours exceptionnels</Text>
+            <Text style={styles.planningSectionDesc}>
+              Bloquez des dates spécifiques (congés, rendez-vous, etc.)
+            </Text>
+            {blockedDates.map((date, i) => (
+              <View key={i} style={styles.blockedDateRow}>
+                <MaterialCommunityIcons name="calendar-remove" size={16} color={Colors.red} />
+                <Text style={styles.blockedDateText}>{date}</Text>
+                <TouchableOpacity onPress={() => setBlockedDates((prev) => prev.filter((_, idx) => idx !== i))}>
+                  <MaterialCommunityIcons name="close-circle" size={18} color={Colors.textMuted} />
+                </TouchableOpacity>
+              </View>
+            ))}
+            <TouchableOpacity style={styles.addDateBtn}>
+              <MaterialCommunityIcons name="plus" size={16} color={Colors.forest} />
+              <Text style={styles.addDateBtnText}>Ajouter une date</Text>
+            </TouchableOpacity>
+
+            {/* Save button */}
+            <TouchableOpacity
+              style={styles.planningSaveBtn}
+              activeOpacity={0.85}
+              onPress={() => setPlanningModal(false)}
+            >
+              <Text style={styles.planningSaveBtnText}>Enregistrer</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      </Modal>
 
       {/* ── Urgency Radius Modal ── */}
       <Modal visible={urgencyModalVisible} animationType="slide" presentationStyle="pageSheet">
@@ -484,6 +568,113 @@ const styles = StyleSheet.create({
     alignItems: "center", justifyContent: "center", ...Shadows.md,
   },
   modalSaveBtnText: { fontFamily: "Manrope_700Bold", fontSize: 15, color: Colors.white },
+
+  /* Planning card */
+  planningCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginHorizontal: 16,
+    marginTop: 12,
+    backgroundColor: Colors.white,
+    borderRadius: Radii["2xl"],
+    padding: 14,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: "rgba(10,22,40,0.04)",
+    ...Shadows.sm,
+  },
+  planningIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: "rgba(27,107,78,0.08)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  planningTitle: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 14,
+    color: Colors.navy,
+  },
+  planningSub: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 1,
+  },
+  planningSectionTitle: {
+    fontFamily: "Manrope_700Bold",
+    fontSize: 16,
+    color: Colors.navy,
+    marginBottom: 4,
+  },
+  planningSectionDesc: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 13,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  weekDayRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.surface,
+  },
+  weekDayLabel: {
+    fontFamily: "DMSans_500Medium",
+    fontSize: 15,
+    color: Colors.navy,
+  },
+  blockedDateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.surface,
+  },
+  blockedDateText: {
+    fontFamily: "DMSans_500Medium",
+    fontSize: 14,
+    color: Colors.navy,
+    flex: 1,
+  },
+  addDateBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderStyle: "dashed",
+    borderColor: "rgba(27,107,78,0.3)",
+    marginTop: 12,
+    marginBottom: 24,
+  },
+  addDateBtnText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 13,
+    color: Colors.forest,
+  },
+  planningSaveBtn: {
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: Colors.deepForest,
+    alignItems: "center",
+    justifyContent: "center",
+    ...Shadows.md,
+    marginBottom: 40,
+  },
+  planningSaveBtnText: {
+    fontFamily: "Manrope_700Bold",
+    fontSize: 15,
+    color: Colors.white,
+  },
 
   /* KPIs */
   kpiGrid: { paddingHorizontal: 16, marginTop: 14, gap: 10 },

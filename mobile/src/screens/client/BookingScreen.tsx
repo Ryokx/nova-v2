@@ -19,6 +19,8 @@ const AVAILABLE_DAYS = [3, 5, 8, 10, 12, 15, 17, 19, 22, 24, 26, 29];
 const TIME_SLOTS = ["9h00", "11h00", "14h00", "16h00", "18h00"];
 const FIRST_DAY_OFFSET = 6; // March 2026 starts on Sunday -> 6 empty cells (Mon-based grid)
 const TOTAL_DAYS = 31;
+const TODAY = 21;
+const UNAVAILABLE_DAYS = [1, 2, 7, 8, 9, 14, 16, 21, 23, 25, 27, 28, 30, 31];
 
 /* ---- Progress bar ---- */
 const ProgressSteps = ({
@@ -57,7 +59,7 @@ export function BookingScreen({
   navigation,
 }: RootStackScreenProps<"Booking">) {
   const [step, setStep] = useState(0);
-  const [selectedDay, setSelectedDay] = useState(15);
+  const [selectedDay, setSelectedDay] = useState(22);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   const [media, setMedia] = useState<{ uri: string; type: "image" | "video" }[]>([]);
@@ -155,17 +157,21 @@ export function BookingScreen({
                 {/* Day cells */}
                 {Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).map(
                   (day) => {
-                    const isAvail = AVAILABLE_DAYS.includes(day);
+                    const isPast = day < TODAY;
+                    const isUnavail = UNAVAILABLE_DAYS.includes(day) && !isPast;
+                    const isAvail = AVAILABLE_DAYS.includes(day) && !isPast;
                     const isSel = day === selectedDay;
+                    const isDisabled = isPast || isUnavail || !isAvail;
                     return (
                       <TouchableOpacity
                         key={day}
-                        disabled={!isAvail}
+                        disabled={isDisabled}
                         onPress={() => setSelectedDay(day)}
                         style={[
                           styles.calendarDayCell,
                           isSel && styles.calendarDaySel,
-                          !isSel && isAvail && styles.calendarDayAvail,
+                          !isSel && isAvail && !isPast && styles.calendarDayAvail,
+                          isPast && { opacity: 0.3 },
                         ]}
                         activeOpacity={0.7}
                       >
@@ -173,16 +179,17 @@ export function BookingScreen({
                           style={[
                             styles.calendarDayText,
                             isSel && styles.calendarDayTextSel,
-                            !isSel &&
-                              isAvail &&
-                              styles.calendarDayTextAvail,
-                            !isAvail &&
-                              !isSel &&
-                              styles.calendarDayTextDisabled,
+                            !isSel && isAvail && !isPast && styles.calendarDayTextAvail,
+                            !isSel && isUnavail && styles.calendarDayUnavail,
+                            !isSel && !isAvail && !isUnavail && !isPast && styles.calendarDayTextDisabled,
+                            isPast && !isSel && styles.calendarDayTextDisabled,
                           ]}
                         >
                           {day}
                         </Text>
+                        {isUnavail && !isSel && (
+                          <View style={styles.calendarRedDot} />
+                        )}
                       </TouchableOpacity>
                     );
                   }
@@ -451,6 +458,15 @@ const styles = StyleSheet.create({
   calendarDayTextSel: { color: Colors.white, fontWeight: "700" },
   calendarDayTextAvail: { color: Colors.forest, fontWeight: "600" },
   calendarDayTextDisabled: { color: "#B0B0BB" },
+  calendarDayUnavail: { color: Colors.red, fontWeight: "600" },
+  calendarRedDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.red,
+    marginTop: 1,
+    alignSelf: "center",
+  },
 
   /* Time slots */
   slotsRow: {
