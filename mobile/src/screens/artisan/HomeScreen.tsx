@@ -77,6 +77,8 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
   const [weekDays, setWeekDays] = useState<Record<string, boolean>>({ lun: true, mar: true, mer: true, jeu: true, ven: true, sam: false, dim: false });
   const [blockedDates, setBlockedDates] = useState(["25 mars 2026", "28 mars 2026"]);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [pickerMonth, setPickerMonth] = useState(2); // 0-indexed: 2 = mars
+  const [pickerYear, setPickerYear] = useState(2026);
   const rotateAnim = useState(new Animated.Value(0))[0];
 
   const toggleFab = () => {
@@ -370,33 +372,74 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
               </View>
             ))}
             {/* Inline date picker */}
-            {showDatePicker ? (
-              <View style={styles.datePickerWrap}>
-                <Text style={styles.datePickerTitle}>Mars 2026</Text>
-                <View style={styles.datePickerGrid}>
-                  {Array.from({ length: 10 }, (_, i) => i + 22).map((day) => {
-                    const dateStr = `${day} mars 2026`;
-                    const alreadyBlocked = blockedDates.includes(dateStr);
-                    return (
-                      <TouchableOpacity
-                        key={day}
-                        style={[styles.datePickerDay, alreadyBlocked && styles.datePickerDayDisabled]}
-                        disabled={alreadyBlocked}
-                        onPress={() => {
-                          setBlockedDates(d => [...d, dateStr]);
-                          setShowDatePicker(false);
-                        }}
-                      >
-                        <Text style={[styles.datePickerDayText, alreadyBlocked && { color: Colors.textMuted }]}>{day}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+            {showDatePicker ? (() => {
+              const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+              const daysInMonth = new Date(pickerYear, pickerMonth + 1, 0).getDate();
+              const firstDayOfWeek = (new Date(pickerYear, pickerMonth, 1).getDay() + 6) % 7; // 0=Lun
+              const monthLabel = `${monthNames[pickerMonth]} ${pickerYear}`;
+
+              const prevMonth = () => {
+                if (pickerMonth === 0) { setPickerMonth(11); setPickerYear(y => y - 1); }
+                else setPickerMonth(m => m - 1);
+              };
+              const nextMonth = () => {
+                if (pickerMonth === 11) { setPickerMonth(0); setPickerYear(y => y + 1); }
+                else setPickerMonth(m => m + 1);
+              };
+
+              return (
+                <View style={styles.datePickerWrap}>
+                  {/* Month/Year selector */}
+                  <View style={styles.datePickerNav}>
+                    <TouchableOpacity onPress={prevMonth} style={styles.datePickerNavBtn}>
+                      <MaterialCommunityIcons name="chevron-left" size={20} color={Colors.forest} />
+                    </TouchableOpacity>
+                    <Text style={styles.datePickerTitle}>{monthLabel}</Text>
+                    <TouchableOpacity onPress={nextMonth} style={styles.datePickerNavBtn}>
+                      <MaterialCommunityIcons name="chevron-right" size={20} color={Colors.forest} />
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Day headers */}
+                  <View style={styles.datePickerDayHeaders}>
+                    {["L", "M", "M", "J", "V", "S", "D"].map((d, i) => (
+                      <Text key={i} style={styles.datePickerDayHeader}>{d}</Text>
+                    ))}
+                  </View>
+
+                  {/* Day grid */}
+                  <View style={styles.datePickerGrid}>
+                    {Array.from({ length: firstDayOfWeek }).map((_, i) => (
+                      <View key={`e${i}`} style={styles.datePickerDayCell} />
+                    ))}
+                    {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
+                      const mStr = monthNames[pickerMonth]!.toLowerCase();
+                      const dateStr = `${day} ${mStr} ${pickerYear}`;
+                      const alreadyBlocked = blockedDates.includes(dateStr);
+                      const today = new Date();
+                      const cellDate = new Date(pickerYear, pickerMonth, day);
+                      const isPast = cellDate < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                      return (
+                        <TouchableOpacity
+                          key={day}
+                          style={[styles.datePickerDayCell, styles.datePickerDay, alreadyBlocked && styles.datePickerDayDisabled, isPast && { opacity: 0.25 }]}
+                          disabled={alreadyBlocked || isPast}
+                          onPress={() => {
+                            setBlockedDates(d => [...d, dateStr]);
+                            setShowDatePicker(false);
+                          }}
+                        >
+                          <Text style={[styles.datePickerDayText, alreadyBlocked && { color: Colors.textMuted }, isPast && { color: Colors.textMuted }]}>{day}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                  <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                    <Text style={styles.datePickerCancel}>Annuler</Text>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                  <Text style={styles.datePickerCancel}>Annuler</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
+              );
+            })() : (
               <TouchableOpacity style={styles.addDateBtn} onPress={() => setShowDatePicker(true)}>
                 <MaterialCommunityIcons name="plus" size={16} color={Colors.forest} />
                 <Text style={styles.addDateBtnText}>Ajouter une date</Text>
@@ -675,22 +718,38 @@ const styles = StyleSheet.create({
   },
   /* Date picker */
   datePickerWrap: {
-    backgroundColor: Colors.bgPage, borderRadius: 12, padding: 12, marginTop: 4,
+    backgroundColor: Colors.bgPage, borderRadius: 14, padding: 12, marginTop: 4,
+  },
+  datePickerNav: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10,
+  },
+  datePickerNavBtn: {
+    width: 32, height: 32, borderRadius: 10, backgroundColor: Colors.white,
+    alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: Colors.border,
   },
   datePickerTitle: {
-    fontFamily: "DMSans_600SemiBold", fontSize: 12, color: Colors.navy, marginBottom: 8, textAlign: "center",
+    fontFamily: "Manrope_700Bold", fontSize: 14, color: Colors.navy,
+  },
+  datePickerDayHeaders: {
+    flexDirection: "row", marginBottom: 4,
+  },
+  datePickerDayHeader: {
+    width: "14.28%", textAlign: "center", fontFamily: "DMSans_500Medium", fontSize: 10, color: Colors.textMuted,
   },
   datePickerGrid: {
-    flexDirection: "row", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 8,
+    flexDirection: "row", flexWrap: "wrap", marginBottom: 8,
+  },
+  datePickerDayCell: {
+    width: "14.28%", height: 36, alignItems: "center", justifyContent: "center",
   },
   datePickerDay: {
-    width: 40, height: 36, borderRadius: 10, backgroundColor: Colors.white,
-    borderWidth: 1, borderColor: Colors.border, alignItems: "center", justifyContent: "center",
+    borderRadius: 10, backgroundColor: Colors.white,
+    borderWidth: 1, borderColor: Colors.border,
   },
   datePickerDayDisabled: { opacity: 0.3 },
   datePickerDayText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.navy },
   datePickerCancel: {
-    fontFamily: "DMSans_500Medium", fontSize: 12, color: Colors.textMuted, textAlign: "center",
+    fontFamily: "DMSans_500Medium", fontSize: 12, color: Colors.textMuted, textAlign: "center", marginTop: 4,
   },
 
   addDateBtn: {
