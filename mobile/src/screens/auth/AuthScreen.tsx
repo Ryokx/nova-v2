@@ -43,7 +43,7 @@ const onboardingSlides = [
     icon: "check-circle",
     title: "Zéro impayé",
     description:
-      "Vous intervenez, Nova valide, vous êtes payé sous 48h. Garanti.",
+      "Vous intervenez, Nova valide et vous garantit votre paiement.",
     accent: Colors.success,
     bg: "#EDFFF6",
   },
@@ -596,10 +596,12 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
 
           {/* SSO buttons */}
           <TouchableOpacity style={styles.ssoGoogle} activeOpacity={0.85}>
+            <MaterialCommunityIcons name="google" size={18} color="#4285F4" />
             <Text style={styles.ssoGoogleText}>Continuer avec Google</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.ssoApple} activeOpacity={0.85}>
+            <MaterialCommunityIcons name="apple" size={18} color="#fff" />
             <Text style={styles.ssoAppleText}>Continuer avec Apple</Text>
           </TouchableOpacity>
 
@@ -773,8 +775,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderWidth: 1,
     borderColor: Colors.border,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 10,
     marginBottom: 10,
     ...Shadows.sm,
   },
@@ -788,8 +792,10 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: Radii.lg,
     backgroundColor: Colors.black,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 10,
     marginBottom: 20,
   },
   ssoAppleText: {
