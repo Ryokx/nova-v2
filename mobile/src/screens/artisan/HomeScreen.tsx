@@ -76,6 +76,7 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
   const [planningModal, setPlanningModal] = useState(false);
   const [weekDays, setWeekDays] = useState<Record<string, boolean>>({ lun: true, mar: true, mer: true, jeu: true, ven: true, sam: false, dim: false });
   const [blockedDates, setBlockedDates] = useState(["25 mars 2026", "28 mars 2026"]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const rotateAnim = useState(new Animated.Value(0))[0];
 
   const toggleFab = () => {
@@ -368,10 +369,39 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
                 </TouchableOpacity>
               </View>
             ))}
-            <TouchableOpacity style={styles.addDateBtn}>
-              <MaterialCommunityIcons name="plus" size={16} color={Colors.forest} />
-              <Text style={styles.addDateBtnText}>Ajouter une date</Text>
-            </TouchableOpacity>
+            {/* Inline date picker */}
+            {showDatePicker ? (
+              <View style={styles.datePickerWrap}>
+                <Text style={styles.datePickerTitle}>Mars 2026</Text>
+                <View style={styles.datePickerGrid}>
+                  {Array.from({ length: 10 }, (_, i) => i + 22).map((day) => {
+                    const dateStr = `${day} mars 2026`;
+                    const alreadyBlocked = blockedDates.includes(dateStr);
+                    return (
+                      <TouchableOpacity
+                        key={day}
+                        style={[styles.datePickerDay, alreadyBlocked && styles.datePickerDayDisabled]}
+                        disabled={alreadyBlocked}
+                        onPress={() => {
+                          setBlockedDates(d => [...d, dateStr]);
+                          setShowDatePicker(false);
+                        }}
+                      >
+                        <Text style={[styles.datePickerDayText, alreadyBlocked && { color: Colors.textMuted }]}>{day}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <Text style={styles.datePickerCancel}>Annuler</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.addDateBtn} onPress={() => setShowDatePicker(true)}>
+                <MaterialCommunityIcons name="plus" size={16} color={Colors.forest} />
+                <Text style={styles.addDateBtnText}>Ajouter une date</Text>
+              </TouchableOpacity>
+            )}
 
             {/* Save button */}
             <TouchableOpacity
@@ -643,6 +673,26 @@ const styles = StyleSheet.create({
     color: Colors.navy,
     flex: 1,
   },
+  /* Date picker */
+  datePickerWrap: {
+    backgroundColor: Colors.bgPage, borderRadius: 12, padding: 12, marginTop: 4,
+  },
+  datePickerTitle: {
+    fontFamily: "DMSans_600SemiBold", fontSize: 12, color: Colors.navy, marginBottom: 8, textAlign: "center",
+  },
+  datePickerGrid: {
+    flexDirection: "row", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 8,
+  },
+  datePickerDay: {
+    width: 40, height: 36, borderRadius: 10, backgroundColor: Colors.white,
+    borderWidth: 1, borderColor: Colors.border, alignItems: "center", justifyContent: "center",
+  },
+  datePickerDayDisabled: { opacity: 0.3 },
+  datePickerDayText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.navy },
+  datePickerCancel: {
+    fontFamily: "DMSans_500Medium", fontSize: 12, color: Colors.textMuted, textAlign: "center",
+  },
+
   addDateBtn: {
     flexDirection: "row",
     alignItems: "center",
