@@ -134,19 +134,6 @@ export function UrgentDetailScreen({
           </View>
         </View>
 
-        {/* Remuneration */}
-        <View style={styles.card}>
-          <Text style={styles.cardSubTitle}>Rémunération</Text>
-          <View style={styles.remuRow}>
-            <Text style={styles.remuLabel}>Tarif horaire urgence</Text>
-            <Text style={styles.remuValue}>85€/h</Text>
-          </View>
-          <View style={styles.remuRow}>
-            <Text style={styles.remuLabel}>Déplacement</Text>
-            <Text style={styles.remuIncluded}>Inclus</Text>
-          </View>
-        </View>
-
         {/* Escrow info */}
         <View style={styles.escrowInfo}>
           <Text style={styles.escrowIcon}><MaterialCommunityIcons name="shield-lock" size={16} color={Colors.forest} /></Text>
@@ -309,29 +296,6 @@ const styles = StyleSheet.create({
     fontFamily: "DMSans_400Regular",
     fontSize: 11,
     color: Colors.textHint,
-  },
-
-  /* Remuneration */
-  remuRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  remuLabel: {
-    fontFamily: "DMSans_400Regular",
-    fontSize: 13,
-    color: Colors.textHint,
-  },
-  remuValue: {
-    fontFamily: "DMMono_500Medium",
-    fontSize: 16,
-    color: Colors.navy,
-  },
-  remuIncluded: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 13,
-    color: Colors.success,
   },
 
   /* Escrow */
