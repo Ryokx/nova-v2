@@ -586,12 +586,12 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
         >
           {/* Logo */}
           <View style={styles.logoWrap}>
-            <View style={styles.logoCircle}>
-              <Text style={styles.logoEmoji}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
+            <View style={styles.novaLogoRow}>
+              <Text style={styles.novaLogoText}>Nova</Text>
+              <View style={styles.novaLogoDot} />
             </View>
-            <Text style={styles.logoTitle}>Nova</Text>
             <Text style={styles.logoSubtitle}>
-              L&apos;artisan qu&apos;il vous faut. Certifié. Garanti.
+              L'artisan qu'il vous faut. Certifié. Garanti.
             </Text>
           </View>
 
@@ -750,22 +750,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoWrap: { alignItems: "center", marginBottom: 32 },
-  logoCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    backgroundColor: Colors.white,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
-    ...Shadows.md,
+  novaLogoRow: {
+    position: "relative",
+    marginBottom: 8,
   },
-  logoEmoji: { fontSize: 28 },
-  logoTitle: {
+  novaLogoText: {
     fontFamily: "Manrope_800ExtraBold",
-    fontSize: 34,
+    fontSize: 38,
     color: Colors.navy,
-    marginBottom: 4,
+    letterSpacing: -0.5,
+  },
+  novaLogoDot: {
+    position: "absolute",
+    top: 2,
+    right: -6,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.gold,
   },
   logoSubtitle: {
     fontFamily: "DMSans_400Regular",
