@@ -45,7 +45,7 @@ export default function SettingsPage() {
       <h1 className="font-heading text-[26px] font-extrabold text-navy mb-6">Paramètres</h1>
 
       {/* Notifications */}
-      <div className="bg-white rounded-[20px] border border-border mb-4">
+      <div className="bg-white rounded-[5px] border border-border mb-4">
         <div className="p-5">
           <h2 className="font-heading font-semibold text-navy flex items-center gap-2 mb-4">
             <Bell className="w-4 h-4 text-forest" />
@@ -72,7 +72,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Security */}
-      <div className="bg-white rounded-[20px] border border-border mb-4">
+      <div className="bg-white rounded-[5px] border border-border mb-4">
         <div className="p-5">
           <h2 className="font-heading font-semibold text-navy flex items-center gap-2 mb-4">
             <Lock className="w-4 h-4 text-forest" />
@@ -92,7 +92,7 @@ export default function SettingsPage() {
               <Input type="password" placeholder="Nouveau mot de passe" />
               <Input type="password" placeholder="Confirmer le nouveau mot de passe" />
               <div className="flex gap-2 pt-1">
-                <button className="px-4 py-2 bg-forest text-white text-sm font-bold rounded-[14px] hover:-translate-y-0.5 transition-transform">
+                <button className="px-4 py-2 bg-forest text-white text-sm font-bold rounded-[5px] hover:-translate-y-0.5 transition-transform">
                   Enregistrer
                 </button>
                 <button
@@ -108,7 +108,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Dark mode */}
-      <div className="bg-white rounded-[20px] border border-border mb-6">
+      <div className="bg-white rounded-[5px] border border-border mb-6">
         <div className="p-5">
           <h2 className="font-heading font-semibold text-navy flex items-center gap-2 mb-4">
             <Moon className="w-4 h-4 text-forest" />
@@ -127,7 +127,7 @@ export default function SettingsPage() {
       {/* Logout */}
       <button
         onClick={() => signOut({ callbackUrl: "/" })}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red text-white text-sm font-bold rounded-[14px] hover:-translate-y-0.5 transition-transform"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red text-white text-sm font-bold rounded-[5px] hover:-translate-y-0.5 transition-transform"
       >
         <LogOut className="w-4 h-4" /> Déconnexion
       </button>

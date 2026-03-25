@@ -14,9 +14,9 @@ const categories = [
 ];
 
 const urgentArtisans = [
-  { name: "Karim B.", initials: "KB", time: "15 min", price: "80€/h" },
-  { name: "Jean-Michel P.", initials: "JM", time: "25 min", price: "85€/h" },
-  { name: "Fatima H.", initials: "FH", time: "40 min", price: "80€/h" },
+  { name: "Karim B.", initials: "KB", time: "15 min" },
+  { name: "Jean-Michel P.", initials: "JM", time: "25 min" },
+  { name: "Fatima H.", initials: "FH", time: "40 min" },
 ];
 
 export default function UrgencePage() {
@@ -48,7 +48,7 @@ export default function UrgencePage() {
             <button
               key={c.id}
               onClick={() => setCat(c.id)}
-              className="flex items-center justify-between bg-white border border-border rounded-[20px] shadow-sm p-4 hover:bg-surface hover:border-l-4 hover:border-l-forest transition-all"
+              className="flex items-center justify-between bg-white border border-border rounded-[5px] shadow-sm p-4 hover:bg-surface hover:border-l-4 hover:border-l-forest transition-all"
             >
               <span className="text-base font-bold text-navy">{c.label}</span>
               <ChevronRight className="w-4 h-4 text-grayText" />
@@ -78,7 +78,7 @@ export default function UrgencePage() {
         {urgentArtisans.map((a) => (
           <div
             key={a.name}
-            className="bg-white border border-border shadow-sm rounded-[20px] p-4"
+            className="bg-white border border-border shadow-sm rounded-[5px] p-4"
           >
             <div className="flex items-center gap-3.5 mb-3.5">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-surface to-border flex items-center justify-center text-base font-bold text-forest">
@@ -90,22 +90,19 @@ export default function UrgencePage() {
                   <span className="text-[13px] font-bold text-red">
                     Dispo en {a.time}
                   </span>
-                  <span className="font-mono text-sm font-bold text-navy">
-                    {a.price}
-                  </span>
                 </div>
               </div>
             </div>
             <div className="flex gap-2">
               <Button
-                className="flex-1 bg-red hover:bg-red/90 text-[13px] rounded-[10px]"
+                className="flex-1 bg-red hover:bg-red/90 text-[13px] rounded-[5px]"
                 size="sm"
               >
                 Intervention immédiate
               </Button>
               <Link
                 href="/artisans"
-                className="px-4 py-2.5 rounded-[10px] bg-surface text-navy border border-border text-[13px] font-semibold hover:bg-border transition-colors text-center"
+                className="px-4 py-2.5 rounded-[5px] bg-surface text-navy border border-border text-[13px] font-semibold hover:bg-border transition-colors text-center"
               >
                 Profil
               </Link>

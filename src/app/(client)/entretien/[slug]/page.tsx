@@ -21,7 +21,7 @@ export default function EntretienPage() {
   if (done) {
     return (
       <div className="max-w-[500px] mx-auto px-6 py-36 text-center animate-pageIn">
-        <div className="w-[72px] h-[72px] rounded-[22px] bg-success flex items-center justify-center mx-auto mb-5">
+        <div className="w-[72px] h-[72px] rounded-[5px] bg-success flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-white" />
         </div>
         <h2 className="font-heading text-2xl font-extrabold text-navy mb-2">
@@ -49,7 +49,7 @@ export default function EntretienPage() {
             key={plan.id}
             onClick={() => setSelected(plan.id)}
             className={cn(
-              "relative bg-white rounded-[20px] shadow-sm p-4 text-left transition-all cursor-pointer",
+              "relative bg-white rounded-[5px] shadow-sm p-4 text-left transition-all cursor-pointer",
               selected === plan.id
                 ? "border-2 border-forest bg-surface"
                 : plan.popular
@@ -63,7 +63,7 @@ export default function EntretienPage() {
               </div>
             )}
             <div className="flex gap-3.5 items-start">
-              <div className="w-11 h-11 rounded-[14px] bg-surface flex items-center justify-center text-xl shrink-0">
+              <div className="w-11 h-11 rounded-[5px] bg-surface flex items-center justify-center text-xl shrink-0">
                 {plan.icon}
               </div>
               <div className="flex-1">

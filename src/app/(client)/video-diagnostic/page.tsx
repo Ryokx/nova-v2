@@ -21,7 +21,7 @@ export default function VideoDiagnosticPage() {
   if (stage === 2) {
     return (
       <div className="max-w-[500px] mx-auto px-6 py-36 text-center animate-pageIn">
-        <div className="w-[72px] h-[72px] rounded-[22px] bg-success flex items-center justify-center mx-auto mb-5">
+        <div className="w-[72px] h-[72px] rounded-[5px] bg-success flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-white" />
         </div>
         <h2 className="font-heading text-2xl font-extrabold text-navy mb-2">
@@ -30,7 +30,7 @@ export default function VideoDiagnosticPage() {
         <p className="text-sm text-grayText mb-2">
           L&apos;artisan va analyser votre vidéo et préparer son intervention.
         </p>
-        <div className="inline-flex items-center gap-1.5 bg-surface px-3.5 py-2 rounded-[10px] mb-6">
+        <div className="inline-flex items-center gap-1.5 bg-surface px-3.5 py-2 rounded-[5px] mb-6">
           <Clock className="w-3.5 h-3.5 text-forest" />
           <span className="text-xs font-semibold text-forest">Réponse estimée sous 2h</span>
         </div>
@@ -63,7 +63,7 @@ export default function VideoDiagnosticPage() {
           placeholder="Note pour l'artisan (optionnel)..."
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="w-full h-[80px] px-3 py-3 rounded-[14px] border border-border bg-white text-sm text-navy placeholder:text-grayText/60 focus:outline-none focus:ring-2 focus:ring-forest/30 resize-none mb-4"
+          className="w-full h-[80px] px-3 py-3 rounded-[5px] border border-border bg-white text-sm text-navy placeholder:text-grayText/60 focus:outline-none focus:ring-2 focus:ring-forest/30 resize-none mb-4"
         />
 
         <Button className="w-full gap-2 mb-2" size="lg" onClick={() => setStage(2)}>
@@ -90,7 +90,7 @@ export default function VideoDiagnosticPage() {
       </p>
 
       {/* Tips card */}
-      <div className="bg-white border border-border shadow-sm rounded-[20px] p-5 mb-6">
+      <div className="bg-white border border-border shadow-sm rounded-[5px] p-5 mb-6">
         {tips.map((tip, i) => (
           <div
             key={tip.title}

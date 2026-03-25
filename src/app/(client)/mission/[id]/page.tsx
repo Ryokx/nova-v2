@@ -217,7 +217,7 @@ export default function MissionDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white text-sm font-bold">
+          <div className="w-12 h-12 rounded-[5px] bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white text-sm font-bold">
             {initials}
           </div>
           <div>
@@ -300,18 +300,18 @@ export default function MissionDetailPage() {
       {/* Documents */}
       <div className="flex gap-2 mb-5">
         {mission.devis && (
-          <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[12px] bg-surface text-forest text-sm font-medium hover:bg-border transition-colors">
+          <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[5px] bg-surface text-forest text-sm font-medium hover:bg-border transition-colors">
             <Download className="w-4 h-4" />
             Devis #{mission.devis.number}
           </button>
         )}
         {mission.invoice ? (
-          <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[12px] bg-surface text-forest text-sm font-medium hover:bg-border transition-colors">
+          <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[5px] bg-surface text-forest text-sm font-medium hover:bg-border transition-colors">
             <Download className="w-4 h-4" />
             Facture #{mission.invoice.number}
           </button>
         ) : (
-          <div className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[12px] border border-dashed border-border text-grayText text-sm">
+          <div className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[5px] border border-dashed border-border text-grayText text-sm">
             <FileText className="w-4 h-4" /> Facture non disponible
           </div>
         )}
@@ -329,7 +329,7 @@ export default function MissionDetailPage() {
           </div>
           <button
             className={cn(
-              "w-full py-3 rounded-[14px] bg-deepForest text-white font-bold font-heading text-sm transition-all flex items-center justify-center gap-2",
+              "w-full py-3 rounded-[5px] bg-deepForest text-white font-bold font-heading text-sm transition-all flex items-center justify-center gap-2",
               stars > 0
                 ? "hover:-translate-y-0.5 opacity-100"
                 : "opacity-50 cursor-not-allowed",
@@ -347,7 +347,7 @@ export default function MissionDetailPage() {
             )}
             Valider — Libérer le paiement
           </button>
-          <button className="w-full mt-2 py-2.5 rounded-[14px] text-red text-sm font-semibold hover:bg-red/5 transition-colors flex items-center justify-center gap-1.5">
+          <button className="w-full mt-2 py-2.5 rounded-[5px] text-red text-sm font-semibold hover:bg-red/5 transition-colors flex items-center justify-center gap-1.5">
             <AlertTriangle className="w-4 h-4" />
             Signaler un litige
           </button>

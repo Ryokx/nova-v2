@@ -104,7 +104,7 @@ export default function TrackingPage() {
 
       {/* Artisan card */}
       <Card className="flex items-center gap-3.5 mb-4">
-        <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white text-sm font-bold shrink-0">
+        <div className="w-12 h-12 rounded-[5px] bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white text-sm font-bold shrink-0">
           {initials}
         </div>
         <div className="flex-1 min-w-0">
@@ -113,17 +113,17 @@ export default function TrackingPage() {
           <div className="text-xs text-forest font-medium mt-0.5">{missionType}</div>
         </div>
         <div className="flex gap-2">
-          <button className="w-10 h-10 rounded-[12px] bg-surface flex items-center justify-center text-forest hover:bg-border transition-colors">
+          <button className="w-10 h-10 rounded-[5px] bg-surface flex items-center justify-center text-forest hover:bg-border transition-colors">
             <MessageCircle className="w-4 h-4" />
           </button>
-          <button className="w-10 h-10 rounded-[12px] bg-surface flex items-center justify-center text-forest hover:bg-border transition-colors">
+          <button className="w-10 h-10 rounded-[5px] bg-surface flex items-center justify-center text-forest hover:bg-border transition-colors">
             <Phone className="w-4 h-4" />
           </button>
         </div>
       </Card>
 
       {/* Status banner */}
-      <div className={cn("px-4 py-3 rounded-[14px] text-sm font-semibold text-center mb-5", banner.cls)}>
+      <div className={cn("px-4 py-3 rounded-[5px] text-sm font-semibold text-center mb-5", banner.cls)}>
         {banner.text}
       </div>
 
@@ -208,7 +208,7 @@ export default function TrackingPage() {
             key={s}
             onClick={() => setDemoStep(s)}
             className={cn(
-              "flex-1 py-2 rounded-[10px] text-xs font-semibold transition-all",
+              "flex-1 py-2 rounded-[5px] text-xs font-semibold transition-all",
               demoStep === s
                 ? "bg-deepForest text-white"
                 : "bg-white border border-border text-navy hover:bg-surface",

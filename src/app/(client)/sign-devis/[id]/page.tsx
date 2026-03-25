@@ -94,7 +94,7 @@ export default function SignDevisPage() {
   if (signed) {
     return (
       <div className="max-w-[500px] mx-auto px-6 pt-36 pb-16 text-center animate-pageIn">
-        <div className="w-[72px] h-[72px] rounded-[22px] bg-success flex items-center justify-center mx-auto mb-5">
+        <div className="w-[72px] h-[72px] rounded-[5px] bg-success flex items-center justify-center mx-auto mb-5">
           <Check className="w-9 h-9 text-white" />
         </div>
         <h2 className="font-heading text-2xl font-extrabold text-navy mb-2">
@@ -105,7 +105,7 @@ export default function SignDevisPage() {
         </p>
         <button
           onClick={() => router.push(`/payment/${missionId}`)}
-          className="w-full py-3.5 rounded-[14px] bg-deepForest text-white border-none text-[15px] font-semibold cursor-pointer hover:-translate-y-0.5 transition-transform"
+          className="w-full py-3.5 rounded-[5px] bg-deepForest text-white border-none text-[15px] font-semibold cursor-pointer hover:-translate-y-0.5 transition-transform"
         >
           Procéder au paiement — {formatPrice(totalTTC)}
         </button>
@@ -180,7 +180,7 @@ export default function SignDevisPage() {
       <button
         disabled={!hasDrawn}
         onClick={() => setSigned(true)}
-        className={`w-full py-3.5 rounded-[14px] border-none text-[15px] font-semibold cursor-pointer flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 ${
+        className={`w-full py-3.5 rounded-[5px] border-none text-[15px] font-semibold cursor-pointer flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 ${
           hasDrawn
             ? "bg-deepForest text-white"
             : "bg-deepForest/50 text-white/70 opacity-50 cursor-default hover:translate-y-0"

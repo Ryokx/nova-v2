@@ -218,7 +218,7 @@ export default function MissionsPage() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              "px-4 py-2 rounded-[10px] text-[13px] font-semibold whitespace-nowrap transition-all",
+              "px-4 py-2 rounded-[5px] text-[13px] font-semibold whitespace-nowrap transition-all",
               tab === t.id
                 ? "bg-deepForest text-white"
                 : "bg-white border border-border text-navy hover:bg-surface",
@@ -249,7 +249,7 @@ export default function MissionsPage() {
             return (
               <div
                 key={m.id}
-                className="bg-white border border-border shadow-sm rounded-[20px] overflow-hidden transition-all"
+                className="bg-white border border-border shadow-sm rounded-[5px] overflow-hidden transition-all"
               >
                 {/* Summary row */}
                 <button
@@ -257,7 +257,7 @@ export default function MissionsPage() {
                   className="w-full flex items-center gap-3.5 p-4 text-left hover:bg-surface/30 transition-colors"
                 >
                   {/* Avatar */}
-                  <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white text-sm font-bold shrink-0">
+                  <div className="w-10 h-10 rounded-[5px] bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white text-sm font-bold shrink-0">
                     {initials}
                   </div>
 
@@ -352,7 +352,7 @@ export default function MissionsPage() {
 
                     {/* Financial */}
                     {m.devis && (
-                      <div className="bg-surface/50 rounded-[14px] p-4 mb-4 space-y-2 text-sm">
+                      <div className="bg-surface/50 rounded-[5px] p-4 mb-4 space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-grayText">Montant HT</span>
                           <span className="font-mono font-semibold text-navy">
@@ -377,13 +377,13 @@ export default function MissionsPage() {
                     {/* Documents */}
                     <div className="flex gap-2 mb-5">
                       {m.devis && (
-                        <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[12px] bg-surface text-forest text-sm font-medium hover:bg-border transition-colors">
+                        <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[5px] bg-surface text-forest text-sm font-medium hover:bg-border transition-colors">
                           <Download className="w-4 h-4" />
                           Devis #{m.devis.number}
                         </button>
                       )}
                       {m.invoice && (
-                        <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[12px] bg-surface text-forest text-sm font-medium hover:bg-border transition-colors">
+                        <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[5px] bg-surface text-forest text-sm font-medium hover:bg-border transition-colors">
                           <Download className="w-4 h-4" />
                           Facture #{m.invoice.number}
                         </button>
@@ -403,12 +403,12 @@ export default function MissionsPage() {
                         </div>
                         <button
                           onClick={() => router.push(`/mission/${m.id}`)}
-                          className="w-full py-3 rounded-[14px] bg-deepForest text-white font-bold font-heading text-sm hover:-translate-y-0.5 transition-transform flex items-center justify-center gap-2"
+                          className="w-full py-3 rounded-[5px] bg-deepForest text-white font-bold font-heading text-sm hover:-translate-y-0.5 transition-transform flex items-center justify-center gap-2"
                         >
                           <Shield className="w-4 h-4" />
                           Valider — Libérer le paiement
                         </button>
-                        <button className="w-full py-2.5 rounded-[14px] text-red text-sm font-semibold hover:bg-red/5 transition-colors flex items-center justify-center gap-1.5">
+                        <button className="w-full py-2.5 rounded-[5px] text-red text-sm font-semibold hover:bg-red/5 transition-colors flex items-center justify-center gap-1.5">
                           <AlertTriangle className="w-4 h-4" />
                           Signaler un litige
                         </button>
@@ -417,7 +417,7 @@ export default function MissionsPage() {
 
                     {/* Actions: Validée */}
                     {m.status === "VALIDATED" && (
-                      <div className="flex items-center gap-2 p-3 rounded-[14px] bg-success/10 text-success text-sm font-semibold">
+                      <div className="flex items-center gap-2 p-3 rounded-[5px] bg-success/10 text-success text-sm font-semibold">
                         <Check className="w-5 h-5" />
                         Paiement versé à l&apos;artisan
                       </div>
@@ -425,7 +425,7 @@ export default function MissionsPage() {
 
                     {/* Actions: Litige */}
                     {m.status === "DISPUTED" && (
-                      <div className="flex items-center gap-2 p-3 rounded-[14px] bg-red/10 text-red text-sm font-semibold">
+                      <div className="flex items-center gap-2 p-3 rounded-[5px] bg-red/10 text-red text-sm font-semibold">
                         <Lock className="w-5 h-5" />
                         Paiement bloqué — Litige en cours de résolution
                       </div>

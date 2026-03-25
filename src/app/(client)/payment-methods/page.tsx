@@ -47,7 +47,7 @@ export default function PaymentMethodsPage() {
             key={card.id}
             onClick={() => setDefaultCard(card.id)}
             className={cn(
-              "w-full flex items-center gap-4 p-4 rounded-[20px] transition-all text-left",
+              "w-full flex items-center gap-4 p-4 rounded-[5px] transition-all text-left",
               defaultCard === card.id
                 ? "border-2 border-forest bg-white"
                 : "border border-border bg-white hover:border-forest/30"
@@ -94,12 +94,12 @@ export default function PaymentMethodsPage() {
       </div>
 
       {/* Add card button */}
-      <button className="w-full flex items-center justify-center gap-2 p-4 rounded-[20px] border-2 border-dashed border-border text-grayText text-sm font-medium hover:border-forest/30 hover:text-navy transition-all mb-6">
+      <button className="w-full flex items-center justify-center gap-2 p-4 rounded-[5px] border-2 border-dashed border-border text-grayText text-sm font-medium hover:border-forest/30 hover:text-navy transition-all mb-6">
         <Plus className="w-4 h-4" /> Ajouter une carte
       </button>
 
       {/* Other methods */}
-      <div className="bg-white rounded-[20px] p-5 border border-border mb-5">
+      <div className="bg-white rounded-[5px] p-5 border border-border mb-5">
         <h2 className="font-heading text-sm font-bold text-navy mb-4">Autres méthodes</h2>
         <div className="space-y-4">
           {[
@@ -140,7 +140,7 @@ export default function PaymentMethodsPage() {
       </div>
 
       {/* Security notice */}
-      <div className="flex items-start gap-2.5 px-4 py-3 rounded-[14px] bg-surface">
+      <div className="flex items-start gap-2.5 px-4 py-3 rounded-[5px] bg-surface">
         <Shield className="w-4 h-4 text-forest shrink-0 mt-0.5" />
         <p className="text-xs text-grayText leading-relaxed">
           Vos données bancaires sont chiffrées et sécurisées par un protocole SSL 256 bits.

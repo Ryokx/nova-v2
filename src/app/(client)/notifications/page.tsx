@@ -139,7 +139,7 @@ export default function NotificationsPage() {
             return (
               <div
                 key={n.id}
-                className="bg-white rounded-[20px] p-5 border border-border flex items-start gap-3"
+                className="bg-white rounded-[5px] p-5 border border-border flex items-start gap-3"
               >
                 {/* Unread indicator */}
                 {!n.read && (

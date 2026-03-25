@@ -27,7 +27,7 @@ export default function ReferralPage() {
       </h1>
 
       {/* Dark green gradient banner */}
-      <div className="bg-gradient-to-br from-deepForest to-forest rounded-[20px] px-6 py-8 text-center mb-6">
+      <div className="bg-gradient-to-br from-deepForest to-forest rounded-[5px] px-6 py-8 text-center mb-6">
         <div className="text-4xl mb-3">🎁</div>
         <div className="font-heading text-[22px] font-extrabold text-white mb-2">
           Gagnez 20€ par parrainage
@@ -38,7 +38,7 @@ export default function ReferralPage() {
       </div>
 
       {/* Referral code card */}
-      <div className="bg-white border border-border shadow-sm rounded-[20px] p-5 mb-5">
+      <div className="bg-white border border-border shadow-sm rounded-[5px] p-5 mb-5">
         <div className="text-sm font-bold text-navy mb-2.5">Votre code</div>
         <div className="flex gap-2">
           <div className="flex-1 bg-surface rounded-xl px-4 py-3.5 font-mono text-lg font-bold text-forest tracking-wider">
@@ -56,13 +56,13 @@ export default function ReferralPage() {
       </div>
 
       {/* Share buttons */}
-      <div className="grid grid-cols-4 gap-2.5 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
         {shareButtons.map((btn) => {
           const Icon = btn.icon;
           return (
             <button
               key={btn.label}
-              className={`flex flex-col items-center gap-1 py-4 px-2 rounded-[14px] ${btn.color} text-white hover:opacity-90 transition-opacity cursor-pointer`}
+              className={`flex flex-col items-center gap-1 py-4 px-2 rounded-[5px] ${btn.color} text-white hover:opacity-90 transition-opacity cursor-pointer`}
             >
               <Icon className="w-5 h-5" />
               <span className="text-[11px] font-semibold">{btn.label}</span>
@@ -72,7 +72,7 @@ export default function ReferralPage() {
       </div>
 
       {/* Stats */}
-      <div className="bg-white border border-border shadow-sm rounded-[20px] p-5">
+      <div className="bg-white border border-border shadow-sm rounded-[5px] p-5">
         <div className="text-xs text-grayText mb-2.5">Vos parrainages</div>
         <div className="grid grid-cols-3 gap-3">
           {[
