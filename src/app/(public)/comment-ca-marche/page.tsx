@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Shield, Lock, Check, X, Star, ArrowRight, Clock,
   MapPin, Camera
@@ -84,13 +85,10 @@ export default function CommentCaMarchePage() {
     return () => clearInterval(interval);
   }, []);
 
+  const router = useRouter();
+
   const openSearch = () => {
-    setShowSearch(true);
-    setSearchStep(0);
-    setSearchCat("");
-    setSearchVille("");
-    setSearchDesc("");
-    setSearchPhotos(0);
+    router.push("/artisans");
   };
 
   return (
@@ -116,7 +114,7 @@ export default function CommentCaMarchePage() {
           </div>
 
           {/* Offer pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-[10px] bg-gradient-to-br from-deepForest to-forest mb-5 animate-fadeIn">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-[5px] bg-gradient-to-br from-deepForest to-forest mb-5 animate-fadeIn">
             <span className="text-sm">&#127873;</span>
             <span className="font-body text-xs font-semibold text-white">1er déplacement offert à l&apos;inscription</span>
           </div>
@@ -192,12 +190,12 @@ export default function CommentCaMarchePage() {
               {horrorStories.map((story, i) => (
                 <div key={i} className={`${activeStory === i ? "block animate-fadeIn" : "hidden"}`}>
                   <p className="font-body text-[15px] md:text-[17px] text-navy leading-relaxed mb-5 min-h-0 md:min-h-[100px]">&ldquo;{story.text}&rdquo;</p>
-                  <div className="inline-flex items-center gap-2 bg-red/10 rounded-[10px] px-4 py-2.5 mb-4">
+                  <div className="inline-flex items-center gap-2 bg-red/10 rounded-[5px] px-4 py-2.5 mb-4">
                     <X className="w-3.5 h-3.5 text-red" />
                     <span className="font-heading text-[15px] font-extrabold text-red">{story.amount}</span>
                   </div>
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-[10px] bg-red/10 flex items-center justify-center font-mono text-[11px] font-semibold text-red">{story.init}</div>
+                    <div className="w-9 h-9 rounded-[5px] bg-red/10 flex items-center justify-center font-mono text-[11px] font-semibold text-red">{story.init}</div>
                     <div>
                       <div className="font-body text-[13px] font-semibold text-navy">{story.name}</div>
                       <div className="font-body text-[11px] text-grayText">{story.city} &mdash; {story.cat}</div>
@@ -230,12 +228,12 @@ export default function CommentCaMarchePage() {
               {successStories.map((story, i) => (
                 <div key={i} className={`${activeStory === i ? "block animate-fadeIn" : "hidden"}`}>
                   <p className="font-body text-[15px] md:text-[17px] text-navy leading-relaxed mb-5 min-h-0 md:min-h-[100px]">&ldquo;{story.text}&rdquo;</p>
-                  <div className="inline-flex items-center gap-2 bg-surface rounded-[10px] px-4 py-2.5 mb-4">
+                  <div className="inline-flex items-center gap-2 bg-surface rounded-[5px] px-4 py-2.5 mb-4">
                     <Check className="w-4 h-4 text-forest" />
                     <span className="font-heading text-[15px] font-extrabold text-forest">{story.amount}</span>
                   </div>
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-forest to-sage flex items-center justify-center font-mono text-[11px] font-semibold text-white">{story.init}</div>
+                    <div className="w-9 h-9 rounded-[5px] bg-gradient-to-br from-forest to-sage flex items-center justify-center font-mono text-[11px] font-semibold text-white">{story.init}</div>
                     <div>
                       <div className="font-body text-[13px] font-semibold text-navy">{story.name}</div>
                       <div className="font-body text-[11px] text-grayText">{story.city} &mdash; {story.cat}</div>
@@ -335,7 +333,7 @@ export default function CommentCaMarchePage() {
               { s: "02", t: "L\u2019artisan chiffre sur place", d: "Il se déplace, diagnostique et fait le devis devant vous. Pas de surprise.", h: "Le devis est fait devant vous" },
               { s: "03", t: "Nous validons, il est payé", d: "Nova vérifie. Ce n\u2019est pas vous qui validez \u2014 c\u2019est nous.", h: "Nous sommes votre garantie" },
             ].map((step, i) => (
-              <div key={i} className="p-6 md:p-7 rounded-[20px] bg-bgPage border border-border flex flex-col">
+              <div key={i} className="p-6 md:p-7 rounded-[5px] bg-bgPage border border-border flex flex-col">
                 <div className="font-mono text-4xl font-extrabold text-border mb-2">{step.s}</div>
                 <h3 className="font-heading text-[17px] md:text-[19px] font-extrabold text-navy mb-2.5">{step.t}</h3>
                 <p className="font-body text-[13px] text-grayText leading-relaxed flex-1">{step.d}</p>
@@ -382,8 +380,8 @@ export default function CommentCaMarchePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 md:gap-4">
             {trustPillars.map((p, i) => (
-              <div key={i} className="p-5 md:p-6 rounded-[18px] bg-white border border-border hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                <div className="w-9 h-9 rounded-[10px] bg-surface flex items-center justify-center font-mono text-xs font-bold text-forest mb-3.5">{p.num}</div>
+              <div key={i} className="p-5 md:p-6 rounded-[5px] bg-white border border-border hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+                <div className="w-9 h-9 rounded-[5px] bg-surface flex items-center justify-center font-mono text-xs font-bold text-forest mb-3.5">{p.num}</div>
                 <h3 className="font-heading text-base font-bold text-navy mb-1.5">{p.title}</h3>
                 <p className="font-body text-[13px] text-grayText leading-relaxed">{p.desc}</p>
               </div>
@@ -444,7 +442,7 @@ export default function CommentCaMarchePage() {
           </p>
 
           <Button size="lg" onClick={openSearch}
-            className="bg-white text-deepForest hover:bg-white/90 text-[17px] font-extrabold px-10 py-5 rounded-[14px] animate-[pulse_2s_infinite] mb-4">
+            className="bg-white text-deepForest hover:bg-white/90 text-[17px] font-extrabold px-10 py-5 rounded-[5px] animate-[pulse_2s_infinite] mb-4">
             Trouver un artisan <ArrowRight className="w-4 h-4" />
           </Button>
 
@@ -460,7 +458,7 @@ export default function CommentCaMarchePage() {
               { icon: <Lock className="w-4 h-4 text-lightSage" />, text: "Paiement séquestre" },
               { icon: <Check className="w-4 h-4 text-lightSage" />, text: "Validation Nova" },
             ].map((g, i) => (
-              <div key={i} className="flex items-center gap-2 bg-white/[0.06] rounded-[10px] px-3.5 py-2">
+              <div key={i} className="flex items-center gap-2 bg-white/[0.06] rounded-[5px] px-3.5 py-2">
                 {g.icon}
                 <span className="font-body text-xs text-white/60 font-medium">{g.text}</span>
               </div>
@@ -491,7 +489,7 @@ export default function CommentCaMarchePage() {
                 </div>
 
                 {/* Offer reminder */}
-                <div className="flex items-center gap-2 bg-gradient-to-br from-deepForest to-forest rounded-[10px] px-3.5 py-2.5 mb-5">
+                <div className="flex items-center gap-2 bg-gradient-to-br from-deepForest to-forest rounded-[5px] px-3.5 py-2.5 mb-5">
                   <span className="text-base">&#127873;</span>
                   <div>
                     <div className="font-body text-[11px] font-bold text-white">1er déplacement offert</div>
@@ -690,7 +688,7 @@ export default function CommentCaMarchePage() {
                         <span className={`font-body text-[11px] ${artisan.available ? "text-success font-semibold" : "text-grayText"}`}>{artisan.delai}</span>
                       </div>
                       <button onClick={() => window.location.href = "/login"}
-                        className="w-full py-2.5 rounded-[10px] bg-deepForest text-white font-body text-[13px] font-semibold flex items-center justify-center gap-1.5 border-0 cursor-pointer hover:bg-deepForest/90 transition-colors">
+                        className="w-full py-2.5 rounded-[5px] bg-deepForest text-white font-body text-[13px] font-semibold flex items-center justify-center gap-1.5 border-0 cursor-pointer hover:bg-deepForest/90 transition-colors">
                         Contacter cet artisan <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>

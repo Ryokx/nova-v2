@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Shield, CheckCircle, ArrowLeft } from "lucide-react";
 
@@ -15,6 +16,8 @@ export default function LoginPage() {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [forgotError, setForgotError] = useState("");
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const handleForgotPassword = async () => {
     if (!forgotEmail) return;
@@ -51,10 +54,14 @@ export default function LoginPage() {
     if (result?.error) {
       setError("Email ou mot de passe incorrect");
     } else {
-      const res = await fetch("/api/auth/session");
-      const session = await res.json();
-      const role = session?.user?.role;
-      window.location.href = role === "ARTISAN" ? "/artisan-dashboard" : "/dashboard";
+      if (callbackUrl) {
+        window.location.href = callbackUrl;
+      } else {
+        const res = await fetch("/api/auth/session");
+        const session = await res.json();
+        const role = session?.user?.role;
+        window.location.href = role === "ARTISAN" ? "/artisan-dashboard" : "/artisans";
+      }
     }
   };
 
@@ -63,7 +70,7 @@ export default function LoginPage() {
       <div className="w-full max-w-[420px]">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-[18px] bg-forest/5 flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 rounded-[5px] bg-forest/5 flex items-center justify-center mx-auto mb-4">
             <Shield className="w-7 h-7 text-forest" />
           </div>
           <h1 className="font-heading text-[28px] font-extrabold text-navy mb-1">
@@ -73,11 +80,11 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-[20px] p-7 shadow-sm border border-border">
+        <div className="bg-white rounded-[5px] p-7 shadow-sm border border-border">
           {/* SSO Buttons */}
           <button
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="w-full h-12 rounded-[12px] border border-border bg-white text-navy text-sm font-semibold flex items-center justify-center gap-2.5 mb-2.5 hover:bg-surface transition-colors"
+            onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artisans" })}
+            className="w-full h-12 rounded-[5px] border border-border bg-white text-navy text-sm font-semibold flex items-center justify-center gap-2.5 mb-2.5 hover:bg-surface transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -88,8 +95,8 @@ export default function LoginPage() {
             Continuer avec Google
           </button>
           <button
-            onClick={() => signIn("apple", { callbackUrl: "/dashboard" })}
-            className="w-full h-12 rounded-[12px] bg-black text-white text-sm font-semibold flex items-center justify-center gap-2.5 mb-4 hover:bg-navy transition-colors"
+            onClick={() => signIn("apple", { callbackUrl: callbackUrl || "/artisans" })}
+            className="w-full h-12 rounded-[5px] bg-black text-white text-sm font-semibold flex items-center justify-center gap-2.5 mb-4 hover:bg-navy transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 814 1000" fill="#fff">
               <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57.8-155.5-127.4c-58.3-81.6-105.6-210.8-105.6-334.1C0 397.1 78.6 283.9 190.5 283.9c64.2 0 117.8 42.8 155.5 42.8 39 0 99.7-45.2 172.8-45.2 27.8 0 127.7 2.5 193.3 59.4z"/>
@@ -114,7 +121,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               aria-label="Email"
-              className="w-full h-12 px-4 rounded-[12px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
+              className="w-full h-12 px-4 rounded-[5px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
             />
             <input
               type="password"
@@ -124,7 +131,7 @@ export default function LoginPage() {
               required
               minLength={8}
               aria-label="Mot de passe"
-              className="w-full h-12 px-4 rounded-[12px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
+              className="w-full h-12 px-4 rounded-[5px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
             />
 
             {error && (
@@ -150,7 +157,7 @@ export default function LoginPage() {
 
             {/* Forgot password inline form */}
             {showForgot && (
-              <div className="p-4 rounded-[14px] bg-surface border border-border space-y-3">
+              <div className="p-4 rounded-[5px] bg-surface border border-border space-y-3">
                 {forgotSuccess ? (
                   <div className="text-center py-2">
                     <CheckCircle className="w-8 h-8 text-success mx-auto mb-2" />
@@ -195,7 +202,7 @@ export default function LoginPage() {
                       placeholder="Votre email"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
-                      className="w-full h-10 px-3 rounded-[10px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
+                      className="w-full h-10 px-3 rounded-[5px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
                     />
                     {forgotError && (
                       <p className="text-xs text-red">{forgotError}</p>
@@ -204,7 +211,7 @@ export default function LoginPage() {
                       type="button"
                       onClick={handleForgotPassword}
                       disabled={forgotLoading || !forgotEmail}
-                      className="w-full h-10 rounded-[10px] bg-deepForest text-white font-heading font-bold text-xs hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
+                      className="w-full h-10 rounded-[5px] bg-deepForest text-white font-heading font-bold text-xs hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
                     >
                       {forgotLoading ? (
                         <span className="flex items-center justify-center gap-2">
@@ -223,7 +230,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 rounded-[14px] bg-deepForest text-white font-heading font-bold text-sm hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
+              className="w-full h-12 rounded-[5px] bg-deepForest text-white font-heading font-bold text-sm hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -240,41 +247,71 @@ export default function LoginPage() {
         {/* Switch to signup */}
         <p className="text-center mt-5 text-sm text-grayText">
           Pas encore de compte ?{" "}
-          <Link href="/signup" className="text-forest font-semibold hover:underline">
+          <Link href={callbackUrl ? `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/signup"} className="text-forest font-semibold hover:underline">
             Créer un compte
           </Link>
         </p>
 
         {/* Demo mode */}
-        <div className="mt-6 p-5 rounded-[16px] bg-surface border border-dashed border-forest/15 text-center">
-          <div className="text-xs font-mono font-semibold text-forest mb-3 uppercase tracking-wider">Mode démo</div>
-          <div className="flex gap-2.5 justify-center">
-            <button
-              onClick={() =>
-                signIn("credentials", {
-                  email: "sophie.client@demo.nova.fr",
-                  password: "Demo1234!",
-                  callbackUrl: "/dashboard",
-                })
-              }
-              className="flex-1 h-10 rounded-[10px] border border-border bg-white text-navy text-[13px] font-semibold hover:bg-bgPage transition-colors"
-            >
-              Client
-            </button>
-            <button
-              onClick={() =>
-                signIn("credentials", {
-                  email: "jm.plombier@demo.nova.fr",
-                  password: "Demo1234!",
-                  callbackUrl: "/artisan-dashboard",
-                })
-              }
-              className="flex-1 h-10 rounded-[10px] border border-border bg-white text-navy text-[13px] font-semibold hover:bg-bgPage transition-colors"
-            >
-              Artisan
-            </button>
-          </div>
-        </div>
+        <DemoButtons onError={setError} />
+      </div>
+    </div>
+  );
+}
+
+function DemoButtons({ onError }: { onError: (msg: string) => void }) {
+  const [demoLoading, setDemoLoading] = useState<"client" | "artisan" | null>(null);
+
+  const handleDemo = async (type: "client" | "artisan") => {
+    onError("");
+    setDemoLoading(type);
+    try {
+      const email = type === "client" ? "sophie.client@demo.nova.fr" : "jm.plombier@demo.nova.fr";
+      const result = await signIn("credentials", {
+        email,
+        password: "Demo1234!",
+        redirect: false,
+      });
+      if (result?.error) {
+        onError(`Compte démo ${type} introuvable. Lancez: npx prisma db seed`);
+        setDemoLoading(null);
+      } else {
+        window.location.href = type === "client" ? "/artisans" : "/artisan-dashboard";
+      }
+    } catch {
+      onError("Erreur de connexion. Réessayez.");
+      setDemoLoading(null);
+    }
+  };
+
+  return (
+    <div className="mt-6 p-5 rounded-[5px] bg-surface border border-dashed border-forest/15 text-center">
+      <div className="text-xs font-mono font-semibold text-forest mb-3 uppercase tracking-wider">Mode démo</div>
+      <div className="flex gap-2.5 justify-center">
+        <button
+          disabled={demoLoading !== null}
+          onClick={() => handleDemo("client")}
+          className="flex-1 h-10 rounded-[5px] border border-border bg-white text-navy text-[13px] font-semibold hover:bg-bgPage transition-colors disabled:opacity-50"
+        >
+          {demoLoading === "client" ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="w-3.5 h-3.5 border-2 border-forest/30 border-t-forest rounded-full animate-spin" />
+              Connexion...
+            </span>
+          ) : "Client"}
+        </button>
+        <button
+          disabled={demoLoading !== null}
+          onClick={() => handleDemo("artisan")}
+          className="flex-1 h-10 rounded-[5px] border border-border bg-white text-navy text-[13px] font-semibold hover:bg-bgPage transition-colors disabled:opacity-50"
+        >
+          {demoLoading === "artisan" ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="w-3.5 h-3.5 border-2 border-forest/30 border-t-forest rounded-full animate-spin" />
+              Connexion...
+            </span>
+          ) : "Artisan"}
+        </button>
       </div>
     </div>
   );

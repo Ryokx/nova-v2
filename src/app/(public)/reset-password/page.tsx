@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-bgPage">
         <div className="w-full max-w-[420px] text-center">
-          <div className="w-14 h-14 rounded-[18px] bg-red/10 flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 rounded-[5px] bg-red/10 flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-7 h-7 text-red" />
           </div>
           <h1 className="font-heading text-[24px] font-extrabold text-navy mb-2">
@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
           </p>
           <Link
             href="/login"
-            className="inline-block h-12 px-8 rounded-[14px] bg-deepForest text-white font-heading font-bold text-sm leading-[48px] hover:-translate-y-0.5 transition-all"
+            className="inline-block h-12 px-8 rounded-[5px] bg-deepForest text-white font-heading font-bold text-sm leading-[48px] hover:-translate-y-0.5 transition-all"
           >
             Retour à la connexion
           </Link>
@@ -99,7 +99,7 @@ export default function ResetPasswordPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-bgPage">
         <div className="w-full max-w-[420px] text-center">
-          <div className="w-14 h-14 rounded-[18px] bg-success/10 flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 rounded-[5px] bg-success/10 flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-7 h-7 text-success" />
           </div>
           <h1 className="font-heading text-[24px] font-extrabold text-navy mb-2">
@@ -111,7 +111,7 @@ export default function ResetPasswordPage() {
           </p>
           <Link
             href="/login"
-            className="inline-block h-12 px-8 rounded-[14px] bg-deepForest text-white font-heading font-bold text-sm leading-[48px] hover:-translate-y-0.5 transition-all"
+            className="inline-block h-12 px-8 rounded-[5px] bg-deepForest text-white font-heading font-bold text-sm leading-[48px] hover:-translate-y-0.5 transition-all"
           >
             Se connecter
           </Link>
@@ -125,7 +125,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-[420px]">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-[18px] bg-forest/5 flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 rounded-[5px] bg-forest/5 flex items-center justify-center mx-auto mb-4">
             <Shield className="w-7 h-7 text-forest" />
           </div>
           <h1 className="font-heading text-[28px] font-extrabold text-navy mb-1">
@@ -137,7 +137,7 @@ export default function ResetPasswordPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-[20px] p-7 shadow-sm border border-border">
+        <div className="bg-white rounded-[5px] p-7 shadow-sm border border-border">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Password field */}
             <div>
@@ -152,7 +152,7 @@ export default function ResetPasswordPage() {
                   required
                   minLength={8}
                   placeholder="Minimum 8 caractères"
-                  className="w-full h-12 px-4 pr-11 rounded-[12px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
+                  className="w-full h-12 px-4 pr-11 rounded-[5px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
                 />
                 <button
                   type="button"
@@ -228,7 +228,7 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   placeholder="Retapez votre mot de passe"
-                  className={`w-full h-12 px-4 pr-11 rounded-[12px] border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:ring-2 transition-all ${
+                  className={`w-full h-12 px-4 pr-11 rounded-[5px] border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:ring-2 transition-all ${
                     confirmPassword.length > 0 && confirmPassword !== password
                       ? "border-red focus:border-red focus:ring-red/10"
                       : "border-border focus:border-forest focus:ring-forest/10"
@@ -255,7 +255,7 @@ export default function ResetPasswordPage() {
 
             {/* Error */}
             {error && (
-              <div className="flex items-center gap-2 p-3 rounded-[10px] bg-red/5 border border-red/10">
+              <div className="flex items-center gap-2 p-3 rounded-[5px] bg-red/5 border border-red/10">
                 <AlertCircle className="w-4 h-4 text-red shrink-0" />
                 <p className="text-xs text-red">{error}</p>
               </div>
@@ -265,7 +265,7 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading || !isValid}
-              className="w-full h-12 rounded-[14px] bg-deepForest text-white font-heading font-bold text-sm hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
+              className="w-full h-12 rounded-[5px] bg-deepForest text-white font-heading font-bold text-sm hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">

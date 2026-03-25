@@ -1,9 +1,31 @@
 import Link from "next/link";
-import { Shield, Lock, Check, FileText } from "lucide-react";
+import {
+  Shield,
+  Lock,
+  Check,
+  FileText,
+  Home,
+  Search,
+  ClipboardList,
+  Bell,
+  User,
+  Smartphone,
+  PenTool,
+  Video,
+  Moon,
+  AlertTriangle,
+  Wrench,
+  Star,
+  ArrowRight,
+  ChevronRight,
+  Zap,
+  BadgeCheck,
+  MapPin,
+} from "lucide-react";
 
-/* ━━━ SVG Icons (matching prototype) ━━━ */
+/* ━━━ Custom SVG Icons ━━━ */
 const ShieldIcon = ({ size = 28, color = "#1B6B4E" }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill={color} opacity=".12" />
     <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" stroke={color} strokeWidth="1.5" fill="none" />
     <path d="M9 12l2 2 4-4" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -11,104 +33,125 @@ const ShieldIcon = ({ size = 28, color = "#1B6B4E" }: { size?: number; color?: s
 );
 
 const LockIcon = ({ size = 18, color = "#1B6B4E" }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <rect x="5" y="11" width="14" height="10" rx="2" stroke={color} strokeWidth="1.5" />
     <path d="M8 11V7a4 4 0 118 0v4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
     <circle cx="12" cy="16" r="1.5" fill={color} />
   </svg>
 );
 
+/* ━━━ Phone tab bar icons ━━━ */
+const TabIcon = ({ icon: Icon, active = false }: { icon: React.ElementType; active?: boolean }) => (
+  <Icon className={`w-[14px] h-[14px] ${active ? "text-forest" : "text-grayText/40"}`} strokeWidth={active ? 2.5 : 1.5} />
+);
+
 export default function HomePage() {
   return (
     <div>
-      {/* ━━━ HERO — Asymmetric layout with phone preview ━━━ */}
-      <section className="relative overflow-hidden min-h-[calc(100vh-64px)] flex items-center px-5 md:px-10" style={{ background: "linear-gradient(150deg, #F5FAF7 0%, #E8F5EE 40%, #D4EBE0 100%)" }}>
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          HERO — Asymmetric layout with floating phone
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section
+        className="relative overflow-hidden min-h-[calc(100vh-72px)] flex items-center px-5 md:px-10"
+        style={{ background: "linear-gradient(160deg, #F5FAF7 0%, #E8F5EE 35%, #D4EBE0 70%, #C8E6D5 100%)" }}
+      >
         {/* Decorative blobs */}
-        <div className="absolute -top-[120px] -right-[80px] w-[400px] h-[400px] rounded-full bg-forest/[0.07] blur-[80px]" />
-        <div className="absolute -bottom-[100px] -left-[60px] w-[300px] h-[300px] rounded-full bg-gold/[0.06] blur-[60px]" />
-        <div className="absolute top-[40%] left-[30%] w-[200px] h-[200px] rounded-full bg-success/[0.05] blur-[50px]" />
+        <div className="absolute -top-[120px] -right-[80px] w-[500px] h-[500px] rounded-full bg-forest/[0.06] blur-[100px]" />
+        <div className="absolute -bottom-[100px] -left-[60px] w-[350px] h-[350px] rounded-full bg-gold/[0.05] blur-[80px]" />
+        <div className="absolute top-[30%] left-[25%] w-[250px] h-[250px] rounded-full bg-sage/[0.04] blur-[60px]" />
 
-        <div className="max-w-[1200px] mx-auto w-full flex items-center gap-[60px] relative z-10">
+        <div className="max-w-[1140px] mx-auto w-full flex items-center gap-20 relative z-10">
           {/* Left — Text content */}
-          <div className="flex-1 min-w-0 py-20">
+          <div className="flex-1 min-w-0 py-16 md:py-20">
             {/* Pain point badge */}
-            <div className="inline-flex items-center gap-2 bg-red/[0.06] border border-red/[0.12] rounded-[20px] px-4 py-[7px] mb-6 text-[13px] font-semibold text-red animate-pageIn">
-              ⚠ 67% des Français ont déjà eu un litige avec un artisan
+            <div className="inline-flex items-center gap-2 bg-red/[0.06] border border-red/[0.1] rounded-lg px-4 py-2 mb-7 text-[13px] font-semibold text-red motion-safe:animate-pageIn">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              67% des Français ont déjà eu un litige avec un artisan
             </div>
 
-            <h1 className="font-heading text-[40px] md:text-[56px] font-extrabold text-navy leading-[1.1] tracking-[-2px] mb-2 animate-pageIn [animation-delay:100ms]">
-              Fini les artisans<br />
-              <span className="text-red line-through decoration-[3px] opacity-50">douteux</span>
+            <h1 className="font-heading text-[36px] md:text-[54px] font-extrabold text-navy leading-[1.08] tracking-[-1.5px] mb-2 motion-safe:animate-pageIn motion-safe:[animation-delay:80ms]" style={{ textWrap: "balance" as never }}>
+              Fini les artisans{" "}
+              <span className="text-red/50 line-through decoration-[3px] decoration-red/30">douteux</span>
             </h1>
-            <h1 className="font-heading text-[40px] md:text-[56px] font-extrabold text-forest leading-[1.1] tracking-[-2px] mb-6 animate-pageIn [animation-delay:200ms]">
-              Place aux certifiés.
+            <h1 className="font-heading text-[36px] md:text-[54px] font-extrabold leading-[1.08] tracking-[-1.5px] mb-7 motion-safe:animate-pageIn motion-safe:[animation-delay:160ms]">
+              <span className="bg-gradient-to-r from-deepForest via-forest to-sage bg-clip-text text-transparent">
+                Place aux certifiés.
+              </span>
             </h1>
 
-            <p className="text-lg text-[#4A5568] leading-[1.8] max-w-[480px] mb-4 animate-pageIn [animation-delay:300ms]">
-              Nova vérifie chaque artisan <span className="font-bold text-navy">(SIRET, décennale, RGE)</span> et bloque votre paiement en <span className="font-bold text-navy">séquestre</span> jusqu&apos;à validation de l&apos;intervention.
+            <p className="text-[17px] text-navy/60 leading-[1.75] max-w-[480px] mb-5 motion-safe:animate-pageIn motion-safe:[animation-delay:240ms]">
+              Nova vérifie chaque artisan <span className="font-semibold text-navy">(SIRET, décennale, RGE)</span> et bloque votre paiement en <span className="font-semibold text-navy">séquestre</span> jusqu&apos;à validation de l&apos;intervention.
             </p>
 
             {/* Trust micro-badges */}
-            <div className="flex gap-4 mb-8 flex-wrap animate-pageIn [animation-delay:400ms]">
+            <div className="flex gap-5 mb-9 flex-wrap motion-safe:animate-pageIn motion-safe:[animation-delay:320ms]">
               {[
-                { icon: <Shield className="w-3.5 h-3.5" />, text: "Artisans vérifiés" },
-                { icon: <Lock className="w-3.5 h-3.5" />, text: "Paiement séquestre" },
-                { icon: <Check className="w-3.5 h-3.5" />, text: "0% d'impayés" },
+                { icon: <Shield className="w-4 h-4 text-forest" />, text: "Artisans vérifiés" },
+                { icon: <Lock className="w-4 h-4 text-forest" />, text: "Paiement séquestre" },
+                { icon: <BadgeCheck className="w-4 h-4 text-forest" />, text: "0% d'impayés" },
               ].map((b) => (
-                <div key={b.text} className="flex items-center gap-1.5 text-xs font-semibold text-[#14523B]">
-                  {b.icon} {b.text}
+                <div key={b.text} className="flex items-center gap-2 text-[13px] font-semibold text-deepForest/80">
+                  <div className="w-7 h-7 rounded-lg bg-forest/[0.07] flex items-center justify-center">{b.icon}</div>
+                  {b.text}
                 </div>
               ))}
             </div>
 
             {/* CTAs */}
-            <div className="flex gap-3 animate-pageIn [animation-delay:500ms]">
-              <Link href="/signup" className="px-9 py-4 rounded-[14px] bg-gradient-to-br from-deepForest to-forest text-white text-base font-bold font-heading shadow-[0_8px_24px_rgba(10,64,48,0.3)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(10,64,48,0.4)] transition-all">
+            <div className="flex gap-3 flex-wrap motion-safe:animate-pageIn motion-safe:[animation-delay:400ms]">
+              <Link
+                href="/signup"
+                className="group flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-br from-deepForest to-forest text-white text-[15px] font-bold font-heading shadow-[0_8px_24px_rgba(10,64,48,0.3)] hover:shadow-[0_12px_32px_rgba(10,64,48,0.4)] active:scale-[0.97] transition-all duration-200 cursor-pointer"
+              >
                 Trouver mon artisan
+                <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
-              <Link href="/login" className="px-7 py-4 rounded-[14px] bg-white/70 backdrop-blur-[10px] text-navy border border-border text-[15px] font-semibold hover:-translate-y-0.5 transition-transform">
-                Voir la démo →
+              <Link
+                href="/login"
+                className="flex items-center gap-2 px-7 py-4 rounded-xl bg-white/80 backdrop-blur-md text-navy border border-border/60 text-[15px] font-semibold hover:bg-white hover:border-border active:scale-[0.97] transition-all duration-200 cursor-pointer"
+              >
+                Voir la démo
+                <ChevronRight className="w-4 h-4 text-navy/40" />
               </Link>
             </div>
 
-            {/* Micro social proof */}
-            <div className="flex items-center gap-2.5 mt-7 animate-pageIn [animation-delay:600ms]">
+            {/* Social proof */}
+            <div className="flex items-center gap-3 mt-8 motion-safe:animate-pageIn motion-safe:[animation-delay:500ms]">
               <div className="flex">
                 {["SL", "PM", "CD", "AM"].map((ini, i) => (
-                  <div key={ini} className="w-8 h-8 rounded-full border-2 border-surface flex items-center justify-center text-[9px] font-bold text-forest" style={{ background: `hsl(${150 + i * 30}, 35%, 85%)`, marginLeft: i > 0 ? -8 : 0 }}>
+                  <div key={ini} className="w-8 h-8 rounded-full border-[2.5px] border-bgPage flex items-center justify-center text-[9px] font-bold text-forest shadow-sm" style={{ background: `hsl(${150 + i * 25}, 30%, 87%)`, marginLeft: i > 0 ? -8 : 0, zIndex: 4 - i }}>
                     {ini}
                   </div>
                 ))}
               </div>
-              <div className="text-xs text-grayText">
-                <span className="font-bold text-navy">Rejoignez-les</span> — Inscription gratuite, sans engagement
+              <div className="text-[13px] text-navy/50">
+                <span className="font-bold text-navy/80">Rejoignez-les</span> — Gratuit, sans engagement
               </div>
             </div>
           </div>
 
-          {/* Right — Phone mockup preview */}
-          <div className="hidden lg:block flex-none w-[300px] relative animate-pageIn [animation-delay:400ms]">
-            <div className="w-[280px] h-[560px] rounded-[44px] bg-navy p-2.5 shadow-[0_30px_80px_rgba(10,22,40,0.2)]" style={{ transform: "rotate(2deg)" }}>
-              {/* Notch */}
+          {/* Right — Floating phone mockup (L3: animate-float) */}
+          <div className="hidden lg:block flex-none w-[320px] relative motion-safe:animate-pageIn motion-safe:[animation-delay:300ms]">
+            <div className="w-[280px] h-[560px] rounded-[36px] bg-navy p-2.5 shadow-[0_40px_100px_rgba(10,22,40,0.25)] motion-safe:animate-float">
+              {/* Dynamic Island */}
               <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[90px] h-[26px] rounded-b-2xl bg-navy z-10">
-                <div className="w-11 h-1 rounded-sm bg-white/[0.12] mx-auto mt-3.5" />
+                <div className="w-11 h-1 rounded-full bg-white/[0.12] mx-auto mt-3.5" />
               </div>
               {/* Screen */}
-              <div className="w-full h-full rounded-[36px] overflow-hidden" style={{ background: "linear-gradient(170deg, #E8F5EE, #F5FAF7)" }}>
+              <div className="w-full h-full rounded-[32px] overflow-hidden" style={{ background: "linear-gradient(170deg, #E8F5EE, #F5FAF7)" }}>
                 <div className="pt-[34px] px-3.5">
-                  {/* Header */}
-                  <div className="flex items-center mb-3 relative">
+                  <div className="flex items-center mb-3">
                     <span className="font-heading text-[13px] font-extrabold text-navy tracking-tight">Nova</span>
-                    <div className="w-[3.5px] h-[3.5px] rounded-full bg-gold absolute top-0 right-[-3px]" />
+                    <div className="w-[3px] h-[3px] rounded-full bg-gold ml-0.5" />
                     <div className="ml-auto w-6 h-6 rounded-lg bg-surface flex items-center justify-center">
                       <LockIcon size={12} />
                     </div>
                   </div>
-                  <div className="font-heading text-sm font-extrabold text-navy mb-3">Bonjour Sophie 👋</div>
-                  {/* Mini stats */}
+                  <div className="font-heading text-sm font-extrabold text-navy mb-3">Bonjour Sophie</div>
+                  {/* Stats cards */}
                   <div className="flex gap-[5px] mb-2.5">
                     {[{ v: "2", l: "En cours", c: "text-success" }, { v: "570€", l: "Séquestre", c: "text-forest" }].map((k) => (
-                      <div key={k.l} className="flex-1 bg-white rounded-[10px] py-[7px] px-1.5 text-center border border-border">
+                      <div key={k.l} className="flex-1 bg-white rounded-lg py-[7px] px-1.5 text-center border border-border/50 shadow-sm">
                         <div className={`font-mono text-xs font-bold ${k.c}`}>{k.v}</div>
                         <div className="text-[7px] text-grayText">{k.l}</div>
                       </div>
@@ -120,180 +163,301 @@ export default function HomePage() {
                     { ini: "SM", name: "Sophie M.", desc: "Prise électrique", badge: "Terminée", bColor: "#1B6B4E" },
                     { ini: "KB", name: "Karim B.", desc: "Serrure", badge: "Validée", bColor: "#F5A623" },
                   ].map((m) => (
-                    <div key={m.ini} className="bg-white rounded-md p-2 mb-[5px] border border-surface flex gap-2 items-center">
+                    <div key={m.ini} className="bg-white rounded-lg p-2 mb-[5px] border border-border/30 shadow-sm flex gap-2 items-center">
                       <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-surface to-border flex items-center justify-center text-[8px] font-bold text-forest">{m.ini}</div>
                       <div className="flex-1">
                         <div className="text-[10px] font-bold text-navy">{m.name}</div>
                         <div className="text-[8px] text-grayText">{m.desc}</div>
                       </div>
-                      <span className="text-[7px] font-bold px-[5px] py-[2px] rounded" style={{ color: m.bColor, background: m.bColor + "15" }}>{m.badge}</span>
+                      <span className="text-[7px] font-bold px-[5px] py-[2px] rounded-sm" style={{ color: m.bColor, background: m.bColor + "15" }}>{m.badge}</span>
                     </div>
                   ))}
-                  {/* Séquestre visual */}
-                  <div className="bg-gradient-to-br from-deepForest to-forest rounded-md p-2.5 mt-2">
+                  {/* Escrow card */}
+                  <div className="bg-gradient-to-br from-deepForest to-forest rounded-xl p-2.5 mt-2 shadow-[0_4px_16px_rgba(10,64,48,0.2)]">
                     <div className="flex items-center gap-[5px] mb-1">
                       <LockIcon size={10} color="#8ECFB0" />
                       <span className="text-[8px] font-bold text-lightSage">Paiement en séquestre</span>
                     </div>
                     <div className="font-mono text-base font-bold text-white">570,00 €</div>
-                    <div className="text-[7px] text-white/50">Protégé jusqu&apos;à validation</div>
+                    <div className="w-full h-1 rounded-full bg-white/10 mt-1.5">
+                      <div className="w-[65%] h-full rounded-full bg-lightSage/60" />
+                    </div>
+                    <div className="text-[7px] text-white/50 mt-1">Protégé jusqu&apos;à validation</div>
                   </div>
                   {/* Tab bar */}
                   <div className="flex justify-around pt-2.5 mt-2.5 border-t border-surface">
-                    {["🏠", "🔍", "📋", "🔔", "👤"].map((e, i) => (
-                      <span key={e} className="text-[13px]" style={{ opacity: i === 0 ? 1 : 0.35 }}>{e}</span>
-                    ))}
+                    <TabIcon icon={Home} active />
+                    <TabIcon icon={Search} />
+                    <TabIcon icon={ClipboardList} />
+                    <TabIcon icon={Bell} />
+                    <TabIcon icon={User} />
                   </div>
                 </div>
               </div>
             </div>
-            {/* Floating notification */}
-            <div className="absolute top-20 -left-[60px] bg-white rounded-[14px] px-3.5 py-2.5 shadow-lg border border-surface flex items-center gap-2 max-w-[200px] animate-pageIn [animation-delay:800ms]">
-              <div className="w-7 h-7 rounded-lg bg-surface flex items-center justify-center"><Check className="w-3.5 h-3.5 text-success" /></div>
+
+            {/* Floating card — Intervention validée (L3: pulse ring) */}
+            <div className="absolute top-16 -left-[70px] bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-border/40 flex items-center gap-2.5 max-w-[210px] motion-safe:animate-pageIn motion-safe:[animation-delay:700ms]">
+              <div className="relative">
+                <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
+                  <Check className="w-4 h-4 text-success" />
+                </div>
+                <div className="absolute inset-0 rounded-lg bg-success/20 motion-safe:animate-pulse-ring" />
+              </div>
               <div>
-                <div className="text-[10px] font-bold text-navy">Intervention validée</div>
-                <div className="text-[8px] text-grayText">Paiement libéré • 320€</div>
+                <div className="text-[11px] font-bold text-navy">Intervention validée</div>
+                <div className="text-[9px] text-grayText">Paiement libéré • 320€</div>
               </div>
             </div>
-            {/* Floating shield */}
-            <div className="absolute bottom-[100px] -right-[30px] bg-white rounded-[14px] px-3.5 py-2.5 shadow-lg border border-surface flex items-center gap-2 animate-pageIn [animation-delay:1000ms]">
-              <ShieldIcon size={18} />
+
+            {/* Floating card — Artisan certifié */}
+            <div className="absolute bottom-[90px] -right-[40px] bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-border/40 flex items-center gap-2.5 motion-safe:animate-pageIn motion-safe:[animation-delay:900ms]">
+              <div className="w-8 h-8 rounded-lg bg-forest/[0.08] flex items-center justify-center">
+                <ShieldIcon size={16} />
+              </div>
               <div>
-                <div className="text-[10px] font-bold text-navy">Artisan certifié</div>
-                <div className="text-[8px] text-grayText">SIRET • Décennale • RGE</div>
+                <div className="text-[11px] font-bold text-navy">Artisan certifié</div>
+                <div className="text-[9px] text-grayText">SIRET • Décennale • RGE</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ━━━ TRUST PILLARS ━━━ */}
-      <section className="py-16 px-5 md:px-10 bg-white">
-        <div className="max-w-[1000px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { icon: <ShieldIcon size={28} />, title: "Artisans certifiés", desc: "Chaque artisan est audité, vérifié et assuré avant d'être référencé sur la plateforme." },
-            { icon: <LockIcon size={28} />, title: "Paiement séquestre", desc: "Votre argent est bloqué sur un compte sécurisé. L'artisan n'est payé qu'après validation par Nova." },
-            { icon: <Check className="w-7 h-7 text-forest" />, title: "Validation Nova", desc: "Notre équipe contrôle et valide chaque mission avant de libérer le paiement vers l'artisan." },
-          ].map((p) => (
-            <div key={p.title} className="p-7 rounded-xl bg-surface border border-border hover:-translate-y-1 hover:shadow-md transition-all">
-              <div className="w-[52px] h-[52px] rounded-lg bg-forest/[0.04] flex items-center justify-center mb-4">{p.icon}</div>
-              <h3 className="font-heading text-lg font-bold text-navy mb-2">{p.title}</h3>
-              <p className="text-sm text-[#4A5568] leading-relaxed">{p.desc}</p>
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          TRUST — Bento grid (L2: break equal-grid syndrome)
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="py-20 px-5 md:px-10 bg-white">
+        <div className="max-w-[1140px] mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="font-heading text-[32px] md:text-[38px] font-extrabold text-navy mb-3" style={{ textWrap: "balance" as never }}>
+              Un système de confiance unique
+            </h2>
+            <p className="text-[16px] text-navy/50 max-w-[460px] mx-auto leading-relaxed">
+              Votre argent est protégé, vos artisans sont vérifiés, chaque mission est contrôlée.
+            </p>
+          </div>
+
+          {/* Bento grid: 1 large featured + 2 smaller */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Featured card — Escrow (span full on md) */}
+            <div className="md:row-span-2 group relative p-8 rounded-2xl overflow-hidden cursor-default" style={{ background: "linear-gradient(160deg, #0A4030 0%, #1B6B4E 100%)" }}>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-5">
+                  <LockIcon size={28} color="#8ECFB0" />
+                </div>
+                <h3 className="font-heading text-2xl font-extrabold text-white mb-2">Paiement séquestre</h3>
+                <p className="text-[15px] text-white/70 leading-relaxed mb-6 max-w-[380px]">
+                  Votre argent est bloqué sur un compte sécurisé dès la signature du devis. L&apos;artisan n&apos;est payé qu&apos;après votre validation.
+                </p>
+
+                {/* L3: Escrow flow visualization */}
+                <div className="flex items-center gap-3 mb-4">
+                  {[
+                    { label: "Vous payez", icon: <CreditCardIcon /> },
+                    { label: "Séquestre", icon: <Lock className="w-4 h-4 text-lightSage" /> },
+                    { label: "Validation", icon: <Check className="w-4 h-4 text-lightSage" /> },
+                    { label: "Artisan payé", icon: <BadgeCheck className="w-4 h-4 text-lightSage" /> },
+                  ].map((step, i) => (
+                    <div key={step.label} className="flex items-center gap-3">
+                      <div className="flex flex-col items-center gap-1.5">
+                        <div className="w-9 h-9 rounded-lg bg-white/[0.12] flex items-center justify-center">{step.icon}</div>
+                        <span className="text-[9px] font-semibold text-white/60 whitespace-nowrap">{step.label}</span>
+                      </div>
+                      {i < 3 && <div className="w-6 h-[2px] bg-lightSage/30 rounded-full mt-[-14px]" />}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="inline-flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2 text-[13px] font-bold text-lightSage">
+                  <Lock className="w-3.5 h-3.5" /> 0€ de risque pour vous
+                </div>
+              </div>
+              {/* Decorative glow */}
+              <div className="absolute -bottom-20 -right-20 w-[250px] h-[250px] rounded-full bg-sage/[0.15] blur-[80px]" />
             </div>
-          ))}
+
+            {/* Card 2 — Certifications */}
+            <div className="group p-7 rounded-2xl bg-bgPage border border-border/50 hover:border-forest/20 hover:shadow-lg active:scale-[0.99] transition-all duration-200 cursor-default">
+              <div className="w-12 h-12 rounded-xl bg-forest/[0.08] group-hover:bg-forest/[0.12] flex items-center justify-center mb-4 transition-colors">
+                <ShieldIcon size={26} />
+              </div>
+              <h3 className="font-heading text-xl font-bold text-navy mb-2">Artisans certifiés</h3>
+              <p className="text-[14px] text-navy/55 leading-relaxed mb-4">
+                Chaque artisan est audité et vérifié avant d&apos;être référencé. Documents obligatoires contrôlés par notre équipe.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {["SIRET vérifié", "Décennale", "Pièce d'identité"].map((tag) => (
+                  <span key={tag} className="inline-flex items-center gap-1 text-[11px] font-bold text-forest bg-forest/[0.06] px-2.5 py-1 rounded-lg">
+                    <Check className="w-3 h-3" /> {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Card 3 — Validation */}
+            <div className="group p-7 rounded-2xl bg-bgPage border border-border/50 hover:border-forest/20 hover:shadow-lg active:scale-[0.99] transition-all duration-200 cursor-default">
+              <div className="w-12 h-12 rounded-xl bg-forest/[0.08] group-hover:bg-forest/[0.12] flex items-center justify-center mb-4 transition-colors">
+                <Check className="w-6 h-6 text-forest" />
+              </div>
+              <h3 className="font-heading text-xl font-bold text-navy mb-2">Validation Nova</h3>
+              <p className="text-[14px] text-navy/55 leading-relaxed mb-4">
+                Notre équipe contrôle et valide chaque mission avant de libérer le paiement. Vous gardez le contrôle total.
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 text-[12px] font-bold text-success">
+                  <div className="relative">
+                    <div className="w-2 h-2 rounded-full bg-success" />
+                    <div className="absolute inset-0 w-2 h-2 rounded-full bg-success motion-safe:animate-pulse-ring" />
+                  </div>
+                  100% des missions contrôlées
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ━━━ HOW IT WORKS ━━━ */}
-      <section className="py-16 px-5 md:px-10 bg-bgPage">
-        <div className="max-w-[800px] mx-auto text-center">
-          <h2 className="font-heading text-[32px] font-extrabold text-navy mb-10">Comment ça marche</h2>
-          <div className="flex flex-col md:flex-row gap-0">
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          HOW IT WORKS — Horizontal stepper (L2)
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="py-20 px-5 md:px-10 bg-bgPage">
+        <div className="max-w-[960px] mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="font-heading text-[32px] md:text-[38px] font-extrabold text-navy mb-3">Comment ça marche</h2>
+            <p className="text-[16px] text-navy/50">De la recherche à la validation, en 4 étapes.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-0 relative">
+            {/* Connecting line (desktop only) */}
+            <div className="hidden md:block absolute top-7 left-[12.5%] right-[12.5%] h-[2px] bg-border/60 z-0" />
+
             {[
-              { step: "1", title: "Trouvez", desc: "Recherchez un artisan certifié par catégorie ou urgence" },
-              { step: "2", title: "Réservez", desc: "Prenez rendez-vous et acceptez le devis en ligne" },
-              { step: "3", title: "Payez en séquestre", desc: "Votre argent est bloqué, pas débité" },
-              { step: "4", title: "On valide", desc: "Nova vérifie la mission et libère le paiement" },
+              { icon: <Search className="w-5 h-5" />, title: "Trouvez", desc: "Recherchez un artisan certifié par catégorie ou urgence", accent: "from-forest to-sage" },
+              { icon: <FileText className="w-5 h-5" />, title: "Réservez", desc: "Prenez rendez-vous et acceptez le devis en ligne", accent: "from-forest to-sage" },
+              { icon: <Lock className="w-5 h-5" />, title: "Payez en séquestre", desc: "Votre argent est bloqué, pas débité", accent: "from-deepForest to-forest" },
+              { icon: <Check className="w-5 h-5" />, title: "On valide", desc: "Nova vérifie la mission et libère le paiement", accent: "from-deepForest to-forest" },
             ].map((s, i) => (
-              <div key={s.step} className="flex-1 text-center relative">
-                {i < 3 && <div className="hidden md:block absolute top-5 left-[60%] w-[80%] h-0.5 bg-border z-0" />}
-                <div className="w-10 h-10 rounded-full bg-deepForest text-white flex items-center justify-center text-base font-bold mx-auto mb-3 relative z-10">{s.step}</div>
-                <h4 className="text-[15px] font-bold text-navy mb-1">{s.title}</h4>
-                <p className="text-[13px] text-grayText leading-snug px-2">{s.desc}</p>
+              <div key={i} className="flex flex-col items-center text-center relative z-10">
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.accent} text-white flex items-center justify-center mb-4 shadow-[0_4px_14px_rgba(10,64,48,0.2)]`}>
+                  {s.icon}
+                </div>
+                <h4 className="text-[15px] font-bold text-navy mb-1.5">{s.title}</h4>
+                <p className="text-[13px] text-navy/45 leading-snug px-2 max-w-[180px]">{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ━━━ APP DEMO PREVIEW ━━━ */}
-      <section className="py-20 px-5 md:px-10 overflow-hidden" style={{ background: "linear-gradient(170deg, #0A4030 0%, #1B6B4E 100%)" }}>
-        <div className="max-w-[1100px] mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-white/10 rounded-[20px] px-4 py-1.5 mb-4 text-xs font-semibold text-white/80">
-              Découvrez la plateforme
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          DEMO PREVIEW — Glassmorphism cards
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section data-navbar-dark className="py-20 px-5 md:px-10 overflow-hidden" style={{ background: "linear-gradient(170deg, #0A4030 0%, #143D2E 50%, #1B6B4E 100%)" }}>
+        <div className="max-w-[1140px] mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 bg-white/[0.08] rounded-lg px-4 py-2 mb-5 text-[12px] font-semibold text-white/70">
+              <Zap className="w-3.5 h-3.5" /> Découvrez la plateforme
             </div>
-            <h2 className="font-heading text-4xl font-extrabold text-white mb-3">Testez Nova en mode démo</h2>
-            <p className="text-base text-white/65 max-w-[500px] mx-auto">
-              Explorez l&apos;interface complète sans créer de compte. Choisissez votre profil.
+            <h2 className="font-heading text-[32px] md:text-[40px] font-extrabold text-white mb-3" style={{ textWrap: "balance" as never }}>
+              Testez Nova en mode démo
+            </h2>
+            <p className="text-[16px] text-white/55 max-w-[480px] mx-auto leading-relaxed">
+              Explorez l&apos;interface complète sans créer de compte.
             </p>
           </div>
 
-          {/* Two demo cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[800px] mx-auto mb-12">
-            <Link href="/login" className="group bg-white/[0.08] backdrop-blur-xl rounded-3xl p-7 border border-white/[0.12] hover:-translate-y-1 hover:bg-white/[0.14] transition-all">
-              <div className="w-14 h-14 rounded-[18px] bg-white/[0.12] flex items-center justify-center mb-5 text-[28px]">🏠</div>
-              <h3 className="font-heading text-[22px] font-extrabold text-white mb-2">Je suis particulier</h3>
-              <p className="text-sm text-white/60 leading-relaxed mb-5">Trouvez un artisan certifié, réservez en ligne, payez en séquestre. Suivi temps réel de l&apos;intervention.</p>
-              <div className="flex flex-wrap gap-1.5 mb-5">
-                {["Recherche artisans", "Réservation", "Vidéo diagnostic", "Signature devis", "Paiement 3x/4x", "Suivi live"].map((f) => (
-                  <span key={f} className="px-2.5 py-1 rounded-lg bg-lightSage/15 text-lightSage text-[11px] font-semibold">{f}</span>
-                ))}
-              </div>
-              <div className="flex items-center gap-2 text-lightSage font-bold text-[15px]">
-                Explorer le mode client <span className="text-lg">→</span>
+          {/* Demo cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[840px] mx-auto mb-14">
+            <Link href="/login" className="group relative bg-white/[0.06] backdrop-blur-xl rounded-2xl p-7 border border-white/[0.1] hover:bg-white/[0.1] hover:border-white/[0.18] active:scale-[0.98] transition-all duration-200 cursor-pointer overflow-hidden">
+              <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-lightSage/[0.04] rounded-full blur-[60px] -translate-y-1/2 translate-x-1/3" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-xl bg-white/[0.1] flex items-center justify-center mb-5">
+                  <Home className="w-7 h-7 text-lightSage" />
+                </div>
+                <h3 className="font-heading text-[22px] font-extrabold text-white mb-2">Je suis particulier</h3>
+                <p className="text-[14px] text-white/55 leading-relaxed mb-5">
+                  Trouvez un artisan certifié, réservez en ligne, payez en séquestre. Suivi temps réel.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {["Recherche artisans", "Réservation", "Vidéo diagnostic", "Signature devis", "Paiement 3x/4x", "Suivi live"].map((f) => (
+                    <span key={f} className="px-2.5 py-1 rounded-lg bg-lightSage/[0.12] text-lightSage/90 text-[11px] font-semibold">{f}</span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-lightSage font-bold text-[15px] group-hover:gap-3 transition-all duration-200">
+                  Explorer le mode client <ChevronRight className="w-4 h-4" />
+                </div>
               </div>
             </Link>
 
-            <Link href="/login" className="group bg-white/[0.08] backdrop-blur-xl rounded-3xl p-7 border border-white/[0.12] hover:-translate-y-1 hover:bg-white/[0.14] transition-all">
-              <div className="w-14 h-14 rounded-[18px] bg-white/[0.12] flex items-center justify-center mb-5 text-[28px]">🔧</div>
-              <h3 className="font-heading text-[22px] font-extrabold text-white mb-2">Je suis artisan</h3>
-              <p className="text-sm text-white/60 leading-relaxed mb-5">Gérez vos missions, créez vos devis et factures, suivez vos paiements. Tout depuis un seul tableau de bord.</p>
-              <div className="flex flex-wrap gap-1.5 mb-5">
-                {["Dashboard KPIs", "Devis en ligne", "Facturation auto", "Comptabilité", "QR code profil", "Carnet clients"].map((f) => (
-                  <span key={f} className="px-2.5 py-1 rounded-lg bg-gold/15 text-[#F5D090] text-[11px] font-semibold">{f}</span>
-                ))}
-              </div>
-              <div className="flex items-center gap-2 text-[#F5D090] font-bold text-[15px]">
-                Explorer le mode artisan <span className="text-lg">→</span>
+            <Link href="/login" className="group relative bg-white/[0.06] backdrop-blur-xl rounded-2xl p-7 border border-white/[0.1] hover:bg-white/[0.1] hover:border-white/[0.18] active:scale-[0.98] transition-all duration-200 cursor-pointer overflow-hidden">
+              <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-gold/[0.04] rounded-full blur-[60px] -translate-y-1/2 translate-x-1/3" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-xl bg-white/[0.1] flex items-center justify-center mb-5">
+                  <Wrench className="w-7 h-7 text-[#F5D090]" />
+                </div>
+                <h3 className="font-heading text-[22px] font-extrabold text-white mb-2">Je suis artisan</h3>
+                <p className="text-[14px] text-white/55 leading-relaxed mb-5">
+                  Gérez vos missions, créez vos devis et factures, suivez vos paiements.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {["Dashboard KPIs", "Devis en ligne", "Facturation auto", "Comptabilité", "QR code profil", "Carnet clients"].map((f) => (
+                    <span key={f} className="px-2.5 py-1 rounded-lg bg-gold/[0.12] text-[#F5D090]/90 text-[11px] font-semibold">{f}</span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-[#F5D090] font-bold text-[15px] group-hover:gap-3 transition-all duration-200">
+                  Explorer le mode artisan <ChevronRight className="w-4 h-4" />
+                </div>
               </div>
             </Link>
           </div>
 
           {/* Feature highlights */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-[900px] mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-[900px] mx-auto">
             {[
-              { icon: <LockIcon size={22} color="#8ECFB0" />, title: "Séquestre", desc: "Paiement bloqué jusqu'à validation" },
-              { icon: <ShieldIcon size={22} color="#8ECFB0" />, title: "Certifications", desc: "SIRET, décennale, RGE vérifiés" },
-              { icon: <Check className="w-[22px] h-[22px] text-lightSage" />, title: "Suivi live", desc: "Artisan en route, sur place, terminé" },
-              { icon: <FileText className="w-[22px] h-[22px] text-lightSage" />, title: "Tout en ligne", desc: "Devis, signature, facture, compta" },
+              { icon: <LockIcon size={20} color="#8ECFB0" />, title: "Séquestre", desc: "Paiement bloqué" },
+              { icon: <ShieldIcon size={20} color="#8ECFB0" />, title: "Certifications", desc: "SIRET, décennale, RGE" },
+              { icon: <MapPin className="w-5 h-5 text-lightSage" />, title: "Suivi live", desc: "En route → sur place → fini" },
+              { icon: <FileText className="w-5 h-5 text-lightSage" />, title: "100% en ligne", desc: "Devis, facture, compta" },
             ].map((f) => (
-              <div key={f.title} className="text-center py-5 px-3">
-                <div className="w-11 h-11 rounded-[14px] bg-white/[0.08] flex items-center justify-center mx-auto mb-2.5">{f.icon}</div>
-                <div className="text-sm font-bold text-white mb-1">{f.title}</div>
-                <div className="text-xs text-white/50">{f.desc}</div>
+              <div key={f.title} className="text-center py-4 px-3 rounded-xl bg-white/[0.03]">
+                <div className="w-10 h-10 rounded-xl bg-white/[0.07] flex items-center justify-center mx-auto mb-2">{f.icon}</div>
+                <div className="text-[13px] font-bold text-white mb-0.5">{f.title}</div>
+                <div className="text-[11px] text-white/45">{f.desc}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ━━━ MOBILE APP PREVIEW ━━━ */}
-      <section className="py-20 px-5 md:px-10 bg-bgPage overflow-hidden">
-        <div className="max-w-[1100px] mx-auto flex items-center gap-[60px] flex-wrap">
-          {/* iPhone mockup */}
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          MOBILE APP — Phone + features
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="py-20 px-5 md:px-10 bg-white overflow-hidden">
+        <div className="max-w-[1140px] mx-auto flex items-center gap-20 flex-wrap">
+          {/* Phone mockup */}
           <div className="hidden md:block flex-none relative">
-            <div className="w-[280px] h-[570px] rounded-[44px] bg-navy p-3 shadow-[0_20px_60px_rgba(10,22,40,0.15)] relative">
-              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[100px] h-7 rounded-b-[18px] bg-navy z-10">
-                <div className="w-[50px] h-1 rounded-sm bg-white/15 mx-auto mt-4" />
+            <div className="w-[260px] h-[530px] rounded-[36px] bg-navy p-2.5 shadow-[0_24px_64px_rgba(10,22,40,0.18)] relative">
+              <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[90px] h-[24px] rounded-b-[16px] bg-navy z-10">
+                <div className="w-[46px] h-1 rounded-full bg-white/[0.12] mx-auto mt-3" />
               </div>
-              <div className="w-full h-full rounded-[34px] overflow-hidden relative" style={{ background: "linear-gradient(170deg, #E8F5EE 0%, #F5FAF7 100%)" }}>
-                <div className="pt-3.5 px-5 flex justify-between items-center">
-                  <span className="text-[11px] font-semibold text-navy">9:41</span>
-                  <div className="w-3.5 h-2.5 rounded-sm border border-navy"><div className="w-[70%] h-full bg-navy rounded-[1px]" /></div>
+              <div className="w-full h-full rounded-[32px] overflow-hidden" style={{ background: "linear-gradient(170deg, #E8F5EE 0%, #F5FAF7 100%)" }}>
+                <div className="pt-3 px-4 flex justify-between items-center">
+                  <span className="text-[10px] font-semibold text-navy">9:41</span>
+                  <div className="w-3 h-2 rounded-sm border border-navy"><div className="w-[70%] h-full bg-navy rounded-sm" /></div>
                 </div>
-                <div className="px-4 pt-4">
-                  <div className="flex items-center gap-2 mb-3.5">
-                    <ShieldIcon size={18} />
-                    <span className="font-heading text-[15px] font-extrabold text-navy">Nova</span>
+                <div className="px-3.5 pt-3">
+                  <div className="flex items-center gap-1.5 mb-3">
+                    <ShieldIcon size={15} />
+                    <span className="font-heading text-[13px] font-extrabold text-navy">Nova</span>
                   </div>
-                  <div className="text-[11px] text-grayText mb-1">Bonjour Sophie</div>
-                  <div className="font-heading text-base font-extrabold text-navy mb-3">Votre espace client</div>
-                  <div className="flex gap-1.5 mb-3">
+                  <div className="text-[10px] text-grayText mb-0.5">Bonjour Sophie</div>
+                  <div className="font-heading text-[14px] font-extrabold text-navy mb-2.5">Votre espace</div>
+                  <div className="flex gap-1 mb-2.5">
                     {[{ v: "2", l: "En cours" }, { v: "570€", l: "Séquestre" }, { v: "8", l: "Terminées" }].map((k) => (
-                      <div key={k.l} className="flex-1 bg-white rounded-md py-2 px-1.5 text-center border border-border">
-                        <div className="font-mono text-[13px] font-bold text-forest">{k.v}</div>
-                        <div className="text-[8px] text-grayText">{k.l}</div>
+                      <div key={k.l} className="flex-1 bg-white rounded-lg py-1.5 px-1 text-center border border-border/40 shadow-sm">
+                        <div className="font-mono text-[11px] font-bold text-forest">{k.v}</div>
+                        <div className="text-[7px] text-grayText">{k.l}</div>
                       </div>
                     ))}
                   </div>
@@ -301,108 +465,179 @@ export default function HomePage() {
                     { ini: "JM", name: "Jean-Michel P.", desc: "Réparation fuite • 15 mars", status: "En cours", color: "text-success" },
                     { ini: "SM", name: "Sophie M.", desc: "Prise électrique • 10 mars", status: "Terminée", color: "text-forest" },
                   ].map((m) => (
-                    <div key={m.ini} className="bg-white rounded-[14px] p-2.5 mb-2 border border-border flex gap-2 items-center">
-                      <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-surface to-border flex items-center justify-center text-[10px] font-bold text-forest">{m.ini}</div>
+                    <div key={m.ini} className="bg-white rounded-lg p-2 mb-1.5 border border-border/30 shadow-sm flex gap-2 items-center">
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-surface to-border flex items-center justify-center text-[9px] font-bold text-forest">{m.ini}</div>
                       <div className="flex-1">
-                        <div className="text-[11px] font-bold text-navy">{m.name}</div>
-                        <div className="text-[9px] text-grayText">{m.desc}</div>
+                        <div className="text-[10px] font-bold text-navy">{m.name}</div>
+                        <div className="text-[8px] text-grayText">{m.desc}</div>
                       </div>
-                      <span className={`text-[8px] font-bold ${m.color} bg-surface px-1.5 py-0.5 rounded`}>{m.status}</span>
+                      <span className={`text-[7px] font-bold ${m.color} bg-surface px-1.5 py-0.5 rounded-sm`}>{m.status}</span>
                     </div>
                   ))}
-                  <div className="flex justify-around pt-2.5 mt-2.5 border-t border-surface">
-                    {["🏠", "🔍", "📋", "🔔", "👤"].map((e, i) => (
-                      <span key={e} className="text-base" style={{ opacity: i === 0 ? 1 : 0.4 }}>{e}</span>
-                    ))}
+                  <div className="flex justify-around pt-2 mt-2 border-t border-surface">
+                    <TabIcon icon={Home} active />
+                    <TabIcon icon={Search} />
+                    <TabIcon icon={ClipboardList} />
+                    <TabIcon icon={Bell} />
+                    <TabIcon icon={User} />
                   </div>
                 </div>
               </div>
             </div>
-            <div className="absolute top-10 -right-5 bg-red text-white px-3.5 py-1.5 rounded-md text-[11px] font-bold shadow-[0_4px_16px_rgba(232,48,42,0.3)]">Nouveau</div>
+            <div className="absolute top-8 -right-3 bg-red text-white px-3 py-1 rounded-lg text-[10px] font-bold shadow-[0_4px_12px_rgba(232,48,42,0.25)]">Nouveau</div>
           </div>
 
           {/* Text content */}
           <div className="flex-1 min-w-[280px]">
-            <div className="inline-flex items-center gap-2 bg-forest/[0.04] rounded-[20px] px-4 py-1.5 mb-5 text-xs font-semibold text-[#14523B]">
-              Application mobile
+            <div className="inline-flex items-center gap-2 bg-forest/[0.05] rounded-lg px-4 py-2 mb-6 text-[12px] font-semibold text-deepForest/70">
+              <Smartphone className="w-4 h-4" /> Application mobile
             </div>
-            <h2 className="font-heading text-[32px] font-extrabold text-navy mb-3">Nova dans votre poche</h2>
-            <p className="text-[15px] text-[#4A5568] leading-relaxed mb-7">
-              Retrouvez toutes les fonctionnalités sur votre smartphone. Notifications en temps réel, suivi artisan, signature de devis et paiement en séquestre — où que vous soyez.
+            <h2 className="font-heading text-[30px] md:text-[36px] font-extrabold text-navy mb-3" style={{ textWrap: "balance" as never }}>Nova dans votre poche</h2>
+            <p className="text-[15px] text-navy/50 leading-relaxed mb-8 max-w-[440px]">
+              Notifications en temps réel, suivi artisan, signature de devis et paiement en séquestre — où que vous soyez.
             </p>
-            <div className="flex flex-col gap-3.5 mb-8">
+            <div className="flex flex-col gap-4 mb-8">
               {[
-                { icon: "📲", title: "Notifications push", desc: "Soyez alerté en temps réel : nouveau devis, artisan en route, intervention terminée" },
-                { icon: "✍️", title: "Signature tactile", desc: "Signez vos devis directement sur l'écran avec votre doigt" },
-                { icon: "📹", title: "Vidéo diagnostic", desc: "Filmez votre problème et envoyez-le à l'artisan avant l'intervention" },
-                { icon: "🌙", title: "Mode sombre", desc: "Interface adaptée pour une utilisation confortable de nuit" },
+                { icon: <Bell className="w-5 h-5 text-forest" />, title: "Notifications push", desc: "Nouveau devis, artisan en route, intervention terminée" },
+                { icon: <PenTool className="w-5 h-5 text-forest" />, title: "Signature tactile", desc: "Signez vos devis directement sur l'écran" },
+                { icon: <Video className="w-5 h-5 text-forest" />, title: "Vidéo diagnostic", desc: "Filmez votre problème avant l'intervention" },
+                { icon: <Moon className="w-5 h-5 text-forest" />, title: "Mode sombre", desc: "Interface confortable de jour comme de nuit" },
               ].map((f) => (
-                <div key={f.title} className="flex gap-3.5 items-start">
-                  <div className="w-10 h-10 rounded-md bg-surface border border-border flex items-center justify-center text-lg shrink-0">{f.icon}</div>
+                <div key={f.title} className="flex gap-3.5 items-start group">
+                  <div className="w-10 h-10 rounded-xl bg-forest/[0.06] group-hover:bg-forest/[0.1] border border-border/40 flex items-center justify-center shrink-0 transition-colors">{f.icon}</div>
                   <div>
-                    <div className="text-sm font-bold text-navy">{f.title}</div>
-                    <div className="text-[13px] text-grayText leading-snug">{f.desc}</div>
+                    <div className="text-[14px] font-bold text-navy mb-0.5">{f.title}</div>
+                    <div className="text-[13px] text-navy/45 leading-snug">{f.desc}</div>
                   </div>
                 </div>
               ))}
             </div>
             <div className="flex gap-3 flex-wrap">
-              <div className="flex items-center gap-2.5 bg-black rounded-md px-5 py-2.5 cursor-pointer">
-                <svg width="24" height="24" viewBox="0 0 814 1000" fill="#fff"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57.8-155.5-127.4c-58.3-81.6-105.6-210.8-105.6-334.1C0 397.1 78.6 283.9 190.5 283.9c64.2 0 117.8 42.8 155.5 42.8 39 0 99.7-45.2 172.8-45.2 27.8 0 127.7 2.5 193.3 59.4z" /><path d="M554.1 0c-7.8 66.3-67.8 134.3-134.2 134.3-12 0-24-1.3-24-13.3 0-5.8 5.8-28.3 29-57.7C449.8 32.7 515.5 0 554.1 0z" /></svg>
+              <button className="flex items-center gap-2.5 bg-navy rounded-xl px-5 py-2.5 cursor-pointer hover:bg-navy/90 active:scale-[0.97] transition-all" aria-label="Télécharger sur l'App Store">
+                <svg width="22" height="22" viewBox="0 0 814 1000" fill="#fff" aria-hidden="true"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57.8-155.5-127.4c-58.3-81.6-105.6-210.8-105.6-334.1C0 397.1 78.6 283.9 190.5 283.9c64.2 0 117.8 42.8 155.5 42.8 39 0 99.7-45.2 172.8-45.2 27.8 0 127.7 2.5 193.3 59.4z" /><path d="M554.1 0c-7.8 66.3-67.8 134.3-134.2 134.3-12 0-24-1.3-24-13.3 0-5.8 5.8-28.3 29-57.7C449.8 32.7 515.5 0 554.1 0z" /></svg>
                 <div>
-                  <div className="text-[9px] text-white/70">Télécharger sur</div>
-                  <div className="text-base font-semibold text-white">App Store</div>
+                  <div className="text-[9px] text-white/60">Télécharger sur</div>
+                  <div className="text-[14px] font-semibold text-white">App Store</div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2.5 bg-black rounded-md px-5 py-2.5 cursor-pointer">
-                <svg width="22" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l12.8 8.5a1 1 0 010 1.6l-12.8 8.5c-.66.5-1.6.03-1.6-.8z" fill="#fff" /></svg>
+              </button>
+              <button className="flex items-center gap-2.5 bg-navy rounded-xl px-5 py-2.5 cursor-pointer hover:bg-navy/90 active:scale-[0.97] transition-all" aria-label="Disponible sur Google Play">
+                <svg width="20" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l12.8 8.5a1 1 0 010 1.6l-12.8 8.5c-.66.5-1.6.03-1.6-.8z" fill="#fff" /></svg>
                 <div>
-                  <div className="text-[9px] text-white/70">Disponible sur</div>
-                  <div className="text-base font-semibold text-white">Google Play</div>
+                  <div className="text-[9px] text-white/60">Disponible sur</div>
+                  <div className="text-[14px] font-semibold text-white">Google Play</div>
+                </div>
+              </button>
+            </div>
+            <p className="text-[11px] text-navy/30 mt-3">iOS 15+ et Android 12+. Gratuit.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          TESTIMONIALS — Featured + grid (L2: break equal grid)
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="py-20 px-5 md:px-10 bg-bgPage">
+        <div className="max-w-[1140px] mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="font-heading text-[32px] md:text-[38px] font-extrabold text-navy mb-3">Ils nous font confiance</h2>
+            <p className="text-[16px] text-navy/50">Des particuliers satisfaits partout en France.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Featured testimonial — larger */}
+            <div className="md:col-span-2 bg-white rounded-2xl p-8 border border-border/40 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex gap-0.5 mb-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-gold text-gold" />
+                ))}
+              </div>
+              <p className="text-[17px] text-navy/70 leading-relaxed mb-6 max-w-[520px]">
+                &ldquo;Le séquestre m&apos;a rassurée. Je savais que mon argent était protégé tant que l&apos;intervention n&apos;était pas terminée. L&apos;artisan était ponctuel, professionnel, et le suivi en temps réel m&apos;a permis de voir exactement quand il arrivait.&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-surface to-border flex items-center justify-center text-sm font-bold text-forest">CL</div>
+                <div>
+                  <div className="text-[14px] font-bold text-navy">Caroline L.</div>
+                  <div className="text-[12px] text-navy/40">Paris 4e — Plomberie</div>
                 </div>
               </div>
             </div>
-            <p className="text-[11px] text-grayText/60 mt-2.5">Disponible sur iOS 15+ et Android 12+. Gratuit.</p>
-          </div>
-        </div>
-      </section>
 
-      {/* ━━━ TESTIMONIALS ━━━ */}
-      <section className="py-16 px-5 md:px-10 bg-white">
-        <div className="max-w-[900px] mx-auto">
-          <h2 className="font-heading text-[28px] font-extrabold text-navy text-center mb-9">Ils nous font confiance</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              { name: "Caroline L.", city: "Paris 4e", text: "Le séquestre m'a rassurée. Je savais que mon argent était protégé. L'artisan était ponctuel et professionnel." },
-              { name: "Pierre M.", city: "Lyon 6e", text: "Fuite d'eau un dimanche soir, intervention en 1h30. Le suivi en temps réel est top, je voyais l'artisan arriver." },
-              { name: "Amélie R.", city: "Bordeaux", text: "J'ai signé le devis en ligne, payé en 3x via Klarna. Aucune surprise sur la facture. Je recommande à 100%." },
-            ].map((t) => (
-              <div key={t.name} className="bg-surface rounded-[18px] p-6 border border-border">
-                <div className="text-gold text-sm mb-2.5">{"★".repeat(5)}</div>
-                <p className="text-sm text-[#4A5568] leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-md bg-gradient-to-br from-surface to-border flex items-center justify-center text-xs font-bold text-forest">
-                    {t.name[0]}{t.name.split(" ")[1]?.[0]}
+            {/* Stacked testimonials */}
+            <div className="flex flex-col gap-5">
+              {[
+                { name: "Pierre M.", city: "Lyon 6e", service: "Urgence", text: "Fuite d'eau un dimanche soir, intervention en 1h30. Le suivi en temps réel est top." },
+                { name: "Amélie R.", city: "Bordeaux", service: "Électricité", text: "J'ai signé le devis en ligne, payé en 3x. Aucune surprise sur la facture." },
+              ].map((t) => (
+                <div key={t.name} className="bg-white rounded-2xl p-6 border border-border/40 shadow-sm hover:shadow-md transition-shadow flex-1">
+                  <div className="flex gap-0.5 mb-3">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
+                    ))}
                   </div>
-                  <div>
-                    <div className="text-[13px] font-bold text-navy">{t.name}</div>
-                    <div className="text-[11px] text-grayText">{t.city}</div>
+                  <p className="text-[13px] text-navy/60 leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-surface to-border flex items-center justify-center text-[10px] font-bold text-forest">
+                      {t.name[0]}{t.name.split(" ")[1]?.[0]}
+                    </div>
+                    <div>
+                      <div className="text-[12px] font-bold text-navy">{t.name}</div>
+                      <div className="text-[10px] text-navy/35">{t.city} — {t.service}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ━━━ FINAL CTA ━━━ */}
-      <section className="py-16 px-5 md:px-10 text-center bg-surface">
-        <h2 className="font-heading text-[28px] font-extrabold text-navy mb-3">Prêt à trouver votre artisan ?</h2>
-        <p className="text-[15px] text-[#4A5568] mb-7">Inscription gratuite. Aucun engagement.</p>
-        <Link href="/signup" className="inline-block px-10 py-3.5 rounded-md bg-deepForest text-white text-[15px] font-semibold shadow-md hover:-translate-y-0.5 transition-transform">
-          Créer un compte gratuitement
-        </Link>
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          FINAL CTA — Full bleed gradient
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section data-navbar-dark className="relative py-24 px-5 md:px-10 text-center overflow-hidden" style={{ background: "linear-gradient(160deg, #0A4030 0%, #1B6B4E 50%, #2D9B6E 100%)" }}>
+        <div className="absolute inset-0">
+          <div className="absolute top-[15%] left-[8%] w-[300px] h-[300px] rounded-full bg-white/[0.03] blur-[80px]" />
+          <div className="absolute bottom-[10%] right-[12%] w-[350px] h-[350px] rounded-full bg-gold/[0.03] blur-[100px]" />
+        </div>
+        <div className="relative z-10 max-w-[600px] mx-auto">
+          <div className="inline-flex items-center gap-2 bg-white/[0.08] rounded-lg px-4 py-2 mb-6 text-[12px] font-semibold text-white/70">
+            <Shield className="w-3.5 h-3.5" /> 100% gratuit, sans engagement
+          </div>
+          <h2 className="font-heading text-[32px] md:text-[44px] font-extrabold text-white mb-4 leading-[1.1]" style={{ textWrap: "balance" as never }}>
+            Prêt à trouver votre artisan de confiance ?
+          </h2>
+          <p className="text-[16px] text-white/55 mb-9 leading-relaxed">
+            Rejoignez des milliers de particuliers qui font confiance à Nova pour leurs travaux.
+          </p>
+          <div className="flex gap-3 justify-center flex-wrap">
+            <Link
+              href="/signup"
+              className="group inline-flex items-center gap-2 px-9 py-4 rounded-xl bg-white text-deepForest text-[15px] font-bold shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] active:scale-[0.97] transition-all duration-200 cursor-pointer"
+            >
+              Créer un compte gratuitement
+              <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              href="/devenir-partenaire"
+              className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white/[0.08] border border-white/[0.15] text-white text-[15px] font-semibold hover:bg-white/[0.12] active:scale-[0.97] transition-all duration-200 cursor-pointer"
+            >
+              Je suis artisan
+            </Link>
+          </div>
+          <p className="text-[11px] text-white/35 mt-6">Aucune carte bancaire requise</p>
+        </div>
       </section>
     </div>
+  );
+}
+
+/* ━━━ Inline helper icon ━━━ */
+function CreditCardIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-lightSage" aria-hidden="true">
+      <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M2 10h20" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
   );
 }

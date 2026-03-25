@@ -68,7 +68,7 @@ function SignupModal({ open, onClose }: { open: boolean; onClose: () => void }) 
             </div>
 
             {/* Offer banner */}
-            <div className="flex items-center gap-2 bg-surface rounded-[10px] px-3.5 py-2.5 mb-5">
+            <div className="flex items-center gap-2 bg-surface rounded-[5px] px-3.5 py-2.5 mb-5">
               <span className="text-base">🎁</span>
               <div>
                 <div className="font-body text-xs font-semibold text-forest">1 mois du forfait Expert offert</div>
@@ -232,12 +232,12 @@ function SignupModal({ open, onClose }: { open: boolean; onClose: () => void }) 
                   key={doc.key}
                   onClick={() => setDocs((d) => ({ ...d, [doc.key]: !d[doc.key] }))}
                   className={cn(
-                    "w-full flex items-center gap-3.5 px-4 py-3.5 rounded-[14px] border-[1.5px] text-left transition-all mb-2",
+                    "w-full flex items-center gap-3.5 px-4 py-3.5 rounded-[5px] border-[1.5px] text-left transition-all mb-2",
                     docs[doc.key] ? "border-forest bg-surface" : "border-border bg-bgPage"
                   )}
                 >
                   <div className={cn(
-                    "w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0 transition-all",
+                    "w-10 h-10 rounded-[5px] flex items-center justify-center shrink-0 transition-all",
                     docs[doc.key] ? "bg-forest" : "bg-white border-[1.5px] border-dashed border-border"
                   )}>
                     {docs[doc.key] ? <Check className="w-4 h-4 text-white" /> : <Plus className="w-[18px] h-[18px] text-grayText" />}
@@ -267,7 +267,7 @@ function SignupModal({ open, onClose }: { open: boolean; onClose: () => void }) 
                   key={doc.key}
                   onClick={() => setDocs((d) => ({ ...d, [doc.key]: !d[doc.key] }))}
                   className={cn(
-                    "w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] border-[1.5px] text-left transition-all mb-2",
+                    "w-full flex items-center gap-3.5 px-4 py-3 rounded-[5px] border-[1.5px] text-left transition-all mb-2",
                     docs[doc.key] ? "border-forest bg-surface" : "border-border bg-white"
                   )}
                 >
@@ -286,7 +286,7 @@ function SignupModal({ open, onClose }: { open: boolean; onClose: () => void }) 
             </div>
 
             {/* Progress */}
-            <div className="flex items-center gap-2.5 bg-bgPage rounded-[10px] px-3.5 py-2.5 mb-5">
+            <div className="flex items-center gap-2.5 bg-bgPage rounded-[5px] px-3.5 py-2.5 mb-5">
               <span className={cn("font-mono text-[13px] font-bold", allRequiredDocs ? "text-success" : "text-gold")}>{uploadedRequired}/3</span>
               <div className="flex-1">
                 <div className="font-body text-[11px] font-semibold text-navy">
@@ -321,7 +321,7 @@ function SignupModal({ open, onClose }: { open: boolean; onClose: () => void }) 
         {/* ── Step 3: Confirmation ── */}
         {step === 3 && (
           <div className="p-6 md:p-9 text-center animate-fadeIn">
-            <div className="w-16 h-16 rounded-[20px] bg-surface flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-[5px] bg-surface flex items-center justify-center mx-auto mb-4">
               <Check className="w-7 h-7 text-forest" />
             </div>
             <h2 className="font-heading text-[22px] md:text-[26px] font-extrabold text-navy mb-1.5">
@@ -422,7 +422,7 @@ export default function DevenirPartenairePage() {
           </div>
 
           {/* Offer banner */}
-          <div className="inline-flex items-center gap-2 bg-gradient-to-br from-deepForest to-forest rounded-[10px] px-4 py-[7px] mb-4 md:mb-5">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-br from-deepForest to-forest rounded-[5px] px-4 py-[7px] mb-4 md:mb-5">
             <span className="text-sm">🎁</span>
             <span className="font-body text-xs font-semibold text-white">1 mois du forfait Expert offert</span>
           </div>
@@ -451,13 +451,13 @@ export default function DevenirPartenairePage() {
           <div className="flex gap-2.5 md:gap-3 justify-center flex-wrap">
             <button
               onClick={() => setShowModal(true)}
-              className="px-7 md:px-9 py-3.5 md:py-4 rounded-[14px] bg-deepForest text-white text-sm md:text-base font-extrabold font-heading inline-flex items-center gap-2 hover:-translate-y-0.5 transition-all shadow-lg hover:shadow-xl"
+              className="px-7 md:px-9 py-3.5 md:py-4 rounded-[5px] bg-deepForest text-white text-sm md:text-base font-extrabold font-heading inline-flex items-center gap-2 hover:-translate-y-0.5 transition-all shadow-lg hover:shadow-xl"
             >
               S&apos;inscrire gratuitement <ArrowRight className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => document.getElementById("simulateur")?.scrollIntoView({ behavior: "smooth" })}
-              className="px-5 md:px-7 py-3.5 md:py-4 rounded-[14px] bg-white text-navy text-[13px] md:text-[15px] font-semibold font-body border border-border hover:-translate-y-0.5 transition-all"
+              className="px-5 md:px-7 py-3.5 md:py-4 rounded-[5px] bg-white text-navy text-[13px] md:text-[15px] font-semibold font-body border border-border hover:-translate-y-0.5 transition-all"
             >
               Simuler mes économies
             </button>
@@ -507,7 +507,7 @@ export default function DevenirPartenairePage() {
               ))}
 
               <div className="mt-5 pt-4 border-t border-[#F0E0E0]">
-                <div className="flex items-center gap-2 bg-red/10 rounded-[10px] px-3.5 py-2.5">
+                <div className="flex items-center gap-2 bg-red/10 rounded-[5px] px-3.5 py-2.5">
                   <X className="w-3.5 h-3.5 text-red shrink-0" />
                   <span className="font-body text-xs font-semibold text-red">Résultat : stress, impayés, perte de temps</span>
                 </div>
@@ -540,7 +540,7 @@ export default function DevenirPartenairePage() {
               ))}
 
               <div className="mt-5 pt-4 border-t border-border">
-                <div className="flex items-center gap-2 bg-surface rounded-[10px] px-3.5 py-2.5">
+                <div className="flex items-center gap-2 bg-surface rounded-[5px] px-3.5 py-2.5">
                   <Check className="w-3.5 h-3.5 text-forest shrink-0" />
                   <span className="font-body text-xs font-semibold text-forest">Résultat : sérénité, revenus garantis, temps libéré</span>
                 </div>
@@ -561,8 +561,8 @@ export default function DevenirPartenairePage() {
           </p>
 
           {/* Card 1 — Gestion */}
-          <div className="bg-white rounded-[20px] p-6 md:p-7 md:px-7 border border-forest/[0.06] mb-4 flex flex-col md:flex-row gap-4 md:gap-7 items-start md:items-center">
-            <div className="w-14 md:w-16 h-14 md:h-16 rounded-[18px] bg-surface flex items-center justify-center shrink-0">
+          <div className="bg-white rounded-[5px] p-6 md:p-7 md:px-7 border border-forest/[0.06] mb-4 flex flex-col md:flex-row gap-4 md:gap-7 items-start md:items-center">
+            <div className="w-14 md:w-16 h-14 md:h-16 rounded-[5px] bg-surface flex items-center justify-center shrink-0">
               <span className="font-mono text-xs md:text-sm font-bold text-forest">PDF</span>
             </div>
             <div className="flex-1">
@@ -584,8 +584,8 @@ export default function DevenirPartenairePage() {
           </div>
 
           {/* Card 2 — Protection (DARK) */}
-          <div className="bg-deepForest rounded-[20px] p-6 md:p-7 md:px-7 mb-4 flex flex-col md:flex-row gap-4 md:gap-7 items-start md:items-center">
-            <div className="w-14 md:w-16 h-14 md:h-16 rounded-[18px] bg-white/10 flex items-center justify-center shrink-0">
+          <div className="bg-deepForest rounded-[5px] p-6 md:p-7 md:px-7 mb-4 flex flex-col md:flex-row gap-4 md:gap-7 items-start md:items-center">
+            <div className="w-14 md:w-16 h-14 md:h-16 rounded-[5px] bg-white/10 flex items-center justify-center shrink-0">
               <Shield className="w-[26px] md:w-[30px] h-[26px] md:h-[30px] text-lightSage" />
             </div>
             <div className="flex-1">
@@ -595,7 +595,7 @@ export default function DevenirPartenairePage() {
               <p className="text-sm text-white/75 leading-relaxed">
                 Un client mécontent qui conteste ? Vous n&apos;êtes plus seul. Nova arbitre chaque litige avec des preuves : devis signé, photos avant/après, horodatage de l&apos;intervention. Si votre travail est conforme, vous êtes payé intégralement. En cas de désaccord, notre équipe tranche sous 48h. Vous vous concentrez sur votre métier, on gère le reste.
               </p>
-              <div className="mt-3.5 inline-block bg-white/[0.08] rounded-[10px] px-3.5 py-2.5">
+              <div className="mt-3.5 inline-block bg-white/[0.08] rounded-[5px] px-3.5 py-2.5">
                 <span className="font-mono text-sm md:text-base font-bold text-lightSage">97% des artisans payés</span>
                 <span className="text-xs text-white/50 ml-2">après examen de litige</span>
               </div>
@@ -603,8 +603,8 @@ export default function DevenirPartenairePage() {
           </div>
 
           {/* Card 3 — Syndics */}
-          <div className="bg-white rounded-[20px] p-6 md:p-7 md:px-7 border border-forest/[0.06] flex flex-col md:flex-row gap-4 md:gap-7 items-start md:items-center">
-            <div className="w-14 md:w-16 h-14 md:h-16 rounded-[18px] bg-surface flex items-center justify-center shrink-0">
+          <div className="bg-white rounded-[5px] p-6 md:p-7 md:px-7 border border-forest/[0.06] flex flex-col md:flex-row gap-4 md:gap-7 items-start md:items-center">
+            <div className="w-14 md:w-16 h-14 md:h-16 rounded-[5px] bg-surface flex items-center justify-center shrink-0">
               <span className="font-mono text-lg md:text-[22px] font-bold text-forest">B2B</span>
             </div>
             <div className="flex-1">
@@ -636,7 +636,7 @@ export default function DevenirPartenairePage() {
             <p className="text-sm md:text-base text-grayText max-w-[540px] mx-auto">Entrez votre chiffre d&apos;affaires mensuel pour voir l&apos;économie réelle avec nos plans premium.</p>
           </div>
 
-          <div className="bg-bgPage rounded-[20px] p-6 md:p-9 border border-border">
+          <div className="bg-bgPage rounded-[5px] p-6 md:p-9 border border-border">
             {/* CA Input */}
             <div className="mb-7">
               <div className="font-body text-[13px] font-semibold text-grayText mb-2.5">Votre chiffre d&apos;affaires mensuel sur Nova</div>
@@ -649,7 +649,7 @@ export default function DevenirPartenairePage() {
                     style={{ background: `linear-gradient(to right, #1B6B4E ${((simCA - 500) / 14500) * 100}%, #D4EBE0 0%)` }}
                   />
                 </div>
-                <div className="flex items-center bg-white rounded-[10px] border border-border px-3.5 py-2 min-w-[130px]">
+                <div className="flex items-center bg-white rounded-[5px] border border-border px-3.5 py-2 min-w-[130px]">
                   <input
                     type="number" value={simCA}
                     onChange={(e) => setSimCA(Math.max(0, Math.min(50000, Number(e.target.value) || 0)))}
@@ -677,7 +677,7 @@ export default function DevenirPartenairePage() {
                     key={plan.key}
                     onClick={() => setSimPlan(plan.key)}
                     className={cn(
-                      "flex-1 p-3.5 md:p-[18px] md:px-5 rounded-[14px] cursor-pointer transition-all border-2",
+                      "flex-1 p-3.5 md:p-[18px] md:px-5 rounded-[5px] cursor-pointer transition-all border-2",
                       active ? "border-forest bg-surface" : "border-border bg-white"
                     )}
                   >
@@ -695,13 +695,13 @@ export default function DevenirPartenairePage() {
             {/* Results */}
             {/* Comparison boxes */}
             <div className="flex gap-2.5 md:gap-4 mb-6">
-              <div className="flex-1 bg-white rounded-[14px] p-4 md:p-5 border border-border">
+              <div className="flex-1 bg-white rounded-[5px] p-4 md:p-5 border border-border">
                 <div className="font-body text-[11px] text-grayText mb-2">Avec le plan Essentiel</div>
                 <div className="font-mono text-[22px] md:text-[28px] font-bold text-navy">{costEssentiel.toLocaleString("fr-FR")} €</div>
                 <div className="font-body text-[11px] text-grayText mt-1">Commission 10% / mois</div>
               </div>
               <div className={cn(
-                "flex-1 rounded-[14px] p-4 md:p-5 border",
+                "flex-1 rounded-[5px] p-4 md:p-5 border",
                 isProfitable ? "bg-surface border-sage/30" : "bg-red/5 border-red/30"
               )}>
                 <div className="font-body text-[11px] text-grayText mb-2">Avec le plan {simPlan === "pro" ? "Pro" : simPlan === "expert" ? "Expert" : "Essentiel"}</div>
@@ -746,7 +746,7 @@ export default function DevenirPartenairePage() {
                       { label: `${(selected.rate * 100).toFixed(0)}%`, sub: "Commission" },
                       { label: "1 clic", sub: "Export compta" },
                     ].map((k) => (
-                      <div key={k.label} className="text-center bg-white/10 rounded-[10px] p-3 px-3.5 min-w-[80px]">
+                      <div key={k.label} className="text-center bg-white/10 rounded-[5px] p-3 px-3.5 min-w-[80px]">
                         <div className="font-heading text-base font-extrabold text-white">{k.label}</div>
                         <div className="font-body text-[10px] text-white/50 mt-0.5">{k.sub}</div>
                       </div>
@@ -822,7 +822,7 @@ export default function DevenirPartenairePage() {
 
           <button
             onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2.5 px-8 md:px-10 py-4 rounded-[14px] bg-white text-deepForest text-[15px] md:text-[17px] font-extrabold font-heading shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 transition-all"
+            className="inline-flex items-center gap-2.5 px-8 md:px-10 py-4 rounded-[5px] bg-white text-deepForest text-[15px] md:text-[17px] font-extrabold font-heading shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 transition-all"
           >
             S&apos;inscrire gratuitement <ArrowRight className="w-4 h-4" />
           </button>
@@ -841,7 +841,7 @@ export default function DevenirPartenairePage() {
               { icon: <Check className="w-3 h-3 text-lightSage" />, text: "0% impayé" },
               { icon: <Check className="w-3 h-3 text-lightSage" />, text: "Sous 48h" },
             ].map((g) => (
-              <div key={g.text} className="flex items-center gap-1.5 bg-white/[0.06] rounded-[10px] px-3.5 py-2">
+              <div key={g.text} className="flex items-center gap-1.5 bg-white/[0.06] rounded-[5px] px-3.5 py-2">
                 {g.icon}
                 <span className="font-body text-xs text-white/60 font-medium">{g.text}</span>
               </div>

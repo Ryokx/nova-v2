@@ -119,7 +119,7 @@ export default function SupportPage() {
 
         {/* ══════ CHAT MODE ══════ */}
         {mode === "chat" && (
-          <div className="bg-white rounded-[20px] border border-border shadow-sm overflow-hidden">
+          <div className="bg-white rounded-[5px] border border-border shadow-sm overflow-hidden">
             {/* Chat header */}
             <div className="px-5 py-4 border-b border-border">
               <div className="flex items-center gap-3">
@@ -194,7 +194,7 @@ export default function SupportPage() {
 
         {/* ══════ EMAIL MODE ══════ */}
         {mode === "email" && !emailSent && (
-          <div className="bg-white rounded-[20px] border border-border shadow-sm p-6 md:p-8">
+          <div className="bg-white rounded-[5px] border border-border shadow-sm p-6 md:p-8">
             {/* Info bar */}
             <div className="flex items-center gap-2.5 bg-surface rounded-xl px-4 py-3 mb-6">
               <Clock className="w-4 h-4 text-forest shrink-0" />
@@ -278,7 +278,7 @@ export default function SupportPage() {
 
         {/* ══════ EMAIL SUCCESS STATE ══════ */}
         {mode === "email" && emailSent && (
-          <div className="bg-white rounded-[20px] border border-border shadow-sm p-8 md:p-12 text-center">
+          <div className="bg-white rounded-[5px] border border-border shadow-sm p-8 md:p-12 text-center">
             <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-5">
               <CheckCircle className="w-8 h-8 text-success" />
             </div>

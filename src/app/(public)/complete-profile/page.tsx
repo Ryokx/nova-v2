@@ -41,7 +41,7 @@ export default function CompleteProfilePage() {
 
       // Refresh session so hasPhone is updated
       await updateSession();
-      router.push("/dashboard");
+      router.push("/artisans");
     } catch {
       setError("Erreur de connexion au serveur");
       setLoading(false);
@@ -52,7 +52,7 @@ export default function CompleteProfilePage() {
     <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-bgPage">
       <div className="w-full max-w-[420px]">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-[18px] bg-forest/5 flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 rounded-[5px] bg-forest/5 flex items-center justify-center mx-auto mb-4">
             <Phone className="w-7 h-7 text-forest" />
           </div>
           <h1 className="font-heading text-[28px] font-extrabold text-navy mb-1">
