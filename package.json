@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Plateforme de mise en relation particuliers / artisans certifiés avec paiement par séquestre",
   "private": true,
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
