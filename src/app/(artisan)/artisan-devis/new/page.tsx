@@ -14,7 +14,7 @@ interface LineItem {
 }
 
 function formatPrice(n: number) {
-  return n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  return n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " EUR";
 }
 
 export default function CreateDevisPage() {
@@ -31,7 +31,7 @@ export default function CreateDevisPage() {
   // Step 1: Line items
   const [lines, setLines] = useState<LineItem[]>([
     { label: "Remplacement robinet mitigeur", qty: 1, unitPrice: 85 },
-    { label: "Main d'œuvre", qty: 2, unitPrice: 65 },
+    { label: "Main d'oeuvre", qty: 2, unitPrice: 65 },
   ]);
 
   // Step 2: Message
@@ -62,15 +62,15 @@ export default function CreateDevisPage() {
   };
 
   return (
-    <div className="max-w-[600px] mx-auto p-5 md:p-8">
+    <div className="max-w-[900px] mx-auto p-5 md:p-8">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-sm text-forest font-medium mb-4 hover:underline"
+        className="flex items-center gap-1.5 text-[15px] text-forest font-medium mb-5 hover:underline"
       >
-        <ArrowLeft className="w-4 h-4" /> Retour
+        <ArrowLeft className="w-5 h-5" /> Retour
       </button>
 
-      <h1 className="font-heading text-[26px] font-extrabold text-navy mb-6">Nouveau devis</h1>
+      <h1 className="font-heading text-[28px] font-extrabold text-navy mb-6">Nouveau devis</h1>
 
       {/* 3-step progress bar */}
       <div className="flex items-center mb-8">
@@ -79,7 +79,7 @@ export default function CreateDevisPage() {
             <div className="flex flex-col items-center gap-1.5">
               <div
                 className={cn(
-                  "w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
+                  "w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold transition-colors",
                   i < step
                     ? "bg-deepForest text-white"
                     : i === step
@@ -87,11 +87,11 @@ export default function CreateDevisPage() {
                       : "bg-border text-grayText"
                 )}
               >
-                {i < step ? <Check className="w-4 h-4" /> : i + 1}
+                {i < step ? <Check className="w-5 h-5" /> : i + 1}
               </div>
               <span
                 className={cn(
-                  "text-xs font-semibold",
+                  "text-[13px] font-semibold",
                   i <= step ? "text-navy" : "text-grayText"
                 )}
               >
@@ -112,41 +112,41 @@ export default function CreateDevisPage() {
 
       {/* Step 0: Client */}
       {step === 0 && (
-        <div className="bg-white border border-border shadow-sm rounded-[20px] p-5">
-          <h2 className="font-heading text-base font-bold text-navy mb-4">Informations client</h2>
-          <div className="space-y-3">
+        <div className="bg-white border border-border shadow-sm rounded-[5px] p-6">
+          <h2 className="font-heading text-[15px] font-bold text-navy mb-5">Informations client</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="text-xs font-semibold text-grayText mb-1 block">Nom du client</label>
+              <label className="text-[13px] font-semibold text-grayText mb-1.5 block">Nom du client</label>
               <input
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
-                className="w-full bg-white border border-border rounded-xl p-3 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-forest/30"
+                className="w-full bg-white border border-border rounded-[5px] p-3.5 text-[15px] text-navy focus:outline-none focus:ring-2 focus:ring-forest/30"
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-grayText mb-1 block">Email</label>
+              <label className="text-[13px] font-semibold text-grayText mb-1.5 block">Email</label>
               <input
                 type="email"
                 value={clientEmail}
                 onChange={(e) => setClientEmail(e.target.value)}
-                className="w-full bg-white border border-border rounded-xl p-3 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-forest/30"
+                className="w-full bg-white border border-border rounded-[5px] p-3.5 text-[15px] text-navy focus:outline-none focus:ring-2 focus:ring-forest/30"
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-grayText mb-1 block">Téléphone</label>
+              <label className="text-[13px] font-semibold text-grayText mb-1.5 block">Téléphone</label>
               <input
                 type="tel"
                 value={clientPhone}
                 onChange={(e) => setClientPhone(e.target.value)}
-                className="w-full bg-white border border-border rounded-xl p-3 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-forest/30"
+                className="w-full bg-white border border-border rounded-[5px] p-3.5 text-[15px] text-navy focus:outline-none focus:ring-2 focus:ring-forest/30"
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-grayText mb-1 block">Adresse</label>
+              <label className="text-[13px] font-semibold text-grayText mb-1.5 block">Adresse</label>
               <input
                 value={clientAddress}
                 onChange={(e) => setClientAddress(e.target.value)}
-                className="w-full bg-white border border-border rounded-xl p-3 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-forest/30"
+                className="w-full bg-white border border-border rounded-[5px] p-3.5 text-[15px] text-navy focus:outline-none focus:ring-2 focus:ring-forest/30"
               />
             </div>
           </div>
@@ -154,20 +154,20 @@ export default function CreateDevisPage() {
           <button
             onClick={() => setStep(1)}
             disabled={!clientName || !clientEmail}
-            className="w-full mt-5 flex items-center justify-center gap-2 bg-deepForest text-white text-sm font-bold py-3 rounded-[14px] hover:-translate-y-0.5 transition-transform disabled:opacity-50 disabled:hover:translate-y-0"
+            className="w-full mt-6 flex items-center justify-center gap-2 bg-deepForest text-white text-sm font-bold px-5 py-2.5 rounded-[5px] hover:-translate-y-0.5 transition-transform disabled:opacity-50 disabled:hover:translate-y-0"
           >
-            Suivant <ArrowRight className="w-4 h-4" />
+            Suivant <ArrowRight className="w-5 h-5" />
           </button>
         </div>
       )}
 
       {/* Step 1: Lines */}
       {step === 1 && (
-        <div className="bg-white border border-border shadow-sm rounded-[20px] p-5">
-          <h2 className="font-heading text-base font-bold text-navy mb-4">Lignes du devis</h2>
+        <div className="bg-white border border-border shadow-sm rounded-[5px] p-6">
+          <h2 className="font-heading text-[15px] font-bold text-navy mb-5">Lignes du devis</h2>
 
           {/* Column headers */}
-          <div className="grid grid-cols-[1fr_60px_80px_80px_32px] gap-2 text-[11px] font-semibold text-grayText uppercase tracking-wide mb-2 px-1">
+          <div className="grid grid-cols-[1fr_80px_100px_100px_40px] gap-3 text-[13px] font-semibold text-grayText uppercase tracking-wide mb-3 px-2">
             <span>Description</span>
             <span className="text-center">Qté</span>
             <span className="text-right">P.U.</span>
@@ -175,21 +175,21 @@ export default function CreateDevisPage() {
             <span />
           </div>
 
-          <div className="space-y-2 mb-4">
+          <div className="space-y-3 mb-5">
             {lines.map((line, i) => (
-              <div key={i} className="grid grid-cols-[1fr_60px_80px_80px_32px] gap-2 items-center">
+              <div key={i} className="grid grid-cols-[1fr_80px_100px_100px_40px] gap-3 items-center">
                 <input
                   placeholder="Description"
                   value={line.label}
                   onChange={(e) => updateLine(i, "label", e.target.value)}
-                  className="w-full bg-white border border-border rounded-xl p-3 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-forest/30"
+                  className="w-full bg-white border border-border rounded-[5px] p-3.5 text-[15px] text-navy focus:outline-none focus:ring-2 focus:ring-forest/30"
                 />
                 <input
                   type="number"
                   min={1}
                   value={line.qty}
                   onChange={(e) => updateLine(i, "qty", e.target.value)}
-                  className="w-full bg-white border border-border rounded-xl p-3 text-sm text-navy text-center focus:outline-none focus:ring-2 focus:ring-forest/30"
+                  className="w-full bg-white border border-border rounded-[5px] p-3.5 text-[15px] text-navy text-center focus:outline-none focus:ring-2 focus:ring-forest/30"
                 />
                 <input
                   type="number"
@@ -197,9 +197,9 @@ export default function CreateDevisPage() {
                   step={0.01}
                   value={line.unitPrice}
                   onChange={(e) => updateLine(i, "unitPrice", e.target.value)}
-                  className="w-full bg-white border border-border rounded-xl p-3 text-sm text-navy text-right focus:outline-none focus:ring-2 focus:ring-forest/30"
+                  className="w-full bg-white border border-border rounded-[5px] p-3.5 text-[15px] text-navy text-right focus:outline-none focus:ring-2 focus:ring-forest/30"
                 />
-                <span className="font-mono text-sm font-semibold text-navy text-right">
+                <span className="font-mono text-[15px] font-semibold text-navy text-right">
                   {formatPrice(line.qty * line.unitPrice)}
                 </span>
                 {lines.length > 1 && (
@@ -207,7 +207,7 @@ export default function CreateDevisPage() {
                     onClick={() => removeLine(i)}
                     className="text-grayText hover:text-red transition-colors p-1"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 )}
               </div>
@@ -216,41 +216,41 @@ export default function CreateDevisPage() {
 
           <button
             onClick={addLine}
-            className="flex items-center gap-1.5 text-sm text-forest font-bold mb-5 hover:underline"
+            className="flex items-center gap-1.5 text-[15px] text-forest font-bold mb-6 hover:underline"
           >
-            <Plus className="w-4 h-4" /> Ajouter une ligne
+            <Plus className="w-5 h-5" /> Ajouter une ligne
           </button>
 
           {/* Totals */}
-          <div className="bg-surface/50 rounded-xl p-4 space-y-2">
-            <div className="flex justify-between text-sm">
+          <div className="bg-surface/50 rounded-[5px] p-5 space-y-3">
+            <div className="flex justify-between text-[15px]">
               <span className="text-grayText">Total HT</span>
               <span className="font-mono font-medium text-navy">{formatPrice(totalHT)}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-[15px]">
               <span className="text-grayText">TVA (20%)</span>
               <span className="font-mono font-medium text-navy">{formatPrice(tva)}</span>
             </div>
-            <div className="flex justify-between pt-2 border-t border-border">
-              <span className="font-bold text-navy">Total TTC</span>
+            <div className="flex justify-between pt-3 border-t border-border">
+              <span className="font-bold text-[15px] text-navy">Total TTC</span>
               <span className="font-mono text-xl font-bold text-navy">{formatPrice(totalTTC)}</span>
             </div>
           </div>
 
           {/* Navigation */}
-          <div className="flex gap-3 mt-5">
+          <div className="flex gap-3 mt-6">
             <button
               onClick={() => setStep(0)}
-              className="flex items-center gap-2 px-5 py-3 bg-surface text-navy text-sm font-bold rounded-[14px] hover:-translate-y-0.5 transition-transform"
+              className="flex items-center gap-2 px-5 py-2.5 bg-surface text-navy text-sm font-bold rounded-[5px] hover:-translate-y-0.5 transition-transform"
             >
-              <ArrowLeft className="w-4 h-4" /> Précédent
+              <ArrowLeft className="w-5 h-5" /> Précédent
             </button>
             <button
               onClick={() => setStep(2)}
               disabled={lines.length === 0}
-              className="flex-1 flex items-center justify-center gap-2 bg-deepForest text-white text-sm font-bold py-3 rounded-[14px] hover:-translate-y-0.5 transition-transform disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 bg-deepForest text-white text-sm font-bold px-5 py-2.5 rounded-[5px] hover:-translate-y-0.5 transition-transform disabled:opacity-50"
             >
-              Suivant <ArrowRight className="w-4 h-4" />
+              Suivant <ArrowRight className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -258,33 +258,33 @@ export default function CreateDevisPage() {
 
       {/* Step 2: Send */}
       {step === 2 && (
-        <div className="bg-white border border-border shadow-sm rounded-[20px] p-5">
-          <h2 className="font-heading text-base font-bold text-navy mb-4">Envoyer le devis</h2>
+        <div className="bg-white border border-border shadow-sm rounded-[5px] p-6">
+          <h2 className="font-heading text-[15px] font-bold text-navy mb-5">Envoyer le devis</h2>
 
           {/* Summary */}
-          <div className="p-4 rounded-xl bg-surface mb-4">
-            <div className="text-xs text-grayText mb-1">Devis pour {clientName}</div>
+          <div className="p-5 rounded-[5px] bg-surface mb-5">
+            <div className="text-[13px] text-grayText mb-1">Devis pour {clientName}</div>
             <div className="font-mono text-xl font-bold text-navy">{formatPrice(totalTTC)}</div>
-            <div className="text-xs text-grayText mt-0.5">
-              {lines.length} ligne{lines.length > 1 ? "s" : ""} &middot; TVA {formatPrice(tva)}
+            <div className="text-[13px] text-grayText mt-0.5">
+              {lines.length} ligne{lines.length > 1 ? "s" : ""} -- TVA {formatPrice(tva)}
             </div>
           </div>
 
-          <label className="text-xs font-semibold text-grayText mb-1 block">Message pour le client</label>
+          <label className="text-[13px] font-semibold text-grayText mb-1.5 block">Message pour le client</label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Message au client..."
-            className="w-full h-[100px] bg-white border border-border rounded-xl p-3 text-sm text-navy placeholder:text-grayText/60 focus:outline-none focus:ring-2 focus:ring-forest/30 resize-none mb-4"
+            className="w-full h-[120px] bg-white border border-border rounded-[5px] p-3.5 text-[15px] text-navy placeholder:text-grayText/60 focus:outline-none focus:ring-2 focus:ring-forest/30 resize-none mb-5"
           />
 
           {/* Escrow info badge */}
-          <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-surface border border-forest/10 mb-5">
+          <div className="flex items-center gap-3 p-5 rounded-[5px] bg-surface border border-forest/10 mb-6">
             <Shield className="w-5 h-5 text-forest shrink-0" />
             <div>
-              <div className="text-sm font-semibold text-navy">Paiement sécurisé par séquestre</div>
-              <div className="text-xs text-grayText">
-                Le montant sera bloqué jusqu&apos;à validation de l&apos;intervention par le client
+              <div className="text-[15px] font-semibold text-navy">Paiement sécurisé par séquestre</div>
+              <div className="text-[13px] text-grayText">
+                Le montant sera bloqué jusqu'à validation de l'intervention par le client
               </div>
             </div>
           </div>
@@ -293,20 +293,20 @@ export default function CreateDevisPage() {
           <div className="flex gap-3">
             <button
               onClick={() => setStep(1)}
-              className="flex items-center gap-2 px-5 py-3 bg-surface text-navy text-sm font-bold rounded-[14px] hover:-translate-y-0.5 transition-transform"
+              className="flex items-center gap-2 px-5 py-2.5 bg-surface text-navy text-sm font-bold rounded-[5px] hover:-translate-y-0.5 transition-transform"
             >
-              <ArrowLeft className="w-4 h-4" /> Précédent
+              <ArrowLeft className="w-5 h-5" /> Précédent
             </button>
             <button
               onClick={handleSend}
               disabled={submitting}
-              className="flex-1 flex items-center justify-center gap-2 bg-deepForest text-white text-sm font-bold py-3 rounded-[14px] hover:-translate-y-0.5 transition-transform disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 bg-deepForest text-white text-sm font-bold px-5 py-2.5 rounded-[5px] hover:-translate-y-0.5 transition-transform disabled:opacity-50"
             >
               {submitting ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <Send className="w-4 h-4" /> Envoyer le devis
+                  <Send className="w-5 h-5" /> Envoyer le devis
                 </>
               )}
             </button>

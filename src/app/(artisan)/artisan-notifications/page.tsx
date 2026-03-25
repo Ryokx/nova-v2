@@ -1,6 +1,7 @@
 "use client";
 
-import { Bell, Zap, FileText, CreditCard, Calendar, Shield } from "lucide-react";
+import { useState } from "react";
+import { Bell, Zap, FileText, CreditCard, Calendar, Shield, Filter, CheckCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useFetch } from "@/hooks/use-fetch";
@@ -16,11 +17,11 @@ interface NotifData {
 }
 
 const iconMap: Record<string, { icon: React.ReactNode; bg: string }> = {
-  URGENT_REQUEST: { icon: <Zap className="w-4 h-4 text-red" />, bg: "bg-red/10" },
-  DEVIS_ACCEPTED: { icon: <FileText className="w-4 h-4 text-success" />, bg: "bg-success/10" },
-  PAYMENT_RELEASED: { icon: <CreditCard className="w-4 h-4 text-gold" />, bg: "bg-gold/10" },
-  APPOINTMENT_CONFIRMED: { icon: <Calendar className="w-4 h-4 text-forest" />, bg: "bg-forest/10" },
-  CERTIFICATION_REMINDER: { icon: <Shield className="w-4 h-4 text-grayText" />, bg: "bg-gray-100" },
+  URGENT_REQUEST: { icon: <Zap className="w-5 h-5 text-red" />, bg: "bg-red/10" },
+  DEVIS_ACCEPTED: { icon: <FileText className="w-5 h-5 text-success" />, bg: "bg-success/10" },
+  PAYMENT_RELEASED: { icon: <CreditCard className="w-5 h-5 text-gold" />, bg: "bg-gold/10" },
+  APPOINTMENT_CONFIRMED: { icon: <Calendar className="w-5 h-5 text-forest" />, bg: "bg-forest/10" },
+  CERTIFICATION_REMINDER: { icon: <Shield className="w-5 h-5 text-grayText" />, bg: "bg-gray-100" },
 };
 
 const actionLabels: Record<string, string> = {
@@ -29,6 +30,16 @@ const actionLabels: Record<string, string> = {
   PAYMENT_RELEASED: "Détails",
   APPOINTMENT_CONFIRMED: "Voir",
 };
+
+const filterTabs = [
+  { key: "all", label: "Toutes" },
+  { key: "unread", label: "Non lues" },
+  { key: "URGENT_REQUEST", label: "Urgences" },
+  { key: "DEVIS_ACCEPTED", label: "Devis" },
+  { key: "PAYMENT_RELEASED", label: "Paiements" },
+  { key: "APPOINTMENT_CONFIRMED", label: "Rendez-vous" },
+  { key: "CERTIFICATION_REMINDER", label: "Rappels" },
+];
 
 // Mock notifications for display
 const mockNotifications: NotifData[] = [
@@ -89,8 +100,19 @@ function formatTime(date: string): string {
 
 export default function ArtisanNotificationsPage() {
   const { data: apiNotifications, loading, refetch } = useFetch<NotifData[]>("/api/notifications");
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const notifications = apiNotifications && apiNotifications.length > 0 ? apiNotifications : mockNotifications;
+
+  const filteredNotifications = notifications
+    ? notifications.filter((n) => {
+        if (activeFilter === "all") return true;
+        if (activeFilter === "unread") return !n.read;
+        return n.type === activeFilter;
+      })
+    : [];
+
+  const unreadCount = notifications ? notifications.filter((n) => !n.read).length : 0;
 
   const markAllRead = async () => {
     await fetch("/api/notifications", {
@@ -102,38 +124,68 @@ export default function ArtisanNotificationsPage() {
   };
 
   return (
-    <div className="max-w-[700px] mx-auto p-5 md:p-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="font-heading text-[26px] font-extrabold text-navy">Notifications</h1>
+    <div className="max-w-[1320px] mx-auto p-5 md:p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="font-heading text-[28px] font-extrabold text-navy">Notifications</h1>
+          {unreadCount > 0 && (
+            <p className="text-[13px] text-grayText mt-1">
+              {unreadCount} notification{unreadCount > 1 ? "s" : ""} non lue{unreadCount > 1 ? "s" : ""}
+            </p>
+          )}
+        </div>
         {notifications && notifications.some((n) => !n.read) && (
-          <button onClick={markAllRead} className="text-xs text-forest font-semibold hover:underline">
+          <button
+            onClick={markAllRead}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-[5px] text-sm font-bold text-forest bg-surface hover:bg-forest/10 transition-colors"
+          >
+            <CheckCircle className="w-5 h-5" />
             Tout marquer comme lu
           </button>
         )}
       </div>
 
+      {/* Filter tabs */}
+      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
+        <Filter className="w-5 h-5 text-grayText shrink-0" />
+        {filterTabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveFilter(tab.key)}
+            className={cn(
+              "px-5 py-2.5 rounded-[5px] text-sm font-bold whitespace-nowrap transition-colors",
+              activeFilter === tab.key
+                ? "bg-deepForest text-white"
+                : "bg-white border border-border text-navy hover:bg-surface"
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Notifications list */}
       {loading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => <Skeleton key={i} variant="rectangular" height={80} />)}
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => <Skeleton key={i} variant="rectangular" height={96} />)}
         </div>
-      ) : notifications && notifications.length > 0 ? (
-        <div className="space-y-3">
-          {notifications.map((n) => {
-            const config = iconMap[n.type] ?? { icon: <Bell className="w-4 h-4 text-grayText" />, bg: "bg-gray-100" };
+      ) : filteredNotifications && filteredNotifications.length > 0 ? (
+        <div className="space-y-4">
+          {filteredNotifications.map((n) => {
+            const config = iconMap[n.type] ?? { icon: <Bell className="w-5 h-5 text-grayText" />, bg: "bg-gray-100" };
             const actionLabel = actionLabels[n.type];
             return (
               <div
                 key={n.id}
-                className="bg-white rounded-[20px] p-5 border border-border flex items-start gap-3"
-              >
-                {/* Unread dot */}
-                {!n.read && (
-                  <div className="w-2 h-2 rounded-full bg-forest shrink-0 mt-2" />
+                className={cn(
+                  "bg-white rounded-[5px] p-5 border border-border flex items-start gap-4 transition-colors",
+                  !n.read && "border-l-4 border-l-forest bg-forest/[0.02]"
                 )}
-
+              >
                 {/* Icon circle */}
                 <div className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+                  "w-12 h-12 rounded-[5px] flex items-center justify-center shrink-0",
                   config.bg,
                 )}>
                   {config.icon}
@@ -141,14 +193,19 @@ export default function ArtisanNotificationsPage() {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="font-heading text-sm font-semibold text-navy">{n.title}</div>
-                  <p className="text-sm text-grayText leading-relaxed mt-0.5">{n.body}</p>
-                  <div className="text-xs font-mono text-grayText mt-1">{formatTime(n.createdAt)}</div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-heading text-[15px] font-semibold text-navy">{n.title}</span>
+                    {!n.read && (
+                      <span className="w-2.5 h-2.5 rounded-full bg-forest shrink-0" />
+                    )}
+                  </div>
+                  <p className="text-[15px] text-grayText leading-relaxed mt-1">{n.body}</p>
+                  <div className="text-[13px] font-mono text-grayText mt-2">{formatTime(n.createdAt)}</div>
                 </div>
 
                 {/* Action button */}
                 {actionLabel && (
-                  <button className="shrink-0 text-forest text-sm font-semibold hover:underline mt-1">
+                  <button className="shrink-0 px-5 py-2.5 rounded-[5px] text-sm font-bold text-forest bg-surface hover:bg-forest/10 transition-colors mt-1">
                     {actionLabel}
                   </button>
                 )}

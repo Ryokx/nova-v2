@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Download, Send, FileText } from "lucide-react";
 
 function formatPrice(n: number) {
-  return n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  return n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " EUR";
 }
 
 const invoiceLines = [
   { description: "Robinet mitigeur", qty: 1, unitPrice: 85 },
-  { description: "Main d'œuvre", qty: 2, unitPrice: 65 },
+  { description: "Main d'oeuvre", qty: 2, unitPrice: 65 },
 ];
 
 const totalHT = invoiceLines.reduce((s, l) => s + l.qty * l.unitPrice, 0);
@@ -28,40 +28,40 @@ export default function ArtisanInvoicesPage() {
   };
 
   return (
-    <div className="max-w-[600px] mx-auto p-5 md:p-8">
+    <div className="max-w-[1320px] mx-auto p-5 md:p-8">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-sm text-forest font-medium mb-4 hover:underline"
+        className="flex items-center gap-1.5 text-[15px] text-forest font-medium mb-5 hover:underline"
       >
-        <ArrowLeft className="w-4 h-4" /> Retour
+        <ArrowLeft className="w-5 h-5" /> Retour
       </button>
 
-      <h1 className="font-heading text-[26px] font-extrabold text-navy mb-1">Nouvelle facture</h1>
-      <p className="text-sm text-grayText mb-6">
+      <h1 className="font-heading text-[28px] font-extrabold text-navy mb-1">Nouvelle facture</h1>
+      <p className="text-[15px] text-grayText mb-6">
         Facture auto-générée depuis la mission validée
       </p>
 
       {/* Invoice preview card */}
-      <div className="bg-white border border-border shadow-sm rounded-[20px] p-5">
+      <div className="bg-white border border-border shadow-sm rounded-[5px] p-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-forest/5 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-forest" />
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-[5px] bg-forest/5 flex items-center justify-center">
+              <FileText className="w-6 h-6 text-forest" />
             </div>
             <div>
-              <span className="font-mono text-sm font-semibold text-forest">#FAC-2026-128</span>
-              <div className="text-xs text-grayText mt-0.5">Caroline L. &middot; 15 mars 2026</div>
+              <span className="font-mono text-[15px] font-semibold text-forest">#FAC-2026-128</span>
+              <div className="text-[13px] text-grayText mt-0.5">Caroline L. -- 15 mars 2026</div>
             </div>
           </div>
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-success/10 text-success">
+          <span className="px-5 py-2.5 rounded-[5px] text-[13px] font-semibold bg-success/10 text-success">
             Payée
           </span>
         </div>
 
         {/* Line items */}
-        <div className="mb-4">
-          <div className="grid grid-cols-[1fr_50px_80px_80px] gap-2 text-[11px] font-semibold text-grayText uppercase tracking-wide mb-2 px-1">
+        <div className="mb-5">
+          <div className="grid grid-cols-[1fr_80px_120px_120px] gap-3 text-[13px] font-semibold text-grayText uppercase tracking-wide mb-3 px-2">
             <span>Description</span>
             <span className="text-center">Qté</span>
             <span className="text-right">P.U.</span>
@@ -70,7 +70,7 @@ export default function ArtisanInvoicesPage() {
           {invoiceLines.map((line, i) => (
             <div
               key={i}
-              className="grid grid-cols-[1fr_50px_80px_80px] gap-2 text-sm py-2.5 px-1 border-b border-border/50 last:border-0"
+              className="grid grid-cols-[1fr_80px_120px_120px] gap-3 text-[15px] py-4 px-2 border-b border-border/50 last:border-0"
             >
               <span className="text-navy">{line.description}</span>
               <span className="text-center text-grayText font-mono">{line.qty}</span>
@@ -83,17 +83,17 @@ export default function ArtisanInvoicesPage() {
         </div>
 
         {/* Totals */}
-        <div className="bg-surface/50 rounded-xl p-4 space-y-2 mb-5">
-          <div className="flex justify-between text-sm">
+        <div className="bg-surface/50 rounded-[5px] p-5 space-y-3 mb-6">
+          <div className="flex justify-between text-[15px]">
             <span className="text-grayText">Total HT</span>
             <span className="font-mono font-medium text-navy">{formatPrice(totalHT)}</span>
           </div>
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-[15px]">
             <span className="text-grayText">TVA (10%)</span>
             <span className="font-mono font-medium text-navy">{formatPrice(tva)}</span>
           </div>
-          <div className="flex justify-between pt-2 border-t border-border">
-            <span className="font-bold text-navy">Total TTC</span>
+          <div className="flex justify-between pt-3 border-t border-border">
+            <span className="font-bold text-[15px] text-navy">Total TTC</span>
             <span className="font-mono text-xl font-bold text-navy">{formatPrice(totalTTC)}</span>
           </div>
         </div>
@@ -103,18 +103,18 @@ export default function ArtisanInvoicesPage() {
           <button
             onClick={handleSend}
             disabled={sending}
-            className="flex-1 flex items-center justify-center gap-2 bg-deepForest text-white text-sm font-bold py-3 rounded-[14px] hover:-translate-y-0.5 transition-transform disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 bg-deepForest text-white text-sm font-bold px-5 py-2.5 rounded-[5px] hover:-translate-y-0.5 transition-transform disabled:opacity-50"
           >
             {sending ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
-                <Send className="w-4 h-4" /> Envoyer au client
+                <Send className="w-5 h-5" /> Envoyer au client
               </>
             )}
           </button>
-          <button className="flex items-center gap-2 px-5 py-3 bg-surface text-navy text-sm font-bold rounded-[14px] hover:-translate-y-0.5 transition-transform">
-            <Download className="w-4 h-4" /> Télécharger PDF
+          <button className="flex items-center gap-2 px-5 py-2.5 bg-surface text-navy text-sm font-bold rounded-[5px] hover:-translate-y-0.5 transition-transform">
+            <Download className="w-5 h-5" /> Télécharger PDF
           </button>
         </div>
       </div>

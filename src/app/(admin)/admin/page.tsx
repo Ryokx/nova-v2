@@ -156,7 +156,7 @@ export default function AdminPage() {
           { id: "missions" as const, label: "Missions" },
         ]).map((t) => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            className={cn("px-4 py-2 rounded-[10px] text-[13px] font-semibold transition-all",
+            className={cn("px-4 py-2 rounded-[5px] text-[13px] font-semibold transition-all",
               tab === t.id ? "bg-deepForest text-white" : "bg-white border border-border text-navy hover:bg-surface")}>
             {t.label}
           </button>
@@ -180,10 +180,10 @@ export default function AdminPage() {
               {/* Row 1 */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {kpiRow1.map((k) => (
-                  <div key={k.label} className="bg-white rounded-[20px] p-5 border border-border hover:shadow-md transition-shadow">
+                  <div key={k.label} className="bg-white rounded-[5px] p-5 border border-border hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-3">
                       <span className="font-body text-[13px] text-grayText font-medium">{k.label}</span>
-                      <div className="w-9 h-9 rounded-[10px] bg-surface flex items-center justify-center">{k.icon}</div>
+                      <div className="w-9 h-9 rounded-[5px] bg-surface flex items-center justify-center">{k.icon}</div>
                     </div>
                     <div className="font-heading text-[28px] font-extrabold text-navy leading-none">{k.value}</div>
                     {k.sub && <div className="font-mono text-[11px] text-grayText mt-1.5">{k.sub}</div>}
@@ -200,10 +200,10 @@ export default function AdminPage() {
               {/* Row 2 */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {kpiRow2.map((k) => (
-                  <div key={k.label} className="bg-white rounded-[20px] p-5 border border-border hover:shadow-md transition-shadow">
+                  <div key={k.label} className="bg-white rounded-[5px] p-5 border border-border hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-3">
                       <span className="font-body text-[13px] text-grayText font-medium">{k.label}</span>
-                      <div className="w-9 h-9 rounded-[10px] bg-surface flex items-center justify-center">{k.icon}</div>
+                      <div className="w-9 h-9 rounded-[5px] bg-surface flex items-center justify-center">{k.icon}</div>
                     </div>
                     <div className="font-heading text-[28px] font-extrabold text-navy leading-none">{k.value}</div>
                     {k.sub && <div className="font-mono text-[11px] text-grayText mt-1.5">{k.sub}</div>}
@@ -221,7 +221,7 @@ export default function AdminPage() {
 
           {/* Disputed missions alert */}
           {stats && stats.disputedMissions > 0 && (
-            <div className="mt-5 bg-white rounded-[20px] border border-red/15 p-5">
+            <div className="mt-5 bg-white rounded-[5px] border border-red/15 p-5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-red/10 flex items-center justify-center shrink-0">
                   <AlertTriangle className="w-5 h-5 text-red" />
@@ -254,7 +254,7 @@ export default function AdminPage() {
           ) : users && users.length > 0 ? (
             <div className="space-y-2">
               {users.map((u) => (
-                <div key={u.id} className="bg-white rounded-[16px] border border-border p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
+                <div key={u.id} className="bg-white rounded-[5px] border border-border p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
                   <Avatar name={u.name ?? u.email} size="sm" />
                   <div className="flex-1 min-w-0">
                     <div className="font-body text-sm font-semibold text-navy">{u.name ?? "\u2014"}</div>
@@ -293,7 +293,7 @@ export default function AdminPage() {
               { id: "VALIDATED", label: "Validées" },
             ].map((f) => (
               <button key={f.id} onClick={() => setMissionFilter(f.id)}
-                className={cn("px-3.5 py-2 rounded-[10px] text-xs font-semibold whitespace-nowrap transition-all",
+                className={cn("px-3.5 py-2 rounded-[5px] text-xs font-semibold whitespace-nowrap transition-all",
                   missionFilter === f.id ? "bg-deepForest text-white" : "bg-white border border-border text-navy hover:bg-surface")}>
                 {f.label}
               </button>
@@ -306,7 +306,7 @@ export default function AdminPage() {
               {missions.map((m) => {
                 const st = statusMap[m.status] ?? { label: m.status, variant: "default" as BadgeVariant };
                 return (
-                  <div key={m.id} className="bg-white rounded-[16px] border border-border p-4 hover:shadow-sm transition-shadow">
+                  <div key={m.id} className="bg-white rounded-[5px] border border-border p-4 hover:shadow-sm transition-shadow">
                     <div className="flex items-center gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
