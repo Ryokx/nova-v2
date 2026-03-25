@@ -15,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge, Card, KPICard, ConfirmModal } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import { useTheme } from "../../hooks/useTheme";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
 
@@ -110,6 +111,10 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
               <View style={styles.certifRow}>
                 <Text style={styles.certifIcon}><MaterialCommunityIcons name="shield-check" size={14} color={Colors.gold} /></Text>
                 <Text style={styles.certifText}>Certifié Nova • #2847</Text>
+                <View style={styles.planBadge}>
+                  <MaterialCommunityIcons name="shield-check" size={10} color={Colors.white} />
+                  <Text style={styles.planBadgeText}>Pro</Text>
+                </View>
               </View>
             </View>
             <View style={styles.headerRight}>
@@ -126,8 +131,27 @@ export function ArtisanHomeScreen({ navigation }: { navigation: any }) {
                 style={styles.avatarBtn}
                 onPress={() => navigation.navigate("ArtisanProfile")}
               >
-                <Avatar name="Jean-Michel" size={40} radius={14} />
+                <Avatar name="Jean-Michel" size={40} radius={14} uri={getAvatarUri("Jean-Michel")} />
               </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        {/* ── Pending validation banner ── */}
+        <View style={styles.pendingBanner}>
+          <View style={styles.pendingIconWrap}>
+            <MaterialCommunityIcons name="clock-outline" size={20} color={Colors.gold} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <View style={styles.pendingTitleRow}>
+              <Text style={styles.pendingTitle}>Compte en attente de validation</Text>
+              <View style={styles.pendingBadge}>
+                <Text style={styles.pendingBadgeText}>EN COURS</Text>
+              </View>
+            </View>
+            <View style={styles.pendingDescRow}>
+              <MaterialCommunityIcons name="eye-off" size={13} color={Colors.textMuted} />
+              <Text style={styles.pendingDesc}>Vous êtes invisible aux yeux des particuliers.</Text>
             </View>
           </View>
         </View>
@@ -562,6 +586,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textHint,
   },
+  planBadge: {
+    flexDirection: "row", alignItems: "center", gap: 3,
+    backgroundColor: Colors.forest, borderRadius: 6,
+    paddingHorizontal: 7, paddingVertical: 2, marginLeft: 4,
+  },
+  planBadgeText: { fontFamily: "DMSans_700Bold", fontSize: 10, color: Colors.white },
   headerRight: { flexDirection: "row", alignItems: "center", gap: 10 },
   bellBtn: { position: "relative", padding: 4 },
   bellEmoji: { fontSize: 22 },
@@ -585,7 +615,61 @@ const styles = StyleSheet.create({
   },
   avatarBtn: {},
 
-  /* Availability */
+  /* Pending validation banner */
+  pendingBanner: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: "rgba(245,166,35,0.05)",
+    borderWidth: 1,
+    borderColor: "rgba(245,166,35,0.2)",
+  },
+  pendingIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "rgba(245,166,35,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pendingTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 2,
+  },
+  pendingTitle: {
+    fontFamily: "DMSans_700Bold",
+    fontSize: 13,
+    color: Colors.navy,
+  },
+  pendingBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 20,
+    backgroundColor: "rgba(245,166,35,0.15)",
+  },
+  pendingBadgeText: {
+    fontFamily: "DMSans_700Bold",
+    fontSize: 9,
+    color: Colors.gold,
+    letterSpacing: 0.5,
+  },
+  pendingDescRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  pendingDesc: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 11,
+    color: Colors.textMuted,
+  },
+
   /* Availability */
   availCard: {
     marginHorizontal: 16, marginTop: -8, borderRadius: Radii["2xl"],

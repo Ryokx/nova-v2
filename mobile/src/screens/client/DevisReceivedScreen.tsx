@@ -9,6 +9,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ---- mock line items ---- */
@@ -76,7 +77,7 @@ export function DevisReceivedScreen({
       >
         {/* Artisan info */}
         <View style={styles.artisanCard}>
-          <Avatar name="Jean-Michel P." size={48} radius={16} />
+          <Avatar name="Jean-Michel P." size={48} radius={16} uri={getAvatarUri("Jean-Michel P.")} />
           <View style={{ flex: 1 }}>
             <Text style={styles.artisanName}>Jean-Michel P.</Text>
             <Text style={styles.artisanSub}>

@@ -66,6 +66,32 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
   const [signupCompany, setSignupCompany] = useState("");
   const [signupSiret, setSignupSiret] = useState("");
   const [signupDecennale, setSignupDecennale] = useState("");
+  const [signupTrade, setSignupTrade] = useState("");
+  const [showTradePicker, setShowTradePicker] = useState(false);
+  const [artisanStep, setArtisanStep] = useState(1);
+
+  const trades = [
+    { id: "plombier", label: "Plombier" },
+    { id: "electricien", label: "Électricien" },
+    { id: "serrurier", label: "Serrurier" },
+    { id: "chauffagiste", label: "Chauffagiste" },
+    { id: "peintre", label: "Peintre" },
+    { id: "menuisier", label: "Menuisier" },
+    { id: "carreleur", label: "Carreleur" },
+    { id: "macon", label: "Maçon" },
+    { id: "couvreur", label: "Couvreur" },
+    { id: "climaticien", label: "Climaticien" },
+    { id: "autre", label: "Autre" },
+  ];
+  // Documents state (artisan step 2)
+  const [docSiret, setDocSiret] = useState<string | null>(null);
+  const [docDecennale, setDocDecennale] = useState<string | null>(null);
+  const [docIdentite, setDocIdentite] = useState<string | null>(null);
+  const [docRge, setDocRge] = useState<string | null>(null);
+  const [docQualibat, setDocQualibat] = useState<string | null>(null);
+  const [docKbis, setDocKbis] = useState<string | null>(null);
+  const [acceptCgu, setAcceptCgu] = useState(false);
+  const [acceptNewsletter, setAcceptNewsletter] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   // Forgot password state
@@ -197,11 +223,13 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
     && isValidPhone(signupPhone)
     && pwdStrength >= 3
     && signupPwd === signupConfirmPwd
-    && signupConfirmPwd.length > 0;
-  const artisanValid = selectedRole === "artisan"
-    ? signupCompany.trim().length > 0 && isValidSiret(signupSiret) && signupDecennale.trim().length > 0
+    && signupConfirmPwd.length > 0
+    && acceptCgu;
+  const artisanStep1Valid = selectedRole === "artisan"
+    ? signupCompany.trim().length > 0 && isValidSiret(signupSiret) && signupDecennale.trim().length > 0 && signupTrade.trim().length > 0
     : true;
-  const canSubmit = baseValid && artisanValid;
+  const canSubmitStep1 = baseValid && artisanStep1Valid;
+  const docsRequiredValid = docSiret !== null && docDecennale !== null && docIdentite !== null;
 
   // ── Signup form ──
   if (showCreate) {
@@ -219,16 +247,206 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
             {/* Back */}
             <TouchableOpacity
               style={styles.backBtn}
-              onPress={() => setShowCreate(false)}
+              onPress={() => {
+                if (selectedRole === "artisan" && artisanStep === 2) {
+                  setArtisanStep(1);
+                } else {
+                  setShowCreate(false);
+                }
+              }}
             >
               <Text style={styles.backArrow}>{"‹"}</Text>
             </TouchableOpacity>
 
-            <Text style={styles.createTitle}>Créer un compte</Text>
+            {/* Step indicator for artisan */}
+            {selectedRole === "artisan" && (
+              <View style={styles.stepRow}>
+                <View style={[styles.stepDot, styles.stepDotActive]}>
+                  <Text style={styles.stepDotText}>1</Text>
+                </View>
+                <View style={[styles.stepLine, artisanStep >= 2 && styles.stepLineActive]} />
+                <View style={[styles.stepDot, artisanStep >= 2 && styles.stepDotActive]}>
+                  <Text style={[styles.stepDotText, artisanStep < 2 && { color: Colors.textMuted }]}>2</Text>
+                </View>
+              </View>
+            )}
+
+            <Text style={styles.createTitle}>
+              {selectedRole === "artisan" && artisanStep === 2 ? "Documents" : "Créer un compte"}
+            </Text>
             <Text style={styles.createSubtitle}>
-              Rejoignez Nova en quelques secondes
+              {selectedRole === "artisan" && artisanStep === 2
+                ? "Téléversez vos justificatifs pour vérification"
+                : "Rejoignez Nova en quelques secondes"}
             </Text>
 
+            {selectedRole === "artisan" && artisanStep === 2 ? (
+              <>
+                {/* Documents obligatoires */}
+                <View style={styles.docSectionHeader}>
+                  <MaterialCommunityIcons name="shield-check" size={16} color={Colors.forest} />
+                  <Text style={styles.docSectionTitle}>DOCUMENTS OBLIGATOIRES</Text>
+                </View>
+
+                <TouchableOpacity
+                  style={[styles.docCard, docSiret && styles.docCardDone]}
+                  onPress={() => setDocSiret(docSiret ? null : "justificatif_siret.pdf")}
+                >
+                  <View style={[styles.docIcon, docSiret && styles.docIconDone]}>
+                    <MaterialCommunityIcons
+                      name={docSiret ? "check-circle" : "file-document-outline"}
+                      size={22}
+                      color={docSiret ? Colors.forest : Colors.textMuted}
+                    />
+                  </View>
+                  <View style={styles.docInfo}>
+                    <View style={styles.docLabelRow}>
+                      <Text style={styles.docLabel}>Justificatif SIRET</Text>
+                      <Text style={styles.docRequired}>*</Text>
+                    </View>
+                    <Text style={docSiret ? styles.docFileNameDone : styles.docHint}>
+                      {docSiret || "PDF, JPG ou PNG"}
+                    </Text>
+                  </View>
+                  <Text style={docSiret ? styles.docRemoveText : styles.docAddText}>
+                    {docSiret ? "Retirer" : "Ajouter"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.docCard, docDecennale && styles.docCardDone]}
+                  onPress={() => setDocDecennale(docDecennale ? null : "attestation_decennale.pdf")}
+                >
+                  <View style={[styles.docIcon, docDecennale && styles.docIconDone]}>
+                    <MaterialCommunityIcons
+                      name={docDecennale ? "check-circle" : "file-document-outline"}
+                      size={22}
+                      color={docDecennale ? Colors.forest : Colors.textMuted}
+                    />
+                  </View>
+                  <View style={styles.docInfo}>
+                    <View style={styles.docLabelRow}>
+                      <Text style={styles.docLabel}>Attestation décennale</Text>
+                      <Text style={styles.docRequired}>*</Text>
+                    </View>
+                    <Text style={docDecennale ? styles.docFileNameDone : styles.docHint}>
+                      {docDecennale || "PDF, JPG ou PNG"}
+                    </Text>
+                  </View>
+                  <Text style={docDecennale ? styles.docRemoveText : styles.docAddText}>
+                    {docDecennale ? "Retirer" : "Ajouter"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.docCard, docIdentite && styles.docCardDone]}
+                  onPress={() => setDocIdentite(docIdentite ? null : "piece_identite.pdf")}
+                >
+                  <View style={[styles.docIcon, docIdentite && styles.docIconDone]}>
+                    <MaterialCommunityIcons
+                      name={docIdentite ? "check-circle" : "file-document-outline"}
+                      size={22}
+                      color={docIdentite ? Colors.forest : Colors.textMuted}
+                    />
+                  </View>
+                  <View style={styles.docInfo}>
+                    <View style={styles.docLabelRow}>
+                      <Text style={styles.docLabel}>Pièce d'identité</Text>
+                      <Text style={styles.docRequired}>*</Text>
+                    </View>
+                    <Text style={docIdentite ? styles.docFileNameDone : styles.docHint}>
+                      {docIdentite || "PDF, JPG ou PNG"}
+                    </Text>
+                  </View>
+                  <Text style={docIdentite ? styles.docRemoveText : styles.docAddText}>
+                    {docIdentite ? "Retirer" : "Ajouter"}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Documents facultatifs */}
+                <View style={[styles.docSectionHeader, { marginTop: 24 }]}>
+                  <MaterialCommunityIcons name="file-document-outline" size={16} color={Colors.textMuted} />
+                  <Text style={[styles.docSectionTitle, { color: Colors.textMuted }]}>DOCUMENTS FACULTATIFS</Text>
+                </View>
+
+                <TouchableOpacity
+                  style={[styles.docCard, docRge && styles.docCardDone]}
+                  onPress={() => setDocRge(docRge ? null : "certificat_rge.pdf")}
+                >
+                  <View style={[styles.docIcon, docRge && styles.docIconDone]}>
+                    <MaterialCommunityIcons
+                      name={docRge ? "check-circle" : "file-document-outline"}
+                      size={22}
+                      color={docRge ? Colors.forest : Colors.textMuted}
+                    />
+                  </View>
+                  <View style={styles.docInfo}>
+                    <Text style={styles.docLabel}>Certificat RGE</Text>
+                    <Text style={docRge ? styles.docFileNameDone : styles.docHint}>
+                      {docRge || "PDF, JPG ou PNG"}
+                    </Text>
+                  </View>
+                  <Text style={docRge ? styles.docRemoveText : styles.docAddText}>
+                    {docRge ? "Retirer" : "Ajouter"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.docCard, docQualibat && styles.docCardDone]}
+                  onPress={() => setDocQualibat(docQualibat ? null : "qualibat.pdf")}
+                >
+                  <View style={[styles.docIcon, docQualibat && styles.docIconDone]}>
+                    <MaterialCommunityIcons
+                      name={docQualibat ? "check-circle" : "file-document-outline"}
+                      size={22}
+                      color={docQualibat ? Colors.forest : Colors.textMuted}
+                    />
+                  </View>
+                  <View style={styles.docInfo}>
+                    <Text style={styles.docLabel}>Qualibat</Text>
+                    <Text style={docQualibat ? styles.docFileNameDone : styles.docHint}>
+                      {docQualibat || "PDF, JPG ou PNG"}
+                    </Text>
+                  </View>
+                  <Text style={docQualibat ? styles.docRemoveText : styles.docAddText}>
+                    {docQualibat ? "Retirer" : "Ajouter"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.docCard, docKbis && styles.docCardDone]}
+                  onPress={() => setDocKbis(docKbis ? null : "extrait_kbis.pdf")}
+                >
+                  <View style={[styles.docIcon, docKbis && styles.docIconDone]}>
+                    <MaterialCommunityIcons
+                      name={docKbis ? "check-circle" : "file-document-outline"}
+                      size={22}
+                      color={docKbis ? Colors.forest : Colors.textMuted}
+                    />
+                  </View>
+                  <View style={styles.docInfo}>
+                    <Text style={styles.docLabel}>Extrait Kbis</Text>
+                    <Text style={docKbis ? styles.docFileNameDone : styles.docHint}>
+                      {docKbis || "PDF, JPG ou PNG"}
+                    </Text>
+                  </View>
+                  <Text style={docKbis ? styles.docRemoveText : styles.docAddText}>
+                    {docKbis ? "Retirer" : "Ajouter"}
+                  </Text>
+                </TouchableOpacity>
+
+                <Button
+                  title="Créer mon compte"
+                  onPress={() => navigation.replace("ArtisanPendingValidation" as any)}
+                  size="lg"
+                  fullWidth
+                  disabled={!docsRequiredValid}
+                  style={{ marginTop: 16 }}
+                />
+
+              </>
+            ) : (
+            <>
             {/* Role selector */}
             <Text style={styles.fieldLabel}>Je suis</Text>
             <View style={styles.roleRow}>
@@ -276,13 +494,28 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
             />
 
             {selectedRole === "artisan" && (
-              <Input
-                label="Nom de l'entreprise *"
-                placeholder="Raison sociale"
-                value={signupCompany}
-                onChangeText={setSignupCompany}
-                error={signupCompany.length > 0 && signupCompany.trim().length < 2 ? "Nom d'entreprise requis" : undefined}
-              />
+              <>
+                <Input
+                  label="Nom de l'entreprise *"
+                  placeholder="Raison sociale"
+                  value={signupCompany}
+                  onChangeText={setSignupCompany}
+                  error={signupCompany.length > 0 && signupCompany.trim().length < 2 ? "Nom d'entreprise requis" : undefined}
+                />
+                <View style={styles.tradeFieldWrap}>
+                  <Text style={styles.phoneFieldLabel}>Métier *</Text>
+                  <TouchableOpacity
+                    style={styles.tradePickerBtn}
+                    onPress={() => setShowTradePicker(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={signupTrade ? styles.tradePickerText : styles.tradePickerPlaceholder}>
+                      {signupTrade ? trades.find(t => t.id === signupTrade)?.label : "Sélectionnez votre métier"}
+                    </Text>
+                    <MaterialCommunityIcons name="chevron-down" size={18} color={Colors.textMuted} />
+                  </TouchableOpacity>
+                </View>
+              </>
             )}
 
             {/* Email * */}
@@ -396,23 +629,49 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
             )}
 
             <Button
-              title="Créer mon compte"
+              title={selectedRole === "artisan" ? "Continuer" : "Créer mon compte"}
               onPress={() => {
-                navigation.replace(
-                  selectedRole === "client" ? "ClientTabs" : "ArtisanTabs",
-                  {} as any,
-                );
+                if (selectedRole === "artisan") {
+                  setArtisanStep(2);
+                } else {
+                  navigation.replace("ClientTabs", {} as any);
+                }
               }}
               size="lg"
               fullWidth
-              disabled={!canSubmit}
+              disabled={!canSubmitStep1}
               style={{ marginTop: 8 }}
             />
 
-            <Text style={styles.legalText}>
-              En créant un compte, vous acceptez nos conditions
-              d’utilisation et notre politique de confidentialité.
-            </Text>
+            {/* CGU checkbox */}
+            <TouchableOpacity
+              style={styles.checkboxRow}
+              onPress={() => setAcceptCgu(!acceptCgu)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.checkbox, acceptCgu && styles.checkboxChecked]}>
+                {acceptCgu && <MaterialCommunityIcons name="check" size={14} color={Colors.white} />}
+              </View>
+              <Text style={styles.checkboxLabel}>
+                J’accepte les <Text style={styles.checkboxLink}>conditions générales d’utilisation</Text> et la <Text style={styles.checkboxLink}>politique de confidentialité</Text> <Text style={{ color: Colors.red }}>*</Text>
+              </Text>
+            </TouchableOpacity>
+
+            {/* Newsletter checkbox */}
+            <TouchableOpacity
+              style={styles.checkboxRow}
+              onPress={() => setAcceptNewsletter(!acceptNewsletter)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.checkbox, acceptNewsletter && styles.checkboxChecked]}>
+                {acceptNewsletter && <MaterialCommunityIcons name="check" size={14} color={Colors.white} />}
+              </View>
+              <Text style={styles.checkboxLabelMuted}>
+                Je souhaite recevoir les actualités et offres de Nova par email
+              </Text>
+            </TouchableOpacity>
+            </>
+            )}
           </ScrollView>
         </KeyboardAvoidingView>
         {/* Country picker modal */}
@@ -447,6 +706,43 @@ export function AuthScreen({ navigation }: RootStackScreenProps<"Auth">) {
                     <Text style={styles.countryItemName}>{c.name}</Text>
                     <Text style={styles.countryItemDial}>{c.dial}</Text>
                     {phoneCountry.code === c.code && (
+                      <MaterialCommunityIcons name="check" size={16} color={Colors.forest} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+        {/* Trade picker modal */}
+        <Modal visible={showTradePicker} transparent animationType="fade">
+          <TouchableOpacity
+            style={styles.countryOverlay}
+            activeOpacity={1}
+            onPress={() => setShowTradePicker(false)}
+          >
+            <View style={styles.countryModal}>
+              <View style={styles.countryModalHeader}>
+                <Text style={styles.countryModalTitle}>Sélectionnez votre métier</Text>
+                <TouchableOpacity onPress={() => setShowTradePicker(false)}>
+                  <MaterialCommunityIcons name="close" size={20} color={Colors.navy} />
+                </TouchableOpacity>
+              </View>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {trades.map((t) => (
+                  <TouchableOpacity
+                    key={t.id}
+                    style={[
+                      styles.countryItem,
+                      signupTrade === t.id && styles.countryItemActive,
+                    ]}
+                    onPress={() => {
+                      setSignupTrade(t.id);
+                      setShowTradePicker(false);
+                    }}
+                  >
+                    <Text style={styles.countryItemName}>{t.label}</Text>
+                    {signupTrade === t.id && (
                       <MaterialCommunityIcons name="check" size={16} color={Colors.forest} />
                     )}
                   </TouchableOpacity>
@@ -1005,5 +1301,185 @@ const styles = StyleSheet.create({
     color: "#E8302A",
     textAlign: "center",
     marginTop: 8,
+  },
+
+  /* ── Checkboxes ── */
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+    marginTop: 12,
+    width: "100%",
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    backgroundColor: Colors.white,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 1,
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.forest,
+    borderColor: Colors.forest,
+  },
+  checkboxLabel: {
+    flex: 1,
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.navy,
+    lineHeight: 18,
+  },
+  checkboxLabelMuted: {
+    flex: 1,
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.textMuted,
+    lineHeight: 18,
+  },
+  checkboxLink: {
+    color: Colors.forest,
+    fontFamily: "DMSans_600SemiBold",
+  },
+
+  /* ── Trade picker ── */
+  tradeFieldWrap: { marginBottom: 10, width: "100%" },
+  tradePickerBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: 48,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  tradePickerText: {
+    fontFamily: "DMSans_500Medium",
+    fontSize: 14,
+    color: Colors.navy,
+  },
+  tradePickerPlaceholder: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 14,
+    color: Colors.textHint,
+  },
+
+  /* ── Step indicator ── */
+  stepRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    gap: 0,
+  },
+  stepDot: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stepDotActive: {
+    backgroundColor: Colors.forest,
+  },
+  stepDotText: {
+    fontFamily: "Manrope_700Bold",
+    fontSize: 13,
+    color: Colors.white,
+  },
+  stepLine: {
+    width: 48,
+    height: 2,
+    backgroundColor: Colors.border,
+    borderRadius: 1,
+  },
+  stepLineActive: {
+    backgroundColor: Colors.forest,
+  },
+
+  /* ── Document upload cards ── */
+  docSectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 12,
+  },
+  docSectionTitle: {
+    fontFamily: "DMMono_500Medium",
+    fontSize: 11,
+    color: Colors.navy,
+    letterSpacing: 1,
+  },
+  docCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.white,
+    marginBottom: 10,
+  },
+  docCardDone: {
+    borderColor: "rgba(27,107,78,0.3)",
+    backgroundColor: "rgba(27,107,78,0.04)",
+  },
+  docIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  docIconDone: {
+    backgroundColor: "rgba(27,107,78,0.1)",
+  },
+  docInfo: {
+    flex: 1,
+  },
+  docLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  docLabel: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 14,
+    color: Colors.navy,
+  },
+  docRequired: {
+    fontFamily: "DMSans_700Bold",
+    fontSize: 10,
+    color: Colors.red,
+  },
+  docHint: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.textMuted,
+    marginTop: 2,
+  },
+  docFileNameDone: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.forest,
+    marginTop: 2,
+  },
+  docAddText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 12,
+    color: Colors.forest,
+  },
+  docRemoveText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 12,
+    color: Colors.red,
   },
 });

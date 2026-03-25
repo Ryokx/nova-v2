@@ -10,6 +10,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar, ConfirmModal } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const plans = [
@@ -265,7 +266,7 @@ export function MaintenanceContractScreen({
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Artisan */}
         <View style={styles.artisanRow}>
-          <Avatar name="Jean-Michel P." size={44} radius={14} />
+          <Avatar name="Jean-Michel P." size={44} radius={14} uri={getAvatarUri("Jean-Michel P.")} />
           <View>
             <Text style={styles.artisanName}>Jean-Michel P.</Text>
             <Text style={styles.artisanSub}>Plombier-Chauffagiste • Certifié Nova</Text>

@@ -7,12 +7,14 @@ import {
   ScrollView,
   TextInput,
   Image,
+  Switch,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar, Badge } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import { useTheme } from "../../hooks/useTheme";
 import type { ArtisanTabScreenProps } from "../../navigation/types";
 
@@ -46,6 +48,7 @@ interface MenuRow {
 }
 
 const menuRows: MenuRow[] = [
+  { icon: "star-circle", label: "Mon abonnement", sub: "Forfait Pro • gérer ou changer", screen: "Subscription" },
   { icon: "currency-eur", label: "Mes tarifs", sub: "Déplacement, devis, urgences", screen: "ArtisanPricing" },
   { icon: "cash", label: "Paiements", sub: "Historique et virements", screen: "ArtisanPayments" },
   { icon: "file-document", label: "Documents", sub: "Devis et factures", screen: "ArtisanDocuments" },
@@ -65,6 +68,7 @@ export function ArtisanProfileScreen({
   const { c } = useTheme();
   const [editSection, setEditSection] = useState<EditSection>(null);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const [instantPayAuto, setInstantPayAuto] = useState(false);
 
   const pickProfilePhoto = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -138,7 +142,7 @@ export function ArtisanProfileScreen({
             {profilePhoto ? (
               <Image source={{ uri: profilePhoto }} style={styles.avatarImage} />
             ) : (
-              <Avatar name={profile.name} size={72} radius={24} />
+              <Avatar name={profile.name} size={72} radius={24} uri={getAvatarUri(profile.name)} />
             )}
             <View style={styles.shieldBadge}>
               <Text style={styles.shieldEmoji}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
@@ -181,6 +185,40 @@ export function ArtisanProfileScreen({
           <TouchableOpacity style={styles.addDocBtn}>
             <Text style={styles.addDocText}>+ Ajouter un document</Text>
           </TouchableOpacity>
+        </View>
+
+        {/* Instant Pay */}
+        <View style={[styles.card, { backgroundColor: c.card }]}>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={[styles.sectionHeaderTitle, { color: c.text }]}>Instant Pay</Text>
+          </View>
+          <View style={styles.instantPayRow}>
+            <View style={styles.instantPayIconWrap}>
+              <MaterialCommunityIcons name="lightning-bolt" size={18} color={Colors.white} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.instantPayLabel, { color: c.text }]}>Virement instantané automatique</Text>
+              <Text style={styles.instantPayDesc}>
+                {instantPayAuto
+                  ? "Chaque paiement débloqué est viré instantanément (4% de frais)"
+                  : "Activez pour recevoir tous vos paiements en quelques secondes"}
+              </Text>
+            </View>
+            <Switch
+              value={instantPayAuto}
+              onValueChange={setInstantPayAuto}
+              trackColor={{ false: Colors.border, true: Colors.forest }}
+              thumbColor={Colors.white}
+            />
+          </View>
+          {instantPayAuto && (
+            <View style={styles.instantPayInfo}>
+              <MaterialCommunityIcons name="information-outline" size={13} color={Colors.forest} />
+              <Text style={styles.instantPayInfoText}>
+                4% de frais seront appliqués automatiquement sur chaque paiement. Vous pouvez désactiver cette option à tout moment.
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Menu rows */}
@@ -418,4 +456,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.red,
   },
+
+  /* Instant Pay */
+  instantPayRow: {
+    flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 6,
+  },
+  instantPayIconWrap: {
+    width: 36, height: 36, borderRadius: 11,
+    backgroundColor: Colors.forest, alignItems: "center", justifyContent: "center",
+  },
+  instantPayLabel: { fontFamily: "DMSans_600SemiBold", fontSize: 14, color: Colors.navy },
+  instantPayDesc: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textSecondary, marginTop: 1 },
+  instantPayInfo: {
+    flexDirection: "row", alignItems: "flex-start", gap: 8,
+    backgroundColor: "rgba(27,107,78,0.04)", borderRadius: 10,
+    padding: 10, marginTop: 10,
+  },
+  instantPayInfoText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: "#14523B", flex: 1, lineHeight: 16 },
 });

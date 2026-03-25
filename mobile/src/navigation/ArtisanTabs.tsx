@@ -23,6 +23,9 @@ import { ClientDirectoryScreen } from "../screens/artisan/ClientDirectoryScreen"
 import { QRCodeScreen } from "../screens/artisan/QRCodeScreen";
 import { AccountingScreen } from "../screens/artisan/AccountingScreen";
 import { ArtisanPricingScreen } from "../screens/artisan/PricingScreen";
+import { InstantPayScreen } from "../screens/artisan/InstantPayScreen";
+import { SubscriptionScreen } from "../screens/artisan/SubscriptionScreen";
+import { AddonsScreen } from "../screens/artisan/AddonsScreen";
 import { ReferralScreen } from "../screens/client/ReferralScreen";
 import { SupportScreen } from "../screens/shared/SupportScreen";
 import { SettingsScreen } from "../screens/shared/SettingsScreen";
@@ -49,6 +52,9 @@ function addArtisanSharedScreens(Stack: ReturnType<typeof createNativeStackNavig
       <Stack.Screen name="QRCodeProfile" component={QRCodeScreen} />
       <Stack.Screen name="Accounting" component={AccountingScreen} />
       <Stack.Screen name="ArtisanPricing" component={ArtisanPricingScreen} />
+      <Stack.Screen name="InstantPay" component={InstantPayScreen} />
+      <Stack.Screen name="Subscription" component={SubscriptionScreen} />
+      <Stack.Screen name="Addons" component={AddonsScreen} />
       <Stack.Screen name="Support" component={SupportScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="NotificationPreferences" component={NotificationPrefsScreen} />

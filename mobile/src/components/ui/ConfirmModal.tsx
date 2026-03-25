@@ -154,10 +154,12 @@ const styles = StyleSheet.create({
   },
   actionBtn: {
     flex: 1,
-    height: 48,
+    minHeight: 48,
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
   actionBtnPrimary: {
     backgroundColor: Colors.deepForest,
@@ -174,6 +176,7 @@ const styles = StyleSheet.create({
     fontFamily: "Manrope_700Bold",
     fontSize: 14,
     color: Colors.white,
+    textAlign: "center",
   },
   actionBtnTextOutline: {
     color: Colors.navy,

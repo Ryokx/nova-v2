@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import { useTheme } from "../../hooks/useTheme";
 import type { ClientTabScreenProps } from "../../navigation/types";
 
@@ -43,12 +44,12 @@ const allArtisans = [
   { id: "5", name: "Christophe Durand", job: "Chauffagiste", rating: 4.9, price: 75, category: "heating" },
   { id: "6", name: "Fatima Hadj", job: "Plombier", rating: 4.8, price: 70, category: "plumber" },
   { id: "7", name: "Thomas Richard", job: "Plombier", rating: 4.7, price: 60, category: "plumber" },
-  { id: "8", name: "Laurent Garcia", job: "Plombier", rating: 4.5, price: 55, category: "plumber" },
-  { id: "9", name: "David Leroy", job: "Électricien", rating: 4.6, price: 65, category: "electrician" },
+  { id: "8", name: "Garcia & Fils", job: "Plombier", rating: 4.5, price: 55, category: "plumber" },
+  { id: "9", name: "Leroy Élec", job: "Électricien", rating: 4.6, price: 65, category: "electrician" },
   { id: "10", name: "Amina Kaddouri", job: "Électricienne", rating: 4.9, price: 75, category: "electrician" },
-  { id: "11", name: "Éric Fabre", job: "Serrurier", rating: 4.7, price: 65, category: "locksmith" },
-  { id: "12", name: "Philippe Clément", job: "Maçon", rating: 4.6, price: 55, category: "mason" },
-  { id: "13", name: "Mehdi Amrani", job: "Maçon", rating: 4.8, price: 60, category: "mason" },
+  { id: "11", name: "Fabre Rénovation", job: "Serrurier", rating: 4.7, price: 65, category: "locksmith" },
+  { id: "12", name: "Clément Couverture", job: "Maçon", rating: 4.6, price: 55, category: "mason" },
+  { id: "13", name: "Amrani Maçonnerie", job: "Maçon", rating: 4.8, price: 60, category: "mason" },
 ];
 
 /* ── Live interventions ── */
@@ -238,7 +239,7 @@ export function ClientHomeScreen({
                     navigation.navigate("ArtisanProfile", { id: a.id });
                   }}
                 >
-                  <Avatar name={a.name} size={36} radius={12} />
+                  <Avatar name={a.name} size={36} radius={12} uri={getAvatarUri(a.name)} />
                   <View style={styles.searchResultInfo}>
                     <Text style={[styles.searchResultName, { color: c.text }]}>{a.name}</Text>
                     <Text style={styles.searchResultJob}>{a.job}</Text>
@@ -309,7 +310,7 @@ export function ClientHomeScreen({
             >
               {/* Avatar row */}
               <View style={styles.artisanRow}>
-                <Avatar name={item.name} size={44} radius={14} />
+                <Avatar name={item.name} size={44} radius={14} uri={getAvatarUri(item.name)} />
                 <View style={styles.artisanInfo}>
                   <Text style={[styles.artisanName, { color: c.text }]}>{item.name}</Text>
                   <Text style={styles.artisanJob}>{item.job}</Text>

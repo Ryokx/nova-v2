@@ -29,6 +29,7 @@ import { ReferralScreen } from "../screens/client/ReferralScreen";
 import { EmergencyScreen } from "../screens/client/EmergencyScreen";
 import { PaymentMethodsScreen } from "../screens/client/PaymentMethodsScreen";
 import { InsuranceSimulatorScreen } from "../screens/client/InsuranceSimulatorScreen";
+import { CreditTravauxScreen } from "../screens/client/CreditTravauxScreen";
 import { SupportScreen } from "../screens/shared/SupportScreen";
 import { SettingsScreen } from "../screens/shared/SettingsScreen";
 import { NotificationPrefsScreen } from "../screens/shared/NotificationPrefsScreen";
@@ -61,6 +62,7 @@ function addSharedScreens(Stack: ReturnType<typeof createNativeStackNavigator>) 
       <Stack.Screen name="Emergency" component={EmergencyScreen} />
       <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
       <Stack.Screen name="InsuranceSimulator" component={InsuranceSimulatorScreen} />
+      <Stack.Screen name="CreditTravaux" component={CreditTravauxScreen} />
       <Stack.Screen name="Support" component={SupportScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="NotificationPreferences" component={NotificationPrefsScreen} />

@@ -10,6 +10,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const reasons = [
@@ -75,7 +76,7 @@ export function ReportDisputeScreen({
       >
         {/* Mission concerned */}
         <View style={styles.missionCard}>
-          <Avatar name="Jean-Michel P." size={42} radius={14} />
+          <Avatar name="Jean-Michel P." size={42} radius={14} uri={getAvatarUri("Jean-Michel P.")} />
           <View style={{ flex: 1 }}>
             <Text style={styles.missionName}>
               Jean-Michel P. {"•"} Plomberie

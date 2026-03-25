@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const clients = [
@@ -95,7 +96,7 @@ export function ClientDirectoryScreen({
 
         {filtered.map((c) => (
           <View key={c.id} style={styles.clientCard}>
-            <Avatar name={c.name} size={48} radius={16} />
+            <Avatar name={c.name} size={48} radius={16} uri={getAvatarUri(c.name)} />
             <View style={styles.clientInfo}>
               <Text style={styles.clientName}>{c.name}</Text>
               <Text style={styles.clientSub}>

@@ -12,6 +12,7 @@ import { WebView } from "react-native-webview";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Shadows } from "../../constants/theme";
 import { Avatar, Button, ConfirmModal } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -255,7 +256,7 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
         <View style={styles.bsHandle} />
 
         <View style={styles.artisanCard}>
-          <Avatar name="Jean-Michel Petit" size={46} radius={15} />
+          <Avatar name="Jean-Michel Petit" size={46} radius={15} uri={getAvatarUri("Jean-Michel Petit")} />
           <View style={{ flex: 1 }}>
             <Text style={styles.artisanName}>Jean-Michel Petit</Text>
             <Text style={styles.artisanMeta}>Plombier • Fuite sous évier</Text>

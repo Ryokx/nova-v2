@@ -9,6 +9,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ---- mock data ---- */
@@ -30,21 +31,21 @@ const artisansByCategory: Record<
     { id: "1", name: "Jean-Michel P.", rating: 4.9, reviews: 127, price: 65, initials: "JM", responseTime: "< 2h", missions: 127, available: true },
     { id: "5", name: "Thomas R.", rating: 4.7, reviews: 68, price: 60, initials: "TR", responseTime: "< 3h", missions: 68, available: true },
     { id: "6", name: "Fatima H.", rating: 4.8, reviews: 91, price: 70, initials: "FH", responseTime: "< 1h", missions: 91, available: true },
-    { id: "7", name: "Laurent G.", rating: 4.5, reviews: 42, price: 55, initials: "LG", responseTime: "< 4h", missions: 42, available: false },
+    { id: "7", name: "Garcia & Fils", rating: 4.5, reviews: 42, price: 55, initials: "GF", responseTime: "< 4h", missions: 42, available: false },
     { id: "8", name: "Nicolas B.", rating: 4.6, reviews: 53, price: 62, initials: "NB", responseTime: "< 2h", missions: 53, available: true },
   ],
   electrician: [
     { id: "2", name: "Sophie M.", rating: 4.8, reviews: 94, price: 70, initials: "SM", responseTime: "< 1h", missions: 94, available: true },
-    { id: "9", name: "David L.", rating: 4.6, reviews: 72, price: 65, initials: "DL", responseTime: "< 2h", missions: 72, available: true },
+    { id: "9", name: "Leroy Élec", rating: 4.6, reviews: 72, price: 65, initials: "LE", responseTime: "< 2h", missions: 72, available: true },
     { id: "10", name: "Amina K.", rating: 4.9, reviews: 58, price: 75, initials: "AK", responseTime: "< 3h", missions: 58, available: true },
   ],
   locksmith: [
     { id: "3", name: "Karim B.", rating: 5.0, reviews: 83, price: 60, initials: "KB", responseTime: "< 30min", missions: 83, available: true },
-    { id: "11", name: "Éric F.", rating: 4.7, reviews: 45, price: 65, initials: "EF", responseTime: "< 1h", missions: 45, available: true },
+    { id: "11", name: "Fabre Rénovation", rating: 4.7, reviews: 45, price: 65, initials: "FR", responseTime: "< 1h", missions: 45, available: true },
   ],
   mason: [
-    { id: "12", name: "Philippe C.", rating: 4.6, reviews: 34, price: 55, initials: "PC", responseTime: "< 4h", missions: 34, available: true },
-    { id: "13", name: "Mehdi A.", rating: 4.8, reviews: 67, price: 60, initials: "MA", responseTime: "< 2h", missions: 67, available: true },
+    { id: "12", name: "Clément Couverture", rating: 4.6, reviews: 34, price: 55, initials: "CC", responseTime: "< 4h", missions: 34, available: true },
+    { id: "13", name: "Amrani Maçonnerie", rating: 4.8, reviews: 67, price: 60, initials: "AM", responseTime: "< 2h", missions: 67, available: true },
   ],
   heating: [
     { id: "14", name: "Christophe D.", rating: 4.9, reviews: 89, price: 75, initials: "CD", responseTime: "< 2h", missions: 89, available: true },
@@ -113,7 +114,7 @@ export function ArtisanListScreen({
     >
       {/* Avatar */}
       <View style={styles.avatarWrap}>
-        <Avatar name={a.name} size={52} radius={18} />
+        <Avatar name={a.name} size={52} radius={18} uri={getAvatarUri(a.name)} />
         {a.available && <View style={styles.onlineDot} />}
       </View>
 

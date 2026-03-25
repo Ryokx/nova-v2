@@ -15,6 +15,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge, Card, EscrowStepper } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ---- mock data ---- */
@@ -95,7 +96,7 @@ export function ArtisanProfileScreen({
           </TouchableOpacity>
 
           <View style={styles.avatarWrap}>
-            <Avatar name="Jean-Michel" size={84} radius={26} />
+            <Avatar name="Jean-Michel" size={84} radius={26} uri={getAvatarUri("Jean-Michel")} />
           </View>
           <Text style={styles.heroName}>Jean-Michel Petit</Text>
           <Text style={styles.heroJob}>Plombier-Chauffagiste</Text>
@@ -164,7 +165,7 @@ export function ArtisanProfileScreen({
             <Text style={styles.escrowTitle}>
               <MaterialCommunityIcons name="information-outline" size={18} color={Colors.forest} /> Comment ça marche
             </Text>
-            <EscrowStepper currentStep={0} />
+            <EscrowStepper currentStep={-1} />
           </View>
 
           {/* Reviews */}
@@ -173,7 +174,7 @@ export function ArtisanProfileScreen({
             <View key={i} style={styles.reviewCard}>
               <View style={styles.reviewHeader}>
                 <View style={styles.reviewLeft}>
-                  <Avatar name={r.name} size={28} radius={10} />
+                  <Avatar name={r.name} size={28} radius={10} uri={getAvatarUri(r.name)} />
                   <Text style={styles.reviewName}>{r.name}</Text>
                 </View>
                 <Stars rating={r.rating} size={11} />
@@ -238,7 +239,7 @@ export function ArtisanProfileScreen({
               <MaterialCommunityIcons name="arrow-left" size={22} color={Colors.navy} />
             </TouchableOpacity>
             <View style={styles.chatHeaderInfo}>
-              <Avatar name="Jean-Michel" size={32} radius={10} />
+              <Avatar name="Jean-Michel" size={32} radius={10} uri={getAvatarUri("Jean-Michel")} />
               <View>
                 <Text style={styles.chatHeaderName}>Jean-Michel Petit</Text>
                 <View style={styles.chatOnlineRow}>

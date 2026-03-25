@@ -10,6 +10,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar, Badge, Card, ConfirmModal } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ---- mock data ---- */
@@ -94,11 +95,11 @@ export function EmergencyScreen({
       visible: true,
       type: "danger",
       title: "Annuler la demande urgente",
-      message: "Êtes-vous sûr de vouloir annuler l'intervention urgente ?\n\nLes frais de déplacement de 50,00€ (tarif urgence) restent à votre charge.",
+      message: "Êtes-vous sûr de vouloir annuler l'intervention urgente ?\n\nLes frais de déplacement urgence de 50,00€ restent à votre charge. Le reste vous sera remboursé sous 3 à 5 jours.",
       actions: [
         { label: "Non, garder", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
         {
-          label: "Oui, annuler (50€ de frais)",
+          label: "Confirmer",
           variant: "danger",
           onPress: () => {
             setUrgCancelled(true);
@@ -250,7 +251,7 @@ export function EmergencyScreen({
                 }
               >
                 <View style={styles.avatarWrap}>
-                  <Avatar name={a.name} size={50} radius={18} />
+                  <Avatar name={a.name} size={50} radius={18} uri={getAvatarUri(a.name)} />
                   <View style={styles.onlineDot} />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -377,7 +378,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingTop: 54,
     paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingBottom: 4,
     backgroundColor: Colors.bgPage,
   },
   backBtn: {
@@ -403,14 +404,15 @@ const styles = StyleSheet.create({
   /* Red banner */
   redBanner: {
     marginHorizontal: 16,
-    marginBottom: 20,
-    paddingVertical: 14,
+    marginTop: 4,
+    marginBottom: 16,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 16,
     backgroundColor: Colors.red,
     alignItems: "center",
   },
-  redBannerEmoji: { fontSize: 20, marginBottom: 6 },
+  redBannerEmoji: { fontSize: 20, marginBottom: 4 },
   redBannerTitle: {
     fontSize: 16,
     fontFamily: "Manrope_700Bold",

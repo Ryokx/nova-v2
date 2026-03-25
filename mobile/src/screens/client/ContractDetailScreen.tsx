@@ -24,6 +24,34 @@ export function ContractDetailScreen({
     setModal({ visible: true, type: "success", title: "Téléchargement", message: "Le contrat a été téléchargé au format PDF dans vos fichiers.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
   };
 
+  const [cancelled, setCancelled] = useState(false);
+
+  const handleCancelContract = () => {
+    setModal({
+      visible: true,
+      type: "danger",
+      title: "Résilier le contrat",
+      message: `Êtes-vous sûr de vouloir résilier votre contrat « ${name} » ?\n\nVotre contrat restera actif jusqu'à sa date d'anniversaire (20 mars 2027). Vous continuerez à bénéficier des prestations prévues jusqu'à cette date.\n\nAucun frais de résiliation ne sera appliqué.`,
+      actions: [
+        { label: "Non, garder", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
+        {
+          label: "Confirmer la résiliation",
+          variant: "danger",
+          onPress: () => {
+            setCancelled(true);
+            setModal({
+              visible: true,
+              type: "info",
+              title: "Résiliation confirmée",
+              message: `Votre contrat « ${name} » a bien été résilié.\n\nIl restera actif jusqu'au 20 mars 2027. Vous recevrez un email de confirmation.`,
+              actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }],
+            });
+          },
+        },
+      ],
+    });
+  };
+
   const handleSendEmail = () => {
     setModal({
       visible: true,
@@ -68,8 +96,10 @@ export function ContractDetailScreen({
             <View style={{ flex: 1 }}>
               <Text style={styles.contractName}>{name}</Text>
               <View style={styles.activeBadge}>
-                <View style={styles.activeDot} />
-                <Text style={styles.activeText}>Actif</Text>
+                <View style={[styles.activeDot, cancelled && { backgroundColor: Colors.gold }]} />
+                <Text style={[styles.activeText, cancelled && { color: Colors.gold }]}>
+                  {cancelled ? "Résiliation programmée" : "Actif"}
+                </Text>
               </View>
             </View>
           </View>
@@ -138,6 +168,24 @@ export function ContractDetailScreen({
             Sans engagement — vous pouvez annuler ce contrat à tout moment depuis votre profil, sans frais.
           </Text>
         </View>
+
+        {/* Cancel subscription */}
+        {cancelled ? (
+          <View style={styles.cancelledBanner}>
+            <MaterialCommunityIcons name="calendar-clock" size={18} color={Colors.gold} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cancelledTitle}>Résiliation programmée</Text>
+              <Text style={styles.cancelledDesc}>
+                Votre contrat prendra fin le 20 mars 2027 (date d'anniversaire). Vous bénéficiez des prestations jusqu'à cette date.
+              </Text>
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity style={styles.cancelBtn} activeOpacity={0.7} onPress={handleCancelContract}>
+            <MaterialCommunityIcons name="close-circle-outline" size={16} color={Colors.red} />
+            <Text style={styles.cancelBtnText}>Résilier le contrat</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       <ConfirmModal
@@ -291,6 +339,21 @@ const styles = StyleSheet.create({
 
   infoBox: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "rgba(27,107,78,0.04)", borderRadius: 12, padding: 12, marginTop: 12, borderWidth: 1, borderColor: "rgba(27,107,78,0.08)" },
   infoText: { fontFamily: "DMSans_500Medium", fontSize: 12, color: "#14523B", flex: 1 },
+
+  /* Cancel contract */
+  cancelBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 6, marginTop: 20, paddingVertical: 14,
+  },
+  cancelBtnText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.red },
+  cancelledBanner: {
+    flexDirection: "row", alignItems: "flex-start", gap: 12,
+    backgroundColor: "rgba(245,166,35,0.06)", borderRadius: 14,
+    padding: 14, marginTop: 20,
+    borderWidth: 1, borderColor: "rgba(245,166,35,0.15)",
+  },
+  cancelledTitle: { fontFamily: "DMSans_600SemiBold", fontSize: 14, color: Colors.gold, marginBottom: 3 },
+  cancelledDesc: { fontFamily: "DMSans_400Regular", fontSize: 12, color: "#92610A", lineHeight: 18 },
 
   /* Preview modal */
   previewModal: { flex: 1, backgroundColor: Colors.white },

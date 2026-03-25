@@ -364,6 +364,41 @@ export function InsuranceSimulatorScreen({ navigation }: { navigation: any }) {
               ))}
             </View>
 
+            {/* Nova accompaniment CTA */}
+            <View style={styles.novaAccompCard}>
+              <View style={styles.novaAccompHeader}>
+                <View style={styles.novaAccompIconWrap}>
+                  <MaterialCommunityIcons name="shield-check" size={22} color={Colors.white} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.novaAccompTitle}>Nova vous accompagne</Text>
+                  <Text style={styles.novaAccompSub}>Bénéficiez de vos droits sans prise de tête</Text>
+                </View>
+              </View>
+              <View style={styles.novaAccompBody}>
+                {[
+                  { icon: "file-send", text: "Envoi automatique de la facture à votre assureur après l'intervention" },
+                  { icon: "text-box-check", text: "Génération du constat amiable pré-rempli avec les détails du sinistre" },
+                  { icon: "account-tie", text: "Un conseiller Nova dédié pour suivre votre dossier de remboursement" },
+                  { icon: "clock-fast", text: "Suivi en temps réel de l'avancement de votre prise en charge" },
+                ].map((item, i) => (
+                  <View key={i} style={styles.novaAccompItem}>
+                    <View style={styles.novaAccompDot}>
+                      <MaterialCommunityIcons name={item.icon as any} size={16} color={Colors.forest} />
+                    </View>
+                    <Text style={styles.novaAccompText}>{item.text}</Text>
+                  </View>
+                ))}
+              </View>
+              <TouchableOpacity style={styles.novaAccompBtn} activeOpacity={0.85} onPress={() => navigation.goBack()}>
+                <MaterialCommunityIcons name="calendar-check" size={18} color={Colors.white} />
+                <Text style={styles.novaAccompBtnText}>Réserver un artisan avec accompagnement</Text>
+              </TouchableOpacity>
+              <Text style={styles.novaAccompFooter}>
+                Nova gère les démarches administratives pour vous
+              </Text>
+            </View>
+
             <View style={styles.resultNotice}>
               <MaterialCommunityIcons name="information-outline" size={14} color={Colors.forest} />
               <Text style={styles.resultNoticeText}>
@@ -460,4 +495,40 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(27,107,78,0.04)", borderRadius: 12, padding: 12, marginBottom: 20,
   },
   resultNoticeText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: "#14523B", flex: 1, lineHeight: 16 },
+
+  /* Nova accompaniment */
+  novaAccompCard: {
+    width: "100%", backgroundColor: Colors.white, borderRadius: 20,
+    borderWidth: 1.5, borderColor: "rgba(27,107,78,0.15)",
+    overflow: "hidden", marginBottom: 16, ...Shadows.sm,
+  },
+  novaAccompHeader: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    padding: 16, paddingBottom: 12,
+    backgroundColor: "rgba(27,107,78,0.04)",
+  },
+  novaAccompIconWrap: {
+    width: 44, height: 44, borderRadius: 14,
+    backgroundColor: Colors.forest, alignItems: "center", justifyContent: "center",
+  },
+  novaAccompTitle: { fontFamily: "Manrope_700Bold", fontSize: 16, color: Colors.navy },
+  novaAccompSub: { fontFamily: "DMSans_400Regular", fontSize: 12, color: Colors.textSecondary, marginTop: 1 },
+  novaAccompBody: { padding: 16, gap: 12 },
+  novaAccompItem: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
+  novaAccompDot: {
+    width: 32, height: 32, borderRadius: 10,
+    backgroundColor: "rgba(27,107,78,0.08)",
+    alignItems: "center", justifyContent: "center",
+  },
+  novaAccompText: { fontFamily: "DMSans_500Medium", fontSize: 13, color: "#4A5568", flex: 1, lineHeight: 19, paddingTop: 5 },
+  novaAccompBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    marginHorizontal: 16, marginBottom: 12, paddingVertical: 15,
+    backgroundColor: Colors.forest, borderRadius: 14, ...Shadows.md,
+  },
+  novaAccompBtnText: { fontFamily: "Manrope_700Bold", fontSize: 14, color: Colors.white },
+  novaAccompFooter: {
+    fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textMuted,
+    textAlign: "center", paddingBottom: 14,
+  },
 });

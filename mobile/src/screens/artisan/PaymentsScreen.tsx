@@ -34,6 +34,8 @@ const receivedPayments = [
 export function ArtisanPaymentsScreen({
   navigation,
 }: ArtisanTabScreenProps<"ArtisanPayments">) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const nav = navigation as any;
   const { c } = useTheme();
   const [tab, setTab] = useState<PayTab>("escrow");
   const [expandedReceived, setExpandedReceived] = useState<number | null>(null);
@@ -76,6 +78,22 @@ export function ArtisanPaymentsScreen({
                 Fonds sécurisés chez Nova. Virement sous 48h après validation par nos équipes.
               </Text>
             </View>
+            {/* Instant Pay CTA */}
+            <TouchableOpacity
+              style={styles.instantPayCta}
+              activeOpacity={0.85}
+              onPress={() => nav.navigate("InstantPay")}
+            >
+              <View style={styles.instantPayIcon}>
+                <MaterialCommunityIcons name="lightning-bolt" size={18} color={Colors.white} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.instantPayTitle}>Instant Pay</Text>
+                <Text style={styles.instantPayDesc}>Recevez vos fonds en quelques secondes (4% de frais)</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.forest} />
+            </TouchableOpacity>
+
             {escrowPayments.map((m, i) => (
               <View key={i} style={[styles.payCard, { backgroundColor: c.card }]}>
                 <View style={styles.payCardTop}>
@@ -328,6 +346,19 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: Colors.success,
   },
+
+  /* Instant Pay CTA */
+  instantPayCta: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: "rgba(27,107,78,0.04)", borderRadius: 16, padding: 14,
+    marginBottom: 14, borderWidth: 1.5, borderColor: "rgba(27,107,78,0.12)",
+  },
+  instantPayIcon: {
+    width: 38, height: 38, borderRadius: 12,
+    backgroundColor: Colors.forest, alignItems: "center", justifyContent: "center",
+  },
+  instantPayTitle: { fontFamily: "DMSans_600SemiBold", fontSize: 14, color: Colors.navy },
+  instantPayDesc: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textSecondary, marginTop: 1 },
 
   /* Empty */
   emptyState: { alignItems: "center", paddingVertical: 40 },

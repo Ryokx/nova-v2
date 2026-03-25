@@ -26,11 +26,13 @@ export type RootStackParamList = {
   Emergency: undefined;
   PaymentMethods: undefined;
   InsuranceSimulator: undefined;
+  CreditTravaux: undefined;
   Support: undefined;
   Settings: undefined;
   NotificationPreferences: undefined;
 
   // Artisan stack screens
+  ArtisanPendingValidation: undefined;
   CreateQuote: undefined;
   CreateInvoice: { missionId: string };
   QuoteSignature: { devisId: string };
@@ -41,6 +43,9 @@ export type RootStackParamList = {
   QRCodeProfile: undefined;
   Accounting: undefined;
   ArtisanPricing: undefined;
+  InstantPay: undefined;
+  Subscription: undefined;
+  Addons: undefined;
 };
 
 // -- Client Tabs --

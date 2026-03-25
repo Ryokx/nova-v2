@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar, Button, ConfirmModal } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 const rdv = {
@@ -76,7 +77,7 @@ export function RDVDetailScreen({
 
         {/* Client card */}
         <View style={styles.clientCard}>
-          <Avatar name={rdv.client} size={50} radius={18} />
+          <Avatar name={rdv.client} size={50} radius={18} uri={getAvatarUri(rdv.client)} />
           <View style={styles.clientInfo}>
             <Text style={styles.clientName}>{rdv.client}</Text>
             <Text style={styles.clientType}>{rdv.type}</Text>

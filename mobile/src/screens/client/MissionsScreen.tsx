@@ -10,11 +10,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import { useTheme } from "../../hooks/useTheme";
 import type { ClientTabScreenProps } from "../../navigation/types";
 
 /* ── Types ── */
-type MissionStatus = "all" | "active" | "completed" | "validated" | "dispute";
+type MissionStatus = "all" | "scheduled" | "active" | "completed" | "validated" | "dispute";
 
 interface Mission {
   id: string;
@@ -31,6 +32,7 @@ interface Mission {
 /* ── Filter tabs ── */
 const tabs: { id: MissionStatus; label: string }[] = [
   { id: "all", label: "Toutes" },
+  { id: "scheduled", label: "Programmées" },
   { id: "active", label: "En cours" },
   { id: "completed", label: "Terminées" },
   { id: "validated", label: "Validées" },
@@ -39,6 +41,28 @@ const tabs: { id: MissionStatus; label: string }[] = [
 
 /* ── Mock data ── */
 const missions: Mission[] = [
+  {
+    id: "mission-scheduled",
+    artisan: "Christophe D.",
+    initials: "CD",
+    type: "Chauffage — Entretien chaudière",
+    date: "28 mars 2026 à 10h",
+    amount: "180,00€",
+    status: "scheduled",
+    statusLabel: "Programmée",
+    statusColor: "#6366F1",
+  },
+  {
+    id: "mission-scheduled-2",
+    artisan: "Sophie M.",
+    initials: "SM",
+    type: "Électricité — Mise aux normes tableau",
+    date: "2 avril 2026 à 14h",
+    amount: "420,00€",
+    status: "scheduled",
+    statusLabel: "Programmée",
+    statusColor: "#6366F1",
+  },
   {
     id: "mission-active",
     artisan: "Jean-Michel P.",
@@ -111,7 +135,7 @@ export function ClientMissionsScreen({
     >
       <View style={styles.missionRow}>
         {/* Avatar */}
-        <Avatar name={item.artisan} size={46} radius={16} />
+        <Avatar name={item.artisan} size={46} radius={16} uri={getAvatarUri(item.artisan)} />
 
         <View style={styles.missionInfo}>
           {/* Name + amount */}

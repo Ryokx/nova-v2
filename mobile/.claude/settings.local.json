@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -d */)",
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(xargs ls:*)",
+      "Bash(ls \"C:/Users/EAF/Documents/nova/src/app/\\(client\\)/\")",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(npx next:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(curl -sL -w \"\\\\n%{http_code}\\\\n%{redirect_url}\" http://localhost:3000)",
+      "Bash(netstat -ano)",
+      "Bash(curl -sI http://localhost:3000/dashboard)",
+      "Bash(curl -s http://localhost:3000/artisan-website)",
+      "Bash(curl -sI http://localhost:3000/artisan-website)",
+      "Bash(taskkill:*)",
+      "Bash(cmd.exe //c \"taskkill /PID 4860 /F\")",
+      "Bash(grep -r \"max-w-\\\\|grid-cols-\\\\|flex-row\\\\|hidden\\\\|fixed\" \"C:\\\\Users\\\\EAF\\\\Documents\\\\nova\\\\src\\\\app\\\\\\(client\\)\"\" --include=\"*.tsx\" | grep -E \"max-w-[.*])",
+      "Bash(grid-cols-[34])",
+      "Bash(flex-row)",
+      "Bash(fixed \")",
+      "Bash(find \"/c/Users/EAF/Documents/nova/src/app\" -name \"page.tsx\" -exec grep -l \"grid-cols-3\\\\|grid-cols-4\" {})"
+    ]
+  }
+}

@@ -7,6 +7,7 @@ import { ArtisanTabs } from "./ArtisanTabs";
 
 // Auth
 import { AuthScreen } from "../screens/auth/AuthScreen";
+import { PendingValidationScreen } from "../screens/artisan/PendingValidationScreen";
 
 // Screens that open fullscreen without tab bar
 import { ArtisanProfileScreen } from "../screens/client/ArtisanProfileScreen";
@@ -25,6 +26,7 @@ export function RootNavigator() {
     >
       <Stack.Screen name="Auth" component={AuthScreen} />
       <Stack.Screen name="ClientTabs" component={ClientTabs} />
+      <Stack.Screen name="ArtisanPendingValidation" component={PendingValidationScreen} />
       <Stack.Screen name="ArtisanTabs" component={ArtisanTabs} />
 
       {/* Screens accessible from ArtisanProfile (outside tabs) */}

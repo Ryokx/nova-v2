@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -6,11 +6,15 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
-import { Button, Card } from "../../components/ui";
+import { Avatar, Button, Card } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 interface LineItem {
@@ -24,12 +28,25 @@ const stepLabels = ["Client", "Lignes", "Envoi"];
 
 const missionTypes = ["Plomberie", "Chauffage", "Sanitaire", "Urgence"];
 
+/* ── Mock dossiers existants ── */
+const existingDossiers = [
+  { id: "DEV-2026-089", client: "Pierre Martin", type: "Plomberie", date: "15 mars 2026", amount: "320,00€", status: "En cours" },
+  { id: "DEV-2026-085", client: "Sophie Lefèvre", type: "Chauffage", date: "10 mars 2026", amount: "475,00€", status: "Terminé" },
+  { id: "DEV-2026-078", client: "Caroline Durand", type: "Plomberie", date: "2 mars 2026", amount: "280,00€", status: "En cours" },
+  { id: "DEV-2026-072", client: "Antoine Moreau", type: "Sanitaire", date: "22 fév 2026", amount: "195,00€", status: "Terminé" },
+  { id: "DEV-2026-065", client: "Amélie R.", type: "Chauffage", date: "15 fév 2026", amount: "650,00€", status: "Validé" },
+  { id: "DEV-2026-058", client: "Luc D.", type: "Urgence", date: "8 fév 2026", amount: "180,00€", status: "Terminé" },
+];
+
 export function CreateQuoteScreen({
   navigation,
 }: RootStackScreenProps<"CreateQuote">) {
   const [step, setStep] = useState(0);
   const [isComplementary, setIsComplementary] = useState(false);
   const [linkedDevis, setLinkedDevis] = useState<string | null>(null);
+  const [linkedClient, setLinkedClient] = useState<string | null>(null);
+  const [dossierModalOpen, setDossierModalOpen] = useState(false);
+  const [dossierSearch, setDossierSearch] = useState("");
   const [clientName, setClientName] = useState("Caroline Lefèvre");
   const [clientEmail, setClientEmail] = useState("caroline.l@email.com");
   const [clientPhone, setClientPhone] = useState("06 12 34 56 78");
@@ -110,9 +127,14 @@ export function CreateQuoteScreen({
               ]}
               activeOpacity={0.85}
               onPress={() => {
-                setIsComplementary(!isComplementary);
-                if (!isComplementary) setLinkedDevis("DEV-2026-089");
-                else setLinkedDevis(null);
+                if (isComplementary) {
+                  setIsComplementary(false);
+                  setLinkedDevis(null);
+                  setLinkedClient(null);
+                } else {
+                  setDossierSearch("");
+                  setDossierModalOpen(true);
+                }
               }}
             >
               <MaterialCommunityIcons
@@ -126,7 +148,7 @@ export function CreateQuoteScreen({
                 </Text>
                 <Text style={styles.complementaryToggleDesc}>
                   {isComplementary
-                    ? `Lié au dossier ${linkedDevis}`
+                    ? `Lié au dossier ${linkedDevis} — ${linkedClient}`
                     : "Lier ce devis à un dossier existant"}
                 </Text>
               </View>
@@ -311,9 +333,182 @@ export function CreateQuoteScreen({
           </View>
         )}
       </ScrollView>
+
+      {/* ── Dossier search modal ── */}
+      <DossierSearchModal
+        visible={dossierModalOpen}
+        search={dossierSearch}
+        onSearchChange={setDossierSearch}
+        onSelect={(dossier) => {
+          setLinkedDevis(dossier.id);
+          setLinkedClient(dossier.client);
+          setIsComplementary(true);
+          setDossierModalOpen(false);
+          // Pre-fill client info from selected dossier
+          setClientName(dossier.client);
+        }}
+        onClose={() => setDossierModalOpen(false)}
+      />
     </SafeAreaView>
   );
 }
+
+/* ── Dossier Search Modal ── */
+function DossierSearchModal({
+  visible,
+  search,
+  onSearchChange,
+  onSelect,
+  onClose,
+}: {
+  visible: boolean;
+  search: string;
+  onSearchChange: (v: string) => void;
+  onSelect: (d: typeof existingDossiers[0]) => void;
+  onClose: () => void;
+}) {
+  const filtered = useMemo(() => {
+    if (!search.trim()) return existingDossiers;
+    const q = search.toLowerCase();
+    return existingDossiers.filter(
+      (d) =>
+        d.client.toLowerCase().includes(q) ||
+        d.id.toLowerCase().includes(q) ||
+        d.type.toLowerCase().includes(q)
+    );
+  }, [search]);
+
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+      <KeyboardAvoidingView
+        style={modalStyles.root}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        {/* Header */}
+        <View style={modalStyles.header}>
+          <TouchableOpacity onPress={onClose} style={modalStyles.closeBtn}>
+            <MaterialCommunityIcons name="close" size={20} color={Colors.navy} />
+          </TouchableOpacity>
+          <Text style={modalStyles.title}>Lier à un dossier</Text>
+          <View style={{ width: 36 }} />
+        </View>
+
+        {/* Search bar */}
+        <View style={modalStyles.searchWrap}>
+          <MaterialCommunityIcons name="magnify" size={18} color={Colors.textMuted} />
+          <TextInput
+            style={modalStyles.searchInput}
+            placeholder="Nom du client ou n° de dossier..."
+            placeholderTextColor={Colors.textHint}
+            value={search}
+            onChangeText={onSearchChange}
+            autoFocus
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => onSearchChange("")}>
+              <MaterialCommunityIcons name="close-circle" size={16} color={Colors.textMuted} />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Results */}
+        <ScrollView style={modalStyles.list} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+          {filtered.length === 0 ? (
+            <View style={modalStyles.emptyWrap}>
+              <MaterialCommunityIcons name="file-search-outline" size={36} color={Colors.border} />
+              <Text style={modalStyles.emptyText}>Aucun dossier trouvé</Text>
+              <Text style={modalStyles.emptyHint}>Essayez un autre nom ou numéro</Text>
+            </View>
+          ) : (
+            filtered.map((d) => (
+              <TouchableOpacity
+                key={d.id}
+                style={modalStyles.dossierCard}
+                activeOpacity={0.85}
+                onPress={() => onSelect(d)}
+              >
+                <Avatar name={d.client} size={42} radius={14} uri={getAvatarUri(d.client)} />
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <View style={modalStyles.dossierTopRow}>
+                    <Text style={modalStyles.dossierClient} numberOfLines={1}>{d.client}</Text>
+                    <Text style={modalStyles.dossierAmount}>{d.amount}</Text>
+                  </View>
+                  <View style={modalStyles.dossierBottomRow}>
+                    <Text style={modalStyles.dossierId}>{d.id}</Text>
+                    <Text style={modalStyles.dossierDot}>{"•"}</Text>
+                    <Text style={modalStyles.dossierType}>{d.type}</Text>
+                    <Text style={modalStyles.dossierDot}>{"•"}</Text>
+                    <Text style={modalStyles.dossierDate}>{d.date}</Text>
+                  </View>
+                  <View style={[modalStyles.dossierStatusBadge, {
+                    backgroundColor:
+                      d.status === "En cours" ? "rgba(245,166,35,0.1)" :
+                      d.status === "Validé" ? "rgba(27,107,78,0.1)" :
+                      "rgba(34,200,138,0.1)",
+                  }]}>
+                    <Text style={[modalStyles.dossierStatusText, {
+                      color:
+                        d.status === "En cours" ? Colors.gold :
+                        d.status === "Validé" ? Colors.forest :
+                        Colors.success,
+                    }]}>{d.status}</Text>
+                  </View>
+                </View>
+                <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.textMuted} />
+              </TouchableOpacity>
+            ))
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
+const modalStyles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: Colors.bgPage },
+  header: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingTop: 16, paddingHorizontal: 16, paddingBottom: 12,
+    backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.border,
+  },
+  closeBtn: {
+    width: 36, height: 36, borderRadius: 12,
+    backgroundColor: Colors.bgPage, alignItems: "center", justifyContent: "center",
+  },
+  title: { fontFamily: "Manrope_700Bold", fontSize: 17, color: Colors.navy },
+  searchWrap: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    marginHorizontal: 16, marginTop: 14, marginBottom: 10,
+    backgroundColor: Colors.white, borderRadius: 14,
+    paddingHorizontal: 14, height: 48,
+    borderWidth: 1, borderColor: Colors.border,
+  },
+  searchInput: {
+    flex: 1, fontSize: 14, fontFamily: "DMSans_400Regular", color: Colors.navy,
+  },
+  list: { flex: 1, paddingHorizontal: 16, paddingTop: 4 },
+  emptyWrap: { alignItems: "center", paddingTop: 60, gap: 8 },
+  emptyText: { fontFamily: "DMSans_600SemiBold", fontSize: 15, color: Colors.navy },
+  emptyHint: { fontFamily: "DMSans_400Regular", fontSize: 13, color: Colors.textMuted },
+  dossierCard: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: Colors.white, borderRadius: 16, padding: 14,
+    marginBottom: 8, borderWidth: 1, borderColor: "rgba(10,22,40,0.04)",
+    ...Shadows.sm,
+  },
+  dossierTopRow: {
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 3,
+  },
+  dossierClient: { fontFamily: "DMSans_600SemiBold", fontSize: 14, color: Colors.navy, flex: 1, marginRight: 8 },
+  dossierAmount: { fontFamily: "DMMono_500Medium", fontSize: 13, color: Colors.navy },
+  dossierBottomRow: { flexDirection: "row", alignItems: "center", gap: 4, marginBottom: 6 },
+  dossierId: { fontFamily: "DMMono_500Medium", fontSize: 11, color: Colors.forest },
+  dossierType: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textSecondary },
+  dossierDate: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textMuted },
+  dossierDot: { fontSize: 8, color: Colors.textMuted },
+  dossierStatusBadge: { alignSelf: "flex-start", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
+  dossierStatusText: { fontFamily: "DMSans_600SemiBold", fontSize: 10 },
+});
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.bgPage },

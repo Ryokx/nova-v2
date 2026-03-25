@@ -11,6 +11,7 @@ import Svg, { Path } from "react-native-svg";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Radii, Shadows, Spacing } from "../../constants/theme";
 import { Avatar } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
 /* ---- devis line items ---- */
@@ -60,6 +61,11 @@ export function SignDevisScreen({
     currentPath.current = "";
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const nav = navigation as any;
+  const DEVIS_AMOUNT = 320;
+  const showCreditTravaux = DEVIS_AMOUNT >= 300;
+
   /* ---- Success state ---- */
   if (signed) {
     return (
@@ -72,15 +78,59 @@ export function SignDevisScreen({
           Il ne reste plus qu'à bloquer le paiement en séquestre pour
           confirmer l'intervention.
         </Text>
-        <TouchableOpacity
-          style={styles.primaryBtn}
-          activeOpacity={0.85}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.primaryBtnText}>
-            Procéder au paiement — 320,00 €
-          </Text>
-        </TouchableOpacity>
+
+        {/* Payment options */}
+        <View style={styles.successPaymentOptions}>
+          {/* Pay now */}
+          <TouchableOpacity
+            style={styles.primaryBtn}
+            activeOpacity={0.85}
+            onPress={() => navigation.goBack()}
+          >
+            <MaterialCommunityIcons name="lock" size={16} color={Colors.white} />
+            <Text style={styles.primaryBtnText}>
+              Payer {DEVIS_AMOUNT},00 €
+            </Text>
+          </TouchableOpacity>
+
+          {/* Klarna split */}
+          <TouchableOpacity
+            style={styles.klarnaSplitBtn}
+            activeOpacity={0.85}
+            onPress={() => navigation.goBack()}
+          >
+            <View style={styles.klarnaMiniLogo}>
+              <Text style={styles.klarnaMiniLogoText}>K</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.klarnaSplitTitle}>Payer en 4x sans frais</Text>
+              <Text style={styles.klarnaSplitSub}>
+                4 × {(DEVIS_AMOUNT / 4).toFixed(2).replace(".", ",")} € via Klarna
+              </Text>
+            </View>
+            <MaterialCommunityIcons name="chevron-right" size={18} color="#17120F" />
+          </TouchableOpacity>
+
+          {/* Credit travaux */}
+          {showCreditTravaux && (
+            <TouchableOpacity
+              style={styles.creditTravauxBtn}
+              activeOpacity={0.85}
+              onPress={() => nav.navigate("CreditTravaux")}
+            >
+              <View style={styles.creditTravauxIcon}>
+                <MaterialCommunityIcons name="bank-outline" size={18} color={Colors.white} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.creditTravauxTitle}>Crédit travaux</Text>
+                <Text style={styles.creditTravauxSub}>
+                  Financez de 500€ à 75 000€ via Cofidis ou Alma
+                </Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={18} color="#6366F1" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     );
   }
@@ -123,7 +173,7 @@ export function SignDevisScreen({
 
         {/* Artisan info */}
         <View style={styles.artisanRow}>
-          <Avatar name="Jean-Michel Petit" size={40} radius={14} />
+          <Avatar name="Jean-Michel Petit" size={40} radius={14} uri={getAvatarUri("Jean-Michel Petit")} />
           <View>
             <Text style={styles.artisanName}>Jean-Michel Petit</Text>
             <Text style={styles.artisanSub}>
@@ -382,18 +432,90 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 24,
   },
+  successPaymentOptions: {
+    width: "100%",
+    gap: 10,
+  },
   primaryBtn: {
     width: "100%",
     height: 52,
     borderRadius: 16,
     backgroundColor: Colors.deepForest,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 8,
     ...Shadows.md,
   },
   primaryBtnText: {
     color: Colors.white,
     fontSize: 15,
     fontFamily: "Manrope_700Bold",
+  },
+
+  /* Klarna split button */
+  klarnaSplitBtn: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 16,
+    backgroundColor: "#FFB3C7",
+    padding: 14,
+    paddingHorizontal: 16,
+  },
+  klarnaMiniLogo: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "#17120F",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  klarnaMiniLogoText: {
+    fontFamily: "Manrope_800ExtraBold",
+    fontSize: 16,
+    color: "#FFB3C7",
+  },
+  klarnaSplitTitle: {
+    fontFamily: "DMSans_700Bold",
+    fontSize: 13,
+    color: "#17120F",
+  },
+  klarnaSplitSub: {
+    fontSize: 11,
+    color: "rgba(23,18,15,0.7)",
+  },
+
+  /* Credit travaux button */
+  creditTravauxBtn: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 16,
+    backgroundColor: Colors.white,
+    padding: 14,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+    borderColor: "rgba(99,102,241,0.2)",
+    borderStyle: "dashed",
+  },
+  creditTravauxIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "#6366F1",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  creditTravauxTitle: {
+    fontFamily: "DMSans_700Bold",
+    fontSize: 13,
+    color: Colors.navy,
+  },
+  creditTravauxSub: {
+    fontSize: 11,
+    color: Colors.textSecondary,
   },
 });

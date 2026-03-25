@@ -10,9 +10,10 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Avatar, Button, Card, EscrowStepper, ConfirmModal } from "../../components/ui";
+import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
-type MissionStatus = "active" | "completed" | "validated" | "dispute";
+type MissionStatus = "scheduled" | "active" | "completed" | "validated" | "dispute";
 
 const CHECKS = [
   "Le travail est conforme au devis",
@@ -54,6 +55,7 @@ export function MissionDetailScreen({
     missionId === "mission-dispute" ? "dispute" :
     missionId === "mission-active" ? "active" :
     missionId === "mission-validated" ? "validated" :
+    (missionId === "mission-scheduled" || missionId === "mission-scheduled-2") ? "scheduled" :
     MOCK_STATUS;
 
   const [checks, setChecks] = useState([false, false, false]);
@@ -89,11 +91,11 @@ export function MissionDetailScreen({
       visible: true,
       type: "danger",
       title: "Annuler l'intervention",
-      message: "Êtes-vous sûr de vouloir annuler cette intervention ?\n\nConformément aux conditions Nova, les frais de déplacement de 40,00€ restent à votre charge.",
+      message: "Êtes-vous sûr de vouloir annuler cette intervention ?\n\nConformément aux conditions Nova, les frais de déplacement de 40,00€ restent à votre charge. Le reste (280,00€) vous sera remboursé sous 3 à 5 jours.",
       actions: [
         { label: "Non, garder", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
         {
-          label: "Oui, annuler (40€ de frais)",
+          label: "Confirmer",
           variant: "danger",
           onPress: () => {
             setModal({
@@ -110,6 +112,37 @@ export function MissionDetailScreen({
     });
   };
 
+  const handleCancelScheduled = () => {
+    // Mock: RDV is on March 28 at 10h, we simulate being > 12h before
+    const isLessThan12h = false; // toggle to true to test the 15€ fee scenario
+    setModal({
+      visible: true,
+      type: "danger" as any,
+      title: "Annuler le rendez-vous",
+      message: isLessThan12h
+        ? "Votre rendez-vous est dans moins de 12 heures.\n\nConformément aux conditions Nova, des frais d'annulation de 15,00€ seront appliqués."
+        : "Êtes-vous sûr de vouloir annuler ce rendez-vous programmé ?\n\nL'annulation est gratuite jusqu'à 12 heures avant le rendez-vous. Passé ce délai, des frais de 15,00€ s'appliquent.",
+      actions: [
+        { label: "Non, garder", variant: "outline", onPress: () => setModal(m => ({ ...m, visible: false })) },
+        {
+          label: "Confirmer",
+          variant: "danger",
+          onPress: () => {
+            setModal({
+              visible: true,
+              type: "info",
+              title: "Rendez-vous annulé",
+              message: isLessThan12h
+                ? "Le rendez-vous a été annulé. Des frais d'annulation de 15,00€ ont été prélevés."
+                : "Le rendez-vous a été annulé. Aucun frais n'a été appliqué.",
+              actions: [{ label: "OK", onPress: () => { setModal(m => ({ ...m, visible: false })); navigation.goBack(); } }],
+            });
+          },
+        },
+      ],
+    });
+  };
+
   const toggleCheck = (idx: number) => {
     const next = [...checks];
     next[idx] = !next[idx];
@@ -117,6 +150,7 @@ export function MissionDetailScreen({
   };
 
   const escrowStep =
+    status === "scheduled" ? -1 :
     status === "active" ? 2 :
     status === "completed" ? 3 :
     status === "validated" ? 4 :
@@ -180,6 +214,29 @@ export function MissionDetailScreen({
             </Text>
           </View>
         )}
+
+        {/* Send invoice to insurer */}
+        <TouchableOpacity
+          style={[styles.insurerBtn, { maxWidth: 340 }]}
+          activeOpacity={0.85}
+          onPress={() => setModal({
+            visible: true,
+            type: "info",
+            title: "Facture envoyée !",
+            message: "La facture de 320,00€ a été transmise à votre assureur.\n\nVous recevrez un email de confirmation avec le récapitulatif et le numéro de dossier.\n\nNotre équipe suit votre demande de remboursement et vous tiendra informé de son avancement.",
+            actions: [{ label: "Parfait", onPress: () => setModal(m => ({ ...m, visible: false })) }],
+          })}
+        >
+          <View style={styles.insurerBtnIcon}>
+            <MaterialCommunityIcons name="file-send" size={20} color={Colors.white} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.insurerBtnTitle}>Envoyer la facture à mon assureur</Text>
+            <Text style={styles.insurerBtnDesc}>Nova transmet et suit votre remboursement</Text>
+          </View>
+          <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.forest} />
+        </TouchableOpacity>
+
         <Button
           title="Retour aux interventions"
           onPress={() => navigation.navigate("ClientTabs", { screen: "ClientMissions" })}
@@ -207,6 +264,11 @@ export function MissionDetailScreen({
             <Text style={styles.statusBadgeActiveText}>En cours</Text>
           </View>
         )}
+        {status === "scheduled" && (
+          <View style={styles.statusBadgeScheduled}>
+            <Text style={styles.statusBadgeScheduledText}>Programmée</Text>
+          </View>
+        )}
       </View>
 
       <ScrollView
@@ -219,7 +281,7 @@ export function MissionDetailScreen({
         {/* Mission info card */}
         <Card style={{ marginBottom: 14 }}>
           <View style={styles.artisanRow}>
-            <Avatar name="Jean-Michel" size={52} radius={18} />
+            <Avatar name="Jean-Michel" size={52} radius={18} uri={getAvatarUri("Jean-Michel")} />
             <View>
               <Text style={styles.artisanName}>Jean-Michel P.</Text>
               <Text style={styles.artisanMeta}>Réparation fuite • Plomberie</Text>
@@ -247,6 +309,60 @@ export function MissionDetailScreen({
             <Text style={[styles.infoValueMono, { fontSize: 16, fontWeight: "700" }]}>320,00€</Text>
           </View>
         </Card>
+
+        {/* ====== STATUS: SCHEDULED (programmée) ====== */}
+        {status === "scheduled" && (
+          <View style={styles.statusCard}>
+            <View style={styles.statusCardHeader}>
+              <MaterialCommunityIcons name="calendar-clock" size={20} color="#6366F1" />
+              <Text style={[styles.statusCardTitle, { color: "#6366F1" }]}>Intervention programmée</Text>
+            </View>
+
+            <View style={styles.scheduledDateCard}>
+              <View style={styles.scheduledDateIcon}>
+                <MaterialCommunityIcons name="calendar" size={20} color="#6366F1" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.scheduledDateLabel}>Date du rendez-vous</Text>
+                <Text style={styles.scheduledDateValue}>28 mars 2026 à 10h00</Text>
+              </View>
+            </View>
+
+            <Text style={styles.statusCardDesc}>
+              L'artisan interviendra à la date et l'heure convenues. Vous recevrez un rappel la veille.
+            </Text>
+
+            <View style={styles.statusCardInfo}>
+              <MaterialCommunityIcons name="shield-lock" size={14} color={Colors.forest} />
+              <Text style={styles.statusCardInfoText}>
+                Le paiement sera mis en séquestre le jour de l'intervention
+              </Text>
+            </View>
+
+            <View style={styles.scheduledActions}>
+              <Button
+                title="Contacter l'artisan"
+                onPress={() => {}}
+                variant="secondary"
+                fullWidth
+                size="lg"
+              />
+            </View>
+
+            {/* Cancel scheduled */}
+            <TouchableOpacity style={styles.cancelScheduledBtn} onPress={handleCancelScheduled} activeOpacity={0.7}>
+              <MaterialCommunityIcons name="close-circle-outline" size={16} color={Colors.red} />
+              <Text style={styles.cancelScheduledText}>Annuler le rendez-vous</Text>
+            </TouchableOpacity>
+
+            <View style={styles.cancelScheduledInfo}>
+              <MaterialCommunityIcons name="information-outline" size={13} color={Colors.textMuted} />
+              <Text style={styles.cancelScheduledInfoText}>
+                Annulation gratuite jusqu'à 12h avant le rendez-vous. Passé ce délai, des frais de 15,00€ s'appliquent.
+              </Text>
+            </View>
+          </View>
+        )}
 
         {/* ====== STATUS: ACTIVE (en cours) ====== */}
         {status === "active" && (
@@ -399,6 +515,28 @@ export function MissionDetailScreen({
                 "Excellent travail, très professionnel et ponctuel."
               </Text>
             </View>
+
+            {/* Send invoice to insurer */}
+            <TouchableOpacity
+              style={styles.insurerBtn}
+              activeOpacity={0.85}
+              onPress={() => setModal({
+                visible: true,
+                type: "info",
+                title: "Facture envoyée !",
+                message: "La facture de 320,00€ a été transmise à votre assureur.\n\nVous recevrez un email de confirmation avec le récapitulatif et le numéro de dossier.\n\nNotre équipe suit votre demande de remboursement et vous tiendra informé de son avancement.",
+                actions: [{ label: "Parfait", onPress: () => setModal(m => ({ ...m, visible: false })) }],
+              })}
+            >
+              <View style={styles.insurerBtnIcon}>
+                <MaterialCommunityIcons name="file-send" size={20} color={Colors.white} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.insurerBtnTitle}>Envoyer la facture à mon assureur</Text>
+                <Text style={styles.insurerBtnDesc}>Nova transmet la facture et suit votre remboursement</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.forest} />
+            </TouchableOpacity>
           </View>
         )}
 
@@ -511,6 +649,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, paddingVertical: 4,
   },
   statusBadgeActiveText: { fontFamily: "DMSans_600SemiBold", fontSize: 11, color: Colors.gold },
+  statusBadgeScheduled: {
+    backgroundColor: "rgba(99,102,241,0.1)", borderRadius: 8,
+    paddingHorizontal: 10, paddingVertical: 4,
+  },
+  statusBadgeScheduledText: { fontFamily: "DMSans_600SemiBold", fontSize: 11, color: "#6366F1" },
 
   /* Artisan row */
   artisanRow: { flexDirection: "row", alignItems: "center", gap: 14, marginBottom: 12 },
@@ -693,4 +836,46 @@ const styles = StyleSheet.create({
   successCheck: { color: Colors.white, fontSize: 40, fontWeight: "700" },
   successTitle: { fontFamily: "Manrope_800ExtraBold", fontSize: 23, color: Colors.navy, marginBottom: 6 },
   successDesc: { fontSize: 14, color: "#4A5568", marginBottom: 24, textAlign: "center" },
+
+  /* Scheduled */
+  scheduledDateCard: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: "rgba(99,102,241,0.06)", borderRadius: 14,
+    padding: 14, marginBottom: 12,
+    borderWidth: 1, borderColor: "rgba(99,102,241,0.12)",
+  },
+  scheduledDateIcon: {
+    width: 42, height: 42, borderRadius: 13,
+    backgroundColor: "rgba(99,102,241,0.1)",
+    alignItems: "center", justifyContent: "center",
+  },
+  scheduledDateLabel: { fontFamily: "DMSans_400Regular", fontSize: 12, color: Colors.textSecondary },
+  scheduledDateValue: { fontFamily: "Manrope_700Bold", fontSize: 16, color: Colors.navy, marginTop: 1 },
+  scheduledActions: { marginBottom: 8 },
+  cancelScheduledBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 6, marginTop: 8, paddingVertical: 12,
+  },
+  cancelScheduledText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.red },
+  cancelScheduledInfo: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: "rgba(138,149,163,0.06)", borderRadius: 10,
+    padding: 10, marginTop: 2,
+  },
+  cancelScheduledInfoText: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textMuted, flex: 1 },
+
+  /* Send invoice to insurer */
+  insurerBtn: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: "rgba(27,107,78,0.04)", borderRadius: 16,
+    padding: 16, marginTop: 14, marginBottom: 4,
+    borderWidth: 1.5, borderColor: "rgba(27,107,78,0.12)",
+  },
+  insurerBtnIcon: {
+    width: 42, height: 42, borderRadius: 13,
+    backgroundColor: Colors.forest,
+    alignItems: "center", justifyContent: "center",
+  },
+  insurerBtnTitle: { fontFamily: "DMSans_600SemiBold", fontSize: 14, color: Colors.navy },
+  insurerBtnDesc: { fontFamily: "DMSans_400Regular", fontSize: 11, color: Colors.textSecondary, marginTop: 2 },
 });
