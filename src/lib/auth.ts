@@ -119,7 +119,7 @@ export const authOptions: NextAuthOptions = {
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (new URL(url).origin === baseUrl) return url;
-      return `${baseUrl}/dashboard`;
+      return `${baseUrl}/artisans`;
     },
     async jwt({ token, user, trigger, account }) {
       if (user) {

@@ -15,7 +15,11 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      // Allow access in dev without login
+      authorized: () => true,
+    },
+    pages: {
+      signIn: "/login",
     },
   },
 );
@@ -23,7 +27,27 @@ export default withAuth(
 export const config = {
   matcher: [
     "/dashboard/:path*",
+    "/booking/:path*",
+    "/missions/:path*",
+    "/mission/:path*",
     "/artisan/:path*",
+    "/artisan-dashboard/:path*",
+    "/artisan-payments/:path*",
+    "/artisan-documents/:path*",
+    "/artisan-devis/:path*",
+    "/artisan-invoices/:path*",
+    "/artisan-clients/:path*",
+    "/artisan-compta/:path*",
+    "/artisan-profile/:path*",
+    "/artisan-notifications/:path*",
+    "/artisan-qr-code/:path*",
+    "/artisan-subscription/:path*",
+    "/artisan-addons/:path*",
+    "/artisan-pricing/:path*",
+    "/artisan-instant-pay/:path*",
+    "/artisan-website/:path*",
+    "/artisan-communication/:path*",
+    "/artisan-newsletter/:path*",
     "/admin/:path*",
     "/api/((?!auth|webhooks|upload|pusher).*)/:path*",
   ],

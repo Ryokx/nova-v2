@@ -9,7 +9,6 @@ interface ArtisanCardProps {
   trade: string;
   rating: number;
   reviewCount: number;
-  hourlyRate: number | null;
   responseTime: string | null;
   city: string | null;
   isVerified: boolean;
@@ -22,7 +21,6 @@ export function ArtisanCard({
   trade,
   rating,
   reviewCount,
-  hourlyRate,
   responseTime,
   city,
   isVerified,
@@ -52,9 +50,6 @@ export function ArtisanCard({
         </div>
 
         <div className="text-right shrink-0">
-          {hourlyRate && (
-            <div className="font-mono text-sm font-bold text-navy">{hourlyRate}€<span className="text-xs font-normal text-grayText">/h</span></div>
-          )}
           {responseTime && (
             <div className="flex items-center gap-1 mt-1 justify-end">
               <Clock className="w-3 h-3 text-grayText" />
