@@ -1,3 +1,14 @@
+/**
+ * Route API — Fiche détaillée d'un artisan (publique)
+ *
+ * GET /api/artisans/[id]
+ *
+ * Retourne le profil complet d'un artisan :
+ * - Informations personnelles (nom, avatar, téléphone)
+ * - Les 10 derniers avis avec le nom de l'auteur
+ * - Les documents vérifiés (type uniquement, pas le contenu)
+ */
+
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -14,10 +25,10 @@ export async function GET(
       reviews: {
         include: { user: { select: { name: true } } },
         orderBy: { createdAt: "desc" },
-        take: 10,
+        take: 10, // Limite aux 10 derniers avis
       },
       documents: {
-        where: { verified: true },
+        where: { verified: true }, // Uniquement les documents vérifiés
         select: { type: true, verified: true },
       },
     },

@@ -1,102 +1,149 @@
+/**
+ * Page Vidéo Diagnostic.
+ * Permet au client de filmer son problème et de l'envoyer à l'artisan.
+ * Parcours en 3 étapes :
+ *   0 - Conseils pour filmer + bouton démarrer
+ *   1 - Aperçu vidéo + note optionnelle + envoi
+ *   2 - Écran de succès
+ */
+
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Lightbulb, Ruler, Mic, Timer, Play, RotateCcw, CheckCircle, Clock } from "lucide-react";
+import { CheckCircle, Clock, Play, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
+/* ------------------------------------------------------------------ */
+/*  Données                                                            */
+/* ------------------------------------------------------------------ */
+
+/** Conseils affichés avant l'enregistrement */
 const tips = [
-  { icon: <Lightbulb className="w-5 h-5 text-gold" />, title: "Bon éclairage", desc: "Placez-vous dans un endroit bien éclairé" },
-  { icon: <Ruler className="w-5 h-5 text-forest" />, title: "Zone complète", desc: "Filmez toute la zone concernée" },
-  { icon: <Mic className="w-5 h-5 text-forest" />, title: "Décrivez à voix haute", desc: "Expliquez le problème en filmant" },
-  { icon: <Timer className="w-5 h-5 text-forest" />, title: "30-60 secondes", desc: "Durée idéale pour un diagnostic" },
+  { emoji: "💡", title: "Bon éclairage", desc: "Allumez les lumières" },
+  { emoji: "📐", title: "Zone complète", desc: "Filmez large puis zoomez" },
+  { emoji: "🎙️", title: "Décrivez à voix haute", desc: "Expliquez ce que vous voyez" },
+  { emoji: "⏱️", title: "30 à 60 secondes", desc: "Court et précis" },
 ];
+
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
 
 export default function VideoDiagnosticPage() {
   const router = useRouter();
+
+  /** Étape courante (0 = conseils, 1 = aperçu, 2 = succès) */
   const [stage, setStage] = useState(0);
+  /** Note optionnelle à joindre à la vidéo */
   const [note, setNote] = useState("");
 
-  // Stage 0: Instructions
-  if (stage === 0) {
+  /* ================================================================ */
+  /*  Étape 2 : Succès — vidéo envoyée                                 */
+  /* ================================================================ */
+  if (stage === 2) {
     return (
-      <div className="max-w-[600px] mx-auto p-5 md:p-8">
-        <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-forest font-medium mb-4 hover:underline">
-          <ArrowLeft className="w-4 h-4" /> Retour
-        </button>
-
-        <h1 className="font-heading text-[22px] font-extrabold text-navy mb-1">Vidéo diagnostic</h1>
-        <p className="text-sm text-grayText mb-6">Filmez le problème pour un diagnostic rapide par l&apos;artisan</p>
-
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {tips.map((tip) => (
-            <Card key={tip.title} className="p-4">
-              <div className="mb-2">{tip.icon}</div>
-              <div className="text-sm font-semibold text-navy">{tip.title}</div>
-              <div className="text-xs text-grayText mt-0.5">{tip.desc}</div>
-            </Card>
-          ))}
+      <div className="max-w-[500px] mx-auto px-6 py-36 text-center animate-pageIn">
+        <div className="w-[72px] h-[72px] rounded-[5px] bg-success flex items-center justify-center mx-auto mb-5">
+          <CheckCircle className="w-9 h-9 text-white" />
         </div>
-
-        <Button className="w-full bg-red hover:bg-red/90" size="lg" onClick={() => setStage(1)}>
-          Commencer l&apos;enregistrement
-        </Button>
+        <h2 className="font-heading text-2xl font-extrabold text-navy mb-2">
+          Vidéo envoyée !
+        </h2>
+        <p className="text-sm text-grayText mb-2">
+          L&apos;artisan va analyser votre vidéo et préparer son intervention.
+        </p>
+        <div className="inline-flex items-center gap-1.5 bg-surface px-3.5 py-2 rounded-[5px] mb-6">
+          <Clock className="w-3.5 h-3.5 text-forest" />
+          <span className="text-xs font-semibold text-forest">Réponse estimée sous 2h</span>
+        </div>
+        <div>
+          <Button onClick={() => router.push("/missions")} className="w-full">
+            Retour à la réservation
+          </Button>
+        </div>
       </div>
     );
   }
 
-  // Stage 1: Preview
+  /* ================================================================ */
+  /*  Étape 1 : Aperçu de la vidéo                                     */
+  /* ================================================================ */
   if (stage === 1) {
     return (
-      <div className="max-w-[600px] mx-auto p-5 md:p-8">
-        <button onClick={() => setStage(0)} className="flex items-center gap-1.5 text-sm text-forest font-medium mb-4 hover:underline">
-          <ArrowLeft className="w-4 h-4" /> Retour
-        </button>
+      <div className="max-w-[600px] mx-auto px-6 py-8">
+        <h1 className="font-heading text-[26px] font-extrabold text-navy mb-5">
+          Aperçu de la vidéo
+        </h1>
 
-        <h1 className="font-heading text-[22px] font-extrabold text-navy mb-5">Aperçu vidéo</h1>
-
-        {/* Video preview mock */}
-        <div className="relative w-full h-[240px] rounded-xl bg-gradient-to-br from-navy to-deepForest mb-4 flex items-center justify-center overflow-hidden">
-          <Play className="w-12 h-12 text-white/50" />
-          <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-black/50 text-white font-mono text-xs">
+        {/* Zone d'aperçu vidéo (mock) */}
+        <div className="relative w-full aspect-video rounded-2xl bg-gradient-to-br from-[#1a1a2e] to-[#0f3460] mb-4 flex items-center justify-center overflow-hidden">
+          <Play className="w-10 h-10 text-white/80" />
+          <div className="absolute bottom-3 right-3.5 px-2 py-1 rounded-md bg-black/50 text-white font-mono text-xs">
             00:34
           </div>
         </div>
 
+        {/* Note optionnelle pour l'artisan */}
         <textarea
-          placeholder="Ajoutez une note pour l'artisan..."
+          placeholder="Note pour l'artisan (optionnel)..."
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="w-full h-[80px] px-4 py-3 rounded-md border border-border bg-white text-sm text-navy placeholder:text-grayText/60 focus:outline-none focus:ring-2 focus:ring-forest/30 resize-none mb-4"
+          className="w-full h-[80px] px-3 py-3 rounded-[5px] border border-border bg-white text-sm text-navy placeholder:text-grayText/60 focus:outline-none focus:ring-2 focus:ring-forest/30 resize-none mb-4"
         />
 
-        <div className="flex gap-2">
-          <Button className="flex-1" onClick={() => setStage(2)}>
-            Envoyer à l&apos;artisan
-          </Button>
-          <Button variant="outline" onClick={() => setStage(0)} className="gap-1.5">
-            <RotateCcw className="w-3.5 h-3.5" /> Refaire
-          </Button>
-        </div>
+        {/* Boutons d'action */}
+        <Button className="w-full gap-2 mb-2" size="lg" onClick={() => setStage(2)}>
+          <Send className="w-4 h-4" /> Envoyer à l&apos;artisan
+        </Button>
+        <button
+          onClick={() => setStage(0)}
+          className="w-full py-3 rounded-xl bg-white border border-border text-sm text-grayText hover:bg-surface transition-colors cursor-pointer"
+        >
+          Refaire la vidéo
+        </button>
       </div>
     );
   }
 
-  // Stage 2: Success
+  /* ================================================================ */
+  /*  Étape 0 : Conseils pour filmer                                    */
+  /* ================================================================ */
   return (
-    <div className="max-w-[600px] mx-auto p-5 md:p-8 text-center py-16 animate-pageIn">
-      <div className="w-[72px] h-[72px] rounded-full bg-success/15 flex items-center justify-center mx-auto mb-5">
-        <CheckCircle className="w-9 h-9 text-success" />
+    <div className="max-w-[600px] mx-auto px-6 py-8">
+      <h1 className="font-heading text-[26px] font-extrabold text-navy mb-2">
+        Vidéo diagnostic
+      </h1>
+      <p className="text-sm text-grayText mb-6">
+        Filmez votre problème. L&apos;artisan pourra évaluer la situation avant de se déplacer.
+      </p>
+
+      {/* Liste de conseils */}
+      <div className="bg-white border border-border shadow-sm rounded-[5px] p-5 mb-6">
+        {tips.map((tip, i) => (
+          <div
+            key={tip.title}
+            className={`flex items-center gap-3 ${i < tips.length - 1 ? "mb-3" : ""}`}
+          >
+            <div className="w-10 h-10 rounded-xl bg-surface flex items-center justify-center text-lg shrink-0">
+              {tip.emoji}
+            </div>
+            <div>
+              <div className="text-[13px] font-semibold text-navy">{tip.title}</div>
+              <div className="text-[11px] text-grayText">{tip.desc}</div>
+            </div>
+          </div>
+        ))}
       </div>
-      <h1 className="font-heading text-2xl font-extrabold text-navy mb-2">Vidéo envoyée !</h1>
-      <p className="text-sm text-grayText mb-4">L&apos;artisan analysera votre vidéo et vous répondra rapidement.</p>
-      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-forest/5 text-forest text-sm font-medium mb-6">
-        <Clock className="w-4 h-4" /> Réponse estimée sous 2h
-      </div>
-      <div>
-        <Button onClick={() => router.push("/missions")}>Voir mes missions</Button>
-      </div>
+
+      {/* Bouton démarrer l'enregistrement */}
+      <Button
+        className="w-full bg-red hover:bg-red/90"
+        size="lg"
+        onClick={() => setStage(1)}
+      >
+        Commencer l&apos;enregistrement
+      </Button>
     </div>
   );
 }

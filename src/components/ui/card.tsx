@@ -1,10 +1,17 @@
+/**
+ * Composants Card — Carte conteneur avec en-tête, titre et contenu.
+ * Utilisée partout dans l'app pour afficher des blocs d'information.
+ */
+
 import { type HTMLAttributes, forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  /** Active l'effet de survol (élévation + ombre) si true */
   hover?: boolean;
 }
 
+/** Conteneur principal de la carte */
 const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className, hover = false, children, ...props }, ref) => {
     return (
@@ -25,6 +32,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
 
 Card.displayName = "Card";
 
+/** En-tête de la carte (marge basse pour séparer du contenu) */
 const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn("mb-4", className)} {...props} />
@@ -32,6 +40,7 @@ const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 );
 CardHeader.displayName = "CardHeader";
 
+/** Titre de la carte (h3, police Manrope bold) */
 const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
     <h3
@@ -43,6 +52,7 @@ const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingEleme
 );
 CardTitle.displayName = "CardTitle";
 
+/** Zone de contenu de la carte */
 const CardContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn("", className)} {...props} />

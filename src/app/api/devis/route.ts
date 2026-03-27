@@ -1,3 +1,13 @@
+/**
+ * Route API — Gestion des devis (côté artisan)
+ *
+ * GET  /api/devis  — Liste tous les devis de l'artisan connecté
+ * POST /api/devis  — Crée un nouveau devis pour une mission
+ *
+ * Un devis contient les lignes de facturation (items), les montants HT/TTC,
+ * et un numéro auto-généré (ex: DEV-2026-001).
+ */
+
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -5,6 +15,7 @@ import { prisma } from "@/lib/db";
 import { requireArtisan } from "@/lib/api-middleware";
 import { z } from "zod";
 
+/* Schéma d'une ligne de devis */
 const lineItemSchema = z.object({
   label: z.string(),
   qty: z.number().positive(),
@@ -12,6 +23,7 @@ const lineItemSchema = z.object({
   total: z.number(),
 });
 
+/* Schéma complet pour la création d'un devis */
 const createDevisSchema = z.object({
   missionId: z.string(),
   clientId: z.string(),
@@ -23,10 +35,15 @@ const createDevisSchema = z.object({
   message: z.string().optional(),
 });
 
+/**
+ * GET — Liste les devis de l'artisan connecté
+ * Inclut les infos de la mission et du client associé
+ */
 export async function GET() {
   const { user, error } = await requireArtisan();
   if (error) return error;
 
+  /* Récupération du profil artisan */
   const profile = await prisma.artisanProfile.findUnique({
     where: { userId: user!.id },
   });
@@ -48,6 +65,10 @@ export async function GET() {
   return NextResponse.json(devis);
 }
 
+/**
+ * POST — Crée un nouveau devis
+ * Génère automatiquement un numéro de devis séquentiel (DEV-AAAA-NNN)
+ */
 export async function POST(request: Request) {
   const { user, error } = await requireArtisan();
   if (error) return error;
@@ -64,10 +85,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
     }
 
-    // Generate devis number
+    /* Génération du numéro de devis : DEV-AAAA-NNN */
     const count = await prisma.devis.count({ where: { artisanId: profile.id } });
     const number = `DEV-${new Date().getFullYear()}-${String(count + 1).padStart(3, "0")}`;
 
+    /* Création du devis avec une validité par défaut de 30 jours */
     const devis = await prisma.devis.create({
       data: {
         missionId: data.missionId,

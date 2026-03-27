@@ -1,15 +1,19 @@
 /**
- * Accounting Integration Stubs
- * Pennylane / Indy / QuickBooks / Tiime
+ * Intégration comptabilité — Stubs (Pennylane, Indy, QuickBooks, Tiime)
  *
- * These stubs prepare the API surface for when real credentials are available.
- * Each integration will export invoices and payment data automatically.
+ * Ces fonctions préparent l'interface API pour quand les vraies
+ * clés d'API seront disponibles. Pour l'instant, elles loguent
+ * les actions dans la console et retournent des données simulées.
  *
- * TODO: Implement OAuth flows and API calls for each provider
+ * TODO: Implémenter les flux OAuth et appels API réels pour chaque fournisseur
  */
 
+// --- Types ---
+
+/** Fournisseurs de comptabilité supportés */
 export type AccountingProvider = "pennylane" | "indy" | "quickbooks" | "tiime";
 
+/** Connexion à un fournisseur de comptabilité */
 export interface AccountingConnection {
   provider: AccountingProvider;
   connected: boolean;
@@ -18,6 +22,7 @@ export interface AccountingConnection {
   expiresAt?: Date;
 }
 
+/** Données d'une facture à exporter */
 export interface InvoiceExportData {
   invoiceNumber: string;
   date: string;
@@ -28,9 +33,9 @@ export interface InvoiceExportData {
   tva: number;
 }
 
-/**
- * Connect to an accounting provider (STUB)
- */
+// --- Fonctions ---
+
+/** Connecte un fournisseur de comptabilité (STUB — simule la connexion) */
 export async function connectProvider(
   provider: AccountingProvider,
   _authCode: string,
@@ -45,16 +50,12 @@ export async function connectProvider(
   };
 }
 
-/**
- * Disconnect from an accounting provider (STUB)
- */
+/** Déconnecte un fournisseur de comptabilité (STUB) */
 export async function disconnectProvider(provider: AccountingProvider): Promise<void> {
   console.log(`[ACCOUNTING STUB] Disconnecting from ${provider}`);
 }
 
-/**
- * Export an invoice to connected accounting provider (STUB)
- */
+/** Exporte une facture vers le fournisseur connecté (STUB) */
 export async function exportInvoice(
   provider: AccountingProvider,
   _accessToken: string,
@@ -64,13 +65,11 @@ export async function exportInvoice(
   return { success: true, externalId: `${provider}_inv_${Date.now()}` };
 }
 
-/**
- * Generate CSV export of invoices
- */
+/** Génère un export CSV des factures (format compatible tableur) */
 export function generateCSV(invoices: InvoiceExportData[]): string {
   const header = "Numéro;Date;Client;Total HT;TVA;Total TTC\n";
-  const rows = invoices.map((inv) =>
-    `${inv.invoiceNumber};${inv.date};${inv.clientName};${inv.totalHT};${inv.tva};${inv.totalTTC}`,
-  ).join("\n");
+  const rows = invoices
+    .map((inv) => `${inv.invoiceNumber};${inv.date};${inv.clientName};${inv.totalHT};${inv.tva};${inv.totalTTC}`)
+    .join("\n");
   return header + rows;
 }

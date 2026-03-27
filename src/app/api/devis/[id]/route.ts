@@ -1,8 +1,18 @@
+/**
+ * Route API — Détail et mise à jour d'un devis spécifique
+ *
+ * GET   /api/devis/[id]  — Récupère le détail d'un devis
+ * PATCH /api/devis/[id]  — Met à jour le statut ou ajoute la signature du client
+ */
+
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
+/**
+ * GET — Récupère un devis avec les infos de la mission et de l'artisan
+ */
 export async function GET(
   _request: Request,
   { params }: { params: { id: string } },
@@ -27,6 +37,12 @@ export async function GET(
   return NextResponse.json(devis);
 }
 
+/**
+ * PATCH — Met à jour un devis
+ * Actions possibles :
+ * - Changer le statut (ACCEPTED, REFUSED, etc.)
+ * - Ajouter la signature du client (signatureData + horodatage)
+ */
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } },

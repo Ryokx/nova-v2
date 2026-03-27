@@ -1,3 +1,10 @@
+/**
+ * Extension des types NextAuth — Ajout de champs personnalisés
+ *
+ * Ajoute id, role et hasPhone à la session et au token JWT
+ * pour que ces infos soient accessibles partout dans l'application.
+ */
+
 import "next-auth";
 import "next-auth/jwt";
 
