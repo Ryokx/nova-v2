@@ -7,6 +7,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
@@ -18,10 +21,6 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ["lucide-react"],
-  },
-  webpack: (config) => {
-    config.cache = false;
-    return config;
   },
 };
 

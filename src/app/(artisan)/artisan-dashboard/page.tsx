@@ -19,6 +19,9 @@ import { useFetch } from "@/hooks/use-fetch";
 import { useState } from "react";
 import { MonthPicker } from "@/components/ui/month-picker";
 import {
+  TrendingUp,
+  Wrench,
+  FileText,
   Star,
   Zap,
   Clock,
@@ -30,11 +33,15 @@ import {
   Users,
   CalendarDays,
   ArrowUpRight,
+  ArrowDownRight,
+  AlertTriangle,
+  CheckCircle2,
   EyeOff,
   ChevronRight,
   ChevronLeft,
   Link2,
   Check,
+  ExternalLink,
 } from "lucide-react";
 
 /* Statistiques retournées par l'API /api/artisan/stats */

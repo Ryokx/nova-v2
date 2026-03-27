@@ -36,6 +36,8 @@ import {
   Calendar,
   Filter,
   Edit3,
+  CheckCircle2,
+  AlertCircle,
   BarChart3,
 } from "lucide-react";
 

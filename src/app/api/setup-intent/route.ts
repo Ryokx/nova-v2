@@ -1,10 +1,10 @@
 /**
- * Route API — Création d'un SetupIntent Stripe (empreinte bancaire à 0€)
+ * Route API — Création d'un SetupIntent Stripe (empreinte bancaire 0€)
  *
  * POST /api/setup-intent
  *
- * Crée un SetupIntent pour enregistrer un moyen de paiement sans prélèvement.
- * Utilisé par : booking, urgency-modal, payment-methods.
+ * Crée un Stripe Customer si nécessaire, puis un SetupIntent
+ * pour enregistrer le moyen de paiement du client avant la réservation.
  */
 
 export const dynamic = "force-dynamic";
@@ -19,6 +19,7 @@ export async function POST() {
   if (error) return error;
 
   try {
+    /* Récupère l'utilisateur complet avec stripeCustomerId */
     const dbUser = await prisma.user.findUnique({
       where: { id: user!.id },
       select: { id: true, email: true, name: true, stripeCustomerId: true },
@@ -28,7 +29,7 @@ export async function POST() {
       return NextResponse.json({ error: "Utilisateur introuvable" }, { status: 404 });
     }
 
-    // Récupère ou crée le Stripe Customer
+    /* Crée ou récupère le Stripe Customer */
     const customerId = await getOrCreateCustomer({
       userId: dbUser.id,
       email: dbUser.email,
@@ -36,7 +37,7 @@ export async function POST() {
       existingCustomerId: dbUser.stripeCustomerId,
     });
 
-    // Sauvegarde le customerId si nouveau
+    /* Sauvegarde le customerId si nouveau */
     if (!dbUser.stripeCustomerId) {
       await prisma.user.update({
         where: { id: dbUser.id },
@@ -44,12 +45,14 @@ export async function POST() {
       });
     }
 
-    // Crée le SetupIntent
+    /* Crée le SetupIntent */
     const setupIntent = await createSetupIntent(customerId);
 
-    return NextResponse.json({ clientSecret: setupIntent.client_secret });
+    return NextResponse.json({
+      clientSecret: setupIntent.client_secret,
+    });
   } catch (err) {
-    console.error("[setup-intent] Error:", err);
-    return NextResponse.json({ error: "Erreur lors de la création du SetupIntent" }, { status: 500 });
+    console.error("SetupIntent error:", err);
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

@@ -79,6 +79,7 @@ export function Navbar() {
   const moreRef = useRef<HTMLDivElement>(null);
 
   // Raccourcis pour l'état de session
+  const isLoading = status === "loading";
   const isAuthenticated = status === "authenticated";
   const isArtisan = session?.user?.role === "ARTISAN";
   const isPublicPath = PUBLIC_PATHS.some((p) => pathname === p);

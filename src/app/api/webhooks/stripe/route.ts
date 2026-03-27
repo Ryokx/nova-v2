@@ -19,7 +19,7 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { stripe, cancelSubscription } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email/send";
 import { missionNotificationEmail } from "@/lib/email/templates";
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
             select: { activeAddons: true },
           });
           const currentAddons = (profile?.activeAddons as string[]) || [];
-          const merged = Array.from(new Set([...currentAddons, ...newAddonIds]));
+          const merged = [...new Set([...currentAddons, ...newAddonIds])];
           await prisma.artisanProfile.update({
             where: { id: profileId },
             data: { activeAddons: merged },

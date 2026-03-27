@@ -59,9 +59,7 @@ export interface TradeConfig {
 
 // --- Données de chaque métier ---
 
-type TradeSlug = "serrurier" | "plombier" | "electricien" | "chauffagiste" | "peintre" | "menuisier" | "carreleur" | "macon";
-
-export const trades: Record<TradeSlug, TradeConfig> = {
+export const trades: Record<string, TradeConfig> = {
   // ━━━ Serrurier ━━━
   serrurier: {
     slug: "serrurier",
@@ -388,7 +386,7 @@ export const tradeList = Object.values(trades);
 
 /** Récupère la config d'un métier par son slug */
 export function getTradeBySlug(slug: string): TradeConfig | undefined {
-  return (trades as Record<string, TradeConfig>)[slug];
+  return trades[slug];
 }
 
 /** Métiers disponibles en page urgence */

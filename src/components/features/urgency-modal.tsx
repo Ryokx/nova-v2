@@ -28,7 +28,7 @@ import { Modal } from "@/components/ui/modal";
 import {
   MapPin, Search, CheckCircle, Bell,
   Navigation, Phone, Clock, Star, Shield,
-  UserPlus, LogIn, CreditCard, Lock, Loader2,
+  UserPlus, LogIn, CreditCard, Lock, Loader2, ArrowRight,
 } from "lucide-react";
 
 /* ━━━ Stripe ━━━ */
@@ -166,7 +166,7 @@ function CardForm({ onSuccess }: { onSuccess: () => void }) {
 /* ━━━ Composant principal ━━━ */
 export function UrgencyModal({ open, onClose, tradeName = "artisan", resume = false }: UrgencyModalProps) {
   const router = useRouter();
-  useSession();
+  const { data: session, status: authStatus } = useSession();
   const [step, setStep] = useState<Step>("locating");
   const [dots, setDots] = useState("");
   const checkedRef = useRef(false);
@@ -259,8 +259,7 @@ export function UrgencyModal({ open, onClose, tradeName = "artisan", resume = fa
     const timer = setTimeout(() => {
       setStep((prev) => {
         const idx = ANIM_STEPS.indexOf(prev);
-        const next = ANIM_STEPS[idx + 1];
-        return idx >= 0 && idx < ANIM_STEPS.length - 1 && next ? next : prev;
+        return idx >= 0 && idx < ANIM_STEPS.length - 1 ? ANIM_STEPS[idx + 1] : prev;
       });
     }, timing);
     return () => clearTimeout(timer);
