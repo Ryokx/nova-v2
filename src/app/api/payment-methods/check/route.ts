@@ -1,10 +1,9 @@
 /**
- * Route API — Vérifie si l'utilisateur a un moyen de paiement enregistré
+ * Route API — Vérifie si le client a un moyen de paiement enregistré
  *
  * GET /api/payment-methods/check
  *
  * Retourne { hasPaymentMethod: boolean }
- * Utilisé par urgency-modal pour vérifier avant de continuer.
  */
 
 export const dynamic = "force-dynamic";
@@ -28,18 +27,17 @@ export async function GET() {
       return NextResponse.json({ hasPaymentMethod: false });
     }
 
-    // Vérifie les moyens de paiement enregistrés chez Stripe
-    const paymentMethods = await stripe.paymentMethods.list({
+    const methods = await stripe.paymentMethods.list({
       customer: dbUser.stripeCustomerId,
       type: "card",
       limit: 1,
     });
 
     return NextResponse.json({
-      hasPaymentMethod: paymentMethods.data.length > 0,
+      hasPaymentMethod: methods.data.length > 0,
     });
   } catch (err) {
-    console.error("[payment-methods/check] Error:", err);
+    console.error("Check payment method error:", err);
     return NextResponse.json({ hasPaymentMethod: false });
   }
 }

@@ -19,7 +19,7 @@ import Link from "next/link";
 import {
   Shield, Lock, Star, ArrowRight, ChevronDown, Clock,
   BadgeCheck, Search, CreditCard, ClipboardList, Check,
-  Zap, AlertTriangle, CheckCircle, Ban,
+  Zap, MapPin, X, AlertTriangle, CheckCircle, Ban,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TradeConfig } from "@/lib/trades";

@@ -1,11 +1,10 @@
 /**
- * Route API — Abonnement artisan via Stripe Checkout
+ * Route API — Gestion des abonnements artisan
  *
  * POST /api/subscriptions
- * Body: { planId: "pro" | "expert", billing: "monthly" | "annual" }
  *
- * Crée une session Checkout Stripe en mode subscription.
- * Retourne { url } pour rediriger l'artisan vers Stripe.
+ * Redirige toujours vers Stripe Checkout pour le paiement.
+ * Si un abonnement existe déjà, l'ancien est annulé après le paiement du nouveau (via webhook).
  */
 
 export const dynamic = "force-dynamic";
@@ -13,7 +12,10 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/api-middleware";
-import { getOrCreateCustomer, createSubscriptionCheckout } from "@/lib/stripe";
+import {
+  getOrCreateCustomer,
+  createSubscriptionCheckout,
+} from "@/lib/stripe";
 import { z } from "zod";
 
 const subscriptionSchema = z.object({
@@ -27,23 +29,36 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const parsed = subscriptionSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json({ error: "Données invalides" }, { status: 400 });
-    }
+    const data = subscriptionSchema.parse(body);
 
-    const { planId, billing } = parsed.data;
-
+    /* Récupère l'utilisateur + profil artisan */
     const dbUser = await prisma.user.findUnique({
       where: { id: user!.id },
-      select: { id: true, email: true, name: true, stripeCustomerId: true, role: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        stripeCustomerId: true,
+        role: true,
+        artisanProfile: {
+          select: {
+            id: true,
+            stripeSubscriptionId: true,
+            currentPlan: true,
+          },
+        },
+      },
     });
 
-    if (!dbUser || dbUser.role !== "ARTISAN") {
-      return NextResponse.json({ error: "Accès réservé aux artisans" }, { status: 403 });
+    if (!dbUser) {
+      return NextResponse.json({ error: "Utilisateur introuvable" }, { status: 404 });
     }
 
-    // Récupère ou crée le Stripe Customer
+    if (dbUser.role !== "ARTISAN" || !dbUser.artisanProfile) {
+      return NextResponse.json({ error: "Réservé aux artisans" }, { status: 403 });
+    }
+
+    /* Crée ou récupère le Customer Stripe */
     const customerId = await getOrCreateCustomer({
       userId: dbUser.id,
       email: dbUser.email,
@@ -58,19 +73,25 @@ export async function POST(request: Request) {
       });
     }
 
+    const profile = dbUser.artisanProfile;
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
+    /* Toujours rediriger vers Stripe Checkout pour valider le paiement */
     const session = await createSubscriptionCheckout({
       customerId,
-      planId,
-      billing,
-      successUrl: `${baseUrl}/artisan-subscription?success=true`,
-      cancelUrl: `${baseUrl}/artisan-subscription?canceled=true`,
+      planId: data.planId,
+      billing: data.billing,
+      successUrl: `${baseUrl}/artisan-subscription?success=true&plan=${data.planId}`,
+      cancelUrl: `${baseUrl}/artisan-subscription?cancelled=true`,
+      existingSubscriptionId: profile.stripeSubscriptionId ?? undefined,
     });
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: session.url }, { status: 201 });
   } catch (err) {
-    console.error("[subscriptions] Error:", err);
-    return NextResponse.json({ error: "Erreur lors de la création de l'abonnement" }, { status: 500 });
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: "Données invalides" }, { status: 400 });
+    }
+    console.error("Subscription error:", err);
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

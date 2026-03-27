@@ -17,7 +17,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import {
-  Phone, Mail, MapPin, Clock, Star, Sparkles,
+  Phone, Mail, MapPin, Clock, Star, Check, Sparkles,
   ChevronRight, Shield, FileText, ArrowRight,
 } from "lucide-react";
 import { Image as ImageIcon } from "lucide-react";
@@ -81,8 +81,8 @@ export default function WebsitePreviewPage() {
   }, []);
 
   /* Résolution du thème et de la police sélectionnés */
-  const t = (THEMES[data?.theme ?? "vert"] ?? THEMES.vert)!;
-  const f = (FONTS[data?.font ?? "moderne"] ?? FONTS.moderne)!;
+  const t = THEMES[data?.theme ?? "vert"] ?? THEMES.vert;
+  const f = FONTS[data?.font ?? "moderne"] ?? FONTS.moderne;
 
   /* Style dynamique du hero selon le type de couverture */
   const heroStyle = useMemo(() => {

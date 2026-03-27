@@ -15,7 +15,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Shield, CheckCircle, ArrowLeft } from "lucide-react";
+import { CheckCircle, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   /* ── État du formulaire de connexion ── */
@@ -97,8 +97,8 @@ export default function LoginPage() {
 
         {/* ── En-tête avec icône et titre ── */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-[5px] bg-forest/5 flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-7 h-7 text-forest" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-deepForest to-forest flex items-center justify-center mx-auto mb-4 shadow-[0_4px_12px_rgba(10,64,48,0.3)]">
+            <span className="text-white font-heading font-extrabold text-xl">N</span>
           </div>
           <h1 className="font-heading text-[28px] font-extrabold text-navy mb-1">
             Connexion

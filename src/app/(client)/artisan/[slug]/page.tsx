@@ -8,10 +8,10 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { ArrowLeft, Star, Calendar, Zap, Shield, MapPin } from "lucide-react";
+import { ArrowLeft, Star, Calendar, Zap, Shield, MapPin, Clock, MessageCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFetch } from "@/hooks/use-fetch";
 import { AuthGateModal } from "@/components/ui/auth-gate-modal";
@@ -102,6 +102,7 @@ function SmallStars({ rating }: { rating: number }) {
 
 export default function ArtisanDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  const pathname = usePathname();
   const { data: session } = useSession();
   const { data: artisan, loading } = useFetch<ArtisanDetail>(`/api/artisans/${slug}`);
 
