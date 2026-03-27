@@ -1,24 +1,44 @@
+/**
+ * Page Parrainage.
+ * Permet au client de partager son code de parrainage pour gagner 20€
+ * par filleul inscrit qui réalise sa première intervention.
+ * Affiche le code, des boutons de partage et les stats de parrainage.
+ */
+
 "use client";
 
 import { useState } from "react";
 import { MessageCircle, Mail, Link2, Smartphone } from "lucide-react";
 
+/* ------------------------------------------------------------------ */
+/*  Données                                                            */
+/* ------------------------------------------------------------------ */
+
+/** Boutons de partage */
+const shareButtons = [
+  { label: "WhatsApp", icon: MessageCircle, color: "bg-[#25D366]" },
+  { label: "SMS", icon: Smartphone, color: "bg-gray-500" },
+  { label: "Email", icon: Mail, color: "bg-forest" },
+  { label: "Lien", icon: Link2, color: "bg-gray-400" },
+];
+
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function ReferralPage() {
+  /** Indique si le code a été copié (feedback visuel temporaire) */
   const [copied, setCopied] = useState(false);
+
+  /** Code de parrainage unique du client */
   const code = "NOVA-SL25";
 
+  /** Copie le code dans le presse-papier */
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const shareButtons = [
-    { label: "WhatsApp", icon: MessageCircle, color: "bg-[#25D366]" },
-    { label: "SMS", icon: Smartphone, color: "bg-gray-500" },
-    { label: "Email", icon: Mail, color: "bg-forest" },
-    { label: "Lien", icon: Link2, color: "bg-gray-400" },
-  ];
 
   return (
     <div className="max-w-[600px] mx-auto px-6 py-8">
@@ -26,7 +46,7 @@ export default function ReferralPage() {
         Inviter des proches
       </h1>
 
-      {/* Dark green gradient banner */}
+      {/* Bannière promotionnelle */}
       <div className="bg-gradient-to-br from-deepForest to-forest rounded-[5px] px-6 py-8 text-center mb-6">
         <div className="text-4xl mb-3">🎁</div>
         <div className="font-heading text-[22px] font-extrabold text-white mb-2">
@@ -37,13 +57,15 @@ export default function ReferralPage() {
         </p>
       </div>
 
-      {/* Referral code card */}
+      {/* Carte code de parrainage */}
       <div className="bg-white border border-border shadow-sm rounded-[5px] p-5 mb-5">
         <div className="text-sm font-bold text-navy mb-2.5">Votre code</div>
         <div className="flex gap-2">
+          {/* Affichage du code */}
           <div className="flex-1 bg-surface rounded-xl px-4 py-3.5 font-mono text-lg font-bold text-forest tracking-wider">
             {code}
           </div>
+          {/* Bouton copier */}
           <button
             onClick={handleCopy}
             className={`px-5 py-3.5 rounded-xl text-[13px] font-semibold text-white transition-all ${
@@ -55,7 +77,7 @@ export default function ReferralPage() {
         </div>
       </div>
 
-      {/* Share buttons */}
+      {/* Boutons de partage */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
         {shareButtons.map((btn) => {
           const Icon = btn.icon;
@@ -71,7 +93,7 @@ export default function ReferralPage() {
         })}
       </div>
 
-      {/* Stats */}
+      {/* Statistiques de parrainage */}
       <div className="bg-white border border-border shadow-sm rounded-[5px] p-5">
         <div className="text-xs text-grayText mb-2.5">Vos parrainages</div>
         <div className="grid grid-cols-3 gap-3">

@@ -1,3 +1,18 @@
+/**
+ * Route API — Liste des clients d'un artisan
+ *
+ * GET /api/artisan/clients
+ *
+ * Récupère toutes les missions de l'artisan connecté,
+ * puis regroupe les données par client unique :
+ * - Nombre de missions
+ * - Chiffre d'affaires total (paiements libérés uniquement)
+ * - Date de la dernière mission
+ *
+ * Résultats triés par date de dernière mission décroissante.
+ * Réservé aux artisans authentifiés.
+ */
+
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -8,6 +23,7 @@ export async function GET() {
   const { user, error } = await requireArtisan();
   if (error) return error;
 
+  /* Récupération du profil artisan */
   const profile = await prisma.artisanProfile.findUnique({
     where: { userId: user!.id },
   });
@@ -16,6 +32,7 @@ export async function GET() {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
+  /* Récupération de toutes les missions avec les infos client et paiement */
   const missions = await prisma.mission.findMany({
     where: { artisanId: profile.id },
     include: {
@@ -25,7 +42,7 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  // Group by client
+  /* Regroupement par client : on agrège les missions et le CA */
   const clientMap = new Map<string, {
     id: string;
     name: string;
@@ -39,8 +56,9 @@ export async function GET() {
 
   for (const m of missions) {
     const c = m.client;
-    const existing = clientMap.get(c.id);
+    /* Ne comptabilise que les paiements effectivement libérés */
     const amount = m.payment?.status === "RELEASED" ? (m.payment.amount ?? 0) : 0;
+    const existing = clientMap.get(c.id);
 
     if (existing) {
       existing.missions += 1;
@@ -60,6 +78,7 @@ export async function GET() {
     }
   }
 
+  /* Tri par date de dernière mission (plus récent en premier) */
   const clients = Array.from(clientMap.values()).sort((a, b) => b.lastDate.getTime() - a.lastDate.getTime());
 
   return NextResponse.json({

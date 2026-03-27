@@ -1,3 +1,18 @@
+/**
+ * Route API — Demande de réinitialisation de mot de passe
+ *
+ * POST /api/auth/forgot-password
+ *
+ * Étapes :
+ * 1. Reçoit l'email de l'utilisateur
+ * 2. Génère un token sécurisé (32 octets aléatoires)
+ * 3. Stocke le hash du token en base (expire dans 1h)
+ * 4. Envoie un email avec le lien de réinitialisation
+ *
+ * SÉCURITÉ : retourne toujours un succès, même si l'email n'existe pas,
+ * pour empêcher l'énumération des comptes.
+ */
+
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -5,6 +20,7 @@ import crypto from "crypto";
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email/send";
 
+/* ━━━ Template HTML de l'email de réinitialisation ━━━ */
 const baseStyles = `
   body { margin: 0; padding: 0; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #F5FAF7; }
   .container { max-width: 600px; margin: 0 auto; background: #fff; }
@@ -17,6 +33,7 @@ const baseStyles = `
   .footer-text { font-size: 11px; color: #6B7280; line-height: 1.6; }
 `;
 
+/** Génère le HTML de l'email de réinitialisation de mot de passe */
 function resetPasswordEmail(resetUrl: string): string {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -49,6 +66,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email } = body as { email?: string };
 
+    /* Validation basique de l'email */
     if (!email || typeof email !== "string") {
       return NextResponse.json(
         { error: "Email requis" },
@@ -58,27 +76,28 @@ export async function POST(request: Request) {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Look up user — but don't leak whether they exist
+    /* Recherche de l'utilisateur (sans révéler s'il existe ou non) */
     const user = await prisma.user.findUnique({
       where: { email: normalizedEmail },
     });
 
     if (user) {
-      // Generate secure random token
+      /* Génération d'un token aléatoire sécurisé */
       const token = crypto.randomBytes(32).toString("hex");
       const hashedToken = crypto
         .createHash("sha256")
         .update(token)
         .digest("hex");
 
-      const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      /* Le token expire dans 1 heure */
+      const expires = new Date(Date.now() + 60 * 60 * 1000);
 
-      // Delete any existing tokens for this email
+      /* Suppression des anciens tokens pour cet email */
       await prisma.verificationToken.deleteMany({
         where: { identifier: normalizedEmail },
       });
 
-      // Store hashed token
+      /* Stockage du token hashé en base */
       await prisma.verificationToken.create({
         data: {
           identifier: normalizedEmail,
@@ -87,11 +106,11 @@ export async function POST(request: Request) {
         },
       });
 
-      // Build reset URL
+      /* Construction de l'URL de réinitialisation */
       const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
       const resetUrl = `${baseUrl}/reset-password?token=${token}&email=${encodeURIComponent(normalizedEmail)}`;
 
-      // Send email
+      /* Envoi de l'email */
       await sendEmail({
         to: normalizedEmail,
         subject: "Nova — Réinitialisation de votre mot de passe",
@@ -99,7 +118,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // Always return success to prevent email enumeration
+    /* Réponse toujours identique (empêche l'énumération des emails) */
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Forgot password error:", error);

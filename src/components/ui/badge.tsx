@@ -1,12 +1,20 @@
+/**
+ * Composant Badge — Étiquette colorée pour afficher un statut ou une catégorie.
+ * Exemples : "En cours" (success), "Urgent" (danger), "Info" (info).
+ */
+
 import { type HTMLAttributes, forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
+/** Variantes visuelles du badge */
 type BadgeVariant = "default" | "success" | "warning" | "danger" | "info";
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+  /** Couleur/style du badge (par défaut : "default") */
   variant?: BadgeVariant;
 }
 
+/** Classes CSS associées à chaque variante */
 const variantStyles: Record<BadgeVariant, string> = {
   default: "bg-surface text-forest",
   success: "bg-success/15 text-success",
@@ -15,6 +23,7 @@ const variantStyles: Record<BadgeVariant, string> = {
   info: "bg-forest/10 text-forest",
 };
 
+/** Badge inline avec coins arrondis et texte en gras */
 const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className, variant = "default", ...props }, ref) => {
     return (

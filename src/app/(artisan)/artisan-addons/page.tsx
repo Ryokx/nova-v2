@@ -1,3 +1,8 @@
+/**
+ * Page des options / modules complémentaires artisan.
+ * Permet d'activer ou désactiver des services à la carte (connexion comptable,
+ * boost visibilité, SMS clients, etc.) avec affichage du coût mensuel total.
+ */
 "use client";
 
 import { useState } from "react";
@@ -14,16 +19,18 @@ import {
 } from "lucide-react";
 import { formatPrice, cn } from "@/lib/utils";
 
+/* Type d'un module complémentaire */
 interface Addon {
   id: string;
   name: string;
   description: string;
-  price: number;
+  price: number;             // Prix mensuel en euros
   icon: React.ElementType;
-  includedInExpert?: boolean;
-  active?: boolean;
+  includedInExpert?: boolean; // Inclus dans le forfait Expert
+  active?: boolean;           // Activé par défaut
 }
 
+/* Liste des modules disponibles */
 const addons: Addon[] = [
   {
     id: "comptable",
@@ -89,6 +96,7 @@ const addons: Addon[] = [
 ];
 
 export default function ArtisanAddonsPage() {
+  /* État des modules activés (clé = id addon, valeur = activé/désactivé) */
   const [activeAddons, setActiveAddons] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     addons.forEach((a) => {
@@ -97,15 +105,18 @@ export default function ArtisanAddonsPage() {
     return initial;
   });
 
+  /* Bascule l'activation d'un module */
   const toggleAddon = (id: string) => {
     setActiveAddons((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  /* Calcul du coût mensuel total des modules activés */
   const totalMonthlyCost = addons.reduce((sum, addon) => {
     if (activeAddons[addon.id]) return sum + addon.price;
     return sum;
   }, 0);
 
+  /* Nombre de modules actuellement actifs */
   const activeCount = Object.values(activeAddons).filter(Boolean).length;
 
   return (

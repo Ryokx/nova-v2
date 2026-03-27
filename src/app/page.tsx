@@ -1,3 +1,17 @@
+/**
+ * Landing page principale — / (page d'accueil)
+ *
+ * Page la plus importante du site. Structure en 7 sections :
+ * 1. HERO : titre accrocheur + mockup téléphone flottant
+ * 2. TRUST (Bento grid) : séquestre, certifications, validation
+ * 3. HOW IT WORKS : 4 étapes du parcours utilisateur
+ * 4. DEMO PREVIEW : cartes pour tester en mode client ou artisan
+ * 5. MOBILE APP : présentation de l'application mobile + features
+ * 6. TESTIMONIALS : avis clients (1 mis en avant + 2 empilés)
+ * 7. FINAL CTA : appel à l'action pour créer un compte
+ *
+ * Page statique (Server Component) — pas de "use client".
+ */
 import Link from "next/link";
 import {
   Shield,
@@ -23,7 +37,9 @@ import {
   MapPin,
 } from "lucide-react";
 
-/* ━━━ Custom SVG Icons ━━━ */
+/* ━━━ Icônes SVG personnalisées ━━━ */
+
+/** Icône bouclier avec coche (utilisée dans les sections confiance) */
 const ShieldIcon = ({ size = 28, color = "#1B6B4E" }: { size?: number; color?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill={color} opacity=".12" />
@@ -32,6 +48,7 @@ const ShieldIcon = ({ size = 28, color = "#1B6B4E" }: { size?: number; color?: s
   </svg>
 );
 
+/** Icône cadenas (utilisée dans les sections séquestre) */
 const LockIcon = ({ size = 18, color = "#1B6B4E" }: { size?: number; color?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <rect x="5" y="11" width="14" height="10" rx="2" stroke={color} strokeWidth="1.5" />
@@ -40,7 +57,7 @@ const LockIcon = ({ size = 18, color = "#1B6B4E" }: { size?: number; color?: str
   </svg>
 );
 
-/* ━━━ Phone tab bar icons ━━━ */
+/** Icône d'onglet pour la barre de navigation du mockup téléphone */
 const TabIcon = ({ icon: Icon, active = false }: { icon: React.ElementType; active?: boolean }) => (
   <Icon className={`w-[14px] h-[14px] ${active ? "text-forest" : "text-grayText/40"}`} strokeWidth={active ? 2.5 : 1.5} />
 );
@@ -48,27 +65,32 @@ const TabIcon = ({ icon: Icon, active = false }: { icon: React.ElementType; acti
 export default function HomePage() {
   return (
     <div>
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          HERO — Asymmetric layout with floating phone
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════════
+          SECTION 1 — HERO
+          Titre accrocheur + badges de confiance + CTAs
+          + mockup téléphone flottant à droite (desktop)
+      ══════════════════════════════════════════════════ */}
       <section
         className="relative overflow-hidden min-h-[calc(100vh-72px)] flex items-center px-5 md:px-10"
         style={{ background: "linear-gradient(160deg, #F5FAF7 0%, #E8F5EE 35%, #D4EBE0 70%, #C8E6D5 100%)" }}
       >
-        {/* Decorative blobs */}
+        {/* Blobs décoratifs d'arrière-plan */}
         <div className="absolute -top-[120px] -right-[80px] w-[500px] h-[500px] rounded-full bg-forest/[0.06] blur-[100px]" />
         <div className="absolute -bottom-[100px] -left-[60px] w-[350px] h-[350px] rounded-full bg-gold/[0.05] blur-[80px]" />
         <div className="absolute top-[30%] left-[25%] w-[250px] h-[250px] rounded-full bg-sage/[0.04] blur-[60px]" />
 
         <div className="max-w-[1140px] mx-auto w-full flex items-center gap-20 relative z-10">
-          {/* Left — Text content */}
+
+          {/* ── Colonne gauche : contenu texte ── */}
           <div className="flex-1 min-w-0 py-16 md:py-20">
-            {/* Pain point badge */}
+
+            {/* Badge d'accroche (point de douleur) */}
             <div className="inline-flex items-center gap-2 bg-red/[0.06] border border-red/[0.1] rounded-lg px-4 py-2 mb-7 text-[13px] font-semibold text-red motion-safe:animate-pageIn">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               67% des Français ont déjà eu un litige avec un artisan
             </div>
 
+            {/* Titre principal en 2 lignes */}
             <h1 className="font-heading text-[36px] md:text-[54px] font-extrabold text-navy leading-[1.08] tracking-[-1.5px] mb-2 motion-safe:animate-pageIn motion-safe:[animation-delay:80ms]" style={{ textWrap: "balance" as never }}>
               Fini les artisans{" "}
               <span className="text-red/50 line-through decoration-[3px] decoration-red/30">douteux</span>
@@ -79,11 +101,12 @@ export default function HomePage() {
               </span>
             </h1>
 
+            {/* Sous-titre explicatif */}
             <p className="text-[17px] text-navy/60 leading-[1.75] max-w-[480px] mb-5 motion-safe:animate-pageIn motion-safe:[animation-delay:240ms]">
               Nova vérifie chaque artisan <span className="font-semibold text-navy">(SIRET, décennale, RGE)</span> et bloque votre paiement en <span className="font-semibold text-navy">séquestre</span> jusqu&apos;à validation de l&apos;intervention.
             </p>
 
-            {/* Trust micro-badges */}
+            {/* Micro-badges de confiance */}
             <div className="flex gap-5 mb-9 flex-wrap motion-safe:animate-pageIn motion-safe:[animation-delay:320ms]">
               {[
                 { icon: <Shield className="w-4 h-4 text-forest" />, text: "Artisans vérifiés" },
@@ -97,7 +120,7 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* CTAs */}
+            {/* Boutons d'appel à l'action */}
             <div className="flex gap-3 flex-wrap motion-safe:animate-pageIn motion-safe:[animation-delay:400ms]">
               <Link
                 href="/signup"
@@ -115,7 +138,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Social proof */}
+            {/* Preuve sociale (avatars + texte) */}
             <div className="flex items-center gap-3 mt-8 motion-safe:animate-pageIn motion-safe:[animation-delay:500ms]">
               <div className="flex">
                 {["SL", "PM", "CD", "AM"].map((ini, i) => (
@@ -130,16 +153,17 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right — Floating phone mockup (L3: animate-float) */}
+          {/* ── Colonne droite : mockup téléphone flottant (desktop uniquement) ── */}
           <div className="hidden lg:block flex-none w-[320px] relative motion-safe:animate-pageIn motion-safe:[animation-delay:300ms]">
             <div className="w-[280px] h-[560px] rounded-[36px] bg-navy p-2.5 shadow-[0_40px_100px_rgba(10,22,40,0.25)] motion-safe:animate-float">
-              {/* Dynamic Island */}
+              {/* Dynamic Island (encoche iPhone) */}
               <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[90px] h-[26px] rounded-b-2xl bg-navy z-10">
                 <div className="w-11 h-1 rounded-full bg-white/[0.12] mx-auto mt-3.5" />
               </div>
-              {/* Screen */}
+              {/* Écran du téléphone */}
               <div className="w-full h-full rounded-[32px] overflow-hidden" style={{ background: "linear-gradient(170deg, #E8F5EE, #F5FAF7)" }}>
                 <div className="pt-[34px] px-3.5">
+                  {/* Barre de navigation app */}
                   <div className="flex items-center mb-3">
                     <span className="font-heading text-[13px] font-extrabold text-navy tracking-tight">Nova</span>
                     <div className="w-[3px] h-[3px] rounded-full bg-gold ml-0.5" />
@@ -148,7 +172,8 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="font-heading text-sm font-extrabold text-navy mb-3">Bonjour Sophie</div>
-                  {/* Stats cards */}
+
+                  {/* Mini cartes de statistiques */}
                   <div className="flex gap-[5px] mb-2.5">
                     {[{ v: "2", l: "En cours", c: "text-success" }, { v: "570€", l: "Séquestre", c: "text-forest" }].map((k) => (
                       <div key={k.l} className="flex-1 bg-white rounded-lg py-[7px] px-1.5 text-center border border-border/50 shadow-sm">
@@ -157,7 +182,8 @@ export default function HomePage() {
                       </div>
                     ))}
                   </div>
-                  {/* Mission cards */}
+
+                  {/* Cartes de missions dans le mockup */}
                   {[
                     { ini: "JM", name: "Jean-Michel P.", desc: "Réparation fuite", badge: "En cours", bColor: "#22C88A" },
                     { ini: "SM", name: "Sophie M.", desc: "Prise électrique", badge: "Terminée", bColor: "#1B6B4E" },
@@ -172,7 +198,8 @@ export default function HomePage() {
                       <span className="text-[7px] font-bold px-[5px] py-[2px] rounded-sm" style={{ color: m.bColor, background: m.bColor + "15" }}>{m.badge}</span>
                     </div>
                   ))}
-                  {/* Escrow card */}
+
+                  {/* Carte séquestre dans le mockup */}
                   <div className="bg-gradient-to-br from-deepForest to-forest rounded-xl p-2.5 mt-2 shadow-[0_4px_16px_rgba(10,64,48,0.2)]">
                     <div className="flex items-center gap-[5px] mb-1">
                       <LockIcon size={10} color="#8ECFB0" />
@@ -184,7 +211,8 @@ export default function HomePage() {
                     </div>
                     <div className="text-[7px] text-white/50 mt-1">Protégé jusqu&apos;à validation</div>
                   </div>
-                  {/* Tab bar */}
+
+                  {/* Barre d'onglets du téléphone */}
                   <div className="flex justify-around pt-2.5 mt-2.5 border-t border-surface">
                     <TabIcon icon={Home} active />
                     <TabIcon icon={Search} />
@@ -196,7 +224,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Floating card — Intervention validée (L3: pulse ring) */}
+            {/* Carte flottante — "Intervention validée" */}
             <div className="absolute top-16 -left-[70px] bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-border/40 flex items-center gap-2.5 max-w-[210px] motion-safe:animate-pageIn motion-safe:[animation-delay:700ms]">
               <div className="relative">
                 <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
@@ -210,7 +238,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Floating card — Artisan certifié */}
+            {/* Carte flottante — "Artisan certifié" */}
             <div className="absolute bottom-[90px] -right-[40px] bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-border/40 flex items-center gap-2.5 motion-safe:animate-pageIn motion-safe:[animation-delay:900ms]">
               <div className="w-8 h-8 rounded-lg bg-forest/[0.08] flex items-center justify-center">
                 <ShieldIcon size={16} />
@@ -224,9 +252,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          TRUST — Bento grid (L2: break equal-grid syndrome)
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════════
+          SECTION 2 — TRUST (Bento Grid)
+          3 cartes : séquestre (mise en avant), certifications, validation
+      ══════════════════════════════════════════════════ */}
       <section className="py-20 px-5 md:px-10 bg-white">
         <div className="max-w-[1140px] mx-auto">
           <div className="text-center mb-14">
@@ -238,9 +267,9 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Bento grid: 1 large featured + 2 smaller */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Featured card — Escrow (span full on md) */}
+
+            {/* Carte principale — Séquestre (occupe 2 rangées) */}
             <div className="md:row-span-2 group relative p-8 rounded-2xl overflow-hidden cursor-default" style={{ background: "linear-gradient(160deg, #0A4030 0%, #1B6B4E 100%)" }}>
               <div className="relative z-10">
                 <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-5">
@@ -251,7 +280,7 @@ export default function HomePage() {
                   Votre argent est bloqué sur un compte sécurisé dès la signature du devis. L&apos;artisan n&apos;est payé qu&apos;après votre validation.
                 </p>
 
-                {/* L3: Escrow flow visualization */}
+                {/* Visualisation du flux séquestre en 4 étapes */}
                 <div className="flex items-center gap-3 mb-4">
                   {[
                     { label: "Vous payez", icon: <CreditCardIcon /> },
@@ -273,11 +302,11 @@ export default function HomePage() {
                   <Lock className="w-3.5 h-3.5" /> 0€ de risque pour vous
                 </div>
               </div>
-              {/* Decorative glow */}
+              {/* Effet lumineux décoratif */}
               <div className="absolute -bottom-20 -right-20 w-[250px] h-[250px] rounded-full bg-sage/[0.15] blur-[80px]" />
             </div>
 
-            {/* Card 2 — Certifications */}
+            {/* Carte — Certifications artisans */}
             <div className="group p-7 rounded-2xl bg-bgPage border border-border/50 hover:border-forest/20 hover:shadow-lg active:scale-[0.99] transition-all duration-200 cursor-default">
               <div className="w-12 h-12 rounded-xl bg-forest/[0.08] group-hover:bg-forest/[0.12] flex items-center justify-center mb-4 transition-colors">
                 <ShieldIcon size={26} />
@@ -295,7 +324,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Card 3 — Validation */}
+            {/* Carte — Validation Nova */}
             <div className="group p-7 rounded-2xl bg-bgPage border border-border/50 hover:border-forest/20 hover:shadow-lg active:scale-[0.99] transition-all duration-200 cursor-default">
               <div className="w-12 h-12 rounded-xl bg-forest/[0.08] group-hover:bg-forest/[0.12] flex items-center justify-center mb-4 transition-colors">
                 <Check className="w-6 h-6 text-forest" />
@@ -318,9 +347,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          HOW IT WORKS — Horizontal stepper (L2)
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════════
+          SECTION 3 — COMMENT ÇA MARCHE (4 étapes)
+      ══════════════════════════════════════════════════ */}
       <section className="py-20 px-5 md:px-10 bg-bgPage">
         <div className="max-w-[960px] mx-auto">
           <div className="text-center mb-14">
@@ -329,7 +358,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-0 relative">
-            {/* Connecting line (desktop only) */}
+            {/* Ligne de connexion entre les étapes (desktop) */}
             <div className="hidden md:block absolute top-7 left-[12.5%] right-[12.5%] h-[2px] bg-border/60 z-0" />
 
             {[
@@ -350,9 +379,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          DEMO PREVIEW — Glassmorphism cards
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════════
+          SECTION 4 — DEMO PREVIEW
+          2 cartes glassmorphism : mode client / mode artisan
+      ══════════════════════════════════════════════════ */}
       <section data-navbar-dark className="py-20 px-5 md:px-10 overflow-hidden" style={{ background: "linear-gradient(170deg, #0A4030 0%, #143D2E 50%, #1B6B4E 100%)" }}>
         <div className="max-w-[1140px] mx-auto">
           <div className="text-center mb-14">
@@ -367,8 +397,9 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Demo cards */}
+          {/* Cartes démo : client et artisan */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[840px] mx-auto mb-14">
+            {/* Carte — Mode client */}
             <Link href="/login" className="group relative bg-white/[0.06] backdrop-blur-xl rounded-2xl p-7 border border-white/[0.1] hover:bg-white/[0.1] hover:border-white/[0.18] active:scale-[0.98] transition-all duration-200 cursor-pointer overflow-hidden">
               <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-lightSage/[0.04] rounded-full blur-[60px] -translate-y-1/2 translate-x-1/3" />
               <div className="relative z-10">
@@ -390,6 +421,7 @@ export default function HomePage() {
               </div>
             </Link>
 
+            {/* Carte — Mode artisan */}
             <Link href="/login" className="group relative bg-white/[0.06] backdrop-blur-xl rounded-2xl p-7 border border-white/[0.1] hover:bg-white/[0.1] hover:border-white/[0.18] active:scale-[0.98] transition-all duration-200 cursor-pointer overflow-hidden">
               <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-gold/[0.04] rounded-full blur-[60px] -translate-y-1/2 translate-x-1/3" />
               <div className="relative z-10">
@@ -412,7 +444,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Feature highlights */}
+          {/* Fonctionnalités clés en grille */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-[900px] mx-auto">
             {[
               { icon: <LockIcon size={20} color="#8ECFB0" />, title: "Séquestre", desc: "Paiement bloqué" },
@@ -430,12 +462,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          MOBILE APP — Phone + features
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════════
+          SECTION 5 — APPLICATION MOBILE
+          Mockup téléphone + liste de fonctionnalités + boutons stores
+      ══════════════════════════════════════════════════ */}
       <section className="py-20 px-5 md:px-10 bg-white overflow-hidden">
         <div className="max-w-[1140px] mx-auto flex items-center gap-20 flex-wrap">
-          {/* Phone mockup */}
+
+          {/* Mockup téléphone (desktop uniquement) */}
           <div className="hidden md:block flex-none relative">
             <div className="w-[260px] h-[530px] rounded-[36px] bg-navy p-2.5 shadow-[0_24px_64px_rgba(10,22,40,0.18)] relative">
               <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[90px] h-[24px] rounded-b-[16px] bg-navy z-10">
@@ -484,10 +518,11 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+            {/* Badge "Nouveau" */}
             <div className="absolute top-8 -right-3 bg-red text-white px-3 py-1 rounded-lg text-[10px] font-bold shadow-[0_4px_12px_rgba(232,48,42,0.25)]">Nouveau</div>
           </div>
 
-          {/* Text content */}
+          {/* Contenu texte : fonctionnalités de l'app */}
           <div className="flex-1 min-w-[280px]">
             <div className="inline-flex items-center gap-2 bg-forest/[0.05] rounded-lg px-4 py-2 mb-6 text-[12px] font-semibold text-deepForest/70">
               <Smartphone className="w-4 h-4" /> Application mobile
@@ -496,6 +531,8 @@ export default function HomePage() {
             <p className="text-[15px] text-navy/50 leading-relaxed mb-8 max-w-[440px]">
               Notifications en temps réel, suivi artisan, signature de devis et paiement en séquestre — où que vous soyez.
             </p>
+
+            {/* Liste des fonctionnalités mobiles */}
             <div className="flex flex-col gap-4 mb-8">
               {[
                 { icon: <Bell className="w-5 h-5 text-forest" />, title: "Notifications push", desc: "Nouveau devis, artisan en route, intervention terminée" },
@@ -512,6 +549,8 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
+
+            {/* Boutons App Store / Google Play */}
             <div className="flex gap-3 flex-wrap">
               <button className="flex items-center gap-2.5 bg-navy rounded-xl px-5 py-2.5 cursor-pointer hover:bg-navy/90 active:scale-[0.97] transition-all" aria-label="Télécharger sur l'App Store">
                 <svg width="22" height="22" viewBox="0 0 814 1000" fill="#fff" aria-hidden="true"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57.8-155.5-127.4c-58.3-81.6-105.6-210.8-105.6-334.1C0 397.1 78.6 283.9 190.5 283.9c64.2 0 117.8 42.8 155.5 42.8 39 0 99.7-45.2 172.8-45.2 27.8 0 127.7 2.5 193.3 59.4z" /><path d="M554.1 0c-7.8 66.3-67.8 134.3-134.2 134.3-12 0-24-1.3-24-13.3 0-5.8 5.8-28.3 29-57.7C449.8 32.7 515.5 0 554.1 0z" /></svg>
@@ -533,9 +572,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          TESTIMONIALS — Featured + grid (L2: break equal grid)
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════════
+          SECTION 6 — TÉMOIGNAGES
+          1 avis mis en avant (large) + 2 avis empilés
+      ══════════════════════════════════════════════════ */}
       <section className="py-20 px-5 md:px-10 bg-bgPage">
         <div className="max-w-[1140px] mx-auto">
           <div className="text-center mb-14">
@@ -544,7 +584,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Featured testimonial — larger */}
+            {/* Témoignage principal (occupe 2 colonnes) */}
             <div className="md:col-span-2 bg-white rounded-2xl p-8 border border-border/40 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex gap-0.5 mb-4">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -563,7 +603,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Stacked testimonials */}
+            {/* Témoignages secondaires empilés */}
             <div className="flex flex-col gap-5">
               {[
                 { name: "Pierre M.", city: "Lyon 6e", service: "Urgence", text: "Fuite d'eau un dimanche soir, intervention en 1h30. Le suivi en temps réel est top." },
@@ -592,14 +632,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          FINAL CTA — Full bleed gradient
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════════
+          SECTION 7 — CTA FINAL
+          Appel à l'action pour créer un compte (fond vert dégradé)
+      ══════════════════════════════════════════════════ */}
       <section data-navbar-dark className="relative py-24 px-5 md:px-10 text-center overflow-hidden" style={{ background: "linear-gradient(160deg, #0A4030 0%, #1B6B4E 50%, #2D9B6E 100%)" }}>
+        {/* Effets lumineux décoratifs */}
         <div className="absolute inset-0">
           <div className="absolute top-[15%] left-[8%] w-[300px] h-[300px] rounded-full bg-white/[0.03] blur-[80px]" />
           <div className="absolute bottom-[10%] right-[12%] w-[350px] h-[350px] rounded-full bg-gold/[0.03] blur-[100px]" />
         </div>
+
         <div className="relative z-10 max-w-[600px] mx-auto">
           <div className="inline-flex items-center gap-2 bg-white/[0.08] rounded-lg px-4 py-2 mb-6 text-[12px] font-semibold text-white/70">
             <Shield className="w-3.5 h-3.5" /> 100% gratuit, sans engagement
@@ -632,7 +675,7 @@ export default function HomePage() {
   );
 }
 
-/* ━━━ Inline helper icon ━━━ */
+/** Icône carte de crédit (utilisée dans la visualisation du flux séquestre) */
 function CreditCardIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-lightSage" aria-hidden="true">

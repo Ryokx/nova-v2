@@ -1,9 +1,18 @@
+/**
+ * Page Comptabilité artisan.
+ * Permet de :
+ * - Voir les KPIs financiers (revenus nets, factures, TVA, commission)
+ * - Connecter un logiciel comptable (Pennylane, Indy, QuickBooks, Tiime)
+ * - Activer l'export automatique des factures
+ * - Consulter le résumé mensuel (revenus, commissions, TVA)
+ */
 "use client";
 
 import { useState } from "react";
 import { FileText, Download, TrendingUp, Receipt, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, CalendarDays } from "lucide-react";
 import { cn, formatPrice } from "@/lib/utils";
 
+/* Type d'un service comptable connectable */
 interface AccountingService {
   id: string;
   name: string;
@@ -12,6 +21,7 @@ interface AccountingService {
   letter: string;
 }
 
+/* Services comptables disponibles (logo via initiale + couleur) */
 const services: AccountingService[] = [
   { id: "pennylane", name: "Pennylane", desc: "Comptabilité tout-en-un TPE/PME", color: "#7C3AED", letter: "P" },
   { id: "indy", name: "Indy", desc: "Automatisée pour indépendants", color: "#2563EB", letter: "I" },
@@ -19,6 +29,7 @@ const services: AccountingService[] = [
   { id: "tiime", name: "Tiime", desc: "Gratuit pour auto-entrepreneurs", color: "#1F2937", letter: "T" },
 ];
 
+/* Lignes du résumé mensuel (revenus bruts, commission, net, TVA) */
 const summaryRows = [
   { label: "Revenus bruts", value: 4820, color: "text-navy" },
   { label: "Commission Nova", value: -482, color: "text-red" },
@@ -26,6 +37,7 @@ const summaryRows = [
   { label: "TVA collectée", value: 803.33, color: "text-navy" },
 ];
 
+/* KPIs affichés en haut de page */
 const stats = [
   { label: "Revenus nets", value: 4338, icon: TrendingUp, accent: "border-forest", trend: "+12%", trendUp: true },
   { label: "Factures émises", value: 12, icon: Receipt, accent: "border-sage", trend: "+3", trendUp: true, raw: true },
@@ -34,9 +46,12 @@ const stats = [
 ];
 
 export default function ArtisanComptaPage() {
+  /* Services comptables connectés (clé = id service) */
   const [connected, setConnected] = useState<Record<string, boolean>>({ pennylane: true });
+  /* Activer/désactiver l'export automatique des factures */
   const [autoExport, setAutoExport] = useState(false);
 
+  /* Bascule la connexion d'un service comptable */
   const toggle = (id: string) => setConnected((prev) => ({ ...prev, [id]: !prev[id] }));
 
   return (

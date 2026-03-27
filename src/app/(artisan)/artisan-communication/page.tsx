@@ -1,3 +1,11 @@
+/**
+ * Page Communications artisan.
+ * Gestion complète du marketing client :
+ * - Onglet Campagnes : créer, envoyer et suivre des campagnes email/SMS
+ * - Onglet Templates : bibliothèque de modèles réutilisables
+ * - Onglet Historique : suivi des envois (ouvert, cliqué, erreur)
+ * - Onglet Contacts : répertoire avec opt-in email/SMS
+ */
 "use client";
 
 import { useState } from "react";
@@ -28,15 +36,16 @@ import {
   Calendar,
   Filter,
   Edit3,
-  CheckCircle2,
-  AlertCircle,
   BarChart3,
 } from "lucide-react";
 
 /* ──────────────── Types ──────────────── */
 
+/* Onglets disponibles */
 type Tab = "campagnes" | "templates" | "historique" | "contacts";
+/* Canal d'envoi de la campagne */
 type Channel = "email" | "sms" | "both";
+/* Segment de destinataires */
 type Segment = "all" | "new" | "loyal" | "inactive";
 
 interface Campaign {
@@ -75,14 +84,16 @@ interface Contact {
   lastContact: string;
 }
 
-/* ──────────────── Mock data ──────────────── */
+/* ──────────────── Données mockées ──────────────── */
 
+/* Campagnes précédemment envoyées */
 const campaigns: Campaign[] = [
   { id: "c1", name: "Offre Printemps -15%", channel: "Email", recipients: 142, openRate: 72, date: "28 mars 2026" },
   { id: "c2", name: "Rappel entretien chaudière", channel: "SMS", recipients: 67, openRate: 89, date: "15 mars 2026" },
   { id: "c3", name: "Bienvenue nouveaux clients", channel: "Email", recipients: 23, openRate: 65, date: "1 mars 2026" },
 ];
 
+/* Templates de messages réutilisables */
 const templates: Template[] = [
   { id: "t1", name: "Rappel de rendez-vous", channel: "SMS", icon: <Clock size={20} />, body: "Bonjour {prénom}, nous vous rappelons votre rendez-vous le {date} à {heure}. À bientôt !" },
   { id: "t2", name: "Devis envoyé", channel: "Email", icon: <FileText size={20} />, body: "Bonjour {prénom},\n\nVotre devis #{numéro} a bien été envoyé. Vous pouvez le consulter et le signer directement depuis votre espace Nova.\n\nCordialement" },
@@ -92,6 +103,7 @@ const templates: Template[] = [
   { id: "t6", name: "Demande d'avis", channel: "Email + SMS", icon: <Star size={20} />, body: "Bonjour {prénom},\n\nVotre avis compte ! Suite à notre intervention du {date}, pourriez-vous nous laisser une évaluation ?\n\nMerci !" },
 ];
 
+/* Historique des envois individuels */
 const historyEntries: HistoryEntry[] = [
   { id: "h1", type: "Email", recipient: "Pierre Martin", subject: "Offre Printemps -15%", date: "28 mars 2026 09:30", status: "Ouvert" },
   { id: "h2", type: "Email", recipient: "Sophie Durand", subject: "Offre Printemps -15%", date: "28 mars 2026 09:30", status: "Cliqué" },
@@ -103,6 +115,7 @@ const historyEntries: HistoryEntry[] = [
   { id: "h8", type: "SMS", recipient: "Claire Dubois", subject: "Rappel entretien", date: "15 mars 2026 14:00", status: "Envoyé" },
 ];
 
+/* Répertoire des contacts clients */
 const contacts: Contact[] = [
   { id: "co1", name: "Pierre Martin", email: "pierre.martin@mail.com", phone: "06 12 34 56 78", optInEmail: true, optInSms: true, lastContact: "28 mars 2026" },
   { id: "co2", name: "Sophie Durand", email: "sophie.durand@mail.com", phone: "06 23 45 67 89", optInEmail: true, optInSms: false, lastContact: "28 mars 2026" },
@@ -116,6 +129,7 @@ const contacts: Contact[] = [
 
 /* ──────────────── Helpers ──────────────── */
 
+/* Couleurs CSS pour chaque statut d'envoi */
 const statusColor: Record<HistoryEntry["status"], string> = {
   Envoyé: "bg-blue-100 text-blue-700",
   Ouvert: "bg-emerald-100 text-emerald-700",
@@ -126,28 +140,31 @@ const statusColor: Record<HistoryEntry["status"], string> = {
 /* ──────────────── Page ──────────────── */
 
 export default function ArtisanCommunicationPage() {
+  /* Onglet actif */
   const [tab, setTab] = useState<Tab>("campagnes");
+  /* Campagne et template dépliés (détail visible) */
   const [expandedCampaign, setExpandedCampaign] = useState<string | null>(null);
   const [expandedTemplate, setExpandedTemplate] = useState<string | null>(null);
+  /* Affiche/masque la modale de création de campagne */
   const [showNewCampaign, setShowNewCampaign] = useState(false);
 
-  /* New campaign form state */
+  /* --- Formulaire nouvelle campagne --- */
   const [campaignName, setCampaignName] = useState("");
   const [channel, setChannel] = useState<Channel>("email");
   const [segment, setSegment] = useState<Segment>("all");
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
-  const [scheduleNow, setScheduleNow] = useState(true);
+  const [scheduleNow, setScheduleNow] = useState(true);     // Envoyer maintenant ou programmer
   const [scheduleDate, setScheduleDate] = useState("");
   const [showPreview, setShowPreview] = useState(false);
 
-  /* History filters */
+  /* --- Filtres de l'historique --- */
   const [historyTypeFilter, setHistoryTypeFilter] = useState<"all" | "Email" | "SMS">("all");
   const [historyDateFrom, setHistoryDateFrom] = useState("");
   const [historyDateTo, setHistoryDateTo] = useState("");
 
-  /* Contacts search */
+  /* --- Recherche dans les contacts --- */
   const [contactSearch, setContactSearch] = useState("");
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
@@ -167,6 +184,7 @@ export default function ArtisanCommunicationPage() {
     c.email.toLowerCase().includes(contactSearch.toLowerCase()),
   );
 
+  /* Réinitialise tous les champs du formulaire de campagne */
   const resetCampaignForm = () => {
     setCampaignName("");
     setChannel("email");

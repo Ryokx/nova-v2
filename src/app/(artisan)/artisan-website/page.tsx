@@ -1,3 +1,26 @@
+/**
+ * Page "Mon site web" artisan (~1300 lignes).
+ * Éditeur WYSIWYG complet pour créer un site vitrine personnalisé :
+ *
+ * SECTIONS ÉDITABLES :
+ * 1. Informations générales (nom, slogan, description, logo)
+ * 2. Coordonnées (téléphone, email, adresse, horaires)
+ * 3. Services proposés (avec fourchettes de prix)
+ * 4. Galerie photos (ajout/suppression, max 12)
+ * 5. Témoignages clients (import auto Nova + ajout manuel)
+ * 6. Apparence (thème couleur, police, style de couverture)
+ * 7. Domaine (sous-domaine Nova + domaine personnalisé premium)
+ *
+ * COMPOSANTS INTERNES :
+ * - SectionCard : carte pliable pour chaque section
+ * - TextInput, FieldLabel : champs de formulaire réutilisables
+ * - Toggle : interrupteur on/off
+ * - StarRating : notation étoiles cliquable
+ * - LivePreview : aperçu en temps réel (desktop/mobile)
+ *
+ * Le panneau droit affiche un aperçu live qui se met à jour en temps réel.
+ * Un bouton "Publier" en bas fixe déploie le site sur un sous-domaine Nova.
+ */
 "use client";
 
 import { useState, useMemo } from "react";
@@ -37,6 +60,7 @@ import {
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
+/* Service proposé par l'artisan (affiché sur le site) */
 interface ServiceItem {
   label: string;
   active: boolean;
@@ -44,6 +68,7 @@ interface ServiceItem {
   priceMax: string;
 }
 
+/* Témoignage client affiché sur le site */
 interface Testimonial {
   id: string;
   name: string;
@@ -51,6 +76,7 @@ interface Testimonial {
   rating: number;
 }
 
+/* Horaires d'ouverture */
 interface Schedule {
   label: string;
   enabled: boolean;
@@ -58,15 +84,17 @@ interface Schedule {
   close: string;
 }
 
+/* Clés de personnalisation d'apparence */
 type ThemeKey = "vert" | "bleu" | "noir" | "blanc" | "orange";
 type FontKey = "moderne" | "classique" | "elegant";
 type CoverKey = "photo" | "gradient" | "minimal";
 type PreviewMode = "mobile" | "desktop";
 
 /* ------------------------------------------------------------------ */
-/*  Constants                                                          */
+/*  Constantes de configuration                                        */
 /* ------------------------------------------------------------------ */
 
+/* Thèmes de couleur disponibles */
 const THEMES: Record<ThemeKey, { label: string; color: string; bg: string; accent: string }> = {
   vert: { label: "Vert Nova", color: "#1B6B4E", bg: "#F5FAF7", accent: "#2D9B6E" },
   bleu: { label: "Bleu Pro", color: "#1E40AF", bg: "#EFF6FF", accent: "#3B82F6" },
@@ -75,18 +103,21 @@ const THEMES: Record<ThemeKey, { label: string; color: string; bg: string; accen
   orange: { label: "Orange Énergie", color: "#C2410C", bg: "#FFF7ED", accent: "#F97316" },
 };
 
+/* Polices disponibles */
 const FONTS: Record<FontKey, { label: string; family: string }> = {
   moderne: { label: "Moderne", family: "'DM Sans', sans-serif" },
   classique: { label: "Classique", family: "Georgia, serif" },
   elegant: { label: "Élégant", family: "'Playfair Display', serif" },
 };
 
+/* Styles de couverture hero */
 const COVER_STYLES: Record<CoverKey, string> = {
   photo: "Photo plein écran",
   gradient: "Dégradé",
   minimal: "Minimaliste",
 };
 
+/* Services par défaut */
 const DEFAULT_SERVICES: ServiceItem[] = [
   { label: "Plomberie", active: true, priceMin: "60", priceMax: "200" },
   { label: "Chauffage", active: true, priceMin: "80", priceMax: "350" },
@@ -98,12 +129,14 @@ const DEFAULT_SERVICES: ServiceItem[] = [
   { label: "Cuisine", active: false, priceMin: "", priceMax: "" },
 ];
 
+/* Horaires par défaut */
 const DEFAULT_SCHEDULE: Schedule[] = [
   { label: "Lun - Ven", enabled: true, open: "08:00", close: "18:00" },
   { label: "Samedi", enabled: true, open: "09:00", close: "14:00" },
   { label: "Dimanche", enabled: false, open: "09:00", close: "12:00" },
 ];
 
+/* Témoignages par défaut */
 const DEFAULT_TESTIMONIALS: Testimonial[] = [
   {
     id: "1",
@@ -120,9 +153,10 @@ const DEFAULT_TESTIMONIALS: Testimonial[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Sub-components                                                     */
+/*  Sous-composants réutilisables                                      */
 /* ------------------------------------------------------------------ */
 
+/* Carte pliable pour chaque section de l'éditeur */
 function SectionCard({
   icon: Icon,
   title,
@@ -159,10 +193,12 @@ function SectionCard({
   );
 }
 
+/* Label de champ de formulaire */
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return <label className="block text-[13px] font-medium text-navy mb-1.5">{children}</label>;
 }
 
+/* Champ texte réutilisable avec styles Nova */
 function TextInput({
   value,
   onChange,
@@ -196,6 +232,7 @@ function TextInput({
   );
 }
 
+/* Interrupteur on/off réutilisable */
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <button
@@ -216,6 +253,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
   );
 }
 
+/* Composant notation étoiles (cliquable si onChange fourni) */
 function StarRating({
   rating,
   onChange,
@@ -245,9 +283,10 @@ function StarRating({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Preview component                                                  */
+/*  Composant d'aperçu en direct du site                              */
 /* ------------------------------------------------------------------ */
 
+/* Prévisualisation miniature du site (desktop ou mobile) */
 function LivePreview({
   mode,
   companyName,
@@ -492,11 +531,11 @@ function LivePreview({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Main page                                                          */
+/*  Page principale de l'éditeur de site                               */
 /* ------------------------------------------------------------------ */
 
 export default function ArtisanWebsitePage() {
-  // General info
+  /* --- Informations générales --- */
   const [companyName, setCompanyName] = useState("Jean-Michel Plomberie");
   const [slogan, setSlogan] = useState("Votre plombier de confiance depuis 2010");
   const [description, setDescription] = useState(
@@ -504,43 +543,42 @@ export default function ArtisanWebsitePage() {
   );
   const [hasLogo, setHasLogo] = useState(false);
 
-  // Contact
+  /* --- Coordonnées --- */
   const [phone, setPhone] = useState("06 12 34 56 78");
   const [email, setEmail] = useState("contact@jm-plomberie.fr");
   const [address, setAddress] = useState("42 rue des Artisans, 75011 Paris");
   const [schedule, setSchedule] = useState<Schedule[]>(DEFAULT_SCHEDULE);
 
-  // Services
+  /* --- Services proposés --- */
   const [services, setServices] = useState<ServiceItem[]>(DEFAULT_SERVICES);
 
-  // Gallery
+  /* --- Galerie photos --- */
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>(["mock1", "mock2", "mock3", "mock4"]);
 
-  // Testimonials
+  /* --- Témoignages clients --- */
   const [autoImportReviews, setAutoImportReviews] = useState(true);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(DEFAULT_TESTIMONIALS);
   const [newTestimonialName, setNewTestimonialName] = useState("");
   const [newTestimonialText, setNewTestimonialText] = useState("");
   const [newTestimonialRating, setNewTestimonialRating] = useState(5);
 
-  // Appearance
+  /* --- Apparence (thème, police, couverture) --- */
   const [theme, setTheme] = useState<ThemeKey>("vert");
   const [font, setFont] = useState<FontKey>("moderne");
   const [cover, setCover] = useState<CoverKey>("gradient");
 
-  // Domain
+  /* --- Domaine personnalisé (premium) --- */
   const [customDomainEnabled, setCustomDomainEnabled] = useState(false);
   const [customDomain, setCustomDomain] = useState("");
 
-  // Preview
+  /* --- Aperçu et publication --- */
   const [previewMode, setPreviewMode] = useState<PreviewMode>("desktop");
-
-  // Publish state
   const [isPublished, setIsPublished] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
+  /* Génère le sous-domaine à partir du nom d'entreprise */
   const subdomain = companyName
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -548,25 +586,30 @@ export default function ArtisanWebsitePage() {
 
   const siteUrl = `${subdomain || "mon-entreprise"}.nova-artisan.fr`;
 
-  // Handlers
+  /* --- Handlers de mise à jour --- */
+
+  /* Bascule l'activation d'un service */
   function toggleService(idx: number) {
     setServices((prev) =>
       prev.map((s, i) => (i === idx ? { ...s, active: !s.active } : s)),
     );
   }
 
+  /* Met à jour la fourchette de prix d'un service */
   function updateServicePrice(idx: number, field: "priceMin" | "priceMax", val: string) {
     setServices((prev) =>
       prev.map((s, i) => (i === idx ? { ...s, [field]: val } : s)),
     );
   }
 
+  /* Met à jour un champ d'horaire */
   function updateSchedule(idx: number, field: keyof Schedule, val: string | boolean) {
     setSchedule((prev) =>
       prev.map((s, i) => (i === idx ? { ...s, [field]: val } : s)),
     );
   }
 
+  /* Ajoute un témoignage manuellement */
   function addTestimonial() {
     if (!newTestimonialName.trim() || !newTestimonialText.trim()) return;
     setTestimonials((prev) => [
@@ -596,6 +639,7 @@ export default function ArtisanWebsitePage() {
     setGalleryPhotos((prev) => prev.filter((_, i) => i !== idx));
   }
 
+  /* Sauvegarde les données dans localStorage pour la page preview */
   function savePreviewData() {
     const previewData = {
       companyName, slogan, description, phone, email, address,
@@ -605,11 +649,13 @@ export default function ArtisanWebsitePage() {
     localStorage.setItem("nova-website-preview", JSON.stringify(previewData));
   }
 
+  /* Ouvre l'aperçu plein écran dans un nouvel onglet */
   function openFullPreview() {
     savePreviewData();
     window.open("/artisan-website/preview", "_blank");
   }
 
+  /* Simule la publication du site (en prod : POST /api/website/publish) */
   function handlePublish() {
     setPublishing(true);
     setTimeout(() => {

@@ -1,3 +1,14 @@
+/**
+ * Page de réinitialisation du mot de passe — /reset-password
+ *
+ * L'utilisateur arrive ici via un lien email contenant un token et un email.
+ * Il peut alors choisir un nouveau mot de passe avec :
+ * - Indicateur de force du mot de passe (faible / moyen / bon / excellent)
+ * - Checklist des critères requis (8 caractères, majuscule, chiffre)
+ * - Confirmation du mot de passe
+ *
+ * Gère 3 états : lien invalide, formulaire, et succès.
+ */
 "use client";
 
 import { useState, useMemo } from "react";
@@ -5,8 +16,13 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Shield, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 
+/** Regex de validation : au moins 8 caractères, 1 majuscule, 1 chiffre */
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
+/**
+ * Calcule la force d'un mot de passe sur 5 critères :
+ * longueur >= 8, majuscule, chiffre, caractère spécial, longueur >= 12
+ */
 function getPasswordStrength(pw: string): {
   score: number;
   label: string;
@@ -26,10 +42,12 @@ function getPasswordStrength(pw: string): {
 }
 
 export default function ResetPasswordPage() {
+  /* ── Paramètres d'URL (token + email envoyés par le lien de réinitialisation) ── */
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
   const email = searchParams.get("email") ?? "";
 
+  /* ── État du formulaire ── */
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -38,9 +56,13 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  /* ── Calcul de la force du mot de passe (mémoïsé) ── */
   const strength = useMemo(() => getPasswordStrength(password), [password]);
   const isValid = PASSWORD_REGEX.test(password) && password === confirmPassword;
 
+  /**
+   * Envoie le nouveau mot de passe à l'API pour réinitialisation
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
@@ -69,7 +91,7 @@ export default function ResetPasswordPage() {
     }
   };
 
-  // Missing token/email
+  /* ── État : lien invalide (token ou email manquant) ── */
   if (!token || !email) {
     return (
       <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-bgPage">
@@ -94,7 +116,7 @@ export default function ResetPasswordPage() {
     );
   }
 
-  // Success state
+  /* ── État : mot de passe modifié avec succès ── */
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-bgPage">
@@ -120,10 +142,12 @@ export default function ResetPasswordPage() {
     );
   }
 
+  /* ── État principal : formulaire de nouveau mot de passe ── */
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-bgPage">
       <div className="w-full max-w-[420px]">
-        {/* Header */}
+
+        {/* En-tête */}
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-[5px] bg-forest/5 flex items-center justify-center mx-auto mb-4">
             <Shield className="w-7 h-7 text-forest" />
@@ -136,10 +160,11 @@ export default function ResetPasswordPage() {
           </p>
         </div>
 
-        {/* Card */}
+        {/* Carte formulaire */}
         <div className="bg-white rounded-[5px] p-7 shadow-sm border border-border">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Password field */}
+
+            {/* Champ nouveau mot de passe */}
             <div>
               <label className="block text-xs font-medium text-grayText mb-1.5">
                 Nouveau mot de passe
@@ -154,6 +179,7 @@ export default function ResetPasswordPage() {
                   placeholder="Minimum 8 caractères"
                   className="w-full h-12 px-4 pr-11 rounded-[5px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
                 />
+                {/* Bouton afficher/masquer le mot de passe */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -167,7 +193,7 @@ export default function ResetPasswordPage() {
                 </button>
               </div>
 
-              {/* Strength indicator */}
+              {/* Barre de force du mot de passe */}
               {password.length > 0 && (
                 <div className="mt-2">
                   <div className="flex gap-1 mb-1">
@@ -194,29 +220,21 @@ export default function ResetPasswordPage() {
                 </div>
               )}
 
-              {/* Requirements checklist */}
+              {/* Checklist des critères */}
               <div className="mt-2 space-y-0.5">
-                <p
-                  className={`text-[11px] ${password.length >= 8 ? "text-success" : "text-grayText"}`}
-                >
-                  {password.length >= 8 ? "\u2713" : "\u2022"} 8 caractères
-                  minimum
+                <p className={`text-[11px] ${password.length >= 8 ? "text-success" : "text-grayText"}`}>
+                  {password.length >= 8 ? "\u2713" : "\u2022"} 8 caractères minimum
                 </p>
-                <p
-                  className={`text-[11px] ${/[A-Z]/.test(password) ? "text-success" : "text-grayText"}`}
-                >
-                  {/[A-Z]/.test(password) ? "\u2713" : "\u2022"} Une lettre
-                  majuscule
+                <p className={`text-[11px] ${/[A-Z]/.test(password) ? "text-success" : "text-grayText"}`}>
+                  {/[A-Z]/.test(password) ? "\u2713" : "\u2022"} Une lettre majuscule
                 </p>
-                <p
-                  className={`text-[11px] ${/\d/.test(password) ? "text-success" : "text-grayText"}`}
-                >
+                <p className={`text-[11px] ${/\d/.test(password) ? "text-success" : "text-grayText"}`}>
                   {/\d/.test(password) ? "\u2713" : "\u2022"} Un chiffre
                 </p>
               </div>
             </div>
 
-            {/* Confirm password field */}
+            {/* Champ confirmation du mot de passe */}
             <div>
               <label className="block text-xs font-medium text-grayText mb-1.5">
                 Confirmer le mot de passe
@@ -246,6 +264,7 @@ export default function ResetPasswordPage() {
                   )}
                 </button>
               </div>
+              {/* Message si les mots de passe ne correspondent pas */}
               {confirmPassword.length > 0 && confirmPassword !== password && (
                 <p className="text-[11px] text-red mt-1">
                   Les mots de passe ne correspondent pas
@@ -253,7 +272,7 @@ export default function ResetPasswordPage() {
               )}
             </div>
 
-            {/* Error */}
+            {/* Message d'erreur serveur */}
             {error && (
               <div className="flex items-center gap-2 p-3 rounded-[5px] bg-red/5 border border-red/10">
                 <AlertCircle className="w-4 h-4 text-red shrink-0" />
@@ -261,7 +280,7 @@ export default function ResetPasswordPage() {
               </div>
             )}
 
-            {/* Submit */}
+            {/* Bouton de validation */}
             <button
               type="submit"
               disabled={loading || !isValid}
@@ -279,7 +298,7 @@ export default function ResetPasswordPage() {
           </form>
         </div>
 
-        {/* Back to login */}
+        {/* Lien retour à la connexion */}
         <p className="text-center mt-5 text-sm text-grayText">
           <Link
             href="/login"

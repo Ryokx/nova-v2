@@ -1,3 +1,9 @@
+/**
+ * Page Dashboard Client.
+ * Affiche un résumé de l'activité : stats (missions actives, séquestre, terminées),
+ * tableau des missions récentes, et liens rapides (notifications, paiements, support).
+ */
+
 "use client";
 
 import { useSession } from "next-auth/react";
@@ -16,6 +22,11 @@ import {
   ArrowRight,
 } from "lucide-react";
 
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+/** Structure d'une mission retournée par l'API */
 interface MissionData {
   id: string;
   type: string;
@@ -24,6 +35,10 @@ interface MissionData {
   scheduledDate: string | null;
   artisan: { user: { name: string; avatar: string | null } };
 }
+
+/* ------------------------------------------------------------------ */
+/*  Configuration des statuts (label + couleurs)                       */
+/* ------------------------------------------------------------------ */
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   PENDING: { label: "En attente", color: "#92650A", bg: "#FEF3C7" },
@@ -35,11 +50,17 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   CANCELLED: { label: "Annulée", color: "#374151", bg: "#F3F4F6" },
 };
 
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function DashboardPage() {
+  /* Authentification et données */
   const { data: session, status: authStatus } = useSession();
   const router = useRouter();
   const { data: missions, loading } = useFetch<MissionData[]>("/api/missions");
 
+  /* Squelette de chargement pendant le fetch */
   if (authStatus === "loading" || loading) {
     return (
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-8 space-y-5">
@@ -52,6 +73,7 @@ export default function DashboardPage() {
     );
   }
 
+  /* Calculs dérivés des missions */
   const activeMissions = missions?.filter((m) => ["PENDING", "ACCEPTED", "IN_PROGRESS"].includes(m.status)) ?? [];
   const escrowAmount = missions
     ?.filter((m) => ["ACCEPTED", "IN_PROGRESS", "COMPLETED"].includes(m.status))
@@ -59,9 +81,24 @@ export default function DashboardPage() {
   const completedCount = missions?.filter((m) => ["COMPLETED", "VALIDATED"].includes(m.status)).length ?? 0;
   const recentMissions = missions?.slice(0, 5) ?? [];
 
+  /* Cartes de statistiques affichées en haut */
+  const statsCards = [
+    { label: "Missions actives", value: String(activeMissions.length), Icon: Wrench, iconColor: "text-forest", iconBg: "bg-forest/[0.08]" },
+    { label: "En séquestre", value: `${escrowAmount.toLocaleString("fr-FR")} €`, Icon: Lock, iconColor: "text-gold", iconBg: "bg-gold/[0.08]" },
+    { label: "Terminées", value: String(completedCount), Icon: CheckCircle, iconColor: "text-sage", iconBg: "bg-sage/[0.08]" },
+  ];
+
+  /* Liens rapides de la barre latérale */
+  const quickActions = [
+    { label: "Notifications", desc: "Vos dernières alertes", Icon: Bell, href: "/notifications" },
+    { label: "Paiements", desc: "Gérer vos moyens de paiement", Icon: CreditCard, href: "/payment-methods" },
+    { label: "Support", desc: "Chat en direct", Icon: MessageCircle, href: "/support" },
+  ];
+
   return (
     <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-8">
-      {/* Header */}
+
+      {/* En-tête : salutation + bouton CTA */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="font-heading text-[24px] font-extrabold text-navy mb-0.5">
@@ -78,13 +115,9 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Top row — stats + quick actions side by side */}
+      {/* Ligne de statistiques cliquables */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-5">
-        {[
-          { label: "Missions actives", value: String(activeMissions.length), Icon: Wrench, iconColor: "text-forest", iconBg: "bg-forest/[0.08]" },
-          { label: "En séquestre", value: `${escrowAmount.toLocaleString("fr-FR")} €`, Icon: Lock, iconColor: "text-gold", iconBg: "bg-gold/[0.08]" },
-          { label: "Terminées", value: String(completedCount), Icon: CheckCircle, iconColor: "text-sage", iconBg: "bg-sage/[0.08]" },
-        ].map((s) => (
+        {statsCards.map((s) => (
           <div
             key={s.label}
             role="button"
@@ -104,9 +137,10 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Main content — missions + sidebar */}
+      {/* Contenu principal : tableau missions + sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Missions — takes 2 cols */}
+
+        {/* Tableau des missions récentes (2 colonnes) */}
         <div className="lg:col-span-2 bg-white rounded-[5px] border border-border p-5">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-[15px] font-bold text-navy">Missions récentes</h3>
@@ -116,11 +150,13 @@ export default function DashboardPage() {
           </div>
 
           {recentMissions.length === 0 ? (
+            /* Message vide si aucune mission */
             <p className="text-[13px] text-grayText text-center py-10">
               Aucune mission pour le moment.{" "}
               <Link href="/artisans" className="text-forest font-semibold">Trouvez un artisan</Link>
             </p>
           ) : (
+            /* Tableau de données */
             <table className="w-full">
               <thead>
                 <tr className="text-[11px] text-grayText uppercase tracking-wider border-b border-border/60">
@@ -171,13 +207,9 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Sidebar — quick actions */}
+        {/* Barre latérale : liens rapides */}
         <div className="space-y-3">
-          {[
-            { label: "Notifications", desc: "Vos dernières alertes", Icon: Bell, href: "/notifications" },
-            { label: "Paiements", desc: "Gérer vos moyens de paiement", Icon: CreditCard, href: "/payment-methods" },
-            { label: "Support", desc: "Chat en direct", Icon: MessageCircle, href: "/support" },
-          ].map((a) => (
+          {quickActions.map((a) => (
             <Link
               key={a.label}
               href={a.href}

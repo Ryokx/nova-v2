@@ -1,43 +1,55 @@
+/**
+ * Page Paiements artisan.
+ * Suivi complet des encaissements :
+ * - Stats (total encaissé, en séquestre, virements reçus, commission Nova 5%)
+ * - Onglets : En séquestre / Reçus / En attente
+ * - Détail par paiement avec option Instant Pay (virement instantané à 4%)
+ * - Sidebar : graphique revenus 6 mois, compte bancaire, résumé mensuel, exports
+ */
 "use client";
 
 import { useState } from "react";
 import { MonthPicker } from "@/components/ui/month-picker";
 import {
-  Shield, CheckCircle, FileText, ChevronDown, Download, Zap, Info,
-  TrendingUp, ArrowUpRight, ArrowDownRight, Clock, Wallet, BanknoteIcon,
-  Calendar, Search, Filter, MoreHorizontal, ExternalLink,
+  Shield, CheckCircle, ChevronDown, Download, Zap, Info,
+  TrendingUp, ArrowUpRight, Clock, Wallet, BanknoteIcon,
+  Search, ExternalLink,
 } from "lucide-react";
-import { EmptyState } from "@/components/ui/empty-state";
 import { formatPrice, cn } from "@/lib/utils";
 
+/* Structure d'un paiement en séquestre */
 interface EscrowItem {
   id: string; client: string; mission: string; amount: number; ht: number; tva: number;
   daysElapsed: number; daysTotal: number; ref: string; factureId: string; date: string;
 }
 
+/* Structure d'un virement reçu */
 interface ReceivedItem {
   id: string; client: string; mission: string; amount: number; ht: number; tva: number;
   date: string; ref: string; factureId: string; iban: string; missionLink: string;
 }
 
+/* Données mockées : paiements en séquestre */
 const escrowItems: EscrowItem[] = [
   { id: "e0", client: "Caroline L.", mission: "Remplacement robinet", amount: 236.5, ht: 197.08, tva: 39.42, daysElapsed: 3, daysTotal: 5, ref: "ESQ-2026-044", factureId: "FAC-2026-128", date: "14 mars 2026" },
   { id: "e1", client: "Pierre M.", mission: "Installation cumulus", amount: 890, ht: 741.67, tva: 148.33, daysElapsed: 5, daysTotal: 5, ref: "ESQ-2026-043", factureId: "FAC-2026-127", date: "12 mars 2026" },
 ];
 
+/* Données mockées : virements reçus */
 const receivedItems: ReceivedItem[] = [
   { id: "r0", client: "Amelie R.", mission: "Reparation chauffe-eau", amount: 450, ht: 375, tva: 75, date: "12 mars 2026", ref: "VIR-2026-089", factureId: "FAC-2026-125", iban: "FR76 **** **** 4521", missionLink: "#" },
   { id: "r1", client: "Luc D.", mission: "Diagnostic fuite", amount: 320, ht: 266.67, tva: 53.33, date: "5 mars 2026", ref: "VIR-2026-082", factureId: "FAC-2026-119", iban: "FR76 **** **** 4521", missionLink: "#" },
   { id: "r2", client: "Sophie L.", mission: "Depannage serrure", amount: 155, ht: 129.17, tva: 25.83, date: "28 fev. 2026", ref: "VIR-2026-075", factureId: "FAC-2026-112", iban: "FR76 **** **** 4521", missionLink: "#" },
 ];
 
+/* Onglets de navigation avec compteur */
 const tabs = [
   { id: "escrow", label: "En sequestre", count: escrowItems.length },
   { id: "received", label: "Recus", count: receivedItems.length },
   { id: "pending", label: "En attente", count: 0 },
 ];
 
-/* Monthly data for chart */
+/* Données mensuelles pour le graphique de la sidebar */
 const monthlyPayments = [
   { month: "Oct", value: 1850 },
   { month: "Nov", value: 2400 },
@@ -49,27 +61,36 @@ const monthlyPayments = [
 const monthlyMax = Math.max(...monthlyPayments.map((d) => d.value));
 
 export default function ArtisanPaymentsPage() {
+  /* Onglet actif (séquestre, reçus, en attente) */
   const [tab, setTab] = useState("escrow");
+  /* Mois/année pour le filtre MonthPicker */
   const [payMonth, setPayMonth] = useState(new Date().getMonth());
   const [payYear, setPayYear] = useState(new Date().getFullYear());
+  /* ID du paiement déplié (détail visible) */
   const [openId, setOpenId] = useState<string | null>(null);
+  /* Recherche dans la liste */
   const [search, setSearch] = useState("");
+  /* État Instant Pay par paiement (activé/désactivé) */
   const [instantPayEnabled, setInstantPayEnabled] = useState<Record<string, boolean>>({});
+  /* Confirmation Instant Pay par paiement (irréversible) */
   const [instantPayConfirmed, setInstantPayConfirmed] = useState<Record<string, boolean>>({});
 
+  /* Bascule l'option Instant Pay (impossible si déjà confirmé) */
   const toggleInstantPay = (id: string) => {
     if (instantPayConfirmed[id]) return;
     setInstantPayEnabled((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  /* Confirme définitivement l'activation d'Instant Pay */
   const confirmInstantPay = (id: string) => {
     setInstantPayConfirmed((prev) => ({ ...prev, [id]: true }));
   };
 
+  /* Calculs des totaux pour les cartes statistiques */
   const totalEscrow = escrowItems.reduce((s, e) => s + e.amount, 0);
   const totalReceived = receivedItems.reduce((s, e) => s + e.amount, 0);
   const totalAll = totalEscrow + totalReceived;
-  const commission = totalAll * 0.05;
+  const commission = totalAll * 0.05; // Commission Nova à 5%
 
   return (
     <div className="max-w-[1320px] mx-auto" style={{ padding: "32px 20px" }}>

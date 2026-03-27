@@ -1,3 +1,12 @@
+/**
+ * Page de support / centre d'aide — /support
+ *
+ * Propose deux modes de contact :
+ * 1. Chat en direct : messagerie instantanée avec un bot puis un agent
+ * 2. Email : formulaire avec choix de sujet, description et pièce jointe
+ *
+ * Note : Le chat simule une réponse automatique (pas de backend réel pour le moment).
+ */
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -8,12 +17,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+/** Structure d'un message dans le chat */
 interface ChatMessage {
   from: "user" | "bot";
   text: string;
   time: string;
 }
 
+/** Message d'accueil affiché à l'ouverture du chat */
 const initialMessages: ChatMessage[] = [
   {
     from: "bot",
@@ -22,6 +33,7 @@ const initialMessages: ChatMessage[] = [
   },
 ];
 
+/** Sujets prédéfinis pour le formulaire email */
 const subjectChips = [
   { label: "Problème de paiement", icon: <CreditCard className="w-3.5 h-3.5" /> },
   { label: "Litige", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
@@ -31,23 +43,29 @@ const subjectChips = [
 ];
 
 export default function SupportPage() {
+  /* ── Mode actif : chat ou email ── */
   const [mode, setMode] = useState<"chat" | "email">("chat");
 
-  // Chat state
+  /* ── État du chat ── */
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [chatInput, setChatInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Email state
+  /* ── État du formulaire email ── */
   const [emailSubject, setEmailSubject] = useState("");
   const [emailDesc, setEmailDesc] = useState("");
   const [emailAttachment, setEmailAttachment] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
+  /** Scroll automatique vers le dernier message du chat */
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  /**
+   * Envoie un message dans le chat et simule une réponse du bot
+   * après un délai de 1,5 seconde.
+   */
   const sendMessage = () => {
     if (!chatInput.trim()) return;
     const now = new Date();
@@ -56,7 +74,7 @@ export default function SupportPage() {
     setMessages((prev) => [...prev, { from: "user", text: chatInput, time }]);
     setChatInput("");
 
-    // Simulate bot reply
+    // Réponse simulée du bot
     setTimeout(() => {
       const botTime = new Date();
       const bt = `${botTime.getHours()}:${String(botTime.getMinutes()).padStart(2, "0")}`;
@@ -71,6 +89,7 @@ export default function SupportPage() {
     }, 1500);
   };
 
+  /** Simule l'envoi du formulaire email */
   const handleEmailSend = () => {
     if (!emailSubject || !emailDesc.trim()) return;
     setEmailSent(true);
@@ -79,7 +98,8 @@ export default function SupportPage() {
   return (
     <div className="min-h-screen bg-bgPage">
       <div className="max-w-[640px] mx-auto px-5 md:px-8 py-10 md:py-16">
-        {/* Header */}
+
+        {/* ── En-tête de la page ── */}
         <div className="text-center mb-8">
           <h1 className="font-heading text-2xl md:text-3xl font-extrabold text-navy mb-2">
             Centre d&apos;aide
@@ -89,7 +109,7 @@ export default function SupportPage() {
           </p>
         </div>
 
-        {/* Mode toggle — pill style */}
+        {/* ── Sélecteur de mode (chat / email) ── */}
         <div className="flex justify-center mb-8">
           <div className="inline-flex bg-white rounded-full border border-border p-1">
             <button
@@ -117,16 +137,18 @@ export default function SupportPage() {
           </div>
         </div>
 
-        {/* ══════ CHAT MODE ══════ */}
+        {/* ══════ MODE CHAT ══════ */}
         {mode === "chat" && (
           <div className="bg-white rounded-[5px] border border-border shadow-sm overflow-hidden">
-            {/* Chat header */}
+
+            {/* En-tête du chat (nom + temps de réponse) */}
             <div className="px-5 py-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-forest to-sage flex items-center justify-center">
                     <MessageCircle className="w-5 h-5 text-white" />
                   </div>
+                  {/* Indicateur "en ligne" */}
                   <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-success border-2 border-white" />
                 </div>
                 <div>
@@ -141,7 +163,7 @@ export default function SupportPage() {
               </div>
             </div>
 
-            {/* Messages area */}
+            {/* Zone d'affichage des messages */}
             <div className="h-[400px] overflow-y-auto px-5 py-4 space-y-4 bg-bgPage/50">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}>
@@ -159,10 +181,11 @@ export default function SupportPage() {
                   </div>
                 </div>
               ))}
+              {/* Ancre pour le scroll automatique */}
               <div ref={chatEndRef} />
             </div>
 
-            {/* Input bar */}
+            {/* Barre de saisie du message */}
             <div className="px-4 py-3 border-t border-border bg-white">
               <div className="flex items-center gap-2">
                 <button className="w-9 h-9 rounded-xl flex items-center justify-center text-grayText hover:bg-surface hover:text-forest transition-colors shrink-0">
@@ -192,16 +215,17 @@ export default function SupportPage() {
           </div>
         )}
 
-        {/* ══════ EMAIL MODE ══════ */}
+        {/* ══════ MODE EMAIL — Formulaire ══════ */}
         {mode === "email" && !emailSent && (
           <div className="bg-white rounded-[5px] border border-border shadow-sm p-6 md:p-8">
-            {/* Info bar */}
+
+            {/* Info délai de réponse */}
             <div className="flex items-center gap-2.5 bg-surface rounded-xl px-4 py-3 mb-6">
               <Clock className="w-4 h-4 text-forest shrink-0" />
               <span className="font-body text-sm text-forest font-medium">Réponse sous 24h ouvrées</span>
             </div>
 
-            {/* Subject chips */}
+            {/* Sélection du sujet (chips cliquables) */}
             <div className="mb-6">
               <label className="font-body text-xs font-semibold text-grayText mb-3 block">Sujet de votre demande</label>
               <div className="flex flex-wrap gap-2">
@@ -222,7 +246,7 @@ export default function SupportPage() {
               </div>
             </div>
 
-            {/* Description */}
+            {/* Champ description */}
             <div className="mb-6">
               <label className="font-body text-xs font-semibold text-grayText mb-2 block">Décrivez votre problème</label>
               <textarea
@@ -234,7 +258,7 @@ export default function SupportPage() {
               />
             </div>
 
-            {/* Screenshot attachment */}
+            {/* Bouton d'ajout de capture d'écran (optionnel) */}
             <div className="mb-8">
               <label className="font-body text-xs font-semibold text-grayText mb-2 block">
                 Capture d&apos;écran <span className="font-normal text-grayText/60">(optionnel)</span>
@@ -263,7 +287,7 @@ export default function SupportPage() {
               </button>
             </div>
 
-            {/* Send button */}
+            {/* Bouton d'envoi */}
             <Button
               size="lg"
               className="w-full bg-deepForest hover:bg-deepForest/90"
@@ -276,7 +300,7 @@ export default function SupportPage() {
           </div>
         )}
 
-        {/* ══════ EMAIL SUCCESS STATE ══════ */}
+        {/* ══════ MODE EMAIL — Confirmation d'envoi ══════ */}
         {mode === "email" && emailSent && (
           <div className="bg-white rounded-[5px] border border-border shadow-sm p-8 md:p-12 text-center">
             <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-5">

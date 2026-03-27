@@ -1,25 +1,29 @@
+/**
+ * Page Documents artisan (devis + factures).
+ * Interface master-detail avec :
+ * - Onglets Devis / Factures
+ * - Filtres par statut + recherche
+ * - Liste des documents à gauche
+ * - Détail complet à droite (lignes, totaux HT/TVA/TTC, timeline, actions)
+ * - Stats : total montant, acceptés/payés, en attente, ce mois
+ */
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { MonthPicker } from "@/components/ui/month-picker";
 import {
-  ChevronDown,
   Download,
   Send,
   Copy,
   FileText,
   Search,
-  Filter,
   Plus,
-  TrendingUp,
   Clock,
   CheckCircle2,
-  AlertTriangle,
   Archive,
   Printer,
   Mail,
-  ArrowUpRight,
   Eye,
   Trash2,
   MoreHorizontal,
@@ -28,12 +32,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/* Ligne de document (devis ou facture) */
 interface LineItem {
   description: string;
   qty: number;
   unitPrice: number;
 }
 
+/* Structure commune pour un devis ou une facture */
 interface Document {
   id: string;
   number: string;
@@ -52,6 +58,7 @@ interface Document {
   viewedAt?: string;
 }
 
+/* Devis mockés avec différents statuts */
 const mockDevis: Document[] = [
   {
     id: "1", number: "DEV-2026-089", client: "Caroline L.", email: "caroline.l@email.fr",
@@ -93,6 +100,7 @@ const mockDevis: Document[] = [
   },
 ];
 
+/* Factures mockées */
 const mockFactures: Document[] = [
   {
     id: "3", number: "FAC-2026-127", client: "Amélie R.", email: "amelie.r@email.fr",
@@ -123,11 +131,12 @@ const mockFactures: Document[] = [
   },
 ];
 
+/* Formateur de prix en français */
 function formatPrice(n: number) {
   return n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
 }
 
-/* ━━━ Document row ━━━ */
+/* Composant : ligne cliquable d'un document dans la liste */
 function DocumentRow({ doc, onSelect, isSelected }: { doc: Document; onSelect: (d: Document) => void; isSelected: boolean }) {
   return (
     <button
@@ -158,14 +167,21 @@ function DocumentRow({ doc, onSelect, isSelected }: { doc: Document; onSelect: (
 }
 
 export default function ArtisanDocumentsPage() {
+  /* Onglet actif : devis ou factures */
   const [tab, setTab] = useState<"devis" | "factures">("devis");
+  /* Recherche par client ou numéro */
   const [search, setSearch] = useState("");
+  /* Filtre par statut */
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  /* Document sélectionné pour le panneau détail */
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+  /* Mois/année sélectionnés via le MonthPicker */
   const [docMonth, setDocMonth] = useState(new Date().getMonth());
   const [docYear, setDocYear] = useState(new Date().getFullYear());
 
+  /* Documents filtrés selon l'onglet actif */
   const allDocs = tab === "devis" ? mockDevis : mockFactures;
+  /* Application des filtres de recherche et de statut */
   const docs = allDocs.filter((d) => {
     const matchSearch = !search || d.client.toLowerCase().includes(search.toLowerCase()) || d.number.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "all" || d.status === statusFilter;
@@ -176,12 +192,12 @@ export default function ArtisanDocumentsPage() {
     ? [{ value: "all", label: "Tous" }, { value: "draft", label: "Brouillon" }, { value: "pending", label: "En attente" }, { value: "accepted", label: "Accepté" }, { value: "expired", label: "Expiré" }]
     : [{ value: "all", label: "Toutes" }, { value: "paid", label: "Payée" }, { value: "overdue", label: "En retard" }];
 
-  // Stats
+  /* Statistiques agrégées pour les cartes KPI */
   const totalAmount = allDocs.reduce((s, d) => s + d.amount, 0);
   const pendingCount = allDocs.filter((d) => ["pending", "draft", "overdue"].includes(d.status)).length;
   const acceptedCount = allDocs.filter((d) => ["accepted", "paid"].includes(d.status)).length;
 
-  // Detail panel
+  /* Calculs pour le panneau de détail (HT, TVA, TTC) */
   const detail = selectedDoc;
   const detailHT = detail ? detail.lines.reduce((s, l) => s + l.qty * l.unitPrice, 0) : 0;
   const detailTVA = detail ? Math.round(detailHT * detail.tvaRate * 100) / 100 : 0;

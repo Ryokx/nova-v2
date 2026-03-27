@@ -1,3 +1,12 @@
+/**
+ * Page Vidéo Diagnostic.
+ * Permet au client de filmer son problème et de l'envoyer à l'artisan.
+ * Parcours en 3 étapes :
+ *   0 - Conseils pour filmer + bouton démarrer
+ *   1 - Aperçu vidéo + note optionnelle + envoi
+ *   2 - Écran de succès
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -5,6 +14,11 @@ import { useRouter } from "next/navigation";
 import { CheckCircle, Clock, Play, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+/* ------------------------------------------------------------------ */
+/*  Données                                                            */
+/* ------------------------------------------------------------------ */
+
+/** Conseils affichés avant l'enregistrement */
 const tips = [
   { emoji: "💡", title: "Bon éclairage", desc: "Allumez les lumières" },
   { emoji: "📐", title: "Zone complète", desc: "Filmez large puis zoomez" },
@@ -12,12 +26,21 @@ const tips = [
   { emoji: "⏱️", title: "30 à 60 secondes", desc: "Court et précis" },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function VideoDiagnosticPage() {
   const router = useRouter();
+
+  /** Étape courante (0 = conseils, 1 = aperçu, 2 = succès) */
   const [stage, setStage] = useState(0);
+  /** Note optionnelle à joindre à la vidéo */
   const [note, setNote] = useState("");
 
-  // Stage 2: Success
+  /* ================================================================ */
+  /*  Étape 2 : Succès — vidéo envoyée                                 */
+  /* ================================================================ */
   if (stage === 2) {
     return (
       <div className="max-w-[500px] mx-auto px-6 py-36 text-center animate-pageIn">
@@ -43,7 +66,9 @@ export default function VideoDiagnosticPage() {
     );
   }
 
-  // Stage 1: Preview
+  /* ================================================================ */
+  /*  Étape 1 : Aperçu de la vidéo                                     */
+  /* ================================================================ */
   if (stage === 1) {
     return (
       <div className="max-w-[600px] mx-auto px-6 py-8">
@@ -51,7 +76,7 @@ export default function VideoDiagnosticPage() {
           Aperçu de la vidéo
         </h1>
 
-        {/* Video preview mock */}
+        {/* Zone d'aperçu vidéo (mock) */}
         <div className="relative w-full aspect-video rounded-2xl bg-gradient-to-br from-[#1a1a2e] to-[#0f3460] mb-4 flex items-center justify-center overflow-hidden">
           <Play className="w-10 h-10 text-white/80" />
           <div className="absolute bottom-3 right-3.5 px-2 py-1 rounded-md bg-black/50 text-white font-mono text-xs">
@@ -59,6 +84,7 @@ export default function VideoDiagnosticPage() {
           </div>
         </div>
 
+        {/* Note optionnelle pour l'artisan */}
         <textarea
           placeholder="Note pour l'artisan (optionnel)..."
           value={note}
@@ -66,6 +92,7 @@ export default function VideoDiagnosticPage() {
           className="w-full h-[80px] px-3 py-3 rounded-[5px] border border-border bg-white text-sm text-navy placeholder:text-grayText/60 focus:outline-none focus:ring-2 focus:ring-forest/30 resize-none mb-4"
         />
 
+        {/* Boutons d'action */}
         <Button className="w-full gap-2 mb-2" size="lg" onClick={() => setStage(2)}>
           <Send className="w-4 h-4" /> Envoyer à l&apos;artisan
         </Button>
@@ -79,7 +106,9 @@ export default function VideoDiagnosticPage() {
     );
   }
 
-  // Stage 0: Tips
+  /* ================================================================ */
+  /*  Étape 0 : Conseils pour filmer                                    */
+  /* ================================================================ */
   return (
     <div className="max-w-[600px] mx-auto px-6 py-8">
       <h1 className="font-heading text-[26px] font-extrabold text-navy mb-2">
@@ -89,7 +118,7 @@ export default function VideoDiagnosticPage() {
         Filmez votre problème. L&apos;artisan pourra évaluer la situation avant de se déplacer.
       </p>
 
-      {/* Tips card */}
+      {/* Liste de conseils */}
       <div className="bg-white border border-border shadow-sm rounded-[5px] p-5 mb-6">
         {tips.map((tip, i) => (
           <div
@@ -107,6 +136,7 @@ export default function VideoDiagnosticPage() {
         ))}
       </div>
 
+      {/* Bouton démarrer l'enregistrement */}
       <Button
         className="w-full bg-red hover:bg-red/90"
         size="lg"

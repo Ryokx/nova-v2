@@ -1,14 +1,26 @@
+/**
+ * Page de détail d'un artisan.
+ * Affiche le profil complet (avatar, note, certifications, description),
+ * les avis clients, et deux CTA : "Prendre rendez-vous" et "Urgence".
+ * Si l'utilisateur n'est pas connecté, une modale d'authentification s'affiche.
+ */
+
 "use client";
 
 import { useState } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { ArrowLeft, Star, Calendar, Zap, Shield, MapPin, Clock, MessageCircle } from "lucide-react";
+import { ArrowLeft, Star, Calendar, Zap, Shield, MapPin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFetch } from "@/hooks/use-fetch";
 import { AuthGateModal } from "@/components/ui/auth-gate-modal";
 
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+/** Données détaillées d'un artisan */
 interface ArtisanDetail {
   id: string;
   trade: string;
@@ -32,12 +44,21 @@ interface ArtisanDetail {
   }>;
 }
 
+/* ------------------------------------------------------------------ */
+/*  Données mock (prototype)                                           */
+/* ------------------------------------------------------------------ */
+
 const mockReviews = [
   { id: "r1", name: "Caroline L.", rating: 5, date: "Il y a 3 jours", comment: "Intervention rapide et soignée. Jean-Michel a parfaitement diagnostiqué la fuite et tout réparé en moins d'une heure. Je recommande vivement !" },
   { id: "r2", name: "Pierre M.", rating: 5, date: "Il y a 1 semaine", comment: "Très professionnel, ponctuel et travail de qualité. Le devis était respecté à l'euro près. Artisan de confiance." },
   { id: "r3", name: "Amélie R.", rating: 4, date: "Il y a 2 semaines", comment: "Bon travail dans l'ensemble, artisan ponctuel et propre. Petit délai sur la livraison des pièces mais rien de grave." },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Utilitaires                                                        */
+/* ------------------------------------------------------------------ */
+
+/** Retourne les initiales d'un nom */
 function getInitials(name: string): string {
   return name
     .split(" ")
@@ -47,6 +68,7 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
+/** Affiche 5 étoiles (pleines ou vides) selon la note */
 function Stars({ rating }: { rating: number }) {
   return (
     <div className="inline-flex gap-0.5">
@@ -60,6 +82,7 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
+/** Version plus petite des étoiles pour les avis */
 function SmallStars({ rating }: { rating: number }) {
   return (
     <div className="inline-flex gap-0.5">
@@ -73,17 +96,25 @@ function SmallStars({ rating }: { rating: number }) {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function ArtisanDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const pathname = usePathname();
   const { data: session } = useSession();
   const { data: artisan, loading } = useFetch<ArtisanDetail>(`/api/artisans/${slug}`);
 
+  /* État de la modale d'authentification */
   const [gateOpen, setGateOpen] = useState(false);
   const [gateAction, setGateAction] = useState<"booking" | "urgence">("booking");
 
   const isAuthenticated = !!session?.user;
 
+  /**
+   * Gère le clic sur "Prendre RDV" ou "Urgence".
+   * Redirige si connecté, ouvre la modale d'auth sinon.
+   */
   function handleProtectedAction(action: "booking" | "urgence") {
     const target = action === "urgence"
       ? `/booking/${slug}?mode=urgence`
@@ -97,6 +128,7 @@ export default function ArtisanDetailPage() {
     }
   }
 
+  /* Squelette de chargement */
   if (loading) {
     return (
       <div className="max-w-[700px] mx-auto p-5 md:p-8 space-y-5">
@@ -107,7 +139,7 @@ export default function ArtisanDetailPage() {
     );
   }
 
-  // Use API data or fall back to mock
+  /* Valeurs avec fallback mock pour le prototype */
   const name = artisan?.user?.name ?? "Jean-Michel P.";
   const initials = getInitials(name);
   const trade = artisan?.trade ?? "Plombier";
@@ -121,13 +153,15 @@ export default function ArtisanDetailPage() {
     ? artisan.reviews
     : null;
 
+  /* URL de redirection après connexion */
   const callbackUrl = gateAction === "urgence"
     ? `/booking/${slug}?mode=urgence`
     : `/booking/${slug}`;
 
   return (
     <div className="max-w-[700px] mx-auto p-5 md:p-8">
-      {/* Back button */}
+
+      {/* Lien retour */}
       <Link
         href="/artisans"
         className="inline-flex items-center gap-1.5 text-sm text-forest font-medium mb-6 hover:underline"
@@ -135,33 +169,33 @@ export default function ArtisanDetailPage() {
         <ArrowLeft className="w-4 h-4" /> Retour aux artisans
       </Link>
 
-      {/* Profile card */}
+      {/* Carte profil de l'artisan */}
       <div className="bg-white border border-border shadow-sm rounded-[5px] p-6 text-center mb-5">
-        {/* Avatar */}
+        {/* Avatar initiales */}
         <div className="flex justify-center mb-3">
           <div className="w-20 h-20 rounded-[5px] bg-gradient-to-br from-forest to-sage flex items-center justify-center">
             <span className="text-white font-heading font-bold text-xl">{initials}</span>
           </div>
         </div>
 
-        {/* Name & trade */}
+        {/* Nom et métier */}
         <h1 className="font-heading text-2xl font-extrabold text-navy">{name}</h1>
         <p className="text-grayText mt-0.5">{trade}</p>
 
-        {/* Location */}
+        {/* Localisation */}
         <div className="flex items-center justify-center gap-1 mt-1.5 text-sm text-grayText">
           <MapPin className="w-3.5 h-3.5" />
           {city}
         </div>
 
-        {/* Stars & missions */}
+        {/* Note et nombre de missions */}
         <div className="flex items-center justify-center gap-2 mt-3">
           <Stars rating={rating} />
           <span className="text-sm font-semibold text-navy">{rating}</span>
           <span className="text-sm text-grayText">· {missionCount} missions</span>
         </div>
 
-        {/* Certification badges */}
+        {/* Badges de certifications */}
         <div className="flex gap-2 mt-4 justify-center flex-wrap">
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-forest text-white">
             <Shield className="w-3 h-3" /> Certifié Nova
@@ -176,12 +210,12 @@ export default function ArtisanDetailPage() {
           )}
         </div>
 
-        {/* Description */}
+        {/* Description de l'artisan */}
         <p className="text-sm text-grayText leading-relaxed mt-4 max-w-[500px] mx-auto">
           {description}
         </p>
 
-        {/* Info cards */}
+        {/* Cartes info : déplacement + devis */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
           <div className="bg-surface rounded-xl p-4 text-center">
             <div className="font-mono font-bold text-navy text-lg">
@@ -196,11 +230,12 @@ export default function ArtisanDetailPage() {
         </div>
       </div>
 
-      {/* Reviews section */}
+      {/* Section avis clients */}
       <div className="bg-white border border-border shadow-sm rounded-[5px] p-6 mb-5">
         <h2 className="font-heading text-base font-bold text-navy mb-4">Avis clients</h2>
 
         {reviews ? (
+          /* Avis provenant de l'API */
           <div className="space-y-4">
             {reviews.map((r) => (
               <div key={r.id} className="pb-4 border-b border-border last:border-0 last:pb-0">
@@ -216,6 +251,7 @@ export default function ArtisanDetailPage() {
             ))}
           </div>
         ) : (
+          /* Avis mock (fallback prototype) */
           <div className="space-y-4">
             {mockReviews.map((r) => (
               <div key={r.id} className="pb-4 border-b border-border last:border-0 last:pb-0">
@@ -231,7 +267,7 @@ export default function ArtisanDetailPage() {
         )}
       </div>
 
-      {/* CTA buttons — auth gated */}
+      {/* Boutons d'action (protégés par authentification) */}
       <div className="flex flex-col gap-3">
         <button
           onClick={() => handleProtectedAction("booking")}
@@ -247,14 +283,14 @@ export default function ArtisanDetailPage() {
         </button>
       </div>
 
-      {/* Auth gate hint for non-auth users */}
+      {/* Indication pour les non-connectés */}
       {!isAuthenticated && (
         <p className="text-center text-xs text-grayText mt-3">
           Connectez-vous ou créez un compte gratuit pour contacter cet artisan
         </p>
       )}
 
-      {/* Auth gate modal */}
+      {/* Modale d'authentification obligatoire */}
       <AuthGateModal
         open={gateOpen}
         onClose={() => setGateOpen(false)}

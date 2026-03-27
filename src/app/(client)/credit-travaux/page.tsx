@@ -1,3 +1,11 @@
+/**
+ * Page Crédit Travaux.
+ * Simulateur de financement en 2 étapes :
+ *   1 - Configuration : montant, durée, type de travaux + estimation mensuelle
+ *   2 - Choix de l'offre (Cofidis ou Alma) + envoi de la demande
+ *   3 - Écran de succès avec timeline des prochaines étapes
+ */
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -25,9 +33,17 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/utils";
 
+/* ------------------------------------------------------------------ */
+/*  Données                                                            */
+/* ------------------------------------------------------------------ */
+
+/** Montants rapides cliquables */
 const quickAmounts = [1000, 3000, 5000, 10000, 20000];
+
+/** Durées de remboursement proposées (en mois) */
 const durations = [6, 12, 24, 36, 48, 60];
 
+/** Types de travaux */
 const workTypes = [
   { id: "plomberie", label: "Plomberie", icon: Wrench },
   { id: "chauffage", label: "Chauffage", icon: Flame },
@@ -39,35 +55,59 @@ const workTypes = [
   { id: "autre", label: "Autre", icon: HelpCircle },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Utilitaire : calcul de mensualité                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Calcule la mensualité d'un crédit amortissable.
+ * @param amount - Montant emprunté
+ * @param months - Nombre de mensualités
+ * @param taeg - Taux annuel effectif global (%)
+ */
 function calcMonthly(amount: number, months: number, taeg: number): number {
   if (taeg === 0) return amount / months;
   const r = taeg / 100 / 12;
   return (amount * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
 }
 
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function CreditTravauxPage() {
   const router = useRouter();
+
+  /** Étape courante (1 = formulaire, 2 = offres, 3 = succès) */
   const [step, setStep] = useState(1);
+  /** Montant souhaité */
   const [amount, setAmount] = useState(5000);
+  /** Durée de remboursement en mois */
   const [duration, setDuration] = useState(24);
+  /** Type de travaux sélectionné */
   const [workType, setWorkType] = useState("");
+  /** Offre sélectionnée (cofidis ou alma) */
   const [selectedOffer, setSelectedOffer] = useState<"cofidis" | "alma" | "">("");
+  /** Soumission en cours */
   const [submitting, setSubmitting] = useState(false);
 
+  /* Calculs des mensualités Cofidis (0.9% TAEG) et Alma (0%) */
   const cofidisMonthly = useMemo(() => calcMonthly(amount, duration, 0.9), [amount, duration]);
   const almaMonthly = useMemo(() => calcMonthly(amount, duration, 0), [amount, duration]);
   const cofidisTotal = cofidisMonthly * duration;
   const almaTotal = almaMonthly * duration;
 
+  /** Simule l'envoi de la demande de crédit */
   const handleSubmit = async () => {
     setSubmitting(true);
-    // Simulate submission
     await new Promise((r) => setTimeout(r, 1500));
     setSubmitting(false);
     setStep(3);
   };
 
-  // Step 3: Success
+  /* ================================================================ */
+  /*  Étape 3 : Succès — demande envoyée                               */
+  /* ================================================================ */
   if (step === 3) {
     const timeline = [
       { icon: Send, label: "Demande envoyée", sub: "Aujourd'hui", done: true },
@@ -86,6 +126,7 @@ export default function CreditTravauxPage() {
           Votre demande de crédit de {formatPrice(amount)} sur {duration} mois via {selectedOffer === "cofidis" ? "Cofidis" : "Alma"} a été transmise.
         </p>
 
+        {/* Timeline des prochaines étapes */}
         <Card className="text-left mb-5">
           <h2 className="font-heading text-sm font-bold text-navy mb-4">Prochaines étapes</h2>
           <div className="space-y-0">
@@ -93,7 +134,6 @@ export default function CreditTravauxPage() {
               const Icon = item.icon;
               return (
                 <div key={i} className="flex items-start gap-3 relative">
-                  {/* Vertical line */}
                   {i < timeline.length - 1 && (
                     <div className="absolute left-[15px] top-[32px] w-px h-[28px] bg-border" />
                   )}
@@ -122,6 +162,7 @@ export default function CreditTravauxPage() {
           Retour à mes missions
         </Button>
 
+        {/* Mention légale obligatoire */}
         <p className="text-[10px] text-grayText/60 mt-6 leading-relaxed">
           Un crédit vous engage et doit être remboursé. Vérifiez vos capacités de remboursement avant de vous engager. Aucun versement de quelque nature que ce soit ne peut être exigé d&apos;un particulier avant l&apos;obtention d&apos;un ou plusieurs prêts d&apos;argent.
         </p>
@@ -129,9 +170,13 @@ export default function CreditTravauxPage() {
     );
   }
 
+  /* ================================================================ */
+  /*  Étapes 1 et 2 : Formulaire + Offres                              */
+  /* ================================================================ */
   return (
     <div className="max-w-[600px] mx-auto px-5 py-8">
-      {/* Back */}
+
+      {/* Bouton retour */}
       <button
         onClick={() => (step > 1 ? setStep(step - 1) : router.back())}
         className="flex items-center gap-1.5 text-[13px] text-grayText font-medium mb-5 hover:text-navy transition-colors bg-transparent border-none cursor-pointer"
@@ -144,7 +189,7 @@ export default function CreditTravauxPage() {
         Financez vos travaux de 500€ à 75 000€
       </p>
 
-      {/* Progress */}
+      {/* Barre de progression */}
       <div className="flex gap-1.5 mb-6">
         {[1, 2].map((s) => (
           <div
@@ -154,15 +199,18 @@ export default function CreditTravauxPage() {
         ))}
       </div>
 
-      {/* Step 1: Form */}
+      {/* ============================================================ */}
+      {/* ÉTAPE 1 : Formulaire de configuration                         */}
+      {/* ============================================================ */}
       {step === 1 && (
         <div className="animate-pageIn">
-          {/* Amount */}
+          {/* Sélection du montant */}
           <Card className="mb-4">
             <h2 className="font-heading text-sm font-bold text-navy mb-3">Montant souhaité</h2>
             <div className="text-center mb-3">
               <span className="font-mono text-3xl font-bold text-navy">{formatPrice(amount)}</span>
             </div>
+            {/* Slider */}
             <input
               type="range"
               min={500}
@@ -176,6 +224,7 @@ export default function CreditTravauxPage() {
               <span>500€</span>
               <span>75 000€</span>
             </div>
+            {/* Boutons montant rapide */}
             <div className="flex flex-wrap gap-2">
               {quickAmounts.map((q) => (
                 <button
@@ -192,7 +241,7 @@ export default function CreditTravauxPage() {
             </div>
           </Card>
 
-          {/* Duration */}
+          {/* Sélection de la durée */}
           <Card className="mb-4">
             <h2 className="font-heading text-sm font-bold text-navy mb-3">Durée de remboursement</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -211,7 +260,7 @@ export default function CreditTravauxPage() {
             </div>
           </Card>
 
-          {/* Work type */}
+          {/* Sélection du type de travaux */}
           <Card className="mb-4">
             <h2 className="font-heading text-sm font-bold text-navy mb-3">Type de travaux</h2>
             <div className="grid grid-cols-2 gap-2.5">
@@ -237,10 +286,11 @@ export default function CreditTravauxPage() {
             </div>
           </Card>
 
-          {/* Preview */}
+          {/* Aperçu des mensualités estimées */}
           <Card className="bg-gradient-to-br from-surface to-white mb-4">
             <h2 className="font-heading text-sm font-bold text-navy mb-3">Estimation mensuelle</h2>
             <div className="grid grid-cols-2 gap-3">
+              {/* Cofidis */}
               <div className="bg-white rounded-xl p-3 border border-border text-center">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center mx-auto mb-1.5" style={{ backgroundColor: "#E30613" }}>
                   <span className="text-white text-xs font-bold">C</span>
@@ -249,6 +299,7 @@ export default function CreditTravauxPage() {
                 <div className="font-mono text-base font-bold text-navy">{formatPrice(cofidisMonthly)}</div>
                 <div className="text-[10px] text-grayText">/mois</div>
               </div>
+              {/* Alma */}
               <div className="bg-white rounded-xl p-3 border border-border text-center">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center mx-auto mb-1.5" style={{ backgroundColor: "#FA5022" }}>
                   <span className="text-white text-xs font-bold">A</span>
@@ -271,10 +322,12 @@ export default function CreditTravauxPage() {
         </div>
       )}
 
-      {/* Step 2: Offers */}
+      {/* ============================================================ */}
+      {/* ÉTAPE 2 : Choix de l'offre                                    */}
+      {/* ============================================================ */}
       {step === 2 && (
         <div className="animate-pageIn">
-          {/* Recap card */}
+          {/* Récapitulatif des paramètres choisis */}
           <Card className="mb-4 bg-surface">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-grayText">Montant</span>
@@ -292,7 +345,7 @@ export default function CreditTravauxPage() {
             </div>
           </Card>
 
-          {/* Cofidis offer */}
+          {/* Offre Cofidis */}
           <button
             onClick={() => setSelectedOffer("cofidis")}
             className={cn(
@@ -340,7 +393,7 @@ export default function CreditTravauxPage() {
             )}
           </button>
 
-          {/* Alma offer */}
+          {/* Offre Alma */}
           <button
             onClick={() => setSelectedOffer("alma")}
             className={cn(
@@ -385,6 +438,7 @@ export default function CreditTravauxPage() {
             )}
           </button>
 
+          {/* Bouton envoyer la demande */}
           <Button
             className="w-full gap-2"
             size="lg"
@@ -395,6 +449,7 @@ export default function CreditTravauxPage() {
             Envoyer ma demande <ArrowRight className="w-4 h-4" />
           </Button>
 
+          {/* Mention légale */}
           <p className="text-[10px] text-grayText/60 text-center mt-4 leading-relaxed">
             Un crédit vous engage et doit être remboursé. Vérifiez vos capacités de remboursement avant de vous engager. Aucun versement de quelque nature que ce soit ne peut être exigé d&apos;un particulier avant l&apos;obtention d&apos;un ou plusieurs prêts d&apos;argent.
           </p>

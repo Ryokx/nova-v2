@@ -1,3 +1,10 @@
+/**
+ * Page Notifications.
+ * Affiche la liste des notifications du client (devis reçu, mission confirmée,
+ * paiement libéré, etc.) avec indicateur non-lu et bouton "Tout marquer comme lu".
+ * Utilise les données API si disponibles, sinon des notifications mock.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -5,6 +12,10 @@ import { Bell, FileText, CheckCircle, CreditCard, UserPlus } from "lucide-react"
 import { useFetch } from "@/hooks/use-fetch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
+
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
 
 interface NotifData {
   id: string;
@@ -14,6 +25,10 @@ interface NotifData {
   read: boolean;
   createdAt: string;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Données mock (prototype)                                           */
+/* ------------------------------------------------------------------ */
 
 const mockNotifications: NotifData[] = [
   {
@@ -50,6 +65,10 @@ const mockNotifications: NotifData[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Configuration des icônes par type de notification                   */
+/* ------------------------------------------------------------------ */
+
 const iconConfig: Record<string, { icon: React.ReactNode; bg: string }> = {
   DEVIS_RECEIVED: {
     icon: <FileText className="w-5 h-5 text-forest" />,
@@ -69,11 +88,16 @@ const iconConfig: Record<string, { icon: React.ReactNode; bg: string }> = {
   },
 };
 
+/** Labels des boutons d'action par type */
 const actionLabels: Record<string, string> = {
   DEVIS_RECEIVED: "Voir le devis",
   MISSION_CONFIRMED: "Voir la mission",
   PAYMENT_RELEASED: "Détails",
 };
+
+/* ------------------------------------------------------------------ */
+/*  Utilitaire : temps relatif ("il y a X min/h/jours")                */
+/* ------------------------------------------------------------------ */
 
 function timeAgo(date: string): string {
   const diff = Date.now() - new Date(date).getTime();
@@ -85,13 +109,21 @@ function timeAgo(date: string): string {
   return days === 1 ? "Hier" : `Il y a ${days} jours`;
 }
 
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function NotificationsPage() {
   const { data: apiNotifications, loading, refetch } = useFetch<NotifData[]>("/api/notifications");
+
+  /** Notifications locales (utilisées si le marquage API échoue) */
   const [localNotifs, setLocalNotifs] = useState<NotifData[] | null>(null);
 
+  /* Source de données : locale > API > mock */
   const notifications = localNotifs ?? apiNotifications ?? mockNotifications;
   const hasUnread = notifications.some((n) => !n.read);
 
+  /** Marque toutes les notifications comme lues */
   const markAllRead = async () => {
     try {
       await fetch("/api/notifications", {
@@ -101,14 +133,15 @@ export default function NotificationsPage() {
       });
       refetch();
     } catch {
-      // Fallback: mark locally
+      /* Fallback local si l'API échoue */
       setLocalNotifs(notifications.map((n) => ({ ...n, read: true })));
     }
   };
 
   return (
     <div className="max-w-[600px] mx-auto p-5 md:p-8">
-      {/* Header */}
+
+      {/* En-tête */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-[26px] font-extrabold text-navy">Notifications</h1>
         {hasUnread && (
@@ -121,6 +154,7 @@ export default function NotificationsPage() {
         )}
       </div>
 
+      {/* Liste des notifications */}
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
@@ -141,19 +175,19 @@ export default function NotificationsPage() {
                 key={n.id}
                 className="bg-white rounded-[5px] p-5 border border-border flex items-start gap-3"
               >
-                {/* Unread indicator */}
+                {/* Indicateur non-lu (point vert) */}
                 {!n.read && (
                   <div className="w-2 h-2 rounded-full bg-forest shrink-0 mt-2" />
                 )}
 
-                {/* Icon circle */}
+                {/* Icône de la notification */}
                 <div
                   className={`w-10 h-10 rounded-full ${config.bg} flex items-center justify-center shrink-0`}
                 >
                   {config.icon}
                 </div>
 
-                {/* Content */}
+                {/* Contenu texte */}
                 <div className="flex-1 min-w-0">
                   <div className="font-heading font-semibold text-navy">{n.title}</div>
                   <p className="text-sm text-grayText mt-0.5">{n.body}</p>
@@ -171,6 +205,7 @@ export default function NotificationsPage() {
           })}
         </div>
       ) : (
+        /* État vide */
         <EmptyState
           icon={<Bell className="w-6 h-6 text-grayText" />}
           title="Aucune notification"

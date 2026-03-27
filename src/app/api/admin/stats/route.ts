@@ -1,3 +1,19 @@
+/**
+ * Route API — Statistiques globales du panneau d'administration
+ *
+ * GET /api/admin/stats
+ *
+ * Retourne les KPIs de la plateforme Nova :
+ * - Nombre total d'utilisateurs, artisans, clients
+ * - Nombre de missions (total, actives, en litige, en attente de validation)
+ * - Revenus des 7 derniers jours
+ * - Solde total en séquestre
+ * - Note moyenne des artisans
+ *
+ * Réservé aux administrateurs.
+ * Utilise Promise.all pour exécuter toutes les requêtes en parallèle.
+ */
+
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -11,6 +27,7 @@ export async function GET() {
   const now = new Date();
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
+  /* Exécution de toutes les requêtes en parallèle pour optimiser les performances */
   const [
     totalUsers,
     totalArtisans,

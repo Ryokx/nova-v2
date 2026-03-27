@@ -1,3 +1,9 @@
+/**
+ * Page Urgence 24h/24.
+ * Première vue : sélection du domaine d'intervention (plomberie, électricité, etc.).
+ * Deuxième vue : liste des artisans disponibles avec temps d'arrivée estimé.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -5,6 +11,11 @@ import Link from "next/link";
 import { Zap, ArrowLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+/* ------------------------------------------------------------------ */
+/*  Données                                                            */
+/* ------------------------------------------------------------------ */
+
+/** Catégories d'urgence disponibles */
 const categories = [
   { id: "plomberie", label: "Plomberie" },
   { id: "electricite", label: "Électricité" },
@@ -13,15 +24,24 @@ const categories = [
   { id: "autre", label: "Autre domaine" },
 ];
 
+/** Artisans disponibles en urgence (mock) */
 const urgentArtisans = [
   { name: "Karim B.", initials: "KB", time: "15 min" },
   { name: "Jean-Michel P.", initials: "JM", time: "25 min" },
   { name: "Fatima H.", initials: "FH", time: "40 min" },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function UrgencePage() {
+  /** Catégorie sélectionnée (null = écran de sélection) */
   const [cat, setCat] = useState<string | null>(null);
 
+  /* ================================================================ */
+  /*  Vue 1 : Sélection de la catégorie                                */
+  /* ================================================================ */
   if (!cat) {
     return (
       <div className="max-w-[600px] mx-auto px-5 py-8">
@@ -32,7 +52,7 @@ export default function UrgencePage() {
           Sélectionnez le domaine de l&apos;intervention
         </p>
 
-        {/* Red gradient banner */}
+        {/* Bandeau rouge d'urgence */}
         <div className="bg-gradient-to-r from-red to-red/80 rounded-2xl p-5 mb-6 text-center">
           <div className="text-base font-bold text-white flex items-center justify-center gap-2">
             <Zap className="w-4 h-4" /> Intervention en moins de 2h
@@ -42,7 +62,7 @@ export default function UrgencePage() {
           </div>
         </div>
 
-        {/* Category buttons — column layout */}
+        {/* Liste des catégories */}
         <div className="flex flex-col gap-2.5">
           {categories.map((c) => (
             <button
@@ -59,9 +79,13 @@ export default function UrgencePage() {
     );
   }
 
+  /* ================================================================ */
+  /*  Vue 2 : Artisans disponibles                                     */
+  /* ================================================================ */
   return (
     <div className="max-w-[700px] mx-auto px-5 py-8">
-      {/* Back button */}
+
+      {/* Bouton retour à la sélection */}
       <button
         onClick={() => setCat(null)}
         className="flex items-center gap-1.5 text-sm text-grayText font-medium mb-5 hover:underline"
@@ -73,7 +97,7 @@ export default function UrgencePage() {
         Artisans disponibles
       </h1>
 
-      {/* Artisan cards */}
+      {/* Cartes artisans */}
       <div className="flex flex-col gap-3">
         {urgentArtisans.map((a) => (
           <div
@@ -81,6 +105,7 @@ export default function UrgencePage() {
             className="bg-white border border-border shadow-sm rounded-[5px] p-4"
           >
             <div className="flex items-center gap-3.5 mb-3.5">
+              {/* Avatar initiales */}
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-surface to-border flex items-center justify-center text-base font-bold text-forest">
                 {a.initials}
               </div>
@@ -93,6 +118,7 @@ export default function UrgencePage() {
                 </div>
               </div>
             </div>
+            {/* Actions */}
             <div className="flex gap-2">
               <Button
                 className="flex-1 bg-red hover:bg-red/90 text-[13px] rounded-[5px]"

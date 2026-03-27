@@ -1,3 +1,10 @@
+/**
+ * Page de création d'un nouveau devis artisan.
+ * Formulaire en 3 étapes :
+ * 1. Informations client (nom, email, téléphone, adresse)
+ * 2. Lignes du devis (description, quantité, prix unitaire) + totaux HT/TVA/TTC
+ * 3. Message personnalisé + envoi sécurisé par séquestre
+ */
 "use client";
 
 import { useState } from "react";
@@ -5,44 +12,53 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, Shield, Plus, Trash2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/* Noms des 3 étapes du formulaire */
 const stepLabels = ["Client", "Lignes", "Envoi"];
 
+/* Ligne de devis (description + quantité + prix unitaire) */
 interface LineItem {
   label: string;
   qty: number;
   unitPrice: number;
 }
 
+/* Formateur de prix en français */
 function formatPrice(n: number) {
   return n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " EUR";
 }
 
 export default function CreateDevisPage() {
   const router = useRouter();
+  /* Étape actuelle du formulaire (0, 1 ou 2) */
   const [step, setStep] = useState(0);
+  /* État de soumission (spinner pendant l'envoi) */
   const [submitting, setSubmitting] = useState(false);
 
-  // Step 0: Client info
+  /* --- Étape 0 : informations client --- */
   const [clientName, setClientName] = useState("Caroline Lefevre");
   const [clientEmail, setClientEmail] = useState("caroline.l@email.com");
   const [clientPhone, setClientPhone] = useState("06 12 34 56 78");
   const [clientAddress, setClientAddress] = useState("12 rue de Clichy 75009");
 
-  // Step 1: Line items
+  /* --- Étape 1 : lignes du devis --- */
   const [lines, setLines] = useState<LineItem[]>([
     { label: "Remplacement robinet mitigeur", qty: 1, unitPrice: 85 },
     { label: "Main d'oeuvre", qty: 2, unitPrice: 65 },
   ]);
 
-  // Step 2: Message
+  /* --- Étape 2 : message d'accompagnement --- */
   const [message, setMessage] = useState("Bonjour, voici le devis détaillé pour l'intervention prévue. N'hésitez pas à me contacter pour toute question.");
 
+  /* Calcul des totaux */
   const totalHT = lines.reduce((sum, l) => sum + l.qty * l.unitPrice, 0);
   const tva = Math.round(totalHT * 0.2 * 100) / 100;
   const totalTTC = totalHT + tva;
 
+  /* Ajoute une nouvelle ligne vide */
   const addLine = () => setLines([...lines, { label: "", qty: 1, unitPrice: 0 }]);
+  /* Supprime une ligne par index */
   const removeLine = (i: number) => setLines(lines.filter((_, idx) => idx !== i));
+  /* Met à jour un champ d'une ligne existante */
   const updateLine = (i: number, field: keyof LineItem, value: string | number) => {
     const updated = [...lines];
     const line = updated[i];
@@ -53,9 +69,9 @@ export default function CreateDevisPage() {
     setLines(updated);
   };
 
+  /* Simule l'envoi du devis (en prod : POST /api/devis) */
   const handleSend = async () => {
     setSubmitting(true);
-    // In real app, would POST to /api/devis
     await new Promise((r) => setTimeout(r, 800));
     setSubmitting(false);
     router.push("/artisan-documents");
@@ -284,7 +300,7 @@ export default function CreateDevisPage() {
             <div>
               <div className="text-[15px] font-semibold text-navy">Paiement sécurisé par séquestre</div>
               <div className="text-[13px] text-grayText">
-                Le montant sera bloqué jusqu'à validation de l'intervention par le client
+                Le montant sera bloqué jusqu&apos;à validation de l&apos;intervention par le client
               </div>
             </div>
           </div>

@@ -1,20 +1,35 @@
 "use client";
 
+/**
+ * TradeLanding — Page d'atterrissage pour chaque corps de métier (plombier, serrurier, etc.)
+ *
+ * Affiche les sections principales :
+ * - Hero avec badges de confiance et CTA
+ * - Comparaison "Sans Nova" vs "Avec Nova"
+ * - Liste des services proposés
+ * - Fonctionnement en 4 étapes
+ * - Avantages Nova
+ * - FAQ avec accordéon
+ * - CTA final avec statistiques
+ * - Liens vers les autres métiers (maillage interne SEO)
+ */
+
 import { useState } from "react";
 import Link from "next/link";
 import {
   Shield, Lock, Star, ArrowRight, ChevronDown, Clock,
   BadgeCheck, Search, CreditCard, ClipboardList, Check,
-  Zap, MapPin, X, AlertTriangle, CheckCircle, Ban,
+  Zap, AlertTriangle, CheckCircle, Ban,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TradeConfig } from "@/lib/trades";
 
+/* ━━━ Types ━━━ */
 interface TradeLandingProps {
   trade: TradeConfig;
 }
 
-/* ━━━ Social proof data ━━━ */
+/* ━━━ Données statiques : avatars pour la preuve sociale ━━━ */
 const socialProof = [
   { ini: "SL", color: "hsl(150,30%,87%)" },
   { ini: "PM", color: "hsl(175,30%,87%)" },
@@ -22,26 +37,31 @@ const socialProof = [
   { ini: "AM", color: "hsl(225,30%,87%)" },
 ];
 
+/* ━━━ Correspondance slug → nom affiché pour les catégories ━━━ */
+const categoryMap: Record<string, string> = {
+  serrurier: "Serrurier",
+  plombier: "Plombier",
+  electricien: "Électricien",
+  chauffagiste: "Chauffagiste",
+  peintre: "Peintre",
+  menuisier: "Menuisier",
+  carreleur: "Carreleur",
+  macon: "Maçon",
+};
+
 export function TradeLanding({ trade }: TradeLandingProps) {
+  /* État pour l'accordéon FAQ : index de la question ouverte (ou null) */
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  /* Icône du métier (composant React dynamique) */
   const Icon = trade.icon;
 
-  /* Category param for filtered search — maps slug to category filter ID */
-  const categoryMap: Record<string, string> = {
-    serrurier: "Serrurier",
-    plombier: "Plombier",
-    electricien: "Électricien",
-    chauffagiste: "Chauffagiste",
-    peintre: "Peintre",
-    menuisier: "Menuisier",
-    carreleur: "Carreleur",
-    macon: "Maçon",
-  };
+  /* Liens de navigation construits à partir du slug du métier */
   const categoryParam = categoryMap[trade.slug] ?? "all";
   const searchLink = `/artisans?category=${encodeURIComponent(categoryParam)}`;
   const urgencyLink = `/${trade.slugUrgency}`;
 
-  /* ━━━ How it works steps ━━━ */
+  /* ━━━ Étapes "Comment ça marche" ━━━ */
   const steps = [
     { num: "01", title: "Décrivez votre besoin", desc: `Recherchez un ${trade.name.toLowerCase()} certifié disponible dans votre zone.`, icon: Search },
     { num: "02", title: "Devis sur place", desc: "L'artisan se déplace et fait le devis devant vous. Jamais de prix par téléphone.", icon: ClipboardList },
@@ -49,24 +69,105 @@ export function TradeLanding({ trade }: TradeLandingProps) {
     { num: "04", title: "Validation & libération", desc: "L'artisan intervient. Vous validez. Seulement alors, le paiement est libéré.", icon: CheckCircle },
   ];
 
+  /* ━━━ Badges de confiance affichés dans le hero ━━━ */
+  const trustBadges = [
+    { icon: Shield, text: "SIRET + décennale vérifiés" },
+    { icon: Lock, text: "Paiement séquestre" },
+    { icon: BadgeCheck, text: "Avis 100% vérifiés" },
+  ];
+
+  /* ━━━ Étapes du schéma séquestre (colonne droite du hero) ━━━ */
+  const escrowSteps = [
+    { num: "1", icon: CreditCard, title: "Vous payez", desc: "L'argent est bloqué en séquestre sécurisé.", highlight: "L'artisan ne reçoit rien", color: "#0A4030" },
+    { num: "2", icon: ClipboardList, title: "L'artisan intervient", desc: "Le travail est réalisé selon le devis signé.", highlight: "Argent toujours verrouillé", color: "#1B6B4E" },
+    { num: "3", icon: Shield, title: "Nova vérifie", desc: "Le prix et le travail sont contrôlés par Nova.", highlight: "Avant tout déblocage", color: "#2D9B6E" },
+    { num: "4", icon: CheckCircle, title: "Déblocage", desc: "Vous ou Nova libérez le paiement à l'artisan.", highlight: "Non conforme = remboursé", color: "#22C88A" },
+  ];
+
+  /* ━━━ Points négatifs "Sans Nova" ━━━ */
+  const withoutNova = [
+    "Prix annoncé par téléphone, gonflé sur place",
+    "Aucune vérification : ni SIRET, ni décennale",
+    "Paiement en liquide — aucun recours",
+    "Avis invérifiables, souvent faux",
+    "En cas de litige, vous êtes seul",
+    "Aucune garantie sur le travail",
+  ];
+
+  /* ━━━ Points positifs "Avec Nova" ━━━ */
+  const withNova = [
+    "Devis fait sur place, devant vous — pas de surprise",
+    `${trade.name} vérifié : SIRET, décennale, identité`,
+    "Paiement par carte, bloqué en séquestre",
+    "Avis 100% liés à des missions réelles",
+    "Nova arbitre en cas de litige (97% résolus)",
+    "Remboursement si travail non conforme",
+  ];
+
+  /* ━━━ Avantages "Pourquoi Nova" ━━━ */
+  const whyNova = [
+    { icon: BadgeCheck, title: "Artisans certifiés", desc: `Chaque ${trade.name.toLowerCase()} est vérifié : SIRET actif, décennale valide, identité contrôlée par notre équipe.` },
+    { icon: Lock, title: "Paiement séquestre", desc: "Votre argent est bloqué en sécurité. L'artisan n'est payé qu'après votre validation du travail." },
+    { icon: ClipboardList, title: "Devis sur place uniquement", desc: "Jamais de prix par téléphone. Le devis est fait devant vous, sans surprise, sans pression." },
+    { icon: Shield, title: "Protection litiges", desc: "En cas de problème, Nova arbitre avec les preuves (photos, devis signé). 97% résolus en faveur du client." },
+    { icon: Star, title: "Avis 100% vérifiés", desc: "Chaque avis est lié à une mission réelle et un paiement vérifié via séquestre. 0 faux avis." },
+    { icon: Clock, title: "Urgence 24h/24", desc: `${trade.namePlural} disponibles en urgence. Mêmes garanties de paiement sécurisé, même en pleine nuit.` },
+  ];
+
+  /* ━━━ Garanties affichées sous le schéma séquestre ━━━ */
+  const escrowGuarantees = [
+    { icon: Lock, text: "Argent bloqué jusqu'à validation" },
+    { icon: Shield, text: "Prix et travail vérifiés par Nova" },
+    { icon: CheckCircle, text: "Le client peut débloquer l'argent" },
+  ];
+
+  /* ━━━ Statistiques du CTA final ━━━ */
+  const ctaStats = [
+    { value: trade.avgResponseTime, label: "réponse" },
+    { value: `${trade.avgRating}/5`, label: "note moyenne" },
+    { value: trade.artisanCount, label: "certifiés" },
+  ];
+
+  /* ━━━ Liste des autres métiers pour le maillage interne ━━━ */
+  const allTrades = ["serrurier", "plombier", "electricien", "chauffagiste", "peintre", "menuisier", "carreleur", "macon"];
+
+  /** Convertit un slug en nom avec majuscule/accent */
+  function formatTradeName(slug: string): string {
+    if (slug === "electricien") return "Électricien";
+    if (slug === "macon") return "Maçon";
+    return slug.charAt(0).toUpperCase() + slug.slice(1);
+  }
+
+  /** Convertit le nom du métier en nom de domaine d'intervention (ex: "Plombier" → "plomberie") */
+  function getInterventionDomain(): string {
+    const name = trade.name.toLowerCase();
+    const mapping: Record<string, string> = {
+      "maçon": "maçonnerie",
+      serrurier: "serrurerie",
+      plombier: "plomberie",
+      menuisier: "menuiserie",
+    };
+    if (mapping[name]) return mapping[name];
+    return name.replace(/eur$/, "erie").replace(/ien$/, "icité");
+  }
+
   return (
     <div className="min-h-screen bg-bgPage">
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          HERO — Trust-first, social proof, clear CTA
-          Psychology: Von Restorff (CTA stands out),
-          Serial position (key info first)
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════
+          SECTION HERO — Titre, badges, CTA, schéma séquestre
+      ══════════════════════════════════════════════ */}
       <section
         className="relative overflow-hidden px-5 md:px-10 pt-8 pb-14"
         style={{ background: "linear-gradient(160deg, #F5FAF7 0%, #E8F5EE 40%, #D4EBE0 100%)" }}
         data-navbar-dark
       >
+        {/* Cercles décoratifs floutés en arrière-plan */}
         <div className="absolute -top-[120px] -right-[80px] w-[500px] h-[500px] rounded-full bg-forest/[0.06] blur-[100px]" />
         <div className="absolute -bottom-[100px] -left-[60px] w-[350px] h-[350px] rounded-full bg-gold/[0.05] blur-[80px]" />
 
         <div className="max-w-[1050px] mx-auto relative z-10">
-          {/* Breadcrumb */}
+          {/* Fil d'Ariane */}
           <div className="flex items-center gap-2 text-[13px] text-navy/40 mb-6">
             <Link href="/" className="hover:text-navy transition-colors">Accueil</Link>
             <span>/</span>
@@ -75,11 +176,12 @@ export function TradeLanding({ trade }: TradeLandingProps) {
             <span className="text-navy font-semibold">{trade.name}</span>
           </div>
 
-          {/* Two-column layout: text left, schema right */}
+          {/* Disposition deux colonnes : texte à gauche, séquestre à droite */}
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
 
-            {/* ━━━ LEFT: text + CTA ━━━ */}
+            {/* ── Colonne gauche : texte + CTA ── */}
             <div className="flex-1 min-w-0">
+              {/* Badge "X artisans certifiés" + note moyenne */}
               <div className="inline-flex items-center gap-2.5 bg-white/70 backdrop-blur-md border border-forest/10 rounded-[5px] px-4 py-2.5 mb-5">
                 <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
                 <span className="text-[13px] font-bold text-deepForest">{trade.artisanCount} {trade.namePlural.toLowerCase()} certifiés</span>
@@ -90,6 +192,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
                 </div>
               </div>
 
+              {/* Titre principal */}
               <h1 className="font-heading text-[30px] md:text-[42px] font-extrabold text-navy leading-[1.08] tracking-[-1.5px] mb-4" style={{ textWrap: "balance" as never }}>
                 {trade.headline}
               </h1>
@@ -97,13 +200,9 @@ export function TradeLanding({ trade }: TradeLandingProps) {
                 {trade.heroDescription}
               </p>
 
-              {/* Trust micro-badges */}
+              {/* Micro-badges de confiance */}
               <div className="flex gap-4 mb-7 flex-wrap">
-                {[
-                  { icon: Shield, text: "SIRET + décennale vérifiés" },
-                  { icon: Lock, text: "Paiement séquestre" },
-                  { icon: BadgeCheck, text: "Avis 100% vérifiés" },
-                ].map((b) => (
+                {trustBadges.map((b) => (
                   <div key={b.text} className="flex items-center gap-1.5 text-[12px] font-semibold text-deepForest/70">
                     <b.icon className="w-3.5 h-3.5 text-forest" />
                     {b.text}
@@ -111,7 +210,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
                 ))}
               </div>
 
-              {/* CTA */}
+              {/* Boutons d'action principaux */}
               <div className="flex gap-3 flex-wrap mb-5">
                 <Link
                   href={searchLink}
@@ -129,7 +228,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
                 </Link>
               </div>
 
-              {/* Social proof */}
+              {/* Preuve sociale : avatars empilés + texte */}
               <div className="flex items-center gap-3">
                 <div className="flex">
                   {socialProof.map((p, i) => (
@@ -148,9 +247,10 @@ export function TradeLanding({ trade }: TradeLandingProps) {
               </div>
             </div>
 
-            {/* ━━━ RIGHT: escrow schema ━━━ */}
+            {/* ── Colonne droite : schéma du paiement séquestre ── */}
             <div className="w-full lg:w-[400px] shrink-0">
               <div className="bg-white/90 backdrop-blur-md border border-border rounded-[5px] p-5 shadow-sm">
+                {/* En-tête de la carte séquestre */}
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-7 h-7 rounded-[4px] bg-deepForest flex items-center justify-center">
                     <Lock className="w-3.5 h-3.5 text-white" />
@@ -158,18 +258,13 @@ export function TradeLanding({ trade }: TradeLandingProps) {
                   <span className="font-heading font-bold text-[13px] text-navy">Paiement par séquestre</span>
                 </div>
 
-                {/* 4 vertical steps */}
+                {/* 4 étapes verticales du séquestre */}
                 <div className="space-y-0">
-                  {[
-                    { num: "1", icon: CreditCard, title: "Vous payez", desc: "L'argent est bloqué en séquestre sécurisé.", highlight: "L'artisan ne reçoit rien", color: "#0A4030" },
-                    { num: "2", icon: ClipboardList, title: "L'artisan intervient", desc: "Le travail est réalisé selon le devis signé.", highlight: "Argent toujours verrouillé", color: "#1B6B4E" },
-                    { num: "3", icon: Shield, title: "Nova vérifie", desc: "Le prix et le travail sont contrôlés par Nova.", highlight: "Avant tout déblocage", color: "#2D9B6E" },
-                    { num: "4", icon: CheckCircle, title: "Déblocage", desc: "Vous ou Nova libérez le paiement à l'artisan.", highlight: "Non conforme = remboursé", color: "#22C88A" },
-                  ].map((s, i) => {
+                  {escrowSteps.map((s, i) => {
                     const StepIcon = s.icon;
                     return (
                       <div key={s.num} className="relative flex gap-3 py-3">
-                        {/* Vertical connector line */}
+                        {/* Ligne verticale entre les étapes */}
                         {i < 3 && (
                           <div className="absolute left-[13px] top-[42px] w-[2px] h-[calc(100%-30px)] bg-border" />
                         )}
@@ -189,13 +284,9 @@ export function TradeLanding({ trade }: TradeLandingProps) {
                   })}
                 </div>
 
-                {/* Bottom guarantees */}
+                {/* Garanties en bas de la carte */}
                 <div className="mt-3 pt-3 border-t border-border/60 space-y-2">
-                  {[
-                    { icon: Lock, text: "Argent bloqué jusqu'à validation" },
-                    { icon: Shield, text: "Prix et travail vérifiés par Nova" },
-                    { icon: CheckCircle, text: "Le client peut débloquer l'argent" },
-                  ].map((g) => (
+                  {escrowGuarantees.map((g) => (
                     <div key={g.text} className="flex items-center gap-1.5 text-[11px] font-semibold text-navy/60">
                       <g.icon className="w-3 h-3 text-forest shrink-0" />
                       {g.text}
@@ -208,11 +299,10 @@ export function TradeLanding({ trade }: TradeLandingProps) {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          SANS NOVA vs AVEC NOVA — Loss aversion
-          Psychology: Humans feel losses 2x more than gains.
-          Showing the "without" scenario makes "with" more valuable.
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════
+          SECTION COMPARAISON — "Sans Nova" vs "Avec Nova"
+          Effet psychologique : aversion à la perte
+      ══════════════════════════════════════════════ */}
       <section className="px-5 md:px-10 py-16 bg-bgPage">
         <div className="max-w-[900px] mx-auto">
           <h2 className="font-heading text-[24px] md:text-[30px] font-extrabold text-navy mb-8 text-center">
@@ -220,7 +310,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Sans Nova — loss framing */}
+            {/* Carte "Sans Nova" — risques */}
             <div className="bg-white rounded-[5px] border border-red/15 p-6 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red/40 to-red/20" />
               <div className="flex items-center gap-2 mb-5">
@@ -230,14 +320,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
                 <span className="font-heading font-extrabold text-[15px] text-navy">Sans Nova</span>
               </div>
               <div className="space-y-3.5">
-                {[
-                  "Prix annoncé par téléphone, gonflé sur place",
-                  "Aucune vérification : ni SIRET, ni décennale",
-                  "Paiement en liquide — aucun recours",
-                  "Avis invérifiables, souvent faux",
-                  "En cas de litige, vous êtes seul",
-                  "Aucune garantie sur le travail",
-                ].map((t) => (
+                {withoutNova.map((t) => (
                   <div key={t} className="flex items-start gap-2.5">
                     <Ban className="w-4 h-4 text-red/50 shrink-0 mt-0.5" />
                     <span className="text-[13px] text-navy/60 leading-relaxed">{t}</span>
@@ -246,7 +329,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
               </div>
             </div>
 
-            {/* Avec Nova — gain framing */}
+            {/* Carte "Avec Nova" — avantages */}
             <div className="bg-white rounded-[5px] border border-forest/20 p-6 relative overflow-hidden shadow-[0_4px_20px_rgba(10,64,48,0.06)]">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-deepForest to-forest" />
               <div className="flex items-center gap-2 mb-5">
@@ -257,14 +340,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
                 <span className="ml-auto px-2 py-0.5 rounded-[5px] bg-forest/[0.08] text-[10px] font-bold text-forest">RECOMMANDÉ</span>
               </div>
               <div className="space-y-3.5">
-                {[
-                  "Devis fait sur place, devant vous — pas de surprise",
-                  `${trade.name} vérifié : SIRET, décennale, identité`,
-                  "Paiement par carte, bloqué en séquestre",
-                  "Avis 100% liés à des missions réelles",
-                  "Nova arbitre en cas de litige (97% résolus)",
-                  "Remboursement si travail non conforme",
-                ].map((t) => (
+                {withNova.map((t) => (
                   <div key={t} className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-forest shrink-0 mt-0.5" />
                     <span className="text-[13px] text-navy leading-relaxed">{t}</span>
@@ -276,13 +352,13 @@ export function TradeLanding({ trade }: TradeLandingProps) {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          SERVICES — What this trade offers
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════
+          SECTION SERVICES — Grille des interventions proposées
+      ══════════════════════════════════════════════ */}
       <section className="px-5 md:px-10 py-16 bg-white">
         <div className="max-w-[900px] mx-auto">
           <h2 className="font-heading text-[24px] md:text-[30px] font-extrabold text-navy mb-2">
-            Nos interventions en {trade.name.toLowerCase().endsWith("eur") || trade.name.toLowerCase().endsWith("on") ? trade.name.toLowerCase() === "maçon" ? "maçonnerie" : trade.name.toLowerCase() === "serrurier" ? "serrurerie" : trade.name.toLowerCase() === "plombier" ? "plomberie" : trade.name.toLowerCase() === "menuisier" ? "menuiserie" : trade.name.toLowerCase().replace(/eur$/, "erie").replace(/ien$/, "icité") : trade.name.toLowerCase()}
+            Nos interventions en {getInterventionDomain()}
           </h2>
           <p className="text-[15px] text-grayText mb-8">
             Chaque intervention est couverte par l&apos;assurance décennale et le paiement séquestre Nova.
@@ -303,7 +379,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
             ))}
           </div>
 
-          {/* CTA under services grid */}
+          {/* Bouton sous la grille */}
           <div className="mt-8 text-center">
             <Link
               href={searchLink}
@@ -317,11 +393,9 @@ export function TradeLanding({ trade }: TradeLandingProps) {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          HOW IT WORKS — 4 steps
-          Psychology: Processing fluency, numbered steps
-          reduce cognitive load
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════
+          SECTION "COMMENT ÇA MARCHE" — 4 étapes numérotées
+      ══════════════════════════════════════════════ */}
       <section className="px-5 md:px-10 py-16 bg-bgPage">
         <div className="max-w-[900px] mx-auto">
           <h2 className="font-heading text-[24px] md:text-[30px] font-extrabold text-navy mb-2 text-center">
@@ -351,9 +425,9 @@ export function TradeLanding({ trade }: TradeLandingProps) {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          WHY NOVA — Trust pillars
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════
+          SECTION "POURQUOI NOVA" — Piliers de confiance
+      ══════════════════════════════════════════════ */}
       <section className="px-5 md:px-10 py-16 bg-white">
         <div className="max-w-[900px] mx-auto">
           <h2 className="font-heading text-[24px] md:text-[30px] font-extrabold text-navy mb-8 text-center">
@@ -361,14 +435,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { icon: BadgeCheck, title: "Artisans certifiés", desc: `Chaque ${trade.name.toLowerCase()} est vérifié : SIRET actif, décennale valide, identité contrôlée par notre équipe.` },
-              { icon: Lock, title: "Paiement séquestre", desc: "Votre argent est bloqué en sécurité. L'artisan n'est payé qu'après votre validation du travail." },
-              { icon: ClipboardList, title: "Devis sur place uniquement", desc: "Jamais de prix par téléphone. Le devis est fait devant vous, sans surprise, sans pression." },
-              { icon: Shield, title: "Protection litiges", desc: "En cas de problème, Nova arbitre avec les preuves (photos, devis signé). 97% résolus en faveur du client." },
-              { icon: Star, title: "Avis 100% vérifiés", desc: "Chaque avis est lié à une mission réelle et un paiement vérifié via séquestre. 0 faux avis." },
-              { icon: Clock, title: "Urgence 24h/24", desc: `${trade.namePlural} disponibles en urgence. Mêmes garanties de paiement sécurisé, même en pleine nuit.` },
-            ].map((item) => {
+            {whyNova.map((item) => {
               const ItemIcon = item.icon;
               return (
                 <div key={item.title} className="flex items-start gap-4 p-5 rounded-[5px] border border-transparent hover:bg-bgPage hover:border-border transition-all duration-200">
@@ -386,10 +453,9 @@ export function TradeLanding({ trade }: TradeLandingProps) {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          FAQ — Objection handling
-          Psychology: Reduces uncertainty, builds trust
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════
+          SECTION FAQ — Accordéon de questions fréquentes
+      ══════════════════════════════════════════════ */}
       <section className="px-5 md:px-10 py-16 bg-bgPage">
         <div className="max-w-[700px] mx-auto">
           <h2 className="font-heading text-[24px] md:text-[30px] font-extrabold text-navy mb-2 text-center">
@@ -402,6 +468,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
           <div className="space-y-2.5">
             {trade.faq.map((item, i) => (
               <div key={i} className="bg-white rounded-[5px] border border-border overflow-hidden">
+                {/* Bouton pour ouvrir/fermer la réponse */}
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer"
@@ -412,6 +479,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
                     openFaq === i && "rotate-180",
                   )} />
                 </button>
+                {/* Contenu de la réponse (visible si ouvert) */}
                 {openFaq === i && (
                   <div className="px-5 pb-4">
                     <p className="text-[13px] text-grayText leading-[1.7]">{item.a}</p>
@@ -423,12 +491,11 @@ export function TradeLanding({ trade }: TradeLandingProps) {
         </div>
       </section>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          CTA FINAL — Urgency + trust combined
-          Psychology: Scarcity ("disponibles maintenant"),
-          clear next step, dual CTA for different intent
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ══════════════════════════════════════════════
+          SECTION CTA FINAL — Fond sombre, statistiques, double CTA
+      ══════════════════════════════════════════════ */}
       <section className="px-5 md:px-10 py-16 bg-gradient-to-br from-deepForest via-forest to-deepForest relative overflow-hidden">
+        {/* Motif SVG subtil en fond */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIi8+PC9zdmc+')] opacity-50" />
 
         <div className="max-w-[700px] mx-auto text-center relative z-10">
@@ -440,13 +507,9 @@ export function TradeLanding({ trade }: TradeLandingProps) {
             Artisans certifiés. Paiement sécurisé par séquestre. Devis sur place, sans surprise.
           </p>
 
-          {/* Stats row */}
+          {/* Statistiques clés */}
           <div className="flex items-center justify-center gap-6 mb-8 flex-wrap">
-            {[
-              { value: trade.avgResponseTime, label: "réponse" },
-              { value: `${trade.avgRating}/5`, label: "note moyenne" },
-              { value: trade.artisanCount, label: "certifiés" },
-            ].map((s) => (
+            {ctaStats.map((s) => (
               <div key={s.label} className="text-center">
                 <div className="font-mono text-[20px] font-bold text-white">{s.value}</div>
                 <div className="text-[11px] text-white/40">{s.label}</div>
@@ -454,6 +517,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
             ))}
           </div>
 
+          {/* Double CTA : recherche + urgence */}
           <div className="flex gap-3 justify-center flex-wrap">
             <Link
               href={searchLink}
@@ -473,12 +537,14 @@ export function TradeLanding({ trade }: TradeLandingProps) {
         </div>
       </section>
 
-      {/* ━━━ Cross-link other trades — SEO internal linking ━━━ */}
+      {/* ══════════════════════════════════════════════
+          SECTION LIENS INTERNES — Maillage SEO vers les autres métiers
+      ══════════════════════════════════════════════ */}
       <section className="px-5 md:px-10 py-10 bg-white border-t border-border/60">
         <div className="max-w-[900px] mx-auto text-center">
           <p className="text-[13px] text-grayText mb-4">Autres artisans certifiés Nova</p>
           <div className="flex flex-wrap gap-2 justify-center">
-            {["serrurier", "plombier", "electricien", "chauffagiste", "peintre", "menuisier", "carreleur", "macon"]
+            {allTrades
               .filter((s) => s !== trade.slug)
               .map((s) => (
                 <Link
@@ -486,7 +552,7 @@ export function TradeLanding({ trade }: TradeLandingProps) {
                   href={`/${s}`}
                   className="px-4 py-2 rounded-[5px] bg-bgPage border border-border text-[13px] font-semibold text-navy hover:border-forest/30 hover:bg-surface transition-all cursor-pointer"
                 >
-                  {s === "electricien" ? "Électricien" : s === "macon" ? "Maçon" : s.charAt(0).toUpperCase() + s.slice(1)}
+                  {formatTradeName(s)}
                 </Link>
               ))}
           </div>

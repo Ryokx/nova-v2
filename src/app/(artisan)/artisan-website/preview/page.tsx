@@ -1,17 +1,33 @@
+/**
+ * Page d'aperçu plein écran du site vitrine artisan.
+ * Ouverte dans un nouvel onglet depuis l'éditeur (artisan-website).
+ * Lit les données depuis localStorage ("nova-website-preview") et écoute
+ * les changements en temps réel via l'événement StorageEvent.
+ *
+ * Affiche le site complet avec :
+ * - Navbar, Hero, Barre de confiance
+ * - Services, Galerie, Témoignages
+ * - Section contact avec formulaire
+ * - Footer
+ *
+ * Le thème (couleurs, police, style hero) est appliqué dynamiquement.
+ */
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import {
-  Phone, Mail, MapPin, Clock, Star, Check, Sparkles,
+  Phone, Mail, MapPin, Clock, Star, Sparkles,
   ChevronRight, Shield, FileText, ArrowRight,
 } from "lucide-react";
 import { Image as ImageIcon } from "lucide-react";
 
+/* Types partagés avec l'éditeur */
 interface ServiceItem { label: string; active: boolean; priceMin: string; priceMax: string; }
 interface Testimonial { id: string; name: string; text: string; rating: number; }
 interface Schedule { label: string; enabled: boolean; open: string; close: string; }
 
+/* Données complètes du site transmises via localStorage */
 interface SiteData {
   companyName: string;
   slogan: string;
@@ -28,6 +44,7 @@ interface SiteData {
   galleryCount: number;
 }
 
+/* Thèmes de couleur (identiques à l'éditeur) */
 const THEMES: Record<string, { label: string; color: string; bg: string; accent: string }> = {
   vert: { label: "Vert Nova", color: "#1B6B4E", bg: "#F5FAF7", accent: "#2D9B6E" },
   bleu: { label: "Bleu Pro", color: "#1E40AF", bg: "#EFF6FF", accent: "#3B82F6" },
@@ -36,6 +53,7 @@ const THEMES: Record<string, { label: string; color: string; bg: string; accent:
   orange: { label: "Orange Energie", color: "#C2410C", bg: "#FFF7ED", accent: "#F97316" },
 };
 
+/* Polices disponibles */
 const FONTS: Record<string, { family: string }> = {
   moderne: { family: "'DM Sans', sans-serif" },
   classique: { family: "Georgia, serif" },
@@ -43,14 +61,16 @@ const FONTS: Record<string, { family: string }> = {
 };
 
 export default function WebsitePreviewPage() {
+  /* Données du site chargées depuis localStorage */
   const [data, setData] = useState<SiteData | null>(null);
 
+  /* Charge les données au montage et écoute les mises à jour en temps réel */
   useEffect(() => {
     const raw = localStorage.getItem("nova-website-preview");
     if (raw) {
       try { setData(JSON.parse(raw)); } catch { /* ignore */ }
     }
-    // Listen for updates from editor tab
+    /* Écoute les changements depuis l'onglet éditeur */
     const handler = (e: StorageEvent) => {
       if (e.key === "nova-website-preview" && e.newValue) {
         try { setData(JSON.parse(e.newValue)); } catch { /* ignore */ }
@@ -60,9 +80,11 @@ export default function WebsitePreviewPage() {
     return () => window.removeEventListener("storage", handler);
   }, []);
 
-  const t = THEMES[data?.theme ?? "vert"] ?? THEMES.vert;
-  const f = FONTS[data?.font ?? "moderne"] ?? FONTS.moderne;
+  /* Résolution du thème et de la police sélectionnés */
+  const t = (THEMES[data?.theme ?? "vert"] ?? THEMES.vert)!;
+  const f = (FONTS[data?.font ?? "moderne"] ?? FONTS.moderne)!;
 
+  /* Style dynamique du hero selon le type de couverture */
   const heroStyle = useMemo(() => {
     const cover = data?.cover;
     if (cover === "photo") return { background: `linear-gradient(135deg, ${t.color}dd 0%, ${t.color}99 100%)` };

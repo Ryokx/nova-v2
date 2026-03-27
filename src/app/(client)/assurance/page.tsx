@@ -1,3 +1,13 @@
+/**
+ * Page Simulateur Assurance.
+ * Parcours en plusieurs étapes pour estimer la couverture d'un sinistre :
+ *   1 - Type de sinistre (dégâts des eaux, incendie, vol, etc.)
+ *   2 - Banque du client
+ *   3 - Type de carte bancaire
+ *   4 - Description libre (uniquement si type = "autre")
+ * Résultat : analyse de couverture (bonne, partielle, non couverte) avec actions recommandées.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -21,10 +31,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/utils";
 
+/* ------------------------------------------------------------------ */
+/*  Données                                                            */
+/* ------------------------------------------------------------------ */
+
+/** Types de sinistres */
 const incidentTypes = [
   { id: "degats_eaux", label: "Dégâts des eaux", icon: Droplets },
   { id: "incendie", label: "Incendie", icon: Flame },
@@ -34,6 +48,7 @@ const incidentTypes = [
   { id: "autre", label: "Autre", icon: HelpCircle },
 ];
 
+/** Liste des banques */
 const banks = [
   "BNP Paribas",
   "Crédit Agricole",
@@ -44,6 +59,7 @@ const banks = [
   "Autre",
 ];
 
+/** Types de cartes bancaires */
 const cardTypes = [
   "Visa Classic",
   "Visa Premier",
@@ -52,6 +68,10 @@ const cardTypes = [
   "American Express",
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Types et logique d'analyse                                         */
+/* ------------------------------------------------------------------ */
+
 interface AnalysisResult {
   coverage: "bonne" | "partielle" | "non_couverte";
   franchise: number;
@@ -59,8 +79,12 @@ interface AnalysisResult {
   actions: string[];
 }
 
+/**
+ * Détermine le niveau de couverture en fonction des sélections.
+ * Logique simplifiée : carte premium + grande banque = meilleure couverture.
+ */
 function getAnalysis(incident: string, bank: string, card: string): AnalysisResult {
-  // Smart analysis based on selections
+  /* Cas "autre" : pas de couverture identifiable */
   if (incident === "autre") {
     return {
       coverage: "non_couverte",
@@ -77,6 +101,7 @@ function getAnalysis(incident: string, bank: string, card: string): AnalysisResu
   const isPremiumCard = ["Visa Premier", "Mastercard Gold", "Mastercard Platinum", "American Express"].includes(card);
   const isMajorBank = ["BNP Paribas", "Crédit Agricole", "Société Générale"].includes(bank);
 
+  /* Carte premium + grande banque = bonne couverture */
   if (isPremiumCard && isMajorBank) {
     return {
       coverage: "bonne",
@@ -91,6 +116,7 @@ function getAnalysis(incident: string, bank: string, card: string): AnalysisResu
     };
   }
 
+  /* Un des deux critères = couverture partielle */
   if (isPremiumCard || isMajorBank) {
     return {
       coverage: "partielle",
@@ -105,6 +131,7 @@ function getAnalysis(incident: string, bank: string, card: string): AnalysisResu
     };
   }
 
+  /* Cas par défaut : couverture partielle basique */
   return {
     coverage: "partielle",
     franchise: 500,
@@ -117,23 +144,33 @@ function getAnalysis(incident: string, bank: string, card: string): AnalysisResu
   };
 }
 
+/** Configuration visuelle des niveaux de couverture */
 const coverageConfig = {
   bonne: { label: "Bonne couverture", icon: CheckCircle, color: "text-success", bg: "bg-success/15" },
   partielle: { label: "Couverture partielle", icon: AlertTriangle, color: "text-gold", bg: "bg-gold/15" },
   non_couverte: { label: "Non couverte", icon: XCircle, color: "text-red", bg: "bg-red/10" },
 };
 
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function InsuranceSimulatorPage() {
   const router = useRouter();
+
+  /** Étape courante */
   const [step, setStep] = useState(1);
+  /** Sélections de l'utilisateur */
   const [incident, setIncident] = useState("");
   const [bank, setBank] = useState("");
   const [cardType, setCardType] = useState("");
   const [description, setDescription] = useState("");
 
+  /* Nombre total d'étapes (4 si "autre", 3 sinon) */
   const totalSteps = incident === "autre" ? 4 : 3;
   const needsDescription = incident === "autre";
 
+  /** Vérifie si on peut passer à l'étape suivante */
   const canNext = () => {
     if (step === 1) return !!incident;
     if (step === 2) return !!bank;
@@ -143,18 +180,22 @@ export default function InsuranceSimulatorPage() {
     return false;
   };
 
+  /** Passe à l'étape suivante ou affiche les résultats */
   const handleNext = () => {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      setStep(totalSteps + 1); // show results
+      setStep(totalSteps + 1); // affiche les résultats
     }
   };
 
+  /* Calcul de l'analyse (uniquement après la dernière étape) */
   const analysis = step > totalSteps ? getAnalysis(incident, bank, cardType) : null;
   const coverageInfo = analysis ? coverageConfig[analysis.coverage] : null;
 
-  // Result view
+  /* ================================================================ */
+  /*  Vue résultat : analyse de couverture                             */
+  /* ================================================================ */
   if (analysis && coverageInfo) {
     const CoverageIcon = coverageInfo.icon;
     return (
@@ -171,7 +212,7 @@ export default function InsuranceSimulatorPage() {
           Basée sur vos informations
         </p>
 
-        {/* Coverage level card */}
+        {/* Carte niveau de couverture */}
         <Card className="mb-4">
           <div className="flex items-center gap-3 mb-4">
             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", coverageInfo.bg)}>
@@ -185,6 +226,7 @@ export default function InsuranceSimulatorPage() {
             </div>
           </div>
 
+          {/* Franchise et plafond (si couvert) */}
           {analysis.coverage !== "non_couverte" && (
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-surface rounded-xl p-3 text-center">
@@ -198,6 +240,7 @@ export default function InsuranceSimulatorPage() {
             </div>
           )}
 
+          {/* Actions recommandées */}
           <div className="border-t border-border pt-3">
             <div className="text-xs font-bold text-navy mb-2">Actions recommandées</div>
             <div className="space-y-2">
@@ -211,7 +254,7 @@ export default function InsuranceSimulatorPage() {
           </div>
         </Card>
 
-        {/* Nova CTA */}
+        {/* CTA Nova */}
         <Card className="bg-gradient-to-br from-surface to-white">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-forest/10 flex items-center justify-center">
@@ -251,9 +294,13 @@ export default function InsuranceSimulatorPage() {
     );
   }
 
+  /* ================================================================ */
+  /*  Formulaire par étapes                                            */
+  /* ================================================================ */
   return (
     <div className="max-w-[600px] mx-auto px-5 py-8">
-      {/* Back */}
+
+      {/* Bouton retour */}
       <button
         onClick={() => (step > 1 ? setStep(step - 1) : router.back())}
         className="flex items-center gap-1.5 text-[13px] text-grayText font-medium mb-5 hover:text-navy transition-colors bg-transparent border-none cursor-pointer"
@@ -261,13 +308,12 @@ export default function InsuranceSimulatorPage() {
         <ArrowLeft className="w-4 h-4" /> Retour
       </button>
 
-      {/* Title */}
       <h1 className="font-heading text-[22px] font-extrabold text-navy mb-1">Simulateur assurance</h1>
       <p className="text-sm text-grayText mb-5">
         Estimez votre couverture en quelques clics
       </p>
 
-      {/* Progress */}
+      {/* Barre de progression */}
       <div className="flex gap-1.5 mb-6">
         {Array.from({ length: totalSteps }).map((_, i) => (
           <div
@@ -280,7 +326,7 @@ export default function InsuranceSimulatorPage() {
         ))}
       </div>
 
-      {/* Step 1: Incident type */}
+      {/* Étape 1 : Type de sinistre */}
       {step === 1 && (
         <div className="animate-pageIn">
           <h2 className="font-heading text-base font-bold text-navy mb-3">Type de sinistre</h2>
@@ -308,7 +354,7 @@ export default function InsuranceSimulatorPage() {
         </div>
       )}
 
-      {/* Step 2: Bank */}
+      {/* Étape 2 : Banque */}
       {step === 2 && (
         <div className="animate-pageIn">
           <h2 className="font-heading text-base font-bold text-navy mb-3">Votre banque</h2>
@@ -340,7 +386,7 @@ export default function InsuranceSimulatorPage() {
         </div>
       )}
 
-      {/* Step 3: Card type */}
+      {/* Étape 3 : Type de carte */}
       {step === 3 && (
         <div className="animate-pageIn">
           <h2 className="font-heading text-base font-bold text-navy mb-3">Type de carte bancaire</h2>
@@ -372,7 +418,7 @@ export default function InsuranceSimulatorPage() {
         </div>
       )}
 
-      {/* Step 4: Description (only if "autre") */}
+      {/* Étape 4 : Description (uniquement pour "autre") */}
       {step === 4 && needsDescription && (
         <div className="animate-pageIn">
           <h2 className="font-heading text-base font-bold text-navy mb-1">Décrivez votre sinistre</h2>
@@ -390,7 +436,7 @@ export default function InsuranceSimulatorPage() {
         </div>
       )}
 
-      {/* Next button */}
+      {/* Bouton suivant / analyser */}
       <Button
         className="w-full mt-6 gap-2"
         size="lg"

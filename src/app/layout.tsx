@@ -1,3 +1,16 @@
+/**
+ * Layout racine de l'application Nova
+ *
+ * Structure de chaque page :
+ * - SkipNav (lien d'accessibilité pour sauter au contenu)
+ * - Navbar (barre de navigation)
+ * - Contenu principal (children)
+ * - Footer
+ *
+ * Les polices (Manrope, DM Sans, DM Mono) sont injectées via les variables CSS.
+ * Les Providers wrappent l'app (session NextAuth, thème, etc.).
+ */
+
 import type { Metadata } from "next";
 import "@/styles/globals.css";
 import { manrope, dmSans, dmMono } from "@/app/fonts";
@@ -6,6 +19,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { SkipNav } from "@/components/layout/skip-nav";
 
+/** Métadonnées SEO globales */
 export const metadata: Metadata = {
   title: "Nova — Artisans certifiés, paiement sécurisé",
   description:

@@ -1,9 +1,20 @@
+/**
+ * Page Instant Pay artisan.
+ * Fonctionnalité premium : recevoir les paiements en 30 min au lieu de 48h.
+ * Affiche :
+ * - Carte hero expliquant le concept
+ * - Fonctionnement en 3 étapes
+ * - Toggle pour activer le virement instantané automatique
+ * - Statistiques (total versé, nombre de demandes, temps gagné)
+ * - Historique des transactions Instant Pay
+ */
 "use client";
 
 import { useState } from "react";
 import { Zap, ArrowRight, CheckCircle, Clock, TrendingUp, Banknote, Info } from "lucide-react";
 import { formatPrice, cn } from "@/lib/utils";
 
+/* Structure d'une transaction Instant Pay */
 interface InstantPayTransaction {
   id: string;
   mission: string;
@@ -14,6 +25,7 @@ interface InstantPayTransaction {
   status: "completed" | "processing";
 }
 
+/* Historique mocké des virements instantanés */
 const transactions: InstantPayTransaction[] = [
   { id: "ip1", mission: "Réparation fuite salle de bain", client: "Caroline L.", amount: 450, fee: 18, date: "20 mars 2026", status: "completed" },
   { id: "ip2", mission: "Installation robinet cuisine", client: "Pierre M.", amount: 320, fee: 12.80, date: "18 mars 2026", status: "completed" },
@@ -22,16 +34,19 @@ const transactions: InstantPayTransaction[] = [
   { id: "ip5", mission: "Remplacement chauffe-eau", client: "Sophie T.", amount: 890, fee: 35.60, date: "10 mars 2026", status: "completed" },
 ];
 
+/* Les 3 étapes du processus Instant Pay */
 const steps = [
   { icon: CheckCircle, title: "Mission validée", description: "Le client valide l'intervention terminée" },
   { icon: Zap, title: "Demande Instant Pay", description: "Demandez le versement instantané" },
   { icon: Banknote, title: "Virement en 30 min", description: "Recevez vos fonds sur votre compte" },
 ];
 
+/* Calculs agrégés pour les statistiques */
 const totalVerse = transactions.reduce((sum, t) => sum + t.amount - t.fee, 0);
 const totalDemandes = transactions.length;
 
 export default function ArtisanInstantPayPage() {
+  /* Active/désactive le virement instantané automatique pour chaque mission */
   const [autoEnabled, setAutoEnabled] = useState(false);
 
   return (
@@ -47,7 +62,7 @@ export default function ArtisanInstantPayPage() {
           <div>
             <h2 className="font-heading text-xl font-extrabold">Recevez vos paiements immédiatement</h2>
             <p className="text-white/70 text-[15px] mt-0.5">
-              Plus besoin d'attendre 48h pour recevoir vos fonds
+              Plus besoin d&apos;attendre 48h pour recevoir vos fonds
             </p>
           </div>
         </div>

@@ -1,3 +1,12 @@
+/**
+ * Route API — Gestion des missions (côté client)
+ *
+ * GET  /api/missions          — Liste les missions du client connecté (filtre par statut optionnel)
+ * POST /api/missions          — Crée une nouvelle mission (demande d'intervention)
+ *
+ * Une mission représente une demande d'intervention d'un client auprès d'un artisan.
+ */
+
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -5,6 +14,7 @@ import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/api-middleware";
 import { z } from "zod";
 
+/* Schéma de validation pour la création d'une mission */
 const createMissionSchema = z.object({
   artisanId: z.string(),
   type: z.string().min(1),
@@ -15,18 +25,25 @@ const createMissionSchema = z.object({
   scheduledSlot: z.string().optional(),
 });
 
+/**
+ * GET — Récupère toutes les missions du client connecté
+ * Filtre optionnel par statut via ?status=IN_PROGRESS
+ */
 export async function GET(request: Request) {
   const { user, error } = await requireAuth();
   if (error) return error;
 
+  /* Lecture du filtre de statut depuis les query params */
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status");
 
+  /* Construction du filtre Prisma */
   const where: Record<string, unknown> = { clientId: user!.id };
   if (status && status !== "all") {
     where.status = status;
   }
 
+  /* Requête avec les relations utiles (artisan, paiement, devis, avis) */
   const missions = await prisma.mission.findMany({
     where,
     include: {
@@ -43,6 +60,10 @@ export async function GET(request: Request) {
   return NextResponse.json(missions);
 }
 
+/**
+ * POST — Crée une nouvelle mission
+ * Le client choisit un artisan et décrit son besoin
+ */
 export async function POST(request: Request) {
   const { user, error } = await requireAuth();
   if (error) return error;

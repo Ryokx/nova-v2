@@ -1,3 +1,14 @@
+/**
+ * Dashboard principal de l'artisan.
+ * Page d'accueil après connexion, affichant :
+ * - Message d'accueil personnalisé + statut de validation
+ * - 4 KPIs cliquables avec sparklines (revenus, missions, devis, note)
+ * - 3 graphiques (revenus mensuels, nouveaux clients, semaine en cours)
+ * - Mini calendrier interactif avec synchronisation externe (Google, Outlook, etc.)
+ * - Prochains rendez-vous avec détail du jour sélectionné
+ * - Accès rapide aux outils (abonnement, site web, communication, etc.)
+ * - Alerte urgences en temps réel
+ */
 "use client";
 
 import { useSession } from "next-auth/react";
@@ -8,9 +19,6 @@ import { useFetch } from "@/hooks/use-fetch";
 import { useState } from "react";
 import { MonthPicker } from "@/components/ui/month-picker";
 import {
-  TrendingUp,
-  Wrench,
-  FileText,
   Star,
   Zap,
   Clock,
@@ -22,17 +30,14 @@ import {
   Users,
   CalendarDays,
   ArrowUpRight,
-  ArrowDownRight,
-  AlertTriangle,
-  CheckCircle2,
   EyeOff,
   ChevronRight,
   ChevronLeft,
   Link2,
   Check,
-  ExternalLink,
 } from "lucide-react";
 
+/* Statistiques retournées par l'API /api/artisan/stats */
 interface ArtisanStats {
   monthRevenue: number;
   activeMissions: number;
@@ -48,25 +53,28 @@ interface ArtisanStats {
   }>;
 }
 
+/* Configuration des couleurs par statut de rendez-vous */
 const statusConfig: Record<string, { label: string; color: string }> = {
   PENDING: { label: "En attente", color: "#F5A623" },
   ACCEPTED: { label: "Confirmé", color: "#22C88A" },
   IN_PROGRESS: { label: "En cours", color: "#1B6B4E" },
 };
 
+/* Demandes d'intervention urgente (temps réel) */
 const urgentDemands = [
   { id: "u1", type: "Fuite d'eau", sector: "Paris 9e", time: "Il y a 4 min" },
   { id: "u2", type: "Panne électrique", sector: "Paris 11e", time: "Il y a 12 min" },
   { id: "u3", type: "Serrure bloquée", sector: "Paris 4e", time: "Il y a 25 min" },
 ];
 
+/* Rendez-vous mockés (affichés si l'API ne retourne rien) */
 const mockRdv = [
   { id: "m1", client: "Pierre M.", type: "Installation robinet", date: "Auj. 14h", status: "Confirmé", sColor: "#22C88A" },
   { id: "m2", client: "Amélie R.", type: "Réparation chauffe-eau", date: "Dem. 9h", status: "En cours", sColor: "#1B6B4E" },
   { id: "m3", client: "Luc D.", type: "Diagnostic fuite", date: "18 mars 11h", status: "En attente", sColor: "#F5A623" },
 ];
 
-/* ━━━ Sparkline SVG ━━━ */
+/* Composant SVG : mini graphique en ligne (sparkline) pour les cartes KPI */
 function Sparkline({ data, color, height = 40, width = 120 }: { data: number[]; color: string; height?: number; width?: number }) {
   const max = Math.max(...data);
   const min = Math.min(...data);
@@ -94,7 +102,7 @@ function Sparkline({ data, color, height = 40, width = 120 }: { data: number[]; 
   );
 }
 
-/* ━━━ Revenue bar chart data ━━━ */
+/* Données du graphique revenus de la semaine */
 const revenueWeekly = [
   { day: "Lun", value: 320 },
   { day: "Mar", value: 180 },
@@ -106,7 +114,7 @@ const revenueWeekly = [
 ];
 const revenueMax = Math.max(...revenueWeekly.map((d) => d.value));
 
-/* ━━━ Monthly revenue data (6 months) ━━━ */
+/* Données du graphique revenus mensuels (6 derniers mois) */
 const monthlyRevenue = [
   { month: "Oct", value: 3200 },
   { month: "Nov", value: 3800 },
@@ -117,7 +125,7 @@ const monthlyRevenue = [
 ];
 const monthlyMax = Math.max(...monthlyRevenue.map((d) => d.value));
 
-/* ━━━ Clients data (6 months) ━━━ */
+/* Données du graphique nouveaux clients (6 derniers mois) */
 const monthlyClients = [
   { month: "Oct", value: 8 },
   { month: "Nov", value: 12 },
@@ -128,18 +136,20 @@ const monthlyClients = [
 ];
 const clientsMax = Math.max(...monthlyClients.map((d) => d.value));
 
-/* ━━━ Calendar helpers ━━━ */
+/* Helpers pour le mini calendrier */
 const DAYS_LABELS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
+/* Retourne le nombre de jours dans un mois donné */
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
 }
+/* Retourne le jour de la semaine du 1er du mois (0=Lundi) */
 function getFirstDayOfMonth(year: number, month: number) {
   const d = new Date(year, month, 1).getDay();
   return d === 0 ? 6 : d - 1; // Monday = 0
 }
 
-// Mock events on specific dates (day of month -> events)
+/* Événements mockés du calendrier (jour du mois -> liste d'événements) */
 const calendarEvents: Record<number, { time: string; client: string; type: string; color: string }[]> = {
   24: [{ time: "14h", client: "Pierre M.", type: "Installation robinet", color: "#22C88A" }],
   25: [{ time: "9h", client: "Amélie R.", type: "Réparation chauffe-eau", color: "#1B6B4E" }],
@@ -151,7 +161,7 @@ const calendarEvents: Record<number, { time: string; client: string; type: strin
   31: [{ time: "8h30", client: "Sophie L.", type: "Entretien chaudière", color: "#6366F1" }],
 };
 
-/* ━━━ Calendar sync providers ━━━ */
+/* Fournisseurs de calendrier pour la synchronisation */
 const calendarProviders = [
   {
     id: "google",

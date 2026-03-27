@@ -1,3 +1,13 @@
+/**
+ * Composant SkipNav — Lien d'accessibilité "Aller au contenu principal".
+ *
+ * Invisible par défaut (sr-only), il apparaît uniquement quand il reçoit le focus
+ * (navigation au clavier avec Tab). Permet aux utilisateurs de clavier/lecteur
+ * d'écran de sauter directement au contenu sans parcourir toute la navbar.
+ *
+ * L'ancre #main-content doit être placée sur le conteneur principal de chaque page.
+ */
+
 export function SkipNav() {
   return (
     <a

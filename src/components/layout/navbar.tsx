@@ -1,5 +1,20 @@
 "use client";
 
+/**
+ * Composant Navbar — Barre de navigation principale de l'application.
+ *
+ * Trois variantes sont rendues selon le contexte :
+ * 1. Navbar publique (visiteurs) : dégradé vert, flottante, liens publics + boutons connexion/inscription
+ * 2. Navbar authentifiée (clients/artisans) : blanche, fixe, liens selon le rôle
+ * 3. Navbar minimale (chargement sur pages protégées) : juste le logo
+ *
+ * Fonctionnalités :
+ * - Menu mobile hamburger
+ * - Dropdown "Plus" pour les liens artisan secondaires
+ * - Détection des sections sombres pour adapter les couleurs (mode public)
+ * - Badge de notifications non lues
+ */
+
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,10 +22,13 @@ import { useSession, signOut } from "next-auth/react";
 import {
   Menu, X, LayoutDashboard, FileText, CreditCard, Megaphone,
   Globe, UserCircle, Calculator, ChevronDown, Wrench, Search,
-  Shield, ClipboardList, Bell, Heart, LogOut, ArrowRight,
+  Shield, ClipboardList, Bell, Heart, LogOut, ArrowRight, Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/* ━━━ Définition des liens de navigation ━━━ */
+
+/** Liens pour les clients connectés */
 const clientLinks = [
   { href: "/artisans", label: "Artisans", icon: Search },
   { href: "/missions", label: "Missions", icon: ClipboardList },
@@ -19,6 +37,7 @@ const clientLinks = [
   { href: "/profile", label: "Profil", icon: UserCircle },
 ];
 
+/** Liens principaux pour les artisans (affichés directement dans la navbar) */
 const artisanMainLinks = [
   { href: "/artisan-dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/artisan-documents", label: "Documents", icon: FileText },
@@ -27,6 +46,7 @@ const artisanMainLinks = [
   { href: "/artisan-notifications", label: "Notifications", icon: Bell },
 ];
 
+/** Liens secondaires artisan (dans le dropdown "Plus") */
 const artisanMoreLinks = [
   { href: "/artisan-communication", label: "Communication", icon: Megaphone },
   { href: "/artisan-website", label: "Mon site", icon: Globe },
@@ -34,41 +54,44 @@ const artisanMoreLinks = [
   { href: "/artisan-profile", label: "Profil", icon: UserCircle },
 ];
 
+/** Tous les liens artisan combinés (utilisé pour le menu mobile) */
 const artisanLinks = [...artisanMainLinks, ...artisanMoreLinks];
 
+/** Chemins publics où la navbar verte est affichée (sauf si connecté) */
 const PUBLIC_PATHS = [
   "/", "/login", "/signup", "/comment-ca-marche", "/devenir-partenaire", "/support", "/cgu", "/confidentialite", "/mentions-legales", "/reset-password", "/complete-profile",
-  // SEO trade landing pages
+  // Pages SEO métiers
   "/serrurier", "/plombier", "/electricien", "/chauffagiste", "/peintre", "/menuisier", "/carreleur", "/macon",
-  // SEO urgency landing pages
+  // Pages SEO urgences
   "/serrurier-urgence", "/plombier-urgence", "/electricien-urgence", "/chauffagiste-urgence", "/macon-urgence",
 ];
 
 export function Navbar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
-  const [onDark, setOnDark] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
 
-  // Hide navbar on urgency pages (full-screen immersive experience)
-  if (pathname.includes("-urgence")) return null;
+  // États locaux
+  const [mobileOpen, setMobileOpen] = useState(false);   // Menu mobile ouvert/fermé
+  const [moreOpen, setMoreOpen] = useState(false);        // Dropdown "Plus" ouvert/fermé
+  const [onDark, setOnDark] = useState(false);            // La navbar est-elle sur une section sombre ?
+  const [unreadCount, setUnreadCount] = useState(0);      // Nombre de notifications non lues
+
   const moreRef = useRef<HTMLDivElement>(null);
 
-  const isLoading = status === "loading";
+  // Raccourcis pour l'état de session
   const isAuthenticated = status === "authenticated";
   const isArtisan = session?.user?.role === "ARTISAN";
-
-  // On public paths, show the public navbar immediately (even during loading)
   const isPublicPath = PUBLIC_PATHS.some((p) => pathname === p);
 
+  /** Liens affichés dans la navbar publique */
   const publicLinks = [
     { href: "/artisans", label: "Trouver un artisan", icon: Search },
     { href: "/comment-ca-marche", label: "Comment ça marche", icon: Wrench },
+    { href: "/serrurier-urgence", label: "Urgences 24h/24", icon: Zap },
   ];
 
-  // Detect dark sections behind navbar (only for public/guest navbar)
+  /* ━━━ Détection des sections sombres (navbar publique seulement) ━━━ */
+  // Utilise IntersectionObserver pour détecter si la navbar est au-dessus d'une section sombre
   useEffect(() => {
     if (isAuthenticated) {
       setOnDark(false);
@@ -99,6 +122,7 @@ export function Navbar() {
     return () => observer.disconnect();
   }, [pathname, isAuthenticated]);
 
+  // Complément au scroll pour une détection plus réactive des sections sombres
   useEffect(() => {
     if (isAuthenticated) return;
     const checkDark = () => {
@@ -118,7 +142,7 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", checkDark);
   }, [pathname, isAuthenticated]);
 
-  // Fetch unread notification count
+  /* ━━━ Récupération du nombre de notifications non lues ━━━ */
   useEffect(() => {
     if (!isAuthenticated) return;
     let cancelled = false;
@@ -131,7 +155,7 @@ export function Navbar() {
     return () => { cancelled = true; };
   }, [isAuthenticated, pathname]);
 
-  // Close "Plus" dropdown on outside click
+  /* ━━━ Fermeture du dropdown "Plus" au clic extérieur ━━━ */
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
@@ -142,23 +166,20 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  /** Vérifie si un lien correspond à la page active */
   const isLinkActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+  /** Vérifie si un des liens "Plus" est actif (pour le surlignage du dropdown) */
   const isMoreActive = isArtisan && artisanMoreLinks.some((l) => isLinkActive(l.href));
 
-  // ━━━ Decision: which navbar to show ━━━
-  // - Public path → always green navbar UNLESS genuinely authenticated with valid session
-  // - Authenticated with valid session → white navbar
-  // - Protected path + loading → white minimal navbar (skeleton)
-  // - Protected path + unauthenticated → white minimal navbar (will redirect via middleware)
-
+  /* ━━━ Décision : quelle navbar afficher ━━━ */
   const hasValidSession = isAuthenticated && !!session?.user?.email;
   const showPublicNavbar = isPublicPath
-    ? !hasValidSession // On public paths: green navbar unless truly logged in
+    ? !hasValidSession // Sur les pages publiques : navbar verte sauf si connecté
     : status === "unauthenticated";
   const showAuthNavbar = hasValidSession;
-  const showMinimalNavbar = !showPublicNavbar && !showAuthNavbar; // loading on protected pages
+  const showMinimalNavbar = !showPublicNavbar && !showAuthNavbar; // Chargement sur pages protégées
 
-  // ━━━ Minimal loading navbar (protected pages only) ━━━
+  /* ━━━ 1. Navbar minimale (chargement) ━━━ */
   if (showMinimalNavbar) {
     return (
       <>
@@ -175,14 +196,15 @@ export function Navbar() {
     );
   }
 
-  // ━━━ Authenticated navbar: white, full-width, fixed ━━━
+  /* ━━━ 2. Navbar authentifiée (blanche, fixe) ━━━ */
   if (showAuthNavbar) {
     return (
       <>
+        {/* Spacer pour compenser la navbar fixe */}
         <div className="h-[56px]" />
 
         <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-white border-b border-border/60 shadow-sm px-5 flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo — redirige vers le dashboard approprié */}
           <Link
             href={isArtisan ? "/artisan-dashboard" : "/artisans"}
             className="relative flex items-center gap-2 mr-6 group"
@@ -198,7 +220,7 @@ export function Navbar() {
 
           <div className="flex-1" />
 
-          {/* Desktop links */}
+          {/* Liens desktop — différents selon client ou artisan */}
           <div className="hidden md:flex items-center gap-0.5">
             {(isArtisan ? artisanMainLinks : clientLinks).map((link) => {
               const Icon = link.icon;
@@ -217,11 +239,13 @@ export function Navbar() {
                 >
                   <Icon className="w-3.5 h-3.5" />
                   {link.label}
+                  {/* Badge notifications non lues */}
                   {isNotif && unreadCount > 0 && (
                     <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red text-white text-[10px] font-bold leading-none">
                       {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                   )}
+                  {/* Indicateur de lien actif */}
                   {active && (
                     <span className="absolute -bottom-[5px] left-3 right-3 h-[2px] rounded-full bg-forest" />
                   )}
@@ -229,7 +253,7 @@ export function Navbar() {
               );
             })}
 
-            {/* "Plus" dropdown (artisan) */}
+            {/* Dropdown "Plus" pour les liens artisan secondaires */}
             {isArtisan && (
               <div className="relative" ref={moreRef}>
                 <button
@@ -275,7 +299,7 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Déconnexion */}
+          {/* Bouton de déconnexion (desktop) */}
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
             className="hidden md:flex items-center gap-1.5 ml-4 px-3.5 py-[7px] rounded-lg text-[12px] font-semibold text-red hover:text-red hover:bg-red/[0.05] active:scale-[0.97] transition-all duration-200 cursor-pointer border-none bg-transparent"
@@ -284,7 +308,7 @@ export function Navbar() {
             Déconnexion
           </button>
 
-          {/* Mobile hamburger */}
+          {/* Bouton hamburger (mobile) */}
           <button
             className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg hover:bg-forest/[0.04] active:scale-[0.95] transition-all cursor-pointer"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -297,9 +321,10 @@ export function Navbar() {
           </button>
         </nav>
 
-        {/* Mobile dropdown */}
+        {/* Menu mobile déroulant (authentifié) */}
         {mobileOpen && (
           <div className="fixed inset-x-0 top-14 bottom-0 z-40 md:hidden">
+            {/* Fond semi-transparent */}
             <div className="absolute inset-0 bg-navy/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
             <div className="relative mx-4 mt-2 bg-white border border-border/60 rounded-2xl shadow-lg p-3 flex flex-col gap-0.5 motion-safe:animate-slideUp">
               {(isArtisan ? artisanLinks : clientLinks).map((link) => {
@@ -345,9 +370,10 @@ export function Navbar() {
     );
   }
 
-  // ━━━ Public/guest navbar: green gradient, floating, rounded ━━━
+  /* ━━━ 3. Navbar publique (visiteurs non connectés) ━━━ */
   return (
     <>
+      {/* Spacer pour compenser la navbar fixe */}
       <div className="h-[72px]" />
 
       <nav
@@ -355,6 +381,7 @@ export function Navbar() {
           "fixed top-3 left-4 right-4 z-50 mx-auto max-w-[1200px]",
           "h-12 rounded-2xl px-5 flex items-center justify-between",
           "border transition-all duration-300",
+          // Quand la navbar est sur une section sombre, elle passe en blanc
           onDark
             ? "bg-white/90 backdrop-blur-2xl border-white/60 shadow-lg"
             : "bg-gradient-to-r from-deepForest to-forest backdrop-blur-2xl border-white/[0.08] shadow-[0_4px_20px_rgba(10,64,48,0.25)]",
@@ -384,7 +411,7 @@ export function Navbar() {
 
         <div className="flex-1" />
 
-        {/* Desktop links */}
+        {/* Liens publics (desktop) */}
         <div className="hidden md:flex items-center gap-0.5">
           {publicLinks.map((link) => {
             const Icon = link.icon;
@@ -395,6 +422,7 @@ export function Navbar() {
                 href={link.href}
                 className={cn(
                   "relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer",
+                  // Couleurs adaptées au mode clair/sombre de la navbar
                   onDark
                     ? active
                       ? "text-forest font-semibold"
@@ -417,7 +445,7 @@ export function Navbar() {
           })}
         </div>
 
-        {/* Auth buttons — always visible on public navbar */}
+        {/* Boutons connexion / inscription (desktop) */}
         <div className="hidden md:flex items-center gap-2 ml-4">
             <Link
               href="/login"
@@ -444,7 +472,7 @@ export function Navbar() {
             </Link>
           </div>
 
-        {/* Mobile hamburger */}
+        {/* Bouton hamburger (mobile) */}
         <button
           className={cn(
             "md:hidden w-9 h-9 flex items-center justify-center rounded-lg active:scale-[0.95] transition-all cursor-pointer",
@@ -460,7 +488,7 @@ export function Navbar() {
         </button>
       </nav>
 
-      {/* Mobile dropdown */}
+      {/* Menu mobile déroulant (public) */}
       {mobileOpen && (
         <div className="fixed inset-x-0 top-[68px] bottom-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-navy/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
@@ -488,6 +516,7 @@ export function Navbar() {
 
             <div className="h-px bg-border/40 my-2" />
 
+            {/* Boutons connexion/inscription (mobile) */}
             <div className="flex flex-col gap-2">
               <Link
                 href="/signup"

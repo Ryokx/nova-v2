@@ -1,19 +1,36 @@
+/**
+ * Configuration des métiers (corps de métier) — Données SEO et landing pages
+ *
+ * Chaque métier contient :
+ * - Infos générales (nom, slug, icône)
+ * - Textes pour les pages normales et urgences
+ * - Liste de services proposés
+ * - FAQ pour le SEO
+ * - Métadonnées SEO (title, description)
+ * - Statistiques affichées (temps de réponse, note, nombre d'artisans)
+ */
+
 import {
   Droplets, Plug, KeyRound, Flame, PaintBucket, Hammer,
   LayoutGrid, Wrench,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+// --- Types ---
+
+/** Service proposé par un métier */
 export interface TradeService {
   title: string;
   desc: string;
 }
 
+/** Question/réponse FAQ d'un métier */
 export interface TradeFaq {
   q: string;
   a: string;
 }
 
+/** Configuration complète d'un métier */
 export interface TradeConfig {
   slug: string;
   slugUrgency: string;
@@ -40,7 +57,12 @@ export interface TradeConfig {
   artisanCount: string;
 }
 
-export const trades: Record<string, TradeConfig> = {
+// --- Données de chaque métier ---
+
+type TradeSlug = "serrurier" | "plombier" | "electricien" | "chauffagiste" | "peintre" | "menuisier" | "carreleur" | "macon";
+
+export const trades: Record<TradeSlug, TradeConfig> = {
+  // ━━━ Serrurier ━━━
   serrurier: {
     slug: "serrurier",
     slugUrgency: "serrurier-urgence",
@@ -80,6 +102,7 @@ export const trades: Record<string, TradeConfig> = {
     artisanCount: "48",
   },
 
+  // ━━━ Plombier ━━━
   plombier: {
     slug: "plombier",
     slugUrgency: "plombier-urgence",
@@ -119,6 +142,7 @@ export const trades: Record<string, TradeConfig> = {
     artisanCount: "62",
   },
 
+  // ━━━ Électricien ━━━
   electricien: {
     slug: "electricien",
     slugUrgency: "electricien-urgence",
@@ -158,6 +182,7 @@ export const trades: Record<string, TradeConfig> = {
     artisanCount: "53",
   },
 
+  // ━━━ Chauffagiste ━━━
   chauffagiste: {
     slug: "chauffagiste",
     slugUrgency: "chauffagiste-urgence",
@@ -197,6 +222,7 @@ export const trades: Record<string, TradeConfig> = {
     artisanCount: "37",
   },
 
+  // ━━━ Peintre ━━━
   peintre: {
     slug: "peintre",
     slugUrgency: "peintre-urgence",
@@ -236,6 +262,7 @@ export const trades: Record<string, TradeConfig> = {
     artisanCount: "41",
   },
 
+  // ━━━ Menuisier ━━━
   menuisier: {
     slug: "menuisier",
     slugUrgency: "menuisier-urgence",
@@ -275,6 +302,7 @@ export const trades: Record<string, TradeConfig> = {
     artisanCount: "29",
   },
 
+  // ━━━ Carreleur ━━━
   carreleur: {
     slug: "carreleur",
     slugUrgency: "carreleur-urgence",
@@ -314,6 +342,7 @@ export const trades: Record<string, TradeConfig> = {
     artisanCount: "25",
   },
 
+  // ━━━ Maçon ━━━
   macon: {
     slug: "macon",
     slugUrgency: "macon-urgence",
@@ -354,10 +383,13 @@ export const trades: Record<string, TradeConfig> = {
   },
 };
 
+/** Liste de tous les métiers sous forme de tableau */
 export const tradeList = Object.values(trades);
 
+/** Récupère la config d'un métier par son slug */
 export function getTradeBySlug(slug: string): TradeConfig | undefined {
-  return trades[slug];
+  return (trades as Record<string, TradeConfig>)[slug];
 }
 
+/** Métiers disponibles en page urgence */
 export const urgencyTrades = ["serrurier", "plombier", "electricien", "chauffagiste", "macon"] as const;

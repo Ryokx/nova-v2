@@ -1,14 +1,24 @@
+/**
+ * Page Tarification artisan.
+ * Permet de configurer :
+ * - Frais de déplacement par tranche kilométrique
+ * - Devis payant ou gratuit
+ * - Majorations (urgence +50%, week-end +30%, nuit +80%)
+ * Un aperçu en temps réel simule le coût d'une intervention type.
+ */
 "use client";
 
 import { useState } from "react";
 import { Car, FileText, AlertTriangle, Eye, Save } from "lucide-react";
 import { formatPrice, cn } from "@/lib/utils";
 
+/* Tranche kilométrique avec prix associé */
 interface DeplacementTier {
   label: string;
   price: number;
 }
 
+/* Tarifs par défaut des frais de déplacement */
 const defaultTiers: DeplacementTier[] = [
   { label: "0 – 10 km", price: 0 },
   { label: "10 – 20 km", price: 15 },
@@ -17,22 +27,29 @@ const defaultTiers: DeplacementTier[] = [
 ];
 
 export default function ArtisanPricingPage() {
+  /* Activation des frais de déplacement */
   const [deplacementEnabled, setDeplacementEnabled] = useState(true);
+  /* Tarifs par tranche kilométrique */
   const [tiers, setTiers] = useState(defaultTiers);
+  /* Devis payant activé/désactivé */
   const [devisPayant, setDevisPayant] = useState(false);
+  /* Prix du devis si payant */
   const [devisPrice, setDevisPrice] = useState(0);
+  /* Activation des majorations */
   const [majorationUrgence, setMajorationUrgence] = useState(true);
   const [majorationWeekend, setMajorationWeekend] = useState(true);
   const [majorationNuit, setMajorationNuit] = useState(false);
 
+  /* Pourcentages de majoration (fixes) */
   const urgencePct = 50;
   const weekendPct = 30;
   const nuitPct = 80;
 
-  // Preview calculation: 15km déplacement
+  /* Simulation d'aperçu : intervention à 15 km */
   const previewKm = 15;
   const deplacementCost = deplacementEnabled ? (tiers.find((_, i) => i === 1)?.price ?? 15) : 0;
 
+  /* Met à jour le prix d'une tranche kilométrique */
   const updateTierPrice = (index: number, price: number) => {
     setTiers((prev) => prev.map((t, i) => (i === index ? { ...t, price } : t)));
   };

@@ -1,8 +1,15 @@
 /**
- * Nova Email Templates
- * Based on /reference/nova-email-artisan.html
- * Ready for Resend or Nodemailer integration
+ * Templates HTML pour les emails Nova
+ *
+ * Deux templates principaux :
+ * 1. artisanWelcomeEmail — Email de bienvenue pour un nouvel artisan
+ * 2. missionNotificationEmail — Notification générique liée à une mission
+ *
+ * Les styles sont inline pour compatibilité maximale avec les clients mail.
+ * Design basé sur le design system Nova (couleurs deepForest, forest, gold, etc.)
  */
+
+// --- Types des données pour chaque template ---
 
 interface ArtisanWelcomeData {
   artisanName: string;
@@ -24,6 +31,7 @@ interface MissionNotifData {
   ctaLabel: string;
 }
 
+// --- Styles CSS de base (communs à tous les templates) ---
 const baseStyles = `
   body { margin: 0; padding: 0; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #F5FAF7; }
   .container { max-width: 600px; margin: 0 auto; background: #fff; }
@@ -40,6 +48,7 @@ const baseStyles = `
   .footer-text { font-size: 11px; color: #6B7280; line-height: 1.6; }
 `;
 
+/** Template email de bienvenue artisan (avec stats optionnelles) */
 export function artisanWelcomeEmail(data: ArtisanWelcomeData): string {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -81,6 +90,7 @@ export function artisanWelcomeEmail(data: ArtisanWelcomeData): string {
 </html>`;
 }
 
+/** Template email de notification mission (devis, paiement, validation, etc.) */
 export function missionNotificationEmail(data: MissionNotifData): string {
   return `<!DOCTYPE html>
 <html lang="fr">

@@ -1,3 +1,10 @@
+/**
+ * Page "Mes missions".
+ * Liste toutes les missions du client avec filtrage par onglets (Toutes, Terminées, Validées, Litiges).
+ * Chaque mission est dépliable pour voir le détail : stepper séquestre, infos, documents, actions.
+ * Utilise les données API si disponibles, sinon affiche des données mock (prototype).
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -36,7 +43,7 @@ interface MissionData {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Mock data (used when API returns nothing — prototype feel)         */
+/*  Données mock (affichées quand l'API ne retourne rien)              */
 /* ------------------------------------------------------------------ */
 
 const mockMissions: MissionData[] = [
@@ -95,9 +102,10 @@ const mockMissions: MissionData[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Tabs                                                               */
+/*  Configuration                                                      */
 /* ------------------------------------------------------------------ */
 
+/** Onglets de filtrage */
 const tabs = [
   { id: "all", label: "Toutes" },
   { id: "COMPLETED", label: "Terminées" },
@@ -105,10 +113,7 @@ const tabs = [
   { id: "DISPUTED", label: "Litiges" },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  Status config                                                      */
-/* ------------------------------------------------------------------ */
-
+/** Apparence des badges de statut */
 const statusBadge: Record<string, { label: string; cls: string }> = {
   IN_PROGRESS: { label: "En cours", cls: "bg-forest/10 text-forest" },
   COMPLETED: { label: "Terminée", cls: "bg-success/10 text-success" },
@@ -116,10 +121,7 @@ const statusBadge: Record<string, { label: string; cls: string }> = {
   DISPUTED: { label: "Litige", cls: "bg-red/10 text-red" },
 };
 
-/* ------------------------------------------------------------------ */
-/*  Escrow step helper                                                 */
-/* ------------------------------------------------------------------ */
-
+/** Labels des 4 étapes du séquestre */
 const escrowSteps = [
   "Paiement bloqué",
   "Mission en cours",
@@ -127,6 +129,7 @@ const escrowSteps = [
   "Artisan payé",
 ];
 
+/** Détermine l'étape du séquestre selon le statut de la mission */
 function getEscrowStep(status: string): number {
   const map: Record<string, number> = {
     PENDING: 0,
@@ -139,15 +142,20 @@ function getEscrowStep(status: string): number {
   return map[status] ?? 0;
 }
 
+/* ------------------------------------------------------------------ */
+/*  Composant Stepper horizontal du séquestre                          */
+/* ------------------------------------------------------------------ */
+
 function EscrowStepperHorizontal({ currentStep }: { currentStep: number }) {
   return (
     <div className="flex items-center w-full">
       {escrowSteps.map((label, i) => {
-        const done = i < currentStep;
-        const active = i === currentStep;
+        const done = i < currentStep;   // étape terminée
+        const active = i === currentStep; // étape en cours
         return (
           <div key={i} className="flex items-center flex-1 last:flex-none">
             <div className="flex flex-col items-center gap-1.5">
+              {/* Cercle numéroté ou coché */}
               <div
                 className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
@@ -158,6 +166,7 @@ function EscrowStepperHorizontal({ currentStep }: { currentStep: number }) {
               >
                 {done ? <Check className="w-4 h-4" /> : i + 1}
               </div>
+              {/* Label de l'étape */}
               <span
                 className={cn(
                   "text-[10px] font-semibold text-center leading-tight whitespace-nowrap",
@@ -167,6 +176,7 @@ function EscrowStepperHorizontal({ currentStep }: { currentStep: number }) {
                 {label}
               </span>
             </div>
+            {/* Barre de connexion entre les étapes */}
             {i < escrowSteps.length - 1 && (
               <div
                 className={cn(
@@ -183,25 +193,30 @@ function EscrowStepperHorizontal({ currentStep }: { currentStep: number }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Main page                                                          */
+/*  Composant principal                                                */
 /* ------------------------------------------------------------------ */
 
 export default function MissionsPage() {
+  /** Onglet actif */
   const [tab, setTab] = useState("all");
+  /** ID de la mission dépliée (null = toutes repliées) */
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  /** Notes données par le client (clé = missionId, valeur = nombre d'étoiles) */
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const router = useRouter();
   const { data: apiMissions, loading } = useFetch<MissionData[]>("/api/missions");
 
-  // Use API data if available, otherwise fall back to mock
+  /* Données API ou mock en fallback */
   const missions = apiMissions && apiMissions.length > 0 ? apiMissions : mockMissions;
 
+  /* Filtrage selon l'onglet sélectionné */
   const filteredMissions = missions.filter((m) => {
     if (tab === "all") return true;
     if (tab === "COMPLETED") return m.status === "COMPLETED";
     return m.status === tab;
   });
 
+  /** Bascule le déplié d'une mission */
   const toggle = (id: string) => setExpandedId(expandedId === id ? null : id);
 
   return (
@@ -211,7 +226,7 @@ export default function MissionsPage() {
       </h1>
       <p className="text-sm text-grayText mb-6">Suivez vos interventions</p>
 
-      {/* Tab pills */}
+      {/* Onglets de filtrage */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
         {tabs.map((t) => (
           <button
@@ -229,8 +244,9 @@ export default function MissionsPage() {
         ))}
       </div>
 
-      {/* Mission list */}
+      {/* Liste des missions */}
       {loading ? (
+        /* Squelettes de chargement */
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} variant="rectangular" height={80} />
@@ -251,17 +267,17 @@ export default function MissionsPage() {
                 key={m.id}
                 className="bg-white border border-border shadow-sm rounded-[5px] overflow-hidden transition-all"
               >
-                {/* Summary row */}
+                {/* Ligne résumée (cliquable pour déplier) */}
                 <button
                   onClick={() => toggle(m.id)}
                   className="w-full flex items-center gap-3.5 p-4 text-left hover:bg-surface/30 transition-colors"
                 >
-                  {/* Avatar */}
+                  {/* Avatar initiales */}
                   <div className="w-10 h-10 rounded-[5px] bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white text-sm font-bold shrink-0">
                     {initials}
                   </div>
 
-                  {/* Name + type + date */}
+                  {/* Nom + type + date */}
                   <div className="flex-1 min-w-0">
                     <div className="font-heading font-semibold text-sm text-navy truncate">
                       {name}
@@ -280,14 +296,14 @@ export default function MissionsPage() {
                     </div>
                   </div>
 
-                  {/* Amount */}
+                  {/* Montant */}
                   {m.amount != null && (
                     <span className="font-mono font-bold text-sm text-navy shrink-0">
                       {formatPrice(m.amount)}
                     </span>
                   )}
 
-                  {/* Status badge */}
+                  {/* Badge statut */}
                   <span
                     className={cn(
                       "inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold shrink-0",
@@ -297,7 +313,7 @@ export default function MissionsPage() {
                     {badge.label}
                   </span>
 
-                  {/* Expand chevron */}
+                  {/* Chevron déplier/replier */}
                   <ChevronDown
                     className={cn(
                       "w-5 h-5 text-grayText shrink-0 transition-transform duration-200",
@@ -306,15 +322,15 @@ export default function MissionsPage() {
                   />
                 </button>
 
-                {/* Expanded content */}
+                {/* Contenu déplié */}
                 {expanded && (
                   <div className="px-5 pb-5 border-t border-border animate-in slide-in-from-top-2 duration-200">
-                    {/* Escrow stepper */}
+                    {/* Stepper séquestre */}
                     <div className="py-5">
                       <EscrowStepperHorizontal currentStep={step} />
                     </div>
 
-                    {/* Info grid 2x2 */}
+                    {/* Grille d'informations 2x2 */}
                     <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                       <div>
                         <span className="text-[11px] text-grayText">Catégorie</span>
@@ -342,7 +358,7 @@ export default function MissionsPage() {
                       </div>
                     </div>
 
-                    {/* Description */}
+                    {/* Description de la mission */}
                     {m.description && (
                       <div className="mb-4">
                         <span className="text-[11px] text-grayText">Description</span>
@@ -350,7 +366,7 @@ export default function MissionsPage() {
                       </div>
                     )}
 
-                    {/* Financial */}
+                    {/* Détail financier (si devis disponible) */}
                     {m.devis && (
                       <div className="bg-surface/50 rounded-[5px] p-4 mb-4 space-y-2 text-sm">
                         <div className="flex justify-between">
@@ -374,7 +390,7 @@ export default function MissionsPage() {
                       </div>
                     )}
 
-                    {/* Documents */}
+                    {/* Boutons téléchargement documents */}
                     <div className="flex gap-2 mb-5">
                       {m.devis && (
                         <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[5px] bg-surface text-forest text-sm font-medium hover:bg-border transition-colors">
@@ -390,7 +406,9 @@ export default function MissionsPage() {
                       )}
                     </div>
 
-                    {/* Actions: Terminée */}
+                    {/* Actions selon le statut */}
+
+                    {/* Mission terminée : noter + valider ou signaler */}
                     {m.status === "COMPLETED" && (
                       <div className="space-y-3">
                         <div className="flex items-center gap-3">
@@ -415,7 +433,7 @@ export default function MissionsPage() {
                       </div>
                     )}
 
-                    {/* Actions: Validée */}
+                    {/* Mission validée : paiement effectué */}
                     {m.status === "VALIDATED" && (
                       <div className="flex items-center gap-2 p-3 rounded-[5px] bg-success/10 text-success text-sm font-semibold">
                         <Check className="w-5 h-5" />
@@ -423,7 +441,7 @@ export default function MissionsPage() {
                       </div>
                     )}
 
-                    {/* Actions: Litige */}
+                    {/* Mission en litige : paiement bloqué */}
                     {m.status === "DISPUTED" && (
                       <div className="flex items-center gap-2 p-3 rounded-[5px] bg-red/10 text-red text-sm font-semibold">
                         <Lock className="w-5 h-5" />
@@ -437,6 +455,7 @@ export default function MissionsPage() {
           })}
         </div>
       ) : (
+        /* État vide */
         <EmptyState
           icon={
             tab === "DISPUTED" ? (

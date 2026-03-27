@@ -1,3 +1,10 @@
+/**
+ * Page Paramètres.
+ * Permet de gérer les préférences de notifications (push, email, SMS),
+ * de changer le mot de passe, et de se déconnecter.
+ * Le mode sombre est prévu mais pas encore disponible.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -5,46 +12,59 @@ import { signOut } from "next-auth/react";
 import { Moon, Bell, Lock, LogOut, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
+/* ------------------------------------------------------------------ */
+/*  Composant Toggle (interrupteur on/off)                             */
+/* ------------------------------------------------------------------ */
+
+const Toggle = ({
+  enabled,
+  onToggle,
+  disabled = false,
+}: {
+  enabled: boolean;
+  onToggle: () => void;
+  disabled?: boolean;
+}) => (
+  <button
+    onClick={onToggle}
+    disabled={disabled}
+    className={`relative w-11 h-6 rounded-full transition-colors ${
+      enabled ? "bg-forest" : "bg-gray-200"
+    } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+    role="switch"
+    aria-checked={enabled}
+  >
+    <div
+      className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+        enabled ? "translate-x-[22px]" : "translate-x-0.5"
+      }`}
+    />
+  </button>
+);
+
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function SettingsPage() {
+  /** Préférences de notifications */
   const [notifications, setNotifications] = useState({
     push: true,
     email: true,
     sms: false,
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [darkMode] = useState(false);
 
-  const Toggle = ({
-    enabled,
-    onToggle,
-    disabled = false,
-  }: {
-    enabled: boolean;
-    onToggle: () => void;
-    disabled?: boolean;
-  }) => (
-    <button
-      onClick={onToggle}
-      disabled={disabled}
-      className={`relative w-11 h-6 rounded-full transition-colors ${
-        enabled ? "bg-forest" : "bg-gray-200"
-      } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-      role="switch"
-      aria-checked={enabled}
-    >
-      <div
-        className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
-          enabled ? "translate-x-[22px]" : "translate-x-0.5"
-        }`}
-      />
-    </button>
-  );
+  /** Affiche le formulaire de changement de mot de passe */
+  const [showPassword, setShowPassword] = useState(false);
+
+  /** Mode sombre (pas encore implémenté) */
+  const [darkMode] = useState(false);
 
   return (
     <div className="max-w-[600px] mx-auto p-5 md:p-8">
       <h1 className="font-heading text-[26px] font-extrabold text-navy mb-6">Paramètres</h1>
 
-      {/* Notifications */}
+      {/* Section Notifications */}
       <div className="bg-white rounded-[5px] border border-border mb-4">
         <div className="p-5">
           <h2 className="font-heading font-semibold text-navy flex items-center gap-2 mb-4">
@@ -71,7 +91,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Security */}
+      {/* Section Sécurité (mot de passe) */}
       <div className="bg-white rounded-[5px] border border-border mb-4">
         <div className="p-5">
           <h2 className="font-heading font-semibold text-navy flex items-center gap-2 mb-4">
@@ -79,6 +99,7 @@ export default function SettingsPage() {
             Sécurité
           </h2>
           {!showPassword ? (
+            /* Bouton pour afficher le formulaire */
             <button
               onClick={() => setShowPassword(true)}
               className="flex items-center justify-between w-full"
@@ -87,6 +108,7 @@ export default function SettingsPage() {
               <ChevronRight className="w-4 h-4 text-grayText" />
             </button>
           ) : (
+            /* Formulaire de changement de mot de passe */
             <div className="space-y-3">
               <Input type="password" placeholder="Mot de passe actuel" />
               <Input type="password" placeholder="Nouveau mot de passe" />
@@ -107,7 +129,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Dark mode */}
+      {/* Section Apparence (mode sombre - bientôt disponible) */}
       <div className="bg-white rounded-[5px] border border-border mb-6">
         <div className="p-5">
           <h2 className="font-heading font-semibold text-navy flex items-center gap-2 mb-4">
@@ -124,7 +146,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Logout */}
+      {/* Bouton de déconnexion */}
       <button
         onClick={() => signOut({ callbackUrl: "/" })}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red text-white text-sm font-bold rounded-[5px] hover:-translate-y-0.5 transition-transform"

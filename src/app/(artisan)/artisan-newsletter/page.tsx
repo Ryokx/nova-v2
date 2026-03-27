@@ -1,3 +1,12 @@
+/**
+ * Page Newsletter artisan.
+ * Permet de :
+ * - Voir les stats (abonnés, taux d'ouverture/clic, désabonnements)
+ * - Consulter l'historique des newsletters envoyées
+ * - Composer et envoyer une nouvelle newsletter (éditeur + aperçu)
+ * - Gérer les abonnés (croissance, liste, widget embarquable)
+ * - Configurer les paramètres d'envoi (fréquence, jour, heure, expéditeur)
+ */
 "use client";
 
 import { useState } from "react";
@@ -29,6 +38,7 @@ import {
 
 /* ──────────────── Types ──────────────── */
 
+/* Structure d'une newsletter envoyée */
 interface Newsletter {
   id: string;
   title: string;
@@ -39,14 +49,16 @@ interface Newsletter {
   preview: string;
 }
 
+/* Structure d'un abonné */
 interface Subscriber {
   name: string;
   email: string;
   date: string;
 }
 
-/* ──────────────── Mock data ──────────────── */
+/* ──────────────── Données mockées ──────────────── */
 
+/* Historique des newsletters envoyées */
 const newsletters: Newsletter[] = [
   {
     id: "n1",
@@ -77,6 +89,7 @@ const newsletters: Newsletter[] = [
   },
 ];
 
+/* Derniers abonnés */
 const recentSubscribers: Subscriber[] = [
   { name: "Camille Leroy", email: "camille.leroy@mail.com", date: "22 mars 2026" },
   { name: "Hugo Fontaine", email: "hugo.fontaine@mail.com", date: "20 mars 2026" },
@@ -85,6 +98,7 @@ const recentSubscribers: Subscriber[] = [
   { name: "Léa Marchand", email: "lea.marchand@mail.com", date: "14 mars 2026" },
 ];
 
+/* Code d'intégration du widget newsletter pour sites externes */
 const embedSnippet = `<div id="nova-newsletter-widget" data-artisan="VOTRE_ID"></div>
 <script src="https://nova.fr/widget/newsletter.js" async></script>`;
 
@@ -101,36 +115,39 @@ const dayOptions = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi",
 /* ──────────────── Page ──────────────── */
 
 export default function ArtisanNewsletterPage() {
+  /* Newsletter dépliée dans l'historique (affiche le détail) */
   const [expandedNewsletter, setExpandedNewsletter] = useState<string | null>(null);
 
-  /* Compose state */
-  const [nlSubject, setNlSubject] = useState("");
-  const [nlBody, setNlBody] = useState("");
-  const [nlTemplate, setNlTemplate] = useState("");
-  const [nlCtaText, setNlCtaText] = useState("");
-  const [nlCtaUrl, setNlCtaUrl] = useState("");
-  const [showPreview, setShowPreview] = useState(false);
+  /* --- État du compositeur de newsletter --- */
+  const [nlSubject, setNlSubject] = useState("");       // Objet de la newsletter
+  const [nlBody, setNlBody] = useState("");              // Contenu texte
+  const [nlTemplate, setNlTemplate] = useState("");      // Template sélectionné
+  const [nlCtaText, setNlCtaText] = useState("");        // Texte du bouton CTA
+  const [nlCtaUrl, setNlCtaUrl] = useState("");          // URL du bouton CTA
+  const [showPreview, setShowPreview] = useState(false);  // Afficher l'aperçu
 
-  /* Subscribers */
-  const [autoSubscribe, setAutoSubscribe] = useState(true);
-  const [codeCopied, setCodeCopied] = useState(false);
+  /* --- Gestion des abonnés --- */
+  const [autoSubscribe, setAutoSubscribe] = useState(true);  // Inscription auto des nouveaux clients
+  const [codeCopied, setCodeCopied] = useState(false);       // Feedback copie du code embed
 
-  /* Settings */
+  /* --- Paramètres d'envoi --- */
   const [frequency, setFrequency] = useState("mensuel");
   const [sendDay, setSendDay] = useState("Mardi");
   const [sendTime, setSendTime] = useState("09:00");
   const [senderName, setSenderName] = useState("Martin Plomberie");
   const [replyEmail, setReplyEmail] = useState("contact@martin-plomberie.fr");
 
+  /* Copie le code d'intégration dans le presse-papier */
   const handleCopyCode = () => {
     navigator.clipboard.writeText(embedSnippet).catch(() => {});
     setCodeCopied(true);
     setTimeout(() => setCodeCopied(false), 2000);
   };
 
+  /* Vérifie que l'objet et le contenu sont remplis avant d'autoriser l'envoi */
   const canSend = nlSubject.trim().length > 0 && nlBody.trim().length > 0;
 
-  /* Mock growth bars */
+  /* Données mockées pour le graphique de croissance des abonnés */
   const growthData = [
     { month: "Oct", count: 180 },
     { month: "Nov", count: 195 },

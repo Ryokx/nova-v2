@@ -1,3 +1,9 @@
+/**
+ * Page des notifications artisan.
+ * Affiche les notifications (urgences, devis acceptés, paiements, RDV, rappels)
+ * avec filtres par type et possibilité de tout marquer comme lu.
+ * Utilise l'API /api/notifications avec fallback sur des données mockées.
+ */
 "use client";
 
 import { useState } from "react";
@@ -7,6 +13,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { useFetch } from "@/hooks/use-fetch";
 import { cn } from "@/lib/utils";
 
+/* Structure d'une notification */
 interface NotifData {
   id: string;
   type: string;
@@ -16,6 +23,7 @@ interface NotifData {
   createdAt: string;
 }
 
+/* Icône et couleur de fond pour chaque type de notification */
 const iconMap: Record<string, { icon: React.ReactNode; bg: string }> = {
   URGENT_REQUEST: { icon: <Zap className="w-5 h-5 text-red" />, bg: "bg-red/10" },
   DEVIS_ACCEPTED: { icon: <FileText className="w-5 h-5 text-success" />, bg: "bg-success/10" },
@@ -24,6 +32,7 @@ const iconMap: Record<string, { icon: React.ReactNode; bg: string }> = {
   CERTIFICATION_REMINDER: { icon: <Shield className="w-5 h-5 text-grayText" />, bg: "bg-gray-100" },
 };
 
+/* Libellé du bouton d'action selon le type de notification */
 const actionLabels: Record<string, string> = {
   URGENT_REQUEST: "Voir",
   DEVIS_ACCEPTED: "Voir le devis",
@@ -31,6 +40,7 @@ const actionLabels: Record<string, string> = {
   APPOINTMENT_CONFIRMED: "Voir",
 };
 
+/* Onglets de filtre disponibles */
 const filterTabs = [
   { key: "all", label: "Toutes" },
   { key: "unread", label: "Non lues" },
@@ -41,7 +51,7 @@ const filterTabs = [
   { key: "CERTIFICATION_REMINDER", label: "Rappels" },
 ];
 
-// Mock notifications for display
+/* Notifications mockées (affichées si l'API ne retourne rien) */
 const mockNotifications: NotifData[] = [
   {
     id: "1",
@@ -85,6 +95,7 @@ const mockNotifications: NotifData[] = [
   },
 ];
 
+/* Formate un timestamp en durée relative ("Il y a 2h", "Hier", etc.) */
 function formatTime(date: string): string {
   const diff = Date.now() - new Date(date).getTime();
   const mins = Math.floor(diff / 60000);
@@ -99,11 +110,15 @@ function formatTime(date: string): string {
 }
 
 export default function ArtisanNotificationsPage() {
+  /* Récupération des notifications via l'API */
   const { data: apiNotifications, loading, refetch } = useFetch<NotifData[]>("/api/notifications");
+  /* Filtre actif (par défaut : toutes) */
   const [activeFilter, setActiveFilter] = useState("all");
 
+  /* Utilise les données API si disponibles, sinon les données mockées */
   const notifications = apiNotifications && apiNotifications.length > 0 ? apiNotifications : mockNotifications;
 
+  /* Filtrage des notifications selon l'onglet sélectionné */
   const filteredNotifications = notifications
     ? notifications.filter((n) => {
         if (activeFilter === "all") return true;
@@ -114,6 +129,7 @@ export default function ArtisanNotificationsPage() {
 
   const unreadCount = notifications ? notifications.filter((n) => !n.read).length : 0;
 
+  /* Marque toutes les notifications comme lues via l'API */
   const markAllRead = async () => {
     await fetch("/api/notifications", {
       method: "PATCH",

@@ -1,3 +1,10 @@
+/**
+ * Page de détail d'une mission.
+ * Affiche le suivi complet : stepper séquestre, infos, paiement, documents.
+ * Permet de valider l'intervention (noter l'artisan + libérer le paiement).
+ * Après validation : écran de succès confirmant le versement.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -40,7 +47,7 @@ interface MissionDetail {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Mock data for prototype feel                                       */
+/*  Données mock (prototype)                                           */
 /* ------------------------------------------------------------------ */
 
 const mockMission: MissionDetail = {
@@ -61,7 +68,7 @@ const mockMission: MissionDetail = {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Escrow stepper (horizontal, 4 steps)                               */
+/*  Stepper séquestre (4 étapes horizontales)                          */
 /* ------------------------------------------------------------------ */
 
 const escrowLabels = [
@@ -71,6 +78,7 @@ const escrowLabels = [
   "Artisan payé",
 ];
 
+/** Détermine l'étape du séquestre selon le statut */
 function getStep(status: string): number {
   const map: Record<string, number> = {
     PENDING: 0,
@@ -83,6 +91,7 @@ function getStep(status: string): number {
   return map[status] ?? 0;
 }
 
+/** Composant stepper horizontal */
 function EscrowStepperH({ currentStep }: { currentStep: number }) {
   return (
     <div className="flex items-center w-full">
@@ -127,7 +136,7 @@ function EscrowStepperH({ currentStep }: { currentStep: number }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Status badge config                                                */
+/*  Configuration des badges de statut                                 */
 /* ------------------------------------------------------------------ */
 
 const statusBadge: Record<string, { label: string; cls: string }> = {
@@ -137,19 +146,25 @@ const statusBadge: Record<string, { label: string; cls: string }> = {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Page                                                               */
+/*  Composant principal                                                */
 /* ------------------------------------------------------------------ */
 
 export default function MissionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { data: apiMission, loading, refetch } = useFetch<MissionDetail>(`/api/missions/${id}`);
+
+  /** Nombre d'étoiles sélectionné par le client */
   const [stars, setStars] = useState(0);
+  /** État de soumission de la validation */
   const [submitting, setSubmitting] = useState(false);
+  /** La mission vient d'être validée */
   const [validated, setValidated] = useState(false);
 
+  /* Données API ou mock en fallback */
   const mission = apiMission ?? mockMission;
 
+  /* Squelette de chargement */
   if (loading) {
     return (
       <div className="max-w-[700px] mx-auto p-5 md:p-8 space-y-4">
@@ -159,6 +174,7 @@ export default function MissionDetailPage() {
     );
   }
 
+  /* Valeurs dérivées */
   const name = mission.artisan.user.name ?? "Artisan";
   const initials = getInitials(name);
   const currentStep = getStep(mission.status);
@@ -169,6 +185,7 @@ export default function MissionDetailPage() {
     cls: mission.review ? "bg-gold/10 text-gold" : "bg-surface text-forest",
   };
 
+  /** Envoie la note et valide la mission (libère le paiement) */
   const handleValidate = async () => {
     if (stars === 0) return;
     setSubmitting(true);
@@ -185,7 +202,9 @@ export default function MissionDetailPage() {
     }
   };
 
-  /* Validated success screen */
+  /* ================================================================ */
+  /*  Écran de succès après validation                                 */
+  /* ================================================================ */
   if (validated || mission.review) {
     const amount = mission.amount ? formatPrice(mission.amount) : "";
     return (
@@ -204,9 +223,13 @@ export default function MissionDetailPage() {
     );
   }
 
+  /* ================================================================ */
+  /*  Vue principale                                                   */
+  /* ================================================================ */
   return (
     <div className="max-w-[700px] mx-auto p-5 md:p-8">
-      {/* Back button */}
+
+      {/* Bouton retour */}
       <button
         onClick={() => router.back()}
         className="flex items-center gap-1.5 text-sm text-forest font-medium mb-5 hover:underline"
@@ -214,7 +237,7 @@ export default function MissionDetailPage() {
         <ArrowLeft className="w-4 h-4" /> Retour
       </button>
 
-      {/* Header */}
+      {/* En-tête : avatar + titre + badge statut */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-[5px] bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white text-sm font-bold">
@@ -232,13 +255,13 @@ export default function MissionDetailPage() {
         </span>
       </div>
 
-      {/* Escrow stepper */}
+      {/* Stepper séquestre */}
       <Card className="mb-4">
         <h2 className="font-heading text-sm font-bold text-navy mb-4">Suivi séquestre</h2>
         <EscrowStepperH currentStep={currentStep} />
       </Card>
 
-      {/* Mission info grid */}
+      {/* Grille d'informations */}
       <Card className="mb-4">
         <h2 className="font-heading text-sm font-bold text-navy mb-3">Détails</h2>
         <div className="grid grid-cols-2 gap-3 text-sm">
@@ -276,7 +299,7 @@ export default function MissionDetailPage() {
         )}
       </Card>
 
-      {/* Financial breakdown */}
+      {/* Détail paiement */}
       {mission.devis && (
         <Card className="mb-4">
           <h2 className="font-heading text-sm font-bold text-navy mb-3">Paiement</h2>
@@ -297,7 +320,7 @@ export default function MissionDetailPage() {
         </Card>
       )}
 
-      {/* Documents */}
+      {/* Documents téléchargeables */}
       <div className="flex gap-2 mb-5">
         {mission.devis && (
           <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-[5px] bg-surface text-forest text-sm font-medium hover:bg-border transition-colors">
@@ -317,16 +340,18 @@ export default function MissionDetailPage() {
         )}
       </div>
 
-      {/* Validation section */}
+      {/* Section validation (visible si mission terminée et non encore validée) */}
       {isCompleted && (
         <Card className="border-2 border-success/20">
           <h2 className="font-heading text-sm font-bold text-navy mb-3">
             Valider l&apos;intervention
           </h2>
+          {/* Notation par étoiles */}
           <div className="flex items-center gap-3 mb-4">
             <span className="text-sm text-grayText">Notez {name} :</span>
             <StarRating value={stars} onChange={setStars} size="lg" />
           </div>
+          {/* Bouton valider */}
           <button
             className={cn(
               "w-full py-3 rounded-[5px] bg-deepForest text-white font-bold font-heading text-sm transition-all flex items-center justify-center gap-2",
@@ -347,6 +372,7 @@ export default function MissionDetailPage() {
             )}
             Valider — Libérer le paiement
           </button>
+          {/* Bouton signaler litige */}
           <button className="w-full mt-2 py-2.5 rounded-[5px] text-red text-sm font-semibold hover:bg-red/5 transition-colors flex items-center justify-center gap-1.5">
             <AlertTriangle className="w-4 h-4" />
             Signaler un litige
@@ -354,7 +380,7 @@ export default function MissionDetailPage() {
         </Card>
       )}
 
-      {/* Disputed state */}
+      {/* Bandeau litige */}
       {isDisputed && (
         <Card className="bg-red/5 border-red/20">
           <div className="flex items-center gap-2">

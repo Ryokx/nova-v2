@@ -1,3 +1,9 @@
+/**
+ * Page Contrat d'entretien annuel.
+ * Affiche les plans disponibles (chaudière, clim, plomberie, pack sérénité)
+ * et permet d'en souscrire un. Après souscription : écran de succès.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -6,6 +12,10 @@ import { Lock, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+/* ------------------------------------------------------------------ */
+/*  Données : plans d'entretien                                        */
+/* ------------------------------------------------------------------ */
+
 const plans = [
   { id: "chaudiere", icon: "🔥", name: "Entretien chaudière", price: "120", freq: "1 visite/an", desc: "Vérification obligatoire, nettoyage, attestation" },
   { id: "clim", icon: "❄️", name: "Entretien climatisation", price: "150", freq: "1 visite/an", desc: "Filtres, fluide, contrôle performance" },
@@ -13,11 +23,21 @@ const plans = [
   { id: "complet", icon: "⭐", name: "Pack Sérénité", price: "299", freq: "3 visites/an", desc: "Tout inclus + intervention prioritaire", popular: true },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function EntretienPage() {
   const router = useRouter();
+
+  /** Plan sélectionné (null = aucun) */
   const [selected, setSelected] = useState<string | null>(null);
+  /** Souscription effectuée */
   const [done, setDone] = useState(false);
 
+  /* ================================================================ */
+  /*  Écran de succès après souscription                               */
+  /* ================================================================ */
   if (done) {
     return (
       <div className="max-w-[500px] mx-auto px-6 py-36 text-center animate-pageIn">
@@ -37,12 +57,16 @@ export default function EntretienPage() {
     );
   }
 
+  /* ================================================================ */
+  /*  Sélection du plan                                                */
+  /* ================================================================ */
   return (
     <div className="max-w-[700px] mx-auto px-6 py-8">
       <h1 className="font-heading text-[26px] font-extrabold text-navy mb-6">
         Contrat d&apos;entretien annuel
       </h1>
 
+      {/* Liste des plans */}
       <div className="flex flex-col gap-2.5 mb-6">
         {plans.map((plan) => (
           <button
@@ -57,16 +81,20 @@ export default function EntretienPage() {
                   : "border border-border"
             )}
           >
+            {/* Badge "Populaire" */}
             {plan.popular && (
               <div className="absolute -top-px right-4 bg-gold text-white text-[9px] font-bold px-2.5 py-1 rounded-b-lg">
                 POPULAIRE
               </div>
             )}
+
             <div className="flex gap-3.5 items-start">
+              {/* Icône du plan */}
               <div className="w-11 h-11 rounded-[5px] bg-surface flex items-center justify-center text-xl shrink-0">
                 {plan.icon}
               </div>
               <div className="flex-1">
+                {/* Nom + prix */}
                 <div className="flex justify-between items-start mb-1">
                   <span className="text-sm font-bold text-navy">{plan.name}</span>
                   <div>
@@ -74,6 +102,7 @@ export default function EntretienPage() {
                     <span className="text-[10px] text-grayText">/an</span>
                   </div>
                 </div>
+                {/* Description + fréquence */}
                 <div className="text-xs text-grayText mb-1">{plan.desc}</div>
                 <div className="text-[11px] font-semibold text-forest">{plan.freq}</div>
               </div>
@@ -82,6 +111,7 @@ export default function EntretienPage() {
         ))}
       </div>
 
+      {/* Bouton souscrire */}
       <Button
         className="w-full gap-2"
         size="lg"

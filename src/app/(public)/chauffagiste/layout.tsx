@@ -1,3 +1,8 @@
+/**
+ * Layout SEO pour la page métier Chauffagiste — /chauffagiste
+ *
+ * Définit les métadonnées (title, description, OpenGraph) pour le référencement.
+ */
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

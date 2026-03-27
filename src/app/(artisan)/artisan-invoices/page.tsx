@@ -1,26 +1,39 @@
+/**
+ * Page de création/aperçu d'une facture artisan.
+ * Affiche une facture auto-générée depuis une mission validée avec :
+ * - En-tête (numéro, client, statut)
+ * - Lignes de facturation (description, qté, prix unitaire, total)
+ * - Totaux HT / TVA / TTC
+ * - Actions : envoyer au client, télécharger PDF
+ */
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Download, Send, FileText } from "lucide-react";
 
+/* Formateur de prix en français (ex: "85,00 EUR") */
 function formatPrice(n: number) {
   return n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " EUR";
 }
 
+/* Données mockées : lignes de la facture */
 const invoiceLines = [
   { description: "Robinet mitigeur", qty: 1, unitPrice: 85 },
   { description: "Main d'oeuvre", qty: 2, unitPrice: 65 },
 ];
 
+/* Calcul des totaux */
 const totalHT = invoiceLines.reduce((s, l) => s + l.qty * l.unitPrice, 0);
 const tva = Math.round(totalHT * 0.1 * 100) / 100;
 const totalTTC = totalHT + tva;
 
 export default function ArtisanInvoicesPage() {
   const router = useRouter();
+  /* État de chargement lors de l'envoi */
   const [sending, setSending] = useState(false);
 
+  /* Simule l'envoi de la facture au client (en prod : POST /api/invoices) */
   const handleSend = async () => {
     setSending(true);
     await new Promise((r) => setTimeout(r, 800));

@@ -19,6 +19,10 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
+  webpack: (config) => {
+    config.cache = false;
+    return config;
+  },
 };
 
 export default withBundleAnalyzer(nextConfig);

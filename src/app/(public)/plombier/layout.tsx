@@ -1,3 +1,9 @@
+/**
+ * Layout SEO pour la page métier Plombier — /plombier
+ *
+ * Définit les métadonnées (title, description, OpenGraph) pour le référencement.
+ * Le composant ne fait que passer les enfants sans wrapper supplémentaire.
+ */
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

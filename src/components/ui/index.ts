@@ -1,3 +1,8 @@
+/**
+ * Barrel file — Réexporte tous les composants UI depuis un seul point d'entrée.
+ * Permet d'importer ainsi : import { Button, Card, Badge } from "@/components/ui";
+ */
+
 export { Button } from "./button";
 export type { ButtonProps, ButtonVariant, ButtonSize } from "./button";
 

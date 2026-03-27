@@ -1,8 +1,14 @@
+/**
+ * Page d'attente de validation artisan.
+ * Affichée tant que les documents de l'artisan n'ont pas été vérifiés par l'équipe Nova.
+ * Montre un stepper 3 étapes (déposés → vérification → visible) et un message d'info.
+ */
 "use client";
 
 import Link from "next/link";
 import { Clock, ShieldCheck, Eye, EyeOff, ArrowRight, FileCheck } from "lucide-react";
 
+/* Étapes de validation avec état (terminée, en cours, à venir) */
 const steps = [
   { icon: FileCheck, label: "Documents déposés", done: true },
   { icon: ShieldCheck, label: "Vérification en cours", done: false, active: true },
@@ -71,7 +77,7 @@ export default function ArtisanPendingPage() {
             <p className="text-[15px] font-semibold text-navy mb-1">Compte en attente de validation</p>
             <p className="text-[13px] text-grayText leading-relaxed">
               Votre profil est invisible aux yeux des particuliers tant que vos documents
-              n'ont pas été validés par notre équipe.
+              n&apos;ont pas été validés par notre équipe.
             </p>
           </div>
         </div>

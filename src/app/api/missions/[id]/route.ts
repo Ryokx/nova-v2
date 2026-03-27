@@ -1,9 +1,22 @@
+/**
+ * Route API — Détail et mise à jour d'une mission spécifique
+ *
+ * GET   /api/missions/[id]  — Récupère le détail complet d'une mission
+ * PATCH /api/missions/[id]  — Met à jour le statut d'une mission
+ *
+ * Seuls le client et l'artisan de la mission y ont accès.
+ */
+
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthenticatedUser } from "@/lib/api-middleware";
 
+/**
+ * GET — Récupère le détail complet d'une mission
+ * Inclut : artisan, paiement, devis, facture, avis, messages
+ */
 export async function GET(
   _request: Request,
   { params }: { params: { id: string } },
@@ -31,7 +44,7 @@ export async function GET(
     return NextResponse.json({ error: "Mission introuvable" }, { status: 404 });
   }
 
-  // Verify user is client or artisan of this mission
+  /* Vérifie que l'utilisateur est bien le client ou l'artisan de cette mission */
   if (user && mission.clientId !== user.id && mission.artisan.userId !== user.id) {
     return NextResponse.json({ error: "Accès interdit" }, { status: 403 });
   }
@@ -39,6 +52,10 @@ export async function GET(
   return NextResponse.json(mission);
 }
 
+/**
+ * PATCH — Met à jour le statut d'une mission
+ * Utilisé pour passer une mission en "COMPLETED", "CANCELLED", etc.
+ */
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } },

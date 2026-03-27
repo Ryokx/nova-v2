@@ -1,3 +1,9 @@
+/**
+ * Page de signature de devis.
+ * Affiche le détail du devis (lignes, montant TTC), un canvas pour la signature manuscrite,
+ * puis redirige vers le paiement après signature.
+ */
+
 "use client";
 
 import { useState, useRef } from "react";
@@ -8,6 +14,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useFetch } from "@/hooks/use-fetch";
 import { formatPrice } from "@/lib/utils";
 
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+/** Ligne de devis */
 interface DevisItem {
   label: string;
   qty: number;
@@ -15,6 +26,7 @@ interface DevisItem {
   total: number;
 }
 
+/** Données complètes d'un devis */
 interface DevisData {
   id: string;
   number: string;
@@ -26,7 +38,10 @@ interface DevisData {
   mission: { id: string; type: string; artisan: { user: { name: string } } };
 }
 
-// Mock line items matching prototype exactly
+/* ------------------------------------------------------------------ */
+/*  Données mock (prototype)                                           */
+/* ------------------------------------------------------------------ */
+
 const mockLineItems = [
   { label: "Remplacement siphon", price: "45\u202F\u20AC" },
   { label: "Joint flexible inox", price: "25\u202F\u20AC" },
@@ -35,15 +50,25 @@ const mockLineItems = [
   { label: "TVA (10%)", price: "30\u202F\u20AC" },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function SignDevisPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { data: devis, loading } = useFetch<DevisData>(`/api/devis/${id}`);
+
+  /** Référence vers le canvas de signature */
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  /** L'utilisateur a commencé à dessiner */
   const [hasDrawn, setHasDrawn] = useState(false);
+  /** Le devis a été signé */
   const [signed, setSigned] = useState(false);
+  /** Dessin en cours (souris/doigt appuyé) */
   const [isDrawing, setIsDrawing] = useState(false);
 
+  /** Démarre le tracé de la signature */
   const startDraw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
     setHasDrawn(true);
@@ -58,6 +83,7 @@ export default function SignDevisPage() {
     ctx.moveTo(x, y);
   };
 
+  /** Continue le tracé pendant le mouvement */
   const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
     const canvas = canvasRef.current;
@@ -74,8 +100,10 @@ export default function SignDevisPage() {
     ctx.stroke();
   };
 
+  /** Arrête le tracé */
   const stopDraw = () => setIsDrawing(false);
 
+  /* Squelette de chargement */
   if (loading) {
     return (
       <div className="max-w-[600px] mx-auto px-6 py-8">
@@ -84,13 +112,15 @@ export default function SignDevisPage() {
     );
   }
 
-  // Use devis data if available, otherwise show prototype defaults
+  /* Valeurs avec fallback pour le prototype */
   const devisNumber = devis?.number ?? "D-2026-089";
   const devisTitle = devis?.mission?.type ?? "Réparation fuite sous évier";
   const totalTTC = devis?.totalTTC ?? 320;
   const missionId = devis?.mission?.id ?? id;
 
-  // Success state
+  /* ================================================================ */
+  /*  Écran de succès après signature                                  */
+  /* ================================================================ */
   if (signed) {
     return (
       <div className="max-w-[500px] mx-auto px-6 pt-36 pb-16 text-center animate-pageIn">
@@ -113,7 +143,7 @@ export default function SignDevisPage() {
     );
   }
 
-  // Build line items from API data or use mock
+  /* Construit les lignes du devis depuis l'API ou les mock */
   const lineItems = devis?.items
     ? (devis.items as DevisItem[]).map((item) => ({
         label: `${item.label}${item.qty > 1 ? ` (x${item.qty})` : ""}`,
@@ -121,16 +151,19 @@ export default function SignDevisPage() {
       }))
     : mockLineItems;
 
+  /* ================================================================ */
+  /*  Formulaire de signature                                          */
+  /* ================================================================ */
   return (
     <div className="max-w-[600px] mx-auto px-6 py-8">
-      {/* Title */}
+
       <h1 className="font-heading text-[26px] font-extrabold text-navy mb-5">
         Signer le devis
       </h1>
 
-      {/* Devis detail card */}
+      {/* Carte détail du devis */}
       <Card className="mb-4">
-        {/* Header: number + title + amount */}
+        {/* En-tête : numéro, titre, montant */}
         <div className="flex justify-between items-start mb-3">
           <div>
             <div className="text-xs text-grayText mb-1">Devis #{devisNumber}</div>
@@ -141,7 +174,7 @@ export default function SignDevisPage() {
           </div>
         </div>
 
-        {/* Line items */}
+        {/* Lignes du devis */}
         {lineItems.map((item, i) => (
           <div
             key={i}
@@ -153,7 +186,7 @@ export default function SignDevisPage() {
         ))}
       </Card>
 
-      {/* Signature section */}
+      {/* Zone de signature (canvas) */}
       <div className="text-sm font-bold text-navy mb-2.5">Votre signature</div>
       <div className="relative mb-4">
         <canvas
@@ -169,6 +202,7 @@ export default function SignDevisPage() {
           onTouchMove={draw}
           onTouchEnd={stopDraw}
         />
+        {/* Placeholder "Signez ici" (disparaît après le premier trait) */}
         {!hasDrawn && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span className="text-[13px] text-grayText">Signez ici</span>
@@ -176,7 +210,7 @@ export default function SignDevisPage() {
         )}
       </div>
 
-      {/* Sign button */}
+      {/* Bouton signer (désactivé tant qu'aucune signature) */}
       <button
         disabled={!hasDrawn}
         onClick={() => setSigned(true)}

@@ -1,13 +1,16 @@
 /**
- * Yousign Integration Stub
- * Electronic signature for legal documents (devis)
+ * Intégration Yousign — Signature électronique de devis
  *
- * In production: Yousign provides legally binding electronic signatures
- * compliant with eIDAS regulation.
+ * En production : Yousign fournit des signatures électroniques
+ * légalement valides, conformes au règlement eIDAS.
  *
- * TODO: Implement when Yousign API credentials are available
+ * Pour l'instant : fonctions STUB qui simulent les appels API.
+ * TODO: Implémenter quand les clés API Yousign seront disponibles
  */
 
+// --- Types ---
+
+/** Paramètres pour créer une demande de signature */
 export interface SignatureRequest {
   documentName: string;
   documentUrl: string;
@@ -16,6 +19,7 @@ export interface SignatureRequest {
   missionId: string;
 }
 
+/** Résultat d'une demande de signature */
 export interface SignatureResult {
   signatureId: string;
   status: "pending" | "signed" | "declined" | "expired";
@@ -23,9 +27,9 @@ export interface SignatureResult {
   signedAt?: string;
 }
 
-/**
- * Create a signature request (STUB)
- */
+// --- Fonctions ---
+
+/** Crée une demande de signature électronique (STUB) */
 export async function createSignatureRequest(params: SignatureRequest): Promise<SignatureResult> {
   console.log("[YOUSIGN STUB] Creating signature request:", params.documentName);
   return {
@@ -34,9 +38,7 @@ export async function createSignatureRequest(params: SignatureRequest): Promise<
   };
 }
 
-/**
- * Check signature status (STUB)
- */
+/** Vérifie le statut d'une signature (STUB — retourne toujours "signed") */
 export async function getSignatureStatus(signatureId: string): Promise<SignatureResult> {
   console.log("[YOUSIGN STUB] Checking status:", signatureId);
   return {
@@ -47,9 +49,7 @@ export async function getSignatureStatus(signatureId: string): Promise<Signature
   };
 }
 
-/**
- * Cancel a pending signature request (STUB)
- */
+/** Annule une demande de signature en attente (STUB) */
 export async function cancelSignatureRequest(signatureId: string): Promise<void> {
   console.log("[YOUSIGN STUB] Cancelling:", signatureId);
 }

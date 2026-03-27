@@ -1,3 +1,10 @@
+/**
+ * Page de recherche d'artisans.
+ * Permet de chercher par nom/métier/ville, filtrer par catégorie,
+ * basculer en mode urgence 24/7, et trier les résultats.
+ * Affiche les données API si disponibles, sinon des données mock.
+ */
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -6,7 +13,7 @@ import { useSearchParams } from "next/navigation";
 import {
   Search, Star, Shield, Zap, Clock, MapPin, ChevronRight,
   Droplets, Plug, KeyRound, Flame, PaintBucket, Hammer,
-  LayoutGrid, Wrench, Filter, X, SlidersHorizontal,
+  LayoutGrid, Wrench, X, SlidersHorizontal,
   ClipboardList, CreditCard, BadgeCheck, Phone, ArrowRight,
 } from "lucide-react";
 import { UrgencyModal } from "@/components/features/urgency-modal";
@@ -16,6 +23,11 @@ import { useFetch } from "@/hooks/use-fetch";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+/** Données d'un artisan retournées par l'API */
 interface ArtisanData {
   id: string;
   trade: string;
@@ -27,6 +39,11 @@ interface ArtisanData {
   user: { id: string; name: string; avatar: string | null };
 }
 
+/* ------------------------------------------------------------------ */
+/*  Données statiques                                                  */
+/* ------------------------------------------------------------------ */
+
+/** Catégories de métiers pour le filtre par onglets */
 const categories = [
   { id: "all", label: "Tous les métiers", icon: LayoutGrid },
   { id: "Plombier", label: "Plombier", icon: Droplets },
@@ -39,6 +56,7 @@ const categories = [
   { id: "Maçon", label: "Maçon", icon: Wrench },
 ];
 
+/** Spécialités disponibles en mode urgence */
 const urgencySpecialties = [
   { id: "Plombier", label: "Plombier", icon: Droplets, desc: "Fuite, canalisation, WC, chauffe-eau" },
   { id: "Électricien", label: "Électricien", icon: Plug, desc: "Panne, court-circuit, tableau électrique" },
@@ -47,6 +65,7 @@ const urgencySpecialties = [
   { id: "Maçon", label: "Maçon", icon: Wrench, desc: "Dégât structurel, fissure, effondrement" },
 ];
 
+/** Artisans fictifs affichés quand l'API ne retourne rien (prototype) */
 const mockArtisans = [
   { id: "jean-michel-p", name: "Jean-Michel Petit", trade: "Plombier", rating: 4.9, reviewCount: 127, initials: "JM", category: "Plombier", responseTime: "30 min", city: "Paris 11e", urgencyAvailable: true, certifications: ["Décennale", "RGE"] },
   { id: "sophie-m", name: "Sophie Martin", trade: "Électricienne", rating: 4.8, reviewCount: 94, initials: "SM", category: "Électricien", responseTime: "45 min", city: "Paris 15e", urgencyAvailable: true, certifications: ["Décennale", "Qualibat"] },
@@ -58,6 +77,11 @@ const mockArtisans = [
   { id: "ahmed-k", name: "Ahmed Kessab", trade: "Maçon", rating: 4.9, reviewCount: 112, initials: "AK", category: "Maçon", responseTime: "2h", city: "Marseille", urgencyAvailable: false, certifications: ["Décennale", "RGE"] },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Utilitaires                                                        */
+/* ------------------------------------------------------------------ */
+
+/** Retourne les initiales d'un nom (ex: "Jean Dupont" → "JD") */
 function getInitials(name: string): string {
   return name
     .split(" ")
@@ -67,6 +91,7 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
+/** Retourne un gradient Tailwind déterministe basé sur le nom */
 function getGradient(name: string): string {
   const gradients = [
     "from-deepForest to-forest",
@@ -75,25 +100,36 @@ function getGradient(name: string): string {
     "from-deepForest to-sage",
   ];
   const idx = name.charCodeAt(0) % gradients.length;
-  return gradients[idx];
+  return gradients[idx]!;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
 
 export default function ArtisansPage() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
+
+  /* --- États des filtres --- */
   const [category, setCategory] = useState(searchParams.get("category") || "all");
   const [search, setSearch] = useState("");
   const [isUrgency, setIsUrgency] = useState(searchParams.get("urgency") === "true");
   const [sortBy, setSortBy] = useState<"rating" | "reviews" | "response">("rating");
   const [showFilters, setShowFilters] = useState(false);
+
+  /* --- États de la modale urgence --- */
   const [urgencyModalOpen, setUrgencyModalOpen] = useState(false);
-  const [selectedUrgencySpec, setSelectedUrgencySpec] = useState<string | null>(null);
+  const [, setSelectedUrgencySpec] = useState<string | null>(null);
+
+  /* Référence vers l'input de recherche pour le raccourci Ctrl+K */
   const searchRef = useRef<HTMLInputElement>(null);
 
+  /* Appel API avec catégorie et recherche en paramètres */
   const url = `/api/artisans?category=${category}${search ? `&search=${encodeURIComponent(search)}` : ""}`;
   const { data: apiArtisans, loading } = useFetch<ArtisanData[]>(url);
 
-  // Filter & sort mock artisans
+  /* Filtrage et tri des artisans mock (fallback quand l'API est vide) */
   const filteredMock = mockArtisans
     .filter((a) => {
       if (category !== "all" && a.category !== category) return false;
@@ -111,7 +147,7 @@ export default function ArtisansPage() {
   const resultCount = hasApiData ? apiArtisans.length : filteredMock.length;
   const firstName = session?.user?.name?.split(" ")[0];
 
-  // Focus search on Ctrl+K
+  /* Raccourci clavier Ctrl+K pour focus sur la recherche */
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
@@ -126,7 +162,7 @@ export default function ArtisansPage() {
   return (
     <div className="max-w-[1080px] mx-auto px-5 md:px-8 pt-6 pb-16">
 
-      {/* ━━━ Header ━━━ */}
+      {/* En-tête de page */}
       <div className="mb-6">
         <h1 className="font-heading text-[24px] md:text-[28px] font-extrabold text-navy leading-tight">
           {firstName ? `${firstName}, trouvez votre artisan` : "Trouvez votre artisan"}
@@ -136,7 +172,7 @@ export default function ArtisansPage() {
         </p>
       </div>
 
-      {/* ━━━ Search bar ━━━ */}
+      {/* Barre de recherche */}
       <div className="relative mb-5">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-grayText/60" />
         <input
@@ -148,6 +184,7 @@ export default function ArtisansPage() {
           className="w-full h-[52px] pl-11 pr-28 rounded-2xl border border-border bg-white text-[15px] text-navy placeholder:text-grayText/50 focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest shadow-sm transition-all"
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          {/* Bouton pour vider la recherche */}
           {search && (
             <button
               onClick={() => setSearch("")}
@@ -156,14 +193,16 @@ export default function ArtisansPage() {
               <X className="w-3.5 h-3.5" />
             </button>
           )}
+          {/* Indicateur raccourci clavier */}
           <kbd className="hidden md:flex items-center gap-0.5 px-2 py-1 rounded-lg bg-surface text-[11px] text-grayText font-mono">
             Ctrl K
           </kbd>
         </div>
       </div>
 
-      {/* ━━━ Mode toggle: Normal / Urgence ━━━ */}
+      {/* Bascule Recherche / Urgence + bouton Filtres */}
       <div className="flex gap-2.5 mb-5">
+        {/* Bouton mode recherche classique */}
         <button
           onClick={() => setIsUrgency(false)}
           className={cn(
@@ -176,6 +215,8 @@ export default function ArtisansPage() {
           <Search className="w-3.5 h-3.5" />
           Recherche
         </button>
+
+        {/* Bouton mode urgence 24/7 */}
         <button
           onClick={() => setIsUrgency(true)}
           className={cn(
@@ -188,6 +229,8 @@ export default function ArtisansPage() {
           <Zap className="w-3.5 h-3.5" />
           Urgence 24/7
         </button>
+
+        {/* Bouton filtres avancés */}
         <button
           onClick={() => setShowFilters(!showFilters)}
           className={cn(
@@ -202,10 +245,10 @@ export default function ArtisansPage() {
         </button>
       </div>
 
-      {/* ━━━ Urgency specialty selector ━━━ */}
+      {/* Panneau urgence : sélection de spécialité */}
       {isUrgency && (
         <div className="bg-red/[0.03] border border-red/15 rounded-2xl p-5 mb-5">
-          {/* Header */}
+          {/* En-tête urgence */}
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-red/10 flex items-center justify-center shrink-0">
               <Zap className="w-5 h-5 text-red" />
@@ -222,7 +265,7 @@ export default function ArtisansPage() {
             </div>
           </div>
 
-          {/* Specialty grid */}
+          {/* Grille de spécialités cliquables */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
             {urgencySpecialties.map((spec) => {
               const Icon = spec.icon;
@@ -248,7 +291,7 @@ export default function ArtisansPage() {
             })}
           </div>
 
-          {/* Phone fallback */}
+          {/* Numéro de téléphone de secours */}
           <div className="flex items-center justify-center gap-2 mt-4 pt-3.5 border-t border-red/10">
             <Phone className="w-3.5 h-3.5 text-grayText" />
             <p className="text-xs text-grayText">
@@ -258,7 +301,7 @@ export default function ArtisansPage() {
         </div>
       )}
 
-      {/* ━━━ Sort bar (collapsible) ━━━ */}
+      {/* Barre de tri (affichée si filtres ouverts) */}
       {showFilters && (
         <div className="bg-white border border-border rounded-2xl px-5 py-4 mb-5 flex flex-wrap items-center gap-3">
           <span className="text-xs font-semibold text-grayText uppercase tracking-wider">Trier par</span>
@@ -283,7 +326,7 @@ export default function ArtisansPage() {
         </div>
       )}
 
-      {/* ━━━ Category grid ━━━ */}
+      {/* Grille de catégories (onglets) */}
       <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 mb-7">
         {categories.map((c) => {
           const Icon = c.icon;
@@ -316,7 +359,7 @@ export default function ArtisansPage() {
         })}
       </div>
 
-      {/* ━━━ Results count ━━━ */}
+      {/* Compteur de résultats */}
       <div className="flex items-center justify-between mb-4">
         <p className="text-[13px] text-grayText">
           <span className="font-semibold text-navy">{resultCount}</span> artisan{resultCount > 1 ? "s" : ""}{" "}
@@ -325,8 +368,9 @@ export default function ArtisansPage() {
         </p>
       </div>
 
-      {/* ━━━ Results grid ━━━ */}
+      {/* Grille de résultats (3 cas : chargement, API, mock, vide) */}
       {loading ? (
+        /* Squelettes de chargement */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="bg-white border border-border rounded-2xl p-5">
@@ -342,6 +386,7 @@ export default function ArtisansPage() {
           ))}
         </div>
       ) : hasApiData ? (
+        /* Résultats depuis l'API */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {apiArtisans.map((a) => {
             const initials = getInitials(a.user.name ?? "A");
@@ -353,6 +398,7 @@ export default function ArtisansPage() {
                 className="group block bg-white border border-border rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(10,64,48,0.08)] transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
+                  {/* Avatar avec initiales */}
                   <div className={cn("w-[52px] h-[52px] rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0", gradient)}>
                     <span className="text-white font-heading font-bold text-sm">{initials}</span>
                   </div>
@@ -387,6 +433,7 @@ export default function ArtisansPage() {
           })}
         </div>
       ) : filteredMock.length > 0 ? (
+        /* Résultats mock (fallback prototype) */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredMock.map((a) => (
             <Link
@@ -398,7 +445,7 @@ export default function ArtisansPage() {
               )}
             >
               <div className="flex items-start gap-4">
-                {/* Avatar */}
+                {/* Avatar : rouge en urgence, vert sinon */}
                 <div className={cn(
                   "w-[52px] h-[52px] rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0",
                   isUrgency ? "from-red to-red/70" : getGradient(a.name),
@@ -406,14 +453,16 @@ export default function ArtisansPage() {
                   <span className="text-white font-heading font-bold text-sm">{a.initials}</span>
                 </div>
 
-                {/* Info */}
                 <div className="flex-1 min-w-0">
+                  {/* Nom + badge vérifié */}
                   <div className="flex items-center gap-2">
                     <h3 className="font-heading font-bold text-[15px] text-navy truncate">{a.name}</h3>
                     <div className="w-4.5 h-4.5 rounded-full bg-forest/10 flex items-center justify-center shrink-0">
                       <BadgeCheck className="w-3 h-3 text-forest" />
                     </div>
                   </div>
+
+                  {/* Métier + ville */}
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <p className="text-[13px] text-grayText">{a.trade}</p>
                     <span className="text-grayText/30">·</span>
@@ -423,7 +472,7 @@ export default function ArtisansPage() {
                     </div>
                   </div>
 
-                  {/* Rating + response time */}
+                  {/* Note + temps de réponse */}
                   <div className="flex items-center gap-3 mt-2">
                     <div className="flex items-center gap-1">
                       <Star className="w-3.5 h-3.5 fill-gold text-gold" />
@@ -443,7 +492,7 @@ export default function ArtisansPage() {
                     )}
                   </div>
 
-                  {/* Certifications */}
+                  {/* Badges certifications */}
                   <div className="flex gap-1.5 mt-2.5">
                     {a.certifications.map((cert) => (
                       <span
@@ -462,6 +511,7 @@ export default function ArtisansPage() {
           ))}
         </div>
       ) : (
+        /* Aucun résultat */
         <EmptyState
           icon={<Search className="w-7 h-7 text-grayText/40" />}
           title="Aucun artisan trouvé"
@@ -483,7 +533,7 @@ export default function ArtisansPage() {
         />
       )}
 
-      {/* ━━━ Urgency modal ━━━ */}
+      {/* Modale urgence (affichée quand on clique sur une spécialité) */}
       <UrgencyModal
         open={urgencyModalOpen}
         onClose={() => {
@@ -492,7 +542,7 @@ export default function ArtisansPage() {
         }}
       />
 
-      {/* ━━━ Trust footer ━━━ */}
+      {/* Pied de page : badges de confiance */}
       <div className="mt-10 pt-8 border-t border-border/60">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {[

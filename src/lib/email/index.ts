@@ -1,11 +1,19 @@
 /**
- * Nova Email Service
- * Centralized email sending for all transactional emails
+ * Service d'emails Nova — Point d'entrée centralisé
+ *
+ * Regroupe toutes les fonctions d'envoi d'emails transactionnels :
+ * - Bienvenue artisan
+ * - Réception de devis (client)
+ * - Signature de devis (artisan)
+ * - Paiement bloqué en séquestre (client)
+ * - Intervention terminée (client)
+ * - Paiement libéré (artisan)
  */
 
 import { sendEmail } from "./send";
 import { artisanWelcomeEmail, missionNotificationEmail } from "./templates";
 
+/** Envoie l'email de bienvenue à un nouvel artisan */
 export async function sendWelcomeEmail(params: { email: string; name: string; trade: string }) {
   const html = artisanWelcomeEmail({
     artisanName: params.name,
@@ -15,6 +23,7 @@ export async function sendWelcomeEmail(params: { email: string; name: string; tr
   return sendEmail({ to: params.email, subject: "Bienvenue sur Nova !", html });
 }
 
+/** Notifie le client qu'il a reçu un nouveau devis */
 export async function sendDevisReceivedEmail(params: {
   clientEmail: string;
   clientName: string;
@@ -34,6 +43,7 @@ export async function sendDevisReceivedEmail(params: {
   return sendEmail({ to: params.clientEmail, subject: `Nouveau devis de ${params.artisanName}`, html });
 }
 
+/** Notifie l'artisan que son devis a été signé par le client */
 export async function sendDevisSignedEmail(params: {
   artisanEmail: string;
   artisanName: string;
@@ -52,6 +62,7 @@ export async function sendDevisSignedEmail(params: {
   return sendEmail({ to: params.artisanEmail, subject: `Devis ${params.devisNumber} signé !`, html });
 }
 
+/** Notifie le client que son paiement est bloqué en séquestre */
 export async function sendPaymentEscrowedEmail(params: {
   clientEmail: string;
   clientName: string;
@@ -70,6 +81,7 @@ export async function sendPaymentEscrowedEmail(params: {
   return sendEmail({ to: params.clientEmail, subject: `${params.amount.toFixed(2)}€ bloqués en séquestre`, html });
 }
 
+/** Notifie le client que l'intervention est terminée (il doit valider) */
 export async function sendMissionCompletedEmail(params: {
   clientEmail: string;
   clientName: string;
@@ -87,6 +99,7 @@ export async function sendMissionCompletedEmail(params: {
   return sendEmail({ to: params.clientEmail, subject: `Intervention terminée — validez pour libérer le paiement`, html });
 }
 
+/** Notifie l'artisan que le paiement a été libéré du séquestre */
 export async function sendPaymentReleasedEmail(params: {
   artisanEmail: string;
   artisanName: string;

@@ -1,3 +1,20 @@
+/**
+ * Page "Comment ça marche" — /comment-ca-marche
+ *
+ * Page marketing destinée aux particuliers.
+ * Explique le fonctionnement de Nova en plusieurs sections :
+ * 1. HERO : titre animé avec rotation de mots-clés métier
+ * 2. AVANT/APRÈS : histoires d'arnaques vs succès avec Nova (carrousel)
+ * 3. TABLEAU COMPARATIF : "Sans Nova" vs "Avec Nova" (7 critères)
+ * 4. 3 ÉTAPES : réserver, devis sur place, validation Nova
+ * 5. SÉQUESTRE VISUEL : parcours du paiement en 4 étapes
+ * 6. PILIERS DE CONFIANCE : 6 garanties Nova
+ * 7. FAQ : questions fréquentes (accordéon)
+ * 8. CTA FINAL : appel à l'action
+ *
+ * Inclut aussi une modale de recherche d'artisan en 4 étapes
+ * (catégorie → description → chargement → résultats).
+ */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,8 +25,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+/** Mots qui s'alternent dans le titre du hero (animation de rotation) */
 const heroWords = ["un plombier", "un électricien", "un serrurier"];
 
+/** Catégories de métiers pour la modale de recherche */
 const categories = [
   { name: "Plomberie", emoji: "\u{1F527}", desc: "Fuites, robinetterie, chauffe-eau" },
   { name: "Électricité", emoji: "\u26A1", desc: "Tableaux, prises, dépannage" },
@@ -19,18 +38,21 @@ const categories = [
   { name: "Maçonnerie", emoji: "\u{1F9F1}", desc: "Murs, terrasses, rénovation" },
 ];
 
+/** Témoignages négatifs "Sans Nova" (arnaques réelles) */
 const horrorStories = [
   { name: "Laurent P.", city: "Bordeaux", cat: "Plomberie", init: "LP", amount: "200\u20AC perdus", text: "Plombier trouvé sur un site d\u2019annonces. 200\u20AC d\u2019avance en liquide. Le lendemain, la fuite avait repris. Numéro coupé. Plus personne." },
   { name: "Marine K.", city: "Paris 9e", cat: "Serrurerie", init: "MK", amount: "650\u20AC pour 3 min", text: "Serrurier Google : 89\u20AC au téléphone. Sur place : 650\u20AC. Enfermée dehors, pas le choix. Il ouvre en 3 minutes avec un outil basique." },
   { name: "Fabien R.", city: "Lyon", cat: "Électricité", init: "FR", amount: "4 800\u20AC à refaire", text: "\"Électricien\" sans décennale. Tableau refait. 3 mois plus tard : court-circuit. Installation non conforme aux normes. Tout à refaire." },
 ];
 
+/** Témoignages positifs "Avec Nova" (interventions réussies) */
 const successStories = [
   { name: "Sophie M.", city: "Paris 15e", cat: "Plomberie urgente", init: "SM", amount: "380\u20AC \u2014 prix juste, validé", text: "Fuite d\u2019eau un dimanche soir. Plombier trouvé en 10 min. Arrivé en 45 min. Tout réparé proprement. J\u2019ai payé uniquement quand Nova a confirmé que le travail était conforme." },
   { name: "Claire D.", city: "Paris 11e", cat: "Serrurerie", init: "CD", amount: "195\u20AC \u2014 tarif transparent", text: "Porte claquée à 22h. Serrurier trouvé en 15 min sur Nova. Il était là en 30 min. Et surtout, le prix correspondait au devis fait sur place. Pas un euro de plus." },
   { name: "Thomas G.", city: "Lyon 3e", cat: "Électricité", init: "TG", amount: "1 450\u20AC \u2014 devis respecté", text: "Tableau électrique à refaire. L\u2019artisan est venu, a fait le devis devant moi, et a tout refait en une journée. Nova a vérifié avant de le payer. La tranquillité totale." },
 ];
 
+/** Lignes du tableau comparatif "Sans Nova" vs "Avec Nova" */
 const comparisonRows = [
   { label: "Trouver un artisan", sans: "Au hasard sur Google ou bouche-à-oreille", avec: "Artisans certifiés : SIRET, décennale, qualifications" },
   { label: "Vérification", sans: "Aucune \u2014 vous faites confiance aveuglément", avec: "Documents analysés par IA + équipe Nova" },
@@ -41,6 +63,7 @@ const comparisonRows = [
   { label: "En urgence", sans: "Vous prenez le premier venu, dans la panique", avec: "Artisan vérifié en 45 min, paiement toujours sécurisé" },
 ];
 
+/** Les 6 piliers de confiance Nova */
 const trustPillars = [
   { num: "01", title: "Artisans audités", desc: "SIRET, décennale, qualifications. Documents analysés par IA." },
   { num: "02", title: "Séquestre sécurisé", desc: "Votre argent est bloqué. L\u2019artisan n\u2019est payé qu\u2019après notre validation." },
@@ -50,6 +73,7 @@ const trustPillars = [
   { num: "06", title: "Protection litiges", desc: "Nova arbitre avec preuves. 97% résolus en faveur du client." },
 ];
 
+/** Questions fréquentes pour la section FAQ (accordéon) */
 const faqItems = [
   { q: "C\u2019est vraiment gratuit pour les particuliers ?", a: "Oui, totalement. Aucun frais d\u2019inscription, aucun abonnement, aucun frais caché. Vous payez uniquement le montant de l\u2019intervention de l\u2019artisan. La commission Nova est incluse dans le prix affiché \u2014 ce que vous voyez est ce que vous payez." },
   { q: "Comment fonctionne le paiement sécurisé ?", a: "Quand vous réservez un artisan, vous payez en ligne par carte bancaire. L\u2019argent est immédiatement bloqué sur un compte séquestre sécurisé. L\u2019artisan intervient chez vous. Ensuite, Nova vérifie que l\u2019intervention est conforme au devis signé. Ce n\u2019est qu\u2019après cette validation que le paiement est libéré à l\u2019artisan. Si l\u2019intervention n\u2019est pas conforme, vous êtes remboursé." },
@@ -64,9 +88,16 @@ const faqItems = [
 ];
 
 export default function CommentCaMarchePage() {
+  /* ── État du hero (rotation de mots) ── */
   const [wordIndex, setWordIndex] = useState(0);
+
+  /* ── État du carrousel de témoignages avant/après ── */
   const [activeStory, setActiveStory] = useState(0);
+
+  /* ── État de la FAQ (index de l'item ouvert) ── */
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  /* ── État de la modale de recherche d'artisan ── */
   const [showSearch, setShowSearch] = useState(false);
   const [searchStep, setSearchStep] = useState(0);
   const [searchCat, setSearchCat] = useState("");
@@ -75,11 +106,13 @@ export default function CommentCaMarchePage() {
   const [searchPhotos, setSearchPhotos] = useState(0);
   const [geoLoading, setGeoLoading] = useState(false);
 
+  /** Rotation automatique des mots du hero (toutes les 3,5 secondes) */
   useEffect(() => {
     const interval = setInterval(() => setWordIndex((i) => (i + 1) % heroWords.length), 3500);
     return () => clearInterval(interval);
   }, []);
 
+  /** Rotation automatique des témoignages (toutes les 6 secondes) */
   useEffect(() => {
     const interval = setInterval(() => setActiveStory((i) => (i + 1) % 3), 6000);
     return () => clearInterval(interval);
@@ -87,6 +120,7 @@ export default function CommentCaMarchePage() {
 
   const router = useRouter();
 
+  /** Redirige vers la page de recherche d'artisans */
   const openSearch = () => {
     router.push("/artisans");
   };

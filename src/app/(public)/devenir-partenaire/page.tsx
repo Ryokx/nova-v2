@@ -1,3 +1,20 @@
+/**
+ * Page "Devenir partenaire" — /devenir-partenaire
+ *
+ * Page marketing destinée aux artisans.
+ * Objectif : convaincre les artisans de s'inscrire sur Nova.
+ *
+ * Structure :
+ * 1. HERO : accroche "zéro impayé" + CTAs
+ * 2. AVANT/APRÈS : comparatif chiffré "Sans Nova" vs "Avec Nova"
+ * 3. 3 AVANTAGES CLÉS : gestion, protection litiges, syndics B2B
+ * 4. SIMULATEUR : calcul d'économies selon le CA et le forfait choisi
+ * 5. FAQ : questions fréquentes artisans (accordéon)
+ * 6. CTA FINAL : appel à l'inscription
+ *
+ * Inclut aussi une modale d'inscription artisan en 4 étapes :
+ * email/mdp → infos personnelles → documents → confirmation.
+ */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,7 +22,7 @@ import { Shield, Lock, Check, ChevronDown, ArrowRight, X, Plus } from "lucide-re
 import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/* ━━━ FAQ DATA ━━━ */
+/** Questions fréquentes pour les artisans */
 const faqItems = [
   { q: "Combien ça coûte ?", a: "L'inscription est gratuite. Votre 1er mois, vous bénéficiez du forfait Expert offert : seulement 5% de commission au lieu de 10-15%. Ensuite, elle passe à 10-15%. Pas d'abonnement obligatoire." },
   { q: "Comment fonctionne le séquestre ?", a: "Quand un client vous réserve, il paie immédiatement sur un compte sécurisé géré par un prestataire agréé. Vous intervenez. Nova vérifie que tout est OK. Les fonds sont virés sur votre compte sous 48h." },
@@ -18,7 +35,13 @@ const faqItems = [
   { q: "Comment sont calculés les avis ?", a: "Seuls les clients ayant finalisé et validé une mission via Nova peuvent laisser un avis. Impossible de tricher — chaque avis est lié à une mission réelle et un paiement séquestre." },
 ];
 
-/* ━━━ SIGNUP MODAL ━━━ */
+/**
+ * Modale d'inscription artisan en 4 étapes :
+ * 0. Email + mot de passe
+ * 1. Informations personnelles (nom, téléphone, métier, ville, SIRET)
+ * 2. Upload des documents (obligatoires + facultatifs)
+ * 3. Confirmation avec timeline des prochaines étapes
+ */
 function SignupModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [step, setStep] = useState(0);
   const [email, setEmail] = useState("");
@@ -380,14 +403,19 @@ function SignupModal({ open, onClose }: { open: boolean; onClose: () => void }) 
   );
 }
 
-/* ━━━ PAGE ━━━ */
+/** Page principale "Devenir partenaire" */
 export default function DevenirPartenairePage() {
+  /* ── État de la modale d'inscription ── */
   const [showModal, setShowModal] = useState(false);
+
+  /* ── État de la FAQ (index de l'item ouvert) ── */
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [simCA, setSimCA] = useState(4820);
+
+  /* ── État du simulateur d'économies ── */
+  const [simCA, setSimCA] = useState(4820); // Chiffre d'affaires mensuel
   const [simPlan, setSimPlan] = useState<"essentiel" | "pro" | "expert">("pro");
 
-  /* Simulator calculations */
+  /* Calculs du simulateur : coûts et économies selon le forfait */
   const plans = { essentiel: { abo: 0, rate: 0.10 }, pro: { abo: 49, rate: 0.07 }, expert: { abo: 99, rate: 0.05 } };
   const costEssentiel = simCA * plans.essentiel.rate;
   const selected = plans[simPlan];
@@ -395,8 +423,8 @@ export default function DevenirPartenairePage() {
   const saving = costEssentiel - costSelected;
   const savingAnnual = saving * 12;
   const isProfitable = saving > 0;
-  const seuilPro = Math.ceil(49 / 0.03);
-  const seuilExpert = Math.ceil(99 / 0.05);
+  const seuilPro = Math.ceil(49 / 0.03);   // Seuil de rentabilité du plan Pro
+  const seuilExpert = Math.ceil(99 / 0.05); // Seuil de rentabilité du plan Expert
   const seuil = simPlan === "pro" ? seuilPro : simPlan === "expert" ? seuilExpert : 0;
 
   return (

@@ -1,3 +1,10 @@
+/**
+ * Page de complétion de profil — /complete-profile
+ *
+ * Affichée après une inscription via Google/Apple si le téléphone n'est pas renseigné.
+ * L'utilisateur doit ajouter son numéro de téléphone pour finaliser son compte,
+ * car il est nécessaire pour que les artisans puissent le contacter.
+ */
 "use client";
 
 import { useState } from "react";
@@ -8,16 +15,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function CompleteProfilePage() {
+  /* ── Session utilisateur (pour afficher le prénom) ── */
   const { data: session, update: updateSession } = useSession();
   const router = useRouter();
+
+  /* ── État du formulaire ── */
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Envoie le numéro de téléphone à l'API pour mettre à jour le profil.
+   * En cas de succès, rafraîchit la session et redirige vers /artisans.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
+    // Validation basique : au moins 10 chiffres
     const cleaned = phone.replace(/\s/g, "");
     if (cleaned.length < 10) {
       setError("Numéro de téléphone invalide (minimum 10 chiffres)");
@@ -39,7 +54,7 @@ export default function CompleteProfilePage() {
         return;
       }
 
-      // Refresh session so hasPhone is updated
+      // Rafraîchir la session pour que hasPhone soit à jour
       await updateSession();
       router.push("/artisans");
     } catch {
@@ -51,6 +66,8 @@ export default function CompleteProfilePage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-bgPage">
       <div className="w-full max-w-[420px]">
+
+        {/* En-tête avec icône et message de bienvenue */}
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-[5px] bg-forest/5 flex items-center justify-center mx-auto mb-4">
             <Phone className="w-7 h-7 text-forest" />
@@ -63,6 +80,7 @@ export default function CompleteProfilePage() {
           </p>
         </div>
 
+        {/* Carte formulaire */}
         <div className="bg-white rounded-xl p-7 shadow-sm border border-border">
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input

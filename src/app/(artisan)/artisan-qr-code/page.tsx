@@ -1,8 +1,19 @@
+/**
+ * Page QR Code artisan.
+ * Génère un QR code unique lié au profil de l'artisan sur Nova.
+ * Inclut :
+ * - Aperçu visuel du QR code (pattern simulé)
+ * - Identité de l'artisan (nom, métier, n° certifié)
+ * - Boutons enregistrer / partager
+ * - Suggestions d'utilisation (véhicule, cartes de visite, etc.)
+ * - Statistiques de scan (ce mois, total, contacts)
+ */
 "use client";
 
 import { useState } from "react";
 import { Save, Share2, CheckCircle, Smartphone, Car, Mail, Globe, CreditCard, Users } from "lucide-react";
 
+/* Suggestions d'emplacements pour le QR code */
 const suggestions = [
   { label: "Véhicule", description: "Collez votre QR code sur votre véhicule professionnel", icon: Car },
   { label: "Cartes de visite", description: "Ajoutez-le au dos de vos cartes pour un accès rapide", icon: CreditCard },
@@ -13,14 +24,16 @@ const suggestions = [
 ];
 
 export default function ArtisanQRCodePage() {
+  /* Feedback visuel après enregistrement */
   const [saved, setSaved] = useState(false);
 
+  /* Simule l'enregistrement du QR code */
   const handleSave = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
-  // Generate a simple QR-like grid pattern
+  /* Génère un pattern de grille simulant un QR code (10x10 cellules) */
   const qrPattern = Array.from({ length: 100 }, (_, i) => {
     const row = Math.floor(i / 10);
     const col = i % 10;

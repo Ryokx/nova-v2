@@ -1,9 +1,14 @@
+/**
+ * Page Répertoire clients artisan.
+ * Interface master-detail : liste des clients à gauche, fiche détaillée à droite.
+ * Affiche pour chaque client : coordonnées, historique des missions, CA total.
+ */
 "use client";
 
 import { useState } from "react";
 import { Search, Phone, Users, Briefcase, TrendingUp, Calendar, Mail, MapPin, ChevronRight, X } from "lucide-react";
 
-
+/* Structure d'un client avec ses missions */
 interface Client {
   id: string;
   name: string;
@@ -17,12 +22,14 @@ interface Client {
   missionsList?: { label: string; date: string; amount: string; status: string }[];
 }
 
+/* KPIs en haut de page (clients actifs, missions, CA) */
 const stats = [
   { value: "4", label: "Clients actifs", color: "border-forest", icon: Users },
   { value: "10", label: "Missions totales", color: "border-sage", icon: Briefcase },
   { value: "2 985 EUR", label: "Chiffre d'affaires", color: "border-gold", icon: TrendingUp },
 ];
 
+/* Données mockées des clients */
 const clients: Client[] = [
   {
     id: "c1",
@@ -88,9 +95,12 @@ const clients: Client[] = [
 ];
 
 export default function ArtisanClientsPage() {
+  /* Recherche par nom de client */
   const [search, setSearch] = useState("");
-  const [selectedClient, setSelectedClient] = useState<Client | null>(clients[0]);
+  /* Client actuellement sélectionné pour le panneau détail */
+  const [selectedClient, setSelectedClient] = useState<Client | null>(clients[0] ?? null);
 
+  /* Filtrage des clients selon la recherche */
   const filtered = clients.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase())
   );

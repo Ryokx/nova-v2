@@ -1,3 +1,10 @@
+/**
+ * Page profil client.
+ * Affiche les informations personnelles (nom, email, téléphone) avec
+ * possibilité de les modifier en mode édition.
+ * Propose aussi des liens de navigation rapide (paiements, missions, parrainage, etc.).
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -12,6 +19,10 @@ import { Input } from "@/components/ui/input";
 import { useFetch } from "@/hooks/use-fetch";
 import { cn } from "@/lib/utils";
 
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
 interface UserProfile {
   id: string;
   name: string | null;
@@ -19,6 +30,10 @@ interface UserProfile {
   phone: string | null;
   avatar: string | null;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Liens de navigation du profil                                      */
+/* ------------------------------------------------------------------ */
 
 const navLinks = [
   { label: "Moyens de paiement", icon: CreditCard, href: "/payment-methods", accent: false },
@@ -28,21 +43,26 @@ const navLinks = [
   { label: "Support", icon: HelpCircle, href: "/support", accent: false },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
 export default function ProfilePage() {
   const { data: session, update: updateSession } = useSession();
   const { data: user, loading, refetch } = useFetch<UserProfile>("/api/auth/me");
 
+  /* --- États du mode édition --- */
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Form fields
+  /* --- Champs du formulaire --- */
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formPhone, setFormPhone] = useState("");
 
-  // Sync form with fetched data
+  /** Synchronise les champs du formulaire avec les données API */
   useEffect(() => {
     if (user) {
       setFormName(user.name ?? "");
@@ -51,7 +71,7 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  // Clear success after 3s
+  /** Masque le message de succès après 3 secondes */
   useEffect(() => {
     if (success) {
       const t = setTimeout(() => setSuccess(false), 3000);
@@ -59,6 +79,7 @@ export default function ProfilePage() {
     }
   }, [success]);
 
+  /* Nom et initiales (avec fallback) */
   const name = user?.name ?? session?.user?.name ?? "Sophie Lefevre";
   const initials = name
     .split(" ")
@@ -67,6 +88,7 @@ export default function ProfilePage() {
     .toUpperCase()
     .slice(0, 2);
 
+  /** Active le mode édition et pré-remplit les champs */
   function startEditing() {
     setFormName(user?.name ?? name);
     setFormEmail(user?.email ?? "");
@@ -76,16 +98,19 @@ export default function ProfilePage() {
     setIsEditing(true);
   }
 
+  /** Annule le mode édition */
   function cancelEditing() {
     setIsEditing(false);
     setError(null);
   }
 
+  /** Sauvegarde les modifications via l'API */
   async function handleSave() {
     setError(null);
     setSaving(true);
 
     try {
+      /* Construit le payload avec uniquement les champs modifiés */
       const payload: Record<string, string> = {};
       if (formName.trim() && formName.trim() !== (user?.name ?? "")) {
         payload.name = formName.trim();
@@ -97,6 +122,7 @@ export default function ProfilePage() {
         payload.phone = formPhone.trim();
       }
 
+      /* Rien à sauvegarder */
       if (Object.keys(payload).length === 0) {
         setIsEditing(false);
         setSaving(false);
@@ -117,7 +143,7 @@ export default function ProfilePage() {
         return;
       }
 
-      // Refresh session and profile data
+      /* Rafraîchit la session et les données affichées */
       await updateSession();
       refetch();
       setIsEditing(false);
@@ -129,6 +155,7 @@ export default function ProfilePage() {
     }
   }
 
+  /* Squelette de chargement */
   if (loading) {
     return (
       <div className="max-w-[600px] mx-auto p-5 md:p-8 space-y-4">
@@ -141,7 +168,8 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-[600px] mx-auto p-5 md:p-8">
-      {/* Avatar + Name */}
+
+      {/* Avatar + Nom */}
       <div className="flex flex-col items-center mb-6">
         <div className="w-[72px] h-[72px] rounded-2xl bg-gradient-to-br from-forest to-sage flex items-center justify-center mb-3">
           <span className="font-heading font-bold text-2xl text-white">{initials}</span>
@@ -150,7 +178,7 @@ export default function ProfilePage() {
         <p className="text-sm text-grayText">Compte particulier</p>
       </div>
 
-      {/* Success message */}
+      {/* Message de succès */}
       {success && (
         <div className="flex items-center gap-2 px-4 py-3 mb-4 rounded-xl bg-success/[0.08] border border-success/20">
           <Check className="w-4 h-4 text-success shrink-0" />
@@ -158,9 +186,9 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Personal info card */}
+      {/* Carte informations personnelles */}
       <div className="bg-white rounded-2xl p-5 border border-border mb-5">
-        {/* Header with edit button */}
+        {/* En-tête avec bouton Modifier/Annuler */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[13px] font-bold text-navy uppercase tracking-wider">Informations personnelles</h2>
           {!isEditing ? (
@@ -182,7 +210,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* Error */}
+        {/* Message d'erreur */}
         {error && (
           <div className="flex items-center gap-2 px-3.5 py-2.5 mb-4 rounded-xl bg-red/[0.06] border border-red/15">
             <AlertCircle className="w-4 h-4 text-red shrink-0" />
@@ -191,7 +219,7 @@ export default function ProfilePage() {
         )}
 
         {isEditing ? (
-          /* ━━━ Edit mode ━━━ */
+          /* Mode édition : formulaire */
           <div className="space-y-4">
             <Input
               label="Nom complet"
@@ -214,7 +242,7 @@ export default function ProfilePage() {
               placeholder="06 12 34 56 78"
             />
 
-            {/* Save button */}
+            {/* Bouton enregistrer */}
             <button
               onClick={handleSave}
               disabled={saving}
@@ -239,7 +267,7 @@ export default function ProfilePage() {
             </button>
           </div>
         ) : (
-          /* ━━━ Display mode ━━━ */
+          /* Mode affichage : données en lecture seule */
           <div className="space-y-4">
             {[
               { label: "NOM", value: user?.name ?? name },
@@ -260,7 +288,7 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {/* Navigation rows */}
+      {/* Liens de navigation rapide */}
       <div className="bg-white rounded-2xl border border-border divide-y divide-border overflow-hidden">
         {navLinks.map((link) => {
           const Icon = link.icon;

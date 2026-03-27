@@ -1,3 +1,13 @@
+/**
+ * Page Profil artisan.
+ * Gestion complète du profil professionnel :
+ * - Stats en haut (note, missions, certifications, assurances)
+ * - Avatar + identité + badges (Certifié Nova, Pro)
+ * - Informations personnelles et entreprise (éditables)
+ * - Certifications & qualifications (CRUD complet)
+ * - Assurances (CRUD complet, décennale et RC Pro obligatoires)
+ * - Menu de navigation vers toutes les pages artisan
+ */
 "use client";
 
 import { useState } from "react";
@@ -6,12 +16,13 @@ import Link from "next/link";
 import {
   CreditCard, FileText, BarChart3, Users, QrCode, Gift, Settings, HelpCircle,
   ChevronRight, Star, Tag, Zap, Globe, Megaphone, Mail, Pencil, Check, X,
-  ShieldCheck, Upload, Trash2, Plus, Award, Calendar, AlertCircle,
+  ShieldCheck, Upload, Trash2, Plus, Award, AlertCircle,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFetch } from "@/hooks/use-fetch";
 import { cn } from "@/lib/utils";
 
+/* Données du profil artisan retournées par l'API */
 interface ArtisanProfileData {
   id: string;
   name: string | null;
@@ -26,6 +37,7 @@ interface ArtisanProfileData {
   } | null;
 }
 
+/* Structure d'une certification professionnelle */
 interface Certification {
   id: string;
   name: string;
@@ -37,6 +49,7 @@ interface Certification {
   fichier: string | null;
 }
 
+/* Structure d'une assurance professionnelle */
 interface Assurance {
   id: string;
   type: string;
@@ -49,6 +62,7 @@ interface Assurance {
   fichier: string | null;
 }
 
+/* Liens de navigation vers les pages du portail artisan */
 const menuItems = [
   { label: "Mon abonnement", icon: Star, href: "/artisan-subscription", sub: "Forfait Pro -- gérer ou changer" },
   { label: "Mes tarifs", icon: Tag, href: "/artisan-pricing", sub: "Déplacement, devis, urgences" },
@@ -66,6 +80,7 @@ const menuItems = [
   { label: "Support", icon: HelpCircle, href: "/support" },
 ];
 
+/* Certifications mockées */
 const mockCertifications: Certification[] = [
   {
     id: "c1", name: "RGE QualiPAC", organisme: "Qualit'EnR",
@@ -84,6 +99,7 @@ const mockCertifications: Certification[] = [
   },
 ];
 
+/* Assurances mockées */
 const mockAssurances: Assurance[] = [
   {
     id: "a1", type: "Décennale", compagnie: "AXA Entreprises",
@@ -102,6 +118,7 @@ const mockAssurances: Assurance[] = [
   },
 ];
 
+/* Configuration visuelle par statut de validité */
 const statusConfig = {
   valid: { label: "Valide", color: "text-success", bg: "bg-success/10" },
   expiring: { label: "Expire bientôt", color: "text-gold", bg: "bg-gold/10" },
@@ -110,9 +127,10 @@ const statusConfig = {
 
 export default function ArtisanProfilePage() {
   const { data: session } = useSession();
+  /* Récupération des données utilisateur depuis l'API */
   const { data: user, loading } = useFetch<ArtisanProfileData>("/api/auth/me");
 
-  // Personal info editing
+  /* --- Édition des informations personnelles --- */
   const [editingPersonal, setEditingPersonal] = useState(false);
   const [personalInfo, setPersonalInfo] = useState({
     nom: "Jean-Michel Petit",
@@ -120,7 +138,7 @@ export default function ArtisanProfilePage() {
     telephone: "06 12 34 56 78",
   });
 
-  // Company info editing
+  /* --- Édition des informations entreprise --- */
   const [editingCompany, setEditingCompany] = useState(false);
   const [companyInfo, setCompanyInfo] = useState({
     raisonSociale: "JM Plomberie Pro",
@@ -131,15 +149,15 @@ export default function ArtisanProfilePage() {
     metier: "Plombier-Chauffagiste",
   });
 
-  // Certifications & Assurances
+  /* --- Gestion des certifications et assurances --- */
   const [certifications, setCertifications] = useState(mockCertifications);
   const [assurances, setAssurances] = useState(mockAssurances);
-  const [addingCert, setAddingCert] = useState(false);
-  const [addingAssurance, setAddingAssurance] = useState(false);
+  const [addingCert, setAddingCert] = useState(false);        // Formulaire d'ajout certification visible
+  const [addingAssurance, setAddingAssurance] = useState(false); // Formulaire d'ajout assurance visible
   const [newCert, setNewCert] = useState({ name: "", organisme: "", numero: "", dateObtention: "", dateExpiration: "" });
   const [newAssurance, setNewAssurance] = useState({ type: "", compagnie: "", numero: "", dateDebut: "", dateFin: "", montantGaranti: "" });
 
-  // Save feedback
+  /* Feedback temporaire après sauvegarde (section = "personal", "company", etc.) */
   const [saved, setSaved] = useState<string | null>(null);
   const showSaved = (section: string) => {
     setSaved(section);
@@ -160,6 +178,7 @@ export default function ArtisanProfilePage() {
   const profile = user?.artisanProfile;
   const initials = name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 
+  /* Ajoute une nouvelle certification à la liste */
   const handleAddCert = () => {
     if (!newCert.name || !newCert.organisme) return;
     setCertifications((prev) => [
@@ -171,6 +190,7 @@ export default function ArtisanProfilePage() {
     showSaved("certifications");
   };
 
+  /* Ajoute une nouvelle assurance à la liste */
   const handleAddAssurance = () => {
     if (!newAssurance.type || !newAssurance.compagnie) return;
     setAssurances((prev) => [
@@ -665,7 +685,7 @@ export default function ArtisanProfilePage() {
       {/* Navigation menu */}
       <div className="bg-white rounded-[5px] border border-border overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2">
-          {menuItems.map((item, idx) => {
+          {menuItems.map((item, _idx) => {
             const Icon = item.icon;
             return (
               <Link

@@ -1,3 +1,10 @@
+/**
+ * Page de suivi en temps réel d'une intervention.
+ * Affiche une timeline verticale (devis signé → en route → sur place → terminé),
+ * le montant bloqué en séquestre, et un bouton de validation à la dernière étape.
+ * Inclut des boutons de démo pour simuler la progression (prototype).
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -35,7 +42,7 @@ interface TrackingMission {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Timeline steps                                                     */
+/*  Données de la timeline                                             */
 /* ------------------------------------------------------------------ */
 
 interface TimelineStep {
@@ -44,6 +51,7 @@ interface TimelineStep {
   description?: string;
 }
 
+/** Les 4 étapes de l'intervention */
 const timelineSteps: TimelineStep[] = [
   { label: "Devis signé", time: "14:02", description: "Paiement bloqué en séquestre" },
   { label: "Artisan en route", time: "14:35", description: "Estimation ~15 min" },
@@ -51,10 +59,7 @@ const timelineSteps: TimelineStep[] = [
   { label: "Terminé", time: "15:40", description: "En attente de validation" },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  Status banners                                                     */
-/* ------------------------------------------------------------------ */
-
+/** Bandeaux de statut selon l'étape courante */
 const statusBanners: Record<number, { text: string; cls: string }> = {
   0: { text: "Devis signé — En attente de l'artisan", cls: "bg-surface text-forest border border-border" },
   1: { text: "En route vers vous — ~15 min", cls: "bg-gold/10 text-gold border border-gold/20" },
@@ -63,7 +68,7 @@ const statusBanners: Record<number, { text: string; cls: string }> = {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Page                                                               */
+/*  Composant principal                                                */
 /* ------------------------------------------------------------------ */
 
 export default function TrackingPage() {
@@ -71,9 +76,10 @@ export default function TrackingPage() {
   const router = useRouter();
   const { data: mission, loading } = useFetch<TrackingMission>(`/api/missions/${id}`);
 
-  // Demo step state for prototype cycling
+  /** Étape de démo (simulée par les boutons en bas) */
   const [demoStep, setDemoStep] = useState(1);
 
+  /* Squelette de chargement */
   if (loading) {
     return (
       <div className="max-w-[600px] mx-auto p-5 md:p-8 space-y-4">
@@ -84,7 +90,7 @@ export default function TrackingPage() {
     );
   }
 
-  // Fallback values for prototype
+  /* Valeurs avec fallback pour le prototype */
   const name = mission?.artisan.user.name ?? "Marc Dupont";
   const trade = mission?.artisan.trade ?? "Plombier";
   const missionType = mission?.type ?? "Fuite sous évier";
@@ -94,7 +100,8 @@ export default function TrackingPage() {
 
   return (
     <div className="max-w-[600px] mx-auto p-5 md:p-8">
-      {/* Back */}
+
+      {/* Lien retour vers les missions */}
       <button
         onClick={() => router.push("/missions")}
         className="flex items-center gap-1.5 text-sm text-forest font-medium mb-5 hover:underline"
@@ -102,7 +109,7 @@ export default function TrackingPage() {
         <ArrowLeft className="w-4 h-4" /> Missions
       </button>
 
-      {/* Artisan card */}
+      {/* Carte artisan + boutons contact */}
       <Card className="flex items-center gap-3.5 mb-4">
         <div className="w-12 h-12 rounded-[5px] bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white text-sm font-bold shrink-0">
           {initials}
@@ -112,6 +119,7 @@ export default function TrackingPage() {
           <div className="text-xs text-grayText">{trade}</div>
           <div className="text-xs text-forest font-medium mt-0.5">{missionType}</div>
         </div>
+        {/* Boutons message et appel */}
         <div className="flex gap-2">
           <button className="w-10 h-10 rounded-[5px] bg-surface flex items-center justify-center text-forest hover:bg-border transition-colors">
             <MessageCircle className="w-4 h-4" />
@@ -122,23 +130,23 @@ export default function TrackingPage() {
         </div>
       </Card>
 
-      {/* Status banner */}
+      {/* Bandeau de statut */}
       <div className={cn("px-4 py-3 rounded-[5px] text-sm font-semibold text-center mb-5", banner.cls)}>
         {banner.text}
       </div>
 
-      {/* Vertical timeline */}
+      {/* Timeline verticale */}
       <Card className="mb-5">
         <h2 className="font-heading text-sm font-bold text-navy mb-4">Suivi en temps réel</h2>
         <div className="flex flex-col">
           {timelineSteps.map((step, i) => {
-            const done = i < currentStep;
-            const active = i === currentStep;
-            const future = i > currentStep;
+            const done = i < currentStep;    // étape passée
+            const active = i === currentStep; // étape en cours
+            const future = i > currentStep;   // étape future
 
             return (
               <div key={i} className="flex gap-3">
-                {/* Vertical line + circle */}
+                {/* Ligne verticale + cercle */}
                 <div className="flex flex-col items-center">
                   <div
                     className={cn(
@@ -150,6 +158,7 @@ export default function TrackingPage() {
                   >
                     {done ? <Check className="w-4 h-4" /> : i + 1}
                   </div>
+                  {/* Barre de connexion verticale */}
                   {i < timelineSteps.length - 1 && (
                     <div
                       className={cn(
@@ -160,7 +169,7 @@ export default function TrackingPage() {
                   )}
                 </div>
 
-                {/* Content */}
+                {/* Contenu de l'étape */}
                 <div className="pb-5 pt-0.5 flex-1">
                   <div className="flex items-center gap-2">
                     <span
@@ -185,7 +194,7 @@ export default function TrackingPage() {
         </div>
       </Card>
 
-      {/* Escrow info */}
+      {/* Carte séquestre : montant bloqué */}
       {(mission?.payment || true) && (
         <Card className="bg-gradient-to-br from-deepForest to-forest text-white mb-5">
           <div className="flex items-center gap-2 mb-2">
@@ -201,7 +210,7 @@ export default function TrackingPage() {
         </Card>
       )}
 
-      {/* Demo controls */}
+      {/* Boutons de démo pour simuler les étapes (prototype) */}
       <div className="flex gap-2 mb-4">
         {[0, 1, 2, 3].map((s) => (
           <button
@@ -222,7 +231,7 @@ export default function TrackingPage() {
         Boutons de démo — Cliquez pour simuler la progression
       </p>
 
-      {/* Validate button (appears at last step) */}
+      {/* Bouton de validation (visible uniquement à la dernière étape) */}
       {currentStep === 3 && (
         <Button
           className="w-full"

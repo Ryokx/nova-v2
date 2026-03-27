@@ -1,11 +1,23 @@
 "use client";
 
+/**
+ * MissionCard — Carte résumée d'une mission (côté client)
+ *
+ * Affiche en une ligne :
+ * - L'avatar de l'artisan
+ * - Le nom + type de mission
+ * - Le montant (ou "En attente")
+ * - La date prévue
+ * - Le badge de statut (En attente, En cours, Validée, Litige, etc.)
+ */
+
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/utils";
 import type { BadgeVariant } from "@/components/ui/badge";
 
+/* ━━━ Configuration des statuts : label affiché + variante du badge ━━━ */
 const statusConfig: Record<string, { label: string; variant: BadgeVariant }> = {
   PENDING: { label: "En attente", variant: "warning" },
   ACCEPTED: { label: "Acceptée", variant: "info" },
@@ -16,6 +28,7 @@ const statusConfig: Record<string, { label: string; variant: BadgeVariant }> = {
   CANCELLED: { label: "Annulée", variant: "default" },
 };
 
+/* ━━━ Types ━━━ */
 interface MissionCardProps {
   id: string;
   type: string;
@@ -38,6 +51,7 @@ export function MissionCard({
   onClick,
   className,
 }: MissionCardProps) {
+  /* Récupère la config du statut, avec un fallback par défaut */
   const config = statusConfig[status] ?? { label: status, variant: "default" as BadgeVariant };
 
   return (
@@ -48,11 +62,16 @@ export function MissionCard({
         className,
       )}
     >
+      {/* Avatar de l'artisan */}
       <Avatar name={artisanName} src={artisanAvatar} size="md" />
+
+      {/* Nom de l'artisan + type de mission */}
       <div className="flex-1 min-w-0">
         <div className="font-semibold text-sm text-navy truncate">{artisanName}</div>
         <div className="text-xs text-grayText truncate">{type}</div>
       </div>
+
+      {/* Montant + date prévue */}
       <div className="text-right shrink-0">
         {amount ? (
           <div className="font-mono text-sm font-bold text-navy">{formatPrice(amount)}</div>
@@ -65,6 +84,8 @@ export function MissionCard({
           </div>
         )}
       </div>
+
+      {/* Badge de statut */}
       <Badge variant={config.variant}>{config.label}</Badge>
     </button>
   );

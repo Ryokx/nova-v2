@@ -1,3 +1,15 @@
+/**
+ * Page principale du tableau de bord administrateur Nova.
+ * Accessible uniquement aux utilisateurs avec le rôle ADMIN.
+ *
+ * 3 onglets :
+ * 1. Vue d'ensemble : 8 KPIs en 2 lignes (missions actives, validation,
+ *    litiges, revenus 7j, séquestre, artisans, clients, note moyenne)
+ *    + alerte litiges en cours
+ * 2. Utilisateurs : recherche + liste avec rôle, métier, vérification
+ * 3. Missions : filtres par statut + liste avec actions admin sur les litiges
+ *    (libérer paiement / rembourser client)
+ */
 "use client";
 
 import { useState } from "react";
@@ -15,17 +27,20 @@ import { useFetch } from "@/hooks/use-fetch";
 import { formatPrice, cn } from "@/lib/utils";
 import type { BadgeVariant } from "@/components/ui/badge";
 
+/* Statistiques globales de la plateforme */
 interface AdminStats {
   totalUsers: number; totalArtisans: number; totalClients: number;
   totalMissions: number; activeMissions: number; disputedMissions: number;
   pendingValidation: number; revenue7d: number; escrowBalance: number; avgRating: number;
 }
 
+/* Données d'un utilisateur (client ou artisan) */
 interface UserData {
   id: string; name: string | null; email: string; role: string; createdAt: string;
   artisanProfile: { trade: string; isVerified: boolean; rating: number; missionCount: number } | null;
 }
 
+/* Données d'une mission avec paiement associé */
 interface MissionData {
   id: string; type: string; status: string; amount: number | null; createdAt: string;
   client: { name: string | null };
@@ -33,6 +48,7 @@ interface MissionData {
   payment: { id: string; amount: number; status: string } | null;
 }
 
+/* Configuration des badges de statut pour les missions */
 const statusMap: Record<string, { label: string; variant: BadgeVariant }> = {
   PENDING: { label: "En attente", variant: "warning" },
   ACCEPTED: { label: "Acceptée", variant: "info" },
@@ -45,10 +61,14 @@ const statusMap: Record<string, { label: string; variant: BadgeVariant }> = {
 
 export default function AdminPage() {
   const { data: session, status: authStatus } = useSession();
+  /* Onglet actif du tableau de bord */
   const [tab, setTab] = useState<"overview" | "users" | "missions">("overview");
+  /* Recherche utilisateur */
   const [userSearch, setUserSearch] = useState("");
+  /* Filtre par statut de mission */
   const [missionFilter, setMissionFilter] = useState("");
 
+  /* Récupération des données admin via l'API (chargement conditionnel par onglet) */
   const { data: stats, loading: loadingStats } = useFetch<AdminStats>("/api/admin/stats");
   const { data: users, loading: loadingUsers } = useFetch<UserData[]>(
     tab === "users" ? `/api/admin/users${userSearch ? `?search=${encodeURIComponent(userSearch)}` : ""}` : null,
@@ -57,9 +77,12 @@ export default function AdminPage() {
     tab === "missions" ? `/api/admin/missions${missionFilter ? `?status=${missionFilter}` : ""}` : null,
   );
 
+  /* Affiche un skeleton pendant le chargement de la session */
   if (authStatus === "loading") return <div className="max-w-[1100px] mx-auto p-8"><Skeleton height={400} variant="rectangular" /></div>;
+  /* Redirige vers /login si l'utilisateur n'est pas admin */
   if (session?.user?.role !== "ADMIN") redirect("/login");
 
+  /* Action admin sur un paiement en litige : libérer vers l'artisan ou rembourser le client */
   const handlePaymentAction = async (paymentId: string, action: "release" | "refund") => {
     await fetch("/api/admin/payments", {
       method: "PATCH",
@@ -69,7 +92,7 @@ export default function AdminPage() {
     window.location.reload();
   };
 
-  /* ── KPI definitions matching nova-admin.jsx ── */
+  /* Définition des 8 KPIs affichés dans la vue d'ensemble (2 lignes de 4) */
   const kpiRow1 = stats ? [
     {
       label: "Interventions actives",

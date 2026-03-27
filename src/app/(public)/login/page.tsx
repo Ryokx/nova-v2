@@ -1,3 +1,14 @@
+/**
+ * Page de connexion — /login
+ *
+ * Permet à l'utilisateur de se connecter via :
+ * - Google ou Apple (SSO)
+ * - Email + mot de passe (credentials)
+ * - Mode démo (comptes pré-créés pour tester la plateforme)
+ *
+ * Inclut aussi un formulaire inline "mot de passe oublié"
+ * qui envoie un email de réinitialisation.
+ */
 "use client";
 
 import { useState } from "react";
@@ -7,18 +18,27 @@ import Link from "next/link";
 import { Shield, CheckCircle, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
+  /* ── État du formulaire de connexion ── */
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  /* ── État du formulaire "mot de passe oublié" ── */
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [forgotError, setForgotError] = useState("");
+
+  /* ── URL de redirection après connexion (si présente dans l'URL) ── */
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
 
+  /**
+   * Envoie un email de réinitialisation de mot de passe
+   * via l'API /api/auth/forgot-password
+   */
   const handleForgotPassword = async () => {
     if (!forgotEmail) return;
     setForgotError("");
@@ -38,6 +58,10 @@ export default function LoginPage() {
     }
   };
 
+  /**
+   * Soumission du formulaire de connexion email/mot de passe.
+   * En cas de succès, redirige vers le dashboard approprié (client ou artisan).
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -53,22 +77,25 @@ export default function LoginPage() {
 
     if (result?.error) {
       setError("Email ou mot de passe incorrect");
+      return;
+    }
+
+    // Redirection selon le rôle de l'utilisateur
+    if (callbackUrl) {
+      window.location.href = callbackUrl;
     } else {
-      if (callbackUrl) {
-        window.location.href = callbackUrl;
-      } else {
-        const res = await fetch("/api/auth/session");
-        const session = await res.json();
-        const role = session?.user?.role;
-        window.location.href = role === "ARTISAN" ? "/artisan-dashboard" : "/artisans";
-      }
+      const res = await fetch("/api/auth/session");
+      const session = await res.json();
+      const role = session?.user?.role;
+      window.location.href = role === "ARTISAN" ? "/artisan-dashboard" : "/artisans";
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-bgPage">
       <div className="w-full max-w-[420px]">
-        {/* Header */}
+
+        {/* ── En-tête avec icône et titre ── */}
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-[5px] bg-forest/5 flex items-center justify-center mx-auto mb-4">
             <Shield className="w-7 h-7 text-forest" />
@@ -79,9 +106,10 @@ export default function LoginPage() {
           <p className="text-sm text-grayText">Accédez à votre espace Nova</p>
         </div>
 
-        {/* Card */}
+        {/* ── Carte principale de connexion ── */}
         <div className="bg-white rounded-[5px] p-7 shadow-sm border border-border">
-          {/* SSO Buttons */}
+
+          {/* Boutons de connexion SSO (Google / Apple) */}
           <button
             onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artisans" })}
             className="w-full h-12 rounded-[5px] border border-border bg-white text-navy text-sm font-semibold flex items-center justify-center gap-2.5 mb-2.5 hover:bg-surface transition-colors"
@@ -105,14 +133,14 @@ export default function LoginPage() {
             Continuer avec Apple
           </button>
 
-          {/* Divider */}
+          {/* Séparateur "ou" */}
           <div className="flex items-center gap-3 my-5">
             <div className="flex-1 h-px bg-border" />
             <span className="text-xs text-grayText font-mono">ou</span>
             <div className="flex-1 h-px bg-border" />
           </div>
 
-          {/* Credentials form */}
+          {/* Formulaire email / mot de passe */}
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
               type="email"
@@ -134,12 +162,14 @@ export default function LoginPage() {
               className="w-full h-12 px-4 rounded-[5px] border border-border bg-white text-sm text-navy placeholder:text-grayText/50 focus:outline-none focus:border-forest focus:ring-2 focus:ring-forest/10 transition-all"
             />
 
+            {/* Message d'erreur de connexion */}
             {error && (
               <p className="text-xs text-red text-center" role="alert">
                 {error}
               </p>
             )}
 
+            {/* Lien "mot de passe oublié" */}
             <div className="text-right">
               <button
                 type="button"
@@ -155,10 +185,11 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Forgot password inline form */}
+            {/* ── Formulaire inline : réinitialisation du mot de passe ── */}
             {showForgot && (
               <div className="p-4 rounded-[5px] bg-surface border border-border space-y-3">
                 {forgotSuccess ? (
+                  /* Confirmation d'envoi */
                   <div className="text-center py-2">
                     <CheckCircle className="w-8 h-8 text-success mx-auto mb-2" />
                     <p className="text-sm font-semibold text-navy mb-1">
@@ -180,6 +211,7 @@ export default function LoginPage() {
                     </button>
                   </div>
                 ) : (
+                  /* Champ email + bouton d'envoi */
                   <>
                     <div className="flex items-center gap-2">
                       <button
@@ -227,6 +259,7 @@ export default function LoginPage() {
               </div>
             )}
 
+            {/* Bouton de connexion principal */}
             <button
               type="submit"
               disabled={loading}
@@ -244,7 +277,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        {/* Switch to signup */}
+        {/* Lien vers la page d'inscription */}
         <p className="text-center mt-5 text-sm text-grayText">
           Pas encore de compte ?{" "}
           <Link href={callbackUrl ? `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/signup"} className="text-forest font-semibold hover:underline">
@@ -252,16 +285,23 @@ export default function LoginPage() {
           </Link>
         </p>
 
-        {/* Demo mode */}
+        {/* Boutons de connexion démo (pour tester la plateforme) */}
         <DemoButtons onError={setError} />
       </div>
     </div>
   );
 }
 
+/**
+ * Composant DemoButtons
+ *
+ * Permet de se connecter rapidement avec des comptes de démonstration
+ * (client ou artisan) pré-créés via le seed de la base de données.
+ */
 function DemoButtons({ onError }: { onError: (msg: string) => void }) {
   const [demoLoading, setDemoLoading] = useState<"client" | "artisan" | null>(null);
 
+  /** Connexion automatique avec un compte démo (client ou artisan) */
   const handleDemo = async (type: "client" | "artisan") => {
     onError("");
     setDemoLoading(type);
