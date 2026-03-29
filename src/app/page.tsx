@@ -1,686 +1,1389 @@
 /**
- * Landing page principale — / (page d'accueil)
+ * Page d'accueil — / (Formulaire de mise en relation)
  *
- * Page la plus importante du site. Structure en 7 sections :
- * 1. HERO : titre accrocheur + mockup téléphone flottant
- * 2. TRUST (Bento grid) : séquestre, certifications, validation
- * 3. HOW IT WORKS : 4 étapes du parcours utilisateur
- * 4. DEMO PREVIEW : cartes pour tester en mode client ou artisan
- * 5. MOBILE APP : présentation de l'application mobile + features
- * 6. TESTIMONIALS : avis clients (1 mis en avant + 2 empilés)
- * 7. FINAL CTA : appel à l'action pour créer un compte
- *
- * Page statique (Server Component) — pas de "use client".
+ * Parcours en 5 étapes sans affichage d'artisans (anti-discrimination) :
+ * 1. Choix du domaine d'intervention
+ * 2. Détails + urgence + description
+ * 3. Choix du moyen de paiement
+ * 4. Création de compte ou connexion
+ * 5. Confirmation — mise en relation avec un artisan proche
  */
-import Link from "next/link";
+
+"use client";
+
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useSession, signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
-  Shield,
-  Lock,
-  Check,
-  FileText,
-  Home,
-  Search,
-  ClipboardList,
-  Bell,
-  User,
-  Smartphone,
-  PenTool,
-  Video,
-  Moon,
-  AlertTriangle,
-  Wrench,
-  Star,
-  ArrowRight,
-  ChevronRight,
-  Zap,
-  BadgeCheck,
-  MapPin,
+  ArrowLeft, ArrowRight, MapPin, User, Mail, Phone,
+  FileText, CreditCard, Banknote, Shield, Check, Lock,
+  AlertTriangle, Loader2, LogIn, Clock, Zap, ChevronRight,
+  Calendar, Navigation,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import Image from "next/image";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import dynamic from "next/dynamic";
 
-/* ━━━ Icônes SVG personnalisées ━━━ */
+const LocationMap = dynamic(() => import("@/components/features/location-map"), { ssr: false });
 
-/** Icône bouclier avec coche (utilisée dans les sections confiance) */
-const ShieldIcon = ({ size = 28, color = "#1B6B4E" }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill={color} opacity=".12" />
-    <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" stroke={color} strokeWidth="1.5" fill="none" />
-    <path d="M9 12l2 2 4-4" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-/** Icône cadenas (utilisée dans les sections séquestre) */
-const LockIcon = ({ size = 18, color = "#1B6B4E" }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <rect x="5" y="11" width="14" height="10" rx="2" stroke={color} strokeWidth="1.5" />
-    <path d="M8 11V7a4 4 0 118 0v4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-    <circle cx="12" cy="16" r="1.5" fill={color} />
-  </svg>
-);
+/* ------------------------------------------------------------------ */
+/*  Sous-composant Stripe : formulaire d'ajout de carte                */
+/* ------------------------------------------------------------------ */
 
-/** Icône d'onglet pour la barre de navigation du mockup téléphone */
-const TabIcon = ({ icon: Icon, active = false }: { icon: React.ElementType; active?: boolean }) => (
-  <Icon className={`w-[14px] h-[14px] ${active ? "text-forest" : "text-grayText/40"}`} strokeWidth={active ? 2.5 : 1.5} />
-);
+function StripeCardForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: () => void }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-export default function HomePage() {
+  const handleSubmit = async () => {
+    if (!stripe || !elements) return;
+    setLoading(true);
+    setError("");
+
+    const { error: submitError } = await elements.submit();
+    if (submitError) {
+      setError(submitError.message ?? "Erreur de validation");
+      setLoading(false);
+      return;
+    }
+
+    const { error: confirmError } = await stripe.confirmSetup({
+      elements,
+      confirmParams: { return_url: window.location.href },
+      redirect: "if_required",
+    });
+
+    if (confirmError) {
+      setError(confirmError.message ?? "Erreur lors de l'enregistrement");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+    onSuccess();
+  };
+
   return (
-    <div>
-      {/* ══════════════════════════════════════════════════
-          SECTION 1 — HERO
-          Titre accrocheur + badges de confiance + CTAs
-          + mockup téléphone flottant à droite (desktop)
-      ══════════════════════════════════════════════════ */}
-      <section
-        className="relative overflow-hidden min-h-[calc(100vh-72px)] flex items-center px-5 md:px-10"
-        style={{ background: "linear-gradient(160deg, #F5FAF7 0%, #E8F5EE 35%, #D4EBE0 70%, #C8E6D5 100%)" }}
+    <div className="p-3 rounded-[6px] bg-bgPage border border-border space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-navy">Enregistrer une carte</span>
+        <button onClick={onCancel} className="text-[11px] text-grayText hover:text-navy cursor-pointer">Annuler</button>
+      </div>
+      <PaymentElement options={{ layout: "tabs" }} />
+      {error && (
+        <div className="flex items-center gap-1.5 text-xs text-red font-medium">
+          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{error}
+        </div>
+      )}
+      <button
+        onClick={handleSubmit}
+        disabled={loading || !stripe}
+        className={cn(
+          "w-full py-2.5 rounded-[6px] text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2",
+          loading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-forest text-white hover:bg-deepForest cursor-pointer",
+        )}
       >
-        {/* Blobs décoratifs d'arrière-plan */}
-        <div className="absolute -top-[120px] -right-[80px] w-[500px] h-[500px] rounded-full bg-forest/[0.06] blur-[100px]" />
-        <div className="absolute -bottom-[100px] -left-[60px] w-[350px] h-[350px] rounded-full bg-gold/[0.05] blur-[80px]" />
-        <div className="absolute top-[30%] left-[25%] w-[250px] h-[250px] rounded-full bg-sage/[0.04] blur-[60px]" />
-
-        <div className="max-w-[1140px] mx-auto w-full flex items-center gap-20 relative z-10">
-
-          {/* ── Colonne gauche : contenu texte ── */}
-          <div className="flex-1 min-w-0 py-16 md:py-20">
-
-            {/* Badge d'accroche (point de douleur) */}
-            <div className="inline-flex items-center gap-2 bg-red/[0.06] border border-red/[0.1] rounded-lg px-4 py-2 mb-7 text-[13px] font-semibold text-red motion-safe:animate-pageIn">
-              <AlertTriangle className="w-4 h-4 shrink-0" />
-              67% des Français ont déjà eu un litige avec un artisan
-            </div>
-
-            {/* Titre principal en 2 lignes */}
-            <h1 className="font-heading text-[36px] md:text-[54px] font-extrabold text-navy leading-[1.08] tracking-[-1.5px] mb-2 motion-safe:animate-pageIn motion-safe:[animation-delay:80ms]" style={{ textWrap: "balance" as never }}>
-              Fini les artisans{" "}
-              <span className="text-red/50 line-through decoration-[3px] decoration-red/30">douteux</span>
-            </h1>
-            <h1 className="font-heading text-[36px] md:text-[54px] font-extrabold leading-[1.08] tracking-[-1.5px] mb-7 motion-safe:animate-pageIn motion-safe:[animation-delay:160ms]">
-              <span className="bg-gradient-to-r from-deepForest via-forest to-sage bg-clip-text text-transparent">
-                Place aux certifiés.
-              </span>
-            </h1>
-
-            {/* Sous-titre explicatif */}
-            <p className="text-[17px] text-navy/60 leading-[1.75] max-w-[480px] mb-5 motion-safe:animate-pageIn motion-safe:[animation-delay:240ms]">
-              Nova vérifie chaque artisan <span className="font-semibold text-navy">(SIRET, décennale, RGE)</span> et bloque votre paiement en <span className="font-semibold text-navy">séquestre</span> jusqu&apos;à validation de l&apos;intervention.
-            </p>
-
-            {/* Micro-badges de confiance */}
-            <div className="flex gap-5 mb-9 flex-wrap motion-safe:animate-pageIn motion-safe:[animation-delay:320ms]">
-              {[
-                { icon: <Shield className="w-4 h-4 text-forest" />, text: "Artisans vérifiés" },
-                { icon: <Lock className="w-4 h-4 text-forest" />, text: "Paiement séquestre" },
-                { icon: <BadgeCheck className="w-4 h-4 text-forest" />, text: "0% d'impayés" },
-              ].map((b) => (
-                <div key={b.text} className="flex items-center gap-2 text-[13px] font-semibold text-deepForest/80">
-                  <div className="w-7 h-7 rounded-lg bg-forest/[0.07] flex items-center justify-center">{b.icon}</div>
-                  {b.text}
-                </div>
-              ))}
-            </div>
-
-            {/* Boutons d'appel à l'action */}
-            <div className="flex gap-3 flex-wrap motion-safe:animate-pageIn motion-safe:[animation-delay:400ms]">
-              <Link
-                href="/signup"
-                className="group flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-br from-deepForest to-forest text-white text-[15px] font-bold font-heading shadow-[0_8px_24px_rgba(10,64,48,0.3)] hover:shadow-[0_12px_32px_rgba(10,64,48,0.4)] active:scale-[0.97] transition-all duration-200 cursor-pointer"
-              >
-                Trouver mon artisan
-                <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-              <Link
-                href="/login"
-                className="flex items-center gap-2 px-7 py-4 rounded-xl bg-white/80 backdrop-blur-md text-navy border border-border/60 text-[15px] font-semibold hover:bg-white hover:border-border active:scale-[0.97] transition-all duration-200 cursor-pointer"
-              >
-                Voir la démo
-                <ChevronRight className="w-4 h-4 text-navy/40" />
-              </Link>
-            </div>
-
-            {/* Preuve sociale (avatars + texte) */}
-            <div className="flex items-center gap-3 mt-8 motion-safe:animate-pageIn motion-safe:[animation-delay:500ms]">
-              <div className="flex">
-                {["SL", "PM", "CD", "AM"].map((ini, i) => (
-                  <div key={ini} className="w-8 h-8 rounded-full border-[2.5px] border-bgPage flex items-center justify-center text-[9px] font-bold text-forest shadow-sm" style={{ background: `hsl(${150 + i * 25}, 30%, 87%)`, marginLeft: i > 0 ? -8 : 0, zIndex: 4 - i }}>
-                    {ini}
-                  </div>
-                ))}
-              </div>
-              <div className="text-[13px] text-navy/50">
-                <span className="font-bold text-navy/80">Rejoignez-les</span> — Gratuit, sans engagement
-              </div>
-            </div>
-          </div>
-
-          {/* ── Colonne droite : mockup téléphone flottant (desktop uniquement) ── */}
-          <div className="hidden lg:block flex-none w-[320px] relative motion-safe:animate-pageIn motion-safe:[animation-delay:300ms]">
-            <div className="w-[280px] h-[560px] rounded-[36px] bg-navy p-2.5 shadow-[0_40px_100px_rgba(10,22,40,0.25)] motion-safe:animate-float">
-              {/* Dynamic Island (encoche iPhone) */}
-              <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[90px] h-[26px] rounded-b-2xl bg-navy z-10">
-                <div className="w-11 h-1 rounded-full bg-white/[0.12] mx-auto mt-3.5" />
-              </div>
-              {/* Écran du téléphone */}
-              <div className="w-full h-full rounded-[32px] overflow-hidden" style={{ background: "linear-gradient(170deg, #E8F5EE, #F5FAF7)" }}>
-                <div className="pt-[34px] px-3.5">
-                  {/* Barre de navigation app */}
-                  <div className="flex items-center mb-3">
-                    <span className="font-heading text-[13px] font-extrabold text-navy tracking-tight">Nova</span>
-                    <div className="w-[3px] h-[3px] rounded-full bg-gold ml-0.5" />
-                    <div className="ml-auto w-6 h-6 rounded-lg bg-surface flex items-center justify-center">
-                      <LockIcon size={12} />
-                    </div>
-                  </div>
-                  <div className="font-heading text-sm font-extrabold text-navy mb-3">Bonjour Sophie</div>
-
-                  {/* Mini cartes de statistiques */}
-                  <div className="flex gap-[5px] mb-2.5">
-                    {[{ v: "2", l: "En cours", c: "text-success" }, { v: "570€", l: "Séquestre", c: "text-forest" }].map((k) => (
-                      <div key={k.l} className="flex-1 bg-white rounded-lg py-[7px] px-1.5 text-center border border-border/50 shadow-sm">
-                        <div className={`font-mono text-xs font-bold ${k.c}`}>{k.v}</div>
-                        <div className="text-[7px] text-grayText">{k.l}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Cartes de missions dans le mockup */}
-                  {[
-                    { ini: "JM", name: "Jean-Michel P.", desc: "Réparation fuite", badge: "En cours", bColor: "#22C88A" },
-                    { ini: "SM", name: "Sophie M.", desc: "Prise électrique", badge: "Terminée", bColor: "#1B6B4E" },
-                    { ini: "KB", name: "Karim B.", desc: "Serrure", badge: "Validée", bColor: "#F5A623" },
-                  ].map((m) => (
-                    <div key={m.ini} className="bg-white rounded-lg p-2 mb-[5px] border border-border/30 shadow-sm flex gap-2 items-center">
-                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-surface to-border flex items-center justify-center text-[8px] font-bold text-forest">{m.ini}</div>
-                      <div className="flex-1">
-                        <div className="text-[10px] font-bold text-navy">{m.name}</div>
-                        <div className="text-[8px] text-grayText">{m.desc}</div>
-                      </div>
-                      <span className="text-[7px] font-bold px-[5px] py-[2px] rounded-sm" style={{ color: m.bColor, background: m.bColor + "15" }}>{m.badge}</span>
-                    </div>
-                  ))}
-
-                  {/* Carte séquestre dans le mockup */}
-                  <div className="bg-gradient-to-br from-deepForest to-forest rounded-xl p-2.5 mt-2 shadow-[0_4px_16px_rgba(10,64,48,0.2)]">
-                    <div className="flex items-center gap-[5px] mb-1">
-                      <LockIcon size={10} color="#8ECFB0" />
-                      <span className="text-[8px] font-bold text-lightSage">Paiement en séquestre</span>
-                    </div>
-                    <div className="font-mono text-base font-bold text-white">570,00 €</div>
-                    <div className="w-full h-1 rounded-full bg-white/10 mt-1.5">
-                      <div className="w-[65%] h-full rounded-full bg-lightSage/60" />
-                    </div>
-                    <div className="text-[7px] text-white/50 mt-1">Protégé jusqu&apos;à validation</div>
-                  </div>
-
-                  {/* Barre d'onglets du téléphone */}
-                  <div className="flex justify-around pt-2.5 mt-2.5 border-t border-surface">
-                    <TabIcon icon={Home} active />
-                    <TabIcon icon={Search} />
-                    <TabIcon icon={ClipboardList} />
-                    <TabIcon icon={Bell} />
-                    <TabIcon icon={User} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Carte flottante — "Intervention validée" */}
-            <div className="absolute top-16 -left-[70px] bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-border/40 flex items-center gap-2.5 max-w-[210px] motion-safe:animate-pageIn motion-safe:[animation-delay:700ms]">
-              <div className="relative">
-                <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
-                  <Check className="w-4 h-4 text-success" />
-                </div>
-                <div className="absolute inset-0 rounded-lg bg-success/20 motion-safe:animate-pulse-ring" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold text-navy">Intervention validée</div>
-                <div className="text-[9px] text-grayText">Paiement libéré • 320€</div>
-              </div>
-            </div>
-
-            {/* Carte flottante — "Artisan certifié" */}
-            <div className="absolute bottom-[90px] -right-[40px] bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-border/40 flex items-center gap-2.5 motion-safe:animate-pageIn motion-safe:[animation-delay:900ms]">
-              <div className="w-8 h-8 rounded-lg bg-forest/[0.08] flex items-center justify-center">
-                <ShieldIcon size={16} />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold text-navy">Artisan certifié</div>
-                <div className="text-[9px] text-grayText">SIRET • Décennale • RGE</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════
-          SECTION 2 — TRUST (Bento Grid)
-          3 cartes : séquestre (mise en avant), certifications, validation
-      ══════════════════════════════════════════════════ */}
-      <section className="py-20 px-5 md:px-10 bg-white">
-        <div className="max-w-[1140px] mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="font-heading text-[32px] md:text-[38px] font-extrabold text-navy mb-3" style={{ textWrap: "balance" as never }}>
-              Un système de confiance unique
-            </h2>
-            <p className="text-[16px] text-navy/50 max-w-[460px] mx-auto leading-relaxed">
-              Votre argent est protégé, vos artisans sont vérifiés, chaque mission est contrôlée.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-            {/* Carte principale — Séquestre (occupe 2 rangées) */}
-            <div className="md:row-span-2 group relative p-8 rounded-2xl overflow-hidden cursor-default" style={{ background: "linear-gradient(160deg, #0A4030 0%, #1B6B4E 100%)" }}>
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-5">
-                  <LockIcon size={28} color="#8ECFB0" />
-                </div>
-                <h3 className="font-heading text-2xl font-extrabold text-white mb-2">Paiement séquestre</h3>
-                <p className="text-[15px] text-white/70 leading-relaxed mb-6 max-w-[380px]">
-                  Votre argent est bloqué sur un compte sécurisé dès la signature du devis. L&apos;artisan n&apos;est payé qu&apos;après votre validation.
-                </p>
-
-                {/* Visualisation du flux séquestre en 4 étapes */}
-                <div className="flex items-center gap-3 mb-4">
-                  {[
-                    { label: "Vous payez", icon: <CreditCardIcon /> },
-                    { label: "Séquestre", icon: <Lock className="w-4 h-4 text-lightSage" /> },
-                    { label: "Validation", icon: <Check className="w-4 h-4 text-lightSage" /> },
-                    { label: "Artisan payé", icon: <BadgeCheck className="w-4 h-4 text-lightSage" /> },
-                  ].map((step, i) => (
-                    <div key={step.label} className="flex items-center gap-3">
-                      <div className="flex flex-col items-center gap-1.5">
-                        <div className="w-9 h-9 rounded-lg bg-white/[0.12] flex items-center justify-center">{step.icon}</div>
-                        <span className="text-[9px] font-semibold text-white/60 whitespace-nowrap">{step.label}</span>
-                      </div>
-                      {i < 3 && <div className="w-6 h-[2px] bg-lightSage/30 rounded-full mt-[-14px]" />}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="inline-flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2 text-[13px] font-bold text-lightSage">
-                  <Lock className="w-3.5 h-3.5" /> 0€ de risque pour vous
-                </div>
-              </div>
-              {/* Effet lumineux décoratif */}
-              <div className="absolute -bottom-20 -right-20 w-[250px] h-[250px] rounded-full bg-sage/[0.15] blur-[80px]" />
-            </div>
-
-            {/* Carte — Certifications artisans */}
-            <div className="group p-7 rounded-2xl bg-bgPage border border-border/50 hover:border-forest/20 hover:shadow-lg active:scale-[0.99] transition-all duration-200 cursor-default">
-              <div className="w-12 h-12 rounded-xl bg-forest/[0.08] group-hover:bg-forest/[0.12] flex items-center justify-center mb-4 transition-colors">
-                <ShieldIcon size={26} />
-              </div>
-              <h3 className="font-heading text-xl font-bold text-navy mb-2">Artisans certifiés</h3>
-              <p className="text-[14px] text-navy/55 leading-relaxed mb-4">
-                Chaque artisan est audité et vérifié avant d&apos;être référencé. Documents obligatoires contrôlés par notre équipe.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {["SIRET vérifié", "Décennale", "Pièce d'identité"].map((tag) => (
-                  <span key={tag} className="inline-flex items-center gap-1 text-[11px] font-bold text-forest bg-forest/[0.06] px-2.5 py-1 rounded-lg">
-                    <Check className="w-3 h-3" /> {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Carte — Validation Nova */}
-            <div className="group p-7 rounded-2xl bg-bgPage border border-border/50 hover:border-forest/20 hover:shadow-lg active:scale-[0.99] transition-all duration-200 cursor-default">
-              <div className="w-12 h-12 rounded-xl bg-forest/[0.08] group-hover:bg-forest/[0.12] flex items-center justify-center mb-4 transition-colors">
-                <Check className="w-6 h-6 text-forest" />
-              </div>
-              <h3 className="font-heading text-xl font-bold text-navy mb-2">Validation Nova</h3>
-              <p className="text-[14px] text-navy/55 leading-relaxed mb-4">
-                Notre équipe contrôle et valide chaque mission avant de libérer le paiement. Vous gardez le contrôle total.
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5 text-[12px] font-bold text-success">
-                  <div className="relative">
-                    <div className="w-2 h-2 rounded-full bg-success" />
-                    <div className="absolute inset-0 w-2 h-2 rounded-full bg-success motion-safe:animate-pulse-ring" />
-                  </div>
-                  100% des missions contrôlées
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════
-          SECTION 3 — COMMENT ÇA MARCHE (4 étapes)
-      ══════════════════════════════════════════════════ */}
-      <section className="py-20 px-5 md:px-10 bg-bgPage">
-        <div className="max-w-[960px] mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="font-heading text-[32px] md:text-[38px] font-extrabold text-navy mb-3">Comment ça marche</h2>
-            <p className="text-[16px] text-navy/50">De la recherche à la validation, en 4 étapes.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-0 relative">
-            {/* Ligne de connexion entre les étapes (desktop) */}
-            <div className="hidden md:block absolute top-7 left-[12.5%] right-[12.5%] h-[2px] bg-border/60 z-0" />
-
-            {[
-              { icon: <Search className="w-5 h-5" />, title: "Trouvez", desc: "Recherchez un artisan certifié par catégorie ou urgence", accent: "from-forest to-sage" },
-              { icon: <FileText className="w-5 h-5" />, title: "Réservez", desc: "Prenez rendez-vous et acceptez le devis en ligne", accent: "from-forest to-sage" },
-              { icon: <Lock className="w-5 h-5" />, title: "Payez en séquestre", desc: "Votre argent est bloqué, pas débité", accent: "from-deepForest to-forest" },
-              { icon: <Check className="w-5 h-5" />, title: "On valide", desc: "Nova vérifie la mission et libère le paiement", accent: "from-deepForest to-forest" },
-            ].map((s, i) => (
-              <div key={i} className="flex flex-col items-center text-center relative z-10">
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.accent} text-white flex items-center justify-center mb-4 shadow-[0_4px_14px_rgba(10,64,48,0.2)]`}>
-                  {s.icon}
-                </div>
-                <h4 className="text-[15px] font-bold text-navy mb-1.5">{s.title}</h4>
-                <p className="text-[13px] text-navy/45 leading-snug px-2 max-w-[180px]">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════
-          SECTION 4 — DEMO PREVIEW
-          2 cartes glassmorphism : mode client / mode artisan
-      ══════════════════════════════════════════════════ */}
-      <section data-navbar-dark className="py-20 px-5 md:px-10 overflow-hidden" style={{ background: "linear-gradient(170deg, #0A4030 0%, #143D2E 50%, #1B6B4E 100%)" }}>
-        <div className="max-w-[1140px] mx-auto">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 bg-white/[0.08] rounded-lg px-4 py-2 mb-5 text-[12px] font-semibold text-white/70">
-              <Zap className="w-3.5 h-3.5" /> Découvrez la plateforme
-            </div>
-            <h2 className="font-heading text-[32px] md:text-[40px] font-extrabold text-white mb-3" style={{ textWrap: "balance" as never }}>
-              Testez Nova en mode démo
-            </h2>
-            <p className="text-[16px] text-white/55 max-w-[480px] mx-auto leading-relaxed">
-              Explorez l&apos;interface complète sans créer de compte.
-            </p>
-          </div>
-
-          {/* Cartes démo : client et artisan */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[840px] mx-auto mb-14">
-            {/* Carte — Mode client */}
-            <Link href="/login" className="group relative bg-white/[0.06] backdrop-blur-xl rounded-2xl p-7 border border-white/[0.1] hover:bg-white/[0.1] hover:border-white/[0.18] active:scale-[0.98] transition-all duration-200 cursor-pointer overflow-hidden">
-              <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-lightSage/[0.04] rounded-full blur-[60px] -translate-y-1/2 translate-x-1/3" />
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-xl bg-white/[0.1] flex items-center justify-center mb-5">
-                  <Home className="w-7 h-7 text-lightSage" />
-                </div>
-                <h3 className="font-heading text-[22px] font-extrabold text-white mb-2">Je suis particulier</h3>
-                <p className="text-[14px] text-white/55 leading-relaxed mb-5">
-                  Trouvez un artisan certifié, réservez en ligne, payez en séquestre. Suivi temps réel.
-                </p>
-                <div className="flex flex-wrap gap-1.5 mb-5">
-                  {["Recherche artisans", "Réservation", "Vidéo diagnostic", "Signature devis", "Paiement 3x/4x", "Suivi live"].map((f) => (
-                    <span key={f} className="px-2.5 py-1 rounded-lg bg-lightSage/[0.12] text-lightSage/90 text-[11px] font-semibold">{f}</span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2 text-lightSage font-bold text-[15px] group-hover:gap-3 transition-all duration-200">
-                  Explorer le mode client <ChevronRight className="w-4 h-4" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Carte — Mode artisan */}
-            <Link href="/login" className="group relative bg-white/[0.06] backdrop-blur-xl rounded-2xl p-7 border border-white/[0.1] hover:bg-white/[0.1] hover:border-white/[0.18] active:scale-[0.98] transition-all duration-200 cursor-pointer overflow-hidden">
-              <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-gold/[0.04] rounded-full blur-[60px] -translate-y-1/2 translate-x-1/3" />
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-xl bg-white/[0.1] flex items-center justify-center mb-5">
-                  <Wrench className="w-7 h-7 text-[#F5D090]" />
-                </div>
-                <h3 className="font-heading text-[22px] font-extrabold text-white mb-2">Je suis artisan</h3>
-                <p className="text-[14px] text-white/55 leading-relaxed mb-5">
-                  Gérez vos missions, créez vos devis et factures, suivez vos paiements.
-                </p>
-                <div className="flex flex-wrap gap-1.5 mb-5">
-                  {["Dashboard KPIs", "Devis en ligne", "Facturation auto", "Comptabilité", "QR code profil", "Carnet clients"].map((f) => (
-                    <span key={f} className="px-2.5 py-1 rounded-lg bg-gold/[0.12] text-[#F5D090]/90 text-[11px] font-semibold">{f}</span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2 text-[#F5D090] font-bold text-[15px] group-hover:gap-3 transition-all duration-200">
-                  Explorer le mode artisan <ChevronRight className="w-4 h-4" />
-                </div>
-              </div>
-            </Link>
-          </div>
-
-          {/* Fonctionnalités clés en grille */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-[900px] mx-auto">
-            {[
-              { icon: <LockIcon size={20} color="#8ECFB0" />, title: "Séquestre", desc: "Paiement bloqué" },
-              { icon: <ShieldIcon size={20} color="#8ECFB0" />, title: "Certifications", desc: "SIRET, décennale, RGE" },
-              { icon: <MapPin className="w-5 h-5 text-lightSage" />, title: "Suivi live", desc: "En route → sur place → fini" },
-              { icon: <FileText className="w-5 h-5 text-lightSage" />, title: "100% en ligne", desc: "Devis, facture, compta" },
-            ].map((f) => (
-              <div key={f.title} className="text-center py-4 px-3 rounded-xl bg-white/[0.03]">
-                <div className="w-10 h-10 rounded-xl bg-white/[0.07] flex items-center justify-center mx-auto mb-2">{f.icon}</div>
-                <div className="text-[13px] font-bold text-white mb-0.5">{f.title}</div>
-                <div className="text-[11px] text-white/45">{f.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════
-          SECTION 5 — APPLICATION MOBILE
-          Mockup téléphone + liste de fonctionnalités + boutons stores
-      ══════════════════════════════════════════════════ */}
-      <section className="py-20 px-5 md:px-10 bg-white overflow-hidden">
-        <div className="max-w-[1140px] mx-auto flex items-center gap-20 flex-wrap">
-
-          {/* Mockup téléphone (desktop uniquement) */}
-          <div className="hidden md:block flex-none relative">
-            <div className="w-[260px] h-[530px] rounded-[36px] bg-navy p-2.5 shadow-[0_24px_64px_rgba(10,22,40,0.18)] relative">
-              <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[90px] h-[24px] rounded-b-[16px] bg-navy z-10">
-                <div className="w-[46px] h-1 rounded-full bg-white/[0.12] mx-auto mt-3" />
-              </div>
-              <div className="w-full h-full rounded-[32px] overflow-hidden" style={{ background: "linear-gradient(170deg, #E8F5EE 0%, #F5FAF7 100%)" }}>
-                <div className="pt-3 px-4 flex justify-between items-center">
-                  <span className="text-[10px] font-semibold text-navy">9:41</span>
-                  <div className="w-3 h-2 rounded-sm border border-navy"><div className="w-[70%] h-full bg-navy rounded-sm" /></div>
-                </div>
-                <div className="px-3.5 pt-3">
-                  <div className="flex items-center gap-1.5 mb-3">
-                    <ShieldIcon size={15} />
-                    <span className="font-heading text-[13px] font-extrabold text-navy">Nova</span>
-                  </div>
-                  <div className="text-[10px] text-grayText mb-0.5">Bonjour Sophie</div>
-                  <div className="font-heading text-[14px] font-extrabold text-navy mb-2.5">Votre espace</div>
-                  <div className="flex gap-1 mb-2.5">
-                    {[{ v: "2", l: "En cours" }, { v: "570€", l: "Séquestre" }, { v: "8", l: "Terminées" }].map((k) => (
-                      <div key={k.l} className="flex-1 bg-white rounded-lg py-1.5 px-1 text-center border border-border/40 shadow-sm">
-                        <div className="font-mono text-[11px] font-bold text-forest">{k.v}</div>
-                        <div className="text-[7px] text-grayText">{k.l}</div>
-                      </div>
-                    ))}
-                  </div>
-                  {[
-                    { ini: "JM", name: "Jean-Michel P.", desc: "Réparation fuite • 15 mars", status: "En cours", color: "text-success" },
-                    { ini: "SM", name: "Sophie M.", desc: "Prise électrique • 10 mars", status: "Terminée", color: "text-forest" },
-                  ].map((m) => (
-                    <div key={m.ini} className="bg-white rounded-lg p-2 mb-1.5 border border-border/30 shadow-sm flex gap-2 items-center">
-                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-surface to-border flex items-center justify-center text-[9px] font-bold text-forest">{m.ini}</div>
-                      <div className="flex-1">
-                        <div className="text-[10px] font-bold text-navy">{m.name}</div>
-                        <div className="text-[8px] text-grayText">{m.desc}</div>
-                      </div>
-                      <span className={`text-[7px] font-bold ${m.color} bg-surface px-1.5 py-0.5 rounded-sm`}>{m.status}</span>
-                    </div>
-                  ))}
-                  <div className="flex justify-around pt-2 mt-2 border-t border-surface">
-                    <TabIcon icon={Home} active />
-                    <TabIcon icon={Search} />
-                    <TabIcon icon={ClipboardList} />
-                    <TabIcon icon={Bell} />
-                    <TabIcon icon={User} />
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Badge "Nouveau" */}
-            <div className="absolute top-8 -right-3 bg-red text-white px-3 py-1 rounded-lg text-[10px] font-bold shadow-[0_4px_12px_rgba(232,48,42,0.25)]">Nouveau</div>
-          </div>
-
-          {/* Contenu texte : fonctionnalités de l'app */}
-          <div className="flex-1 min-w-[280px]">
-            <div className="inline-flex items-center gap-2 bg-forest/[0.05] rounded-lg px-4 py-2 mb-6 text-[12px] font-semibold text-deepForest/70">
-              <Smartphone className="w-4 h-4" /> Application mobile
-            </div>
-            <h2 className="font-heading text-[30px] md:text-[36px] font-extrabold text-navy mb-3" style={{ textWrap: "balance" as never }}>Nova dans votre poche</h2>
-            <p className="text-[15px] text-navy/50 leading-relaxed mb-8 max-w-[440px]">
-              Notifications en temps réel, suivi artisan, signature de devis et paiement en séquestre — où que vous soyez.
-            </p>
-
-            {/* Liste des fonctionnalités mobiles */}
-            <div className="flex flex-col gap-4 mb-8">
-              {[
-                { icon: <Bell className="w-5 h-5 text-forest" />, title: "Notifications push", desc: "Nouveau devis, artisan en route, intervention terminée" },
-                { icon: <PenTool className="w-5 h-5 text-forest" />, title: "Signature tactile", desc: "Signez vos devis directement sur l'écran" },
-                { icon: <Video className="w-5 h-5 text-forest" />, title: "Vidéo diagnostic", desc: "Filmez votre problème avant l'intervention" },
-                { icon: <Moon className="w-5 h-5 text-forest" />, title: "Mode sombre", desc: "Interface confortable de jour comme de nuit" },
-              ].map((f) => (
-                <div key={f.title} className="flex gap-3.5 items-start group">
-                  <div className="w-10 h-10 rounded-xl bg-forest/[0.06] group-hover:bg-forest/[0.1] border border-border/40 flex items-center justify-center shrink-0 transition-colors">{f.icon}</div>
-                  <div>
-                    <div className="text-[14px] font-bold text-navy mb-0.5">{f.title}</div>
-                    <div className="text-[13px] text-navy/45 leading-snug">{f.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Boutons App Store / Google Play */}
-            <div className="flex gap-3 flex-wrap">
-              <button className="flex items-center gap-2.5 bg-navy rounded-xl px-5 py-2.5 cursor-pointer hover:bg-navy/90 active:scale-[0.97] transition-all" aria-label="Télécharger sur l'App Store">
-                <svg width="22" height="22" viewBox="0 0 814 1000" fill="#fff" aria-hidden="true"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57.8-155.5-127.4c-58.3-81.6-105.6-210.8-105.6-334.1C0 397.1 78.6 283.9 190.5 283.9c64.2 0 117.8 42.8 155.5 42.8 39 0 99.7-45.2 172.8-45.2 27.8 0 127.7 2.5 193.3 59.4z" /><path d="M554.1 0c-7.8 66.3-67.8 134.3-134.2 134.3-12 0-24-1.3-24-13.3 0-5.8 5.8-28.3 29-57.7C449.8 32.7 515.5 0 554.1 0z" /></svg>
-                <div>
-                  <div className="text-[9px] text-white/60">Télécharger sur</div>
-                  <div className="text-[14px] font-semibold text-white">App Store</div>
-                </div>
-              </button>
-              <button className="flex items-center gap-2.5 bg-navy rounded-xl px-5 py-2.5 cursor-pointer hover:bg-navy/90 active:scale-[0.97] transition-all" aria-label="Disponible sur Google Play">
-                <svg width="20" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l12.8 8.5a1 1 0 010 1.6l-12.8 8.5c-.66.5-1.6.03-1.6-.8z" fill="#fff" /></svg>
-                <div>
-                  <div className="text-[9px] text-white/60">Disponible sur</div>
-                  <div className="text-[14px] font-semibold text-white">Google Play</div>
-                </div>
-              </button>
-            </div>
-            <p className="text-[11px] text-navy/30 mt-3">iOS 15+ et Android 12+. Gratuit.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════
-          SECTION 6 — TÉMOIGNAGES
-          1 avis mis en avant (large) + 2 avis empilés
-      ══════════════════════════════════════════════════ */}
-      <section className="py-20 px-5 md:px-10 bg-bgPage">
-        <div className="max-w-[1140px] mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="font-heading text-[32px] md:text-[38px] font-extrabold text-navy mb-3">Ils nous font confiance</h2>
-            <p className="text-[16px] text-navy/50">Des particuliers satisfaits partout en France.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Témoignage principal (occupe 2 colonnes) */}
-            <div className="md:col-span-2 bg-white rounded-2xl p-8 border border-border/40 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex gap-0.5 mb-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-gold text-gold" />
-                ))}
-              </div>
-              <p className="text-[17px] text-navy/70 leading-relaxed mb-6 max-w-[520px]">
-                &ldquo;Le séquestre m&apos;a rassurée. Je savais que mon argent était protégé tant que l&apos;intervention n&apos;était pas terminée. L&apos;artisan était ponctuel, professionnel, et le suivi en temps réel m&apos;a permis de voir exactement quand il arrivait.&rdquo;
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-surface to-border flex items-center justify-center text-sm font-bold text-forest">CL</div>
-                <div>
-                  <div className="text-[14px] font-bold text-navy">Caroline L.</div>
-                  <div className="text-[12px] text-navy/40">Paris 4e — Plomberie</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Témoignages secondaires empilés */}
-            <div className="flex flex-col gap-5">
-              {[
-                { name: "Pierre M.", city: "Lyon 6e", service: "Urgence", text: "Fuite d'eau un dimanche soir, intervention en 1h30. Le suivi en temps réel est top." },
-                { name: "Amélie R.", city: "Bordeaux", service: "Électricité", text: "J'ai signé le devis en ligne, payé en 3x. Aucune surprise sur la facture." },
-              ].map((t) => (
-                <div key={t.name} className="bg-white rounded-2xl p-6 border border-border/40 shadow-sm hover:shadow-md transition-shadow flex-1">
-                  <div className="flex gap-0.5 mb-3">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
-                    ))}
-                  </div>
-                  <p className="text-[13px] text-navy/60 leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-surface to-border flex items-center justify-center text-[10px] font-bold text-forest">
-                      {t.name[0]}{t.name.split(" ")[1]?.[0]}
-                    </div>
-                    <div>
-                      <div className="text-[12px] font-bold text-navy">{t.name}</div>
-                      <div className="text-[10px] text-navy/35">{t.city} — {t.service}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════
-          SECTION 7 — CTA FINAL
-          Appel à l'action pour créer un compte (fond vert dégradé)
-      ══════════════════════════════════════════════════ */}
-      <section data-navbar-dark className="relative py-24 px-5 md:px-10 text-center overflow-hidden" style={{ background: "linear-gradient(160deg, #0A4030 0%, #1B6B4E 50%, #2D9B6E 100%)" }}>
-        {/* Effets lumineux décoratifs */}
-        <div className="absolute inset-0">
-          <div className="absolute top-[15%] left-[8%] w-[300px] h-[300px] rounded-full bg-white/[0.03] blur-[80px]" />
-          <div className="absolute bottom-[10%] right-[12%] w-[350px] h-[350px] rounded-full bg-gold/[0.03] blur-[100px]" />
-        </div>
-
-        <div className="relative z-10 max-w-[600px] mx-auto">
-          <div className="inline-flex items-center gap-2 bg-white/[0.08] rounded-lg px-4 py-2 mb-6 text-[12px] font-semibold text-white/70">
-            <Shield className="w-3.5 h-3.5" /> 100% gratuit, sans engagement
-          </div>
-          <h2 className="font-heading text-[32px] md:text-[44px] font-extrabold text-white mb-4 leading-[1.1]" style={{ textWrap: "balance" as never }}>
-            Prêt à trouver votre artisan de confiance ?
-          </h2>
-          <p className="text-[16px] text-white/55 mb-9 leading-relaxed">
-            Rejoignez des milliers de particuliers qui font confiance à Nova pour leurs travaux.
-          </p>
-          <div className="flex gap-3 justify-center flex-wrap">
-            <Link
-              href="/signup"
-              className="group inline-flex items-center gap-2 px-9 py-4 rounded-xl bg-white text-deepForest text-[15px] font-bold shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] active:scale-[0.97] transition-all duration-200 cursor-pointer"
-            >
-              Créer un compte gratuitement
-              <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-            <Link
-              href="/devenir-partenaire"
-              className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white/[0.08] border border-white/[0.15] text-white text-[15px] font-semibold hover:bg-white/[0.12] active:scale-[0.97] transition-all duration-200 cursor-pointer"
-            >
-              Je suis artisan
-            </Link>
-          </div>
-          <p className="text-[11px] text-white/35 mt-6">Aucune carte bancaire requise</p>
-        </div>
-      </section>
+        {loading ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Enregistrement...</> : "Enregistrer la carte"}
+      </button>
+      <p className="text-[10px] text-grayText text-center flex items-center justify-center gap-1">
+        <Lock className="w-3 h-3" /> Empreinte bancaire sécurisée — aucun débit ne sera effectué
+      </p>
     </div>
   );
 }
 
-/** Icône carte de crédit (utilisée dans la visualisation du flux séquestre) */
-function CreditCardIcon() {
+/* ------------------------------------------------------------------ */
+/*  Domaines                                                           */
+/* ------------------------------------------------------------------ */
+
+const TRADES = [
+  { id: "plombier", name: "Plomberie", desc: "Fuites, robinets, chauffe-eau, canalisations", img: "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400&h=250&fit=crop" },
+  { id: "electricien", name: "Électricité", desc: "Prises, tableau électrique, éclairage, panne", img: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&h=250&fit=crop" },
+  { id: "serrurier", name: "Serrurerie", desc: "Portes, serrures, blindage, ouverture", img: "https://images.unsplash.com/photo-1677951570313-b0750351c461?w=400&h=250&fit=crop" },
+  { id: "chauffagiste", name: "Chauffage / Clim", desc: "Chaudière, radiateurs, climatisation", img: "https://images.unsplash.com/photo-1599028274511-e02a767949a3?w=400&h=250&fit=crop" },
+  { id: "peintre", name: "Peinture", desc: "Intérieur, extérieur, revêtements, finitions", img: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=400&h=250&fit=crop" },
+  { id: "menuisier", name: "Menuiserie", desc: "Portes, fenêtres, parquet, meubles sur mesure", img: "https://images.unsplash.com/photo-1626081062126-d3b192c1fcb0?w=400&h=250&fit=crop" },
+  { id: "carreleur", name: "Carrelage", desc: "Sols, murs, salles de bain, terrasses", img: "https://images.unsplash.com/photo-1523413363574-c30aa1c2a516?w=400&h=250&fit=crop" },
+  { id: "macon", name: "Maçonnerie", desc: "Murs, fondations, terrasses, gros œuvre", img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&h=250&fit=crop" },
+  { id: "autre", name: "Autre", desc: "Précisez votre besoin ci-dessous", img: "" },
+];
+
+const STEP_TITLES = [
+  "Votre domaine",
+  "Votre intervention",
+  "Mode de paiement",
+  "Votre compte",
+  "Mise en relation",
+];
+
+/* ------------------------------------------------------------------ */
+/*  Composant                                                          */
+/* ------------------------------------------------------------------ */
+
+export default function HomePage() {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [step, setStep] = useState(0);
+
+  /* Step 0 */
+  const [selectedTrade, setSelectedTrade] = useState<string | null>(null);
+  const [customTrade, setCustomTrade] = useState("");
+
+  /* Step 1 */
+  const [isUrgent, setIsUrgent] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
+  const [locating, setLocating] = useState(false);
+  const [addressSuggestions, setAddressSuggestions] = useState<{ display_name: string; lat: string; lon: string }[]>([]);
+  const [addressSearching, setAddressSearching] = useState(false);
+  const [addressManual, setAddressManual] = useState(false);
+  const [addressConfirmed, setAddressConfirmed] = useState(false);
+  const [addressNotFound, setAddressNotFound] = useState(false);
+  const addressDebounce = useRef<NodeJS.Timeout | null>(null);
+
+  /* Step 2 */
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash" | null>(null);
+  const [savedCards, setSavedCards] = useState<{ id: string; brand: string; last4: string; expiry: string }[]>([
+    { id: "card_demo_1", brand: "Visa", last4: "4242", expiry: "09/28" },
+    { id: "card_demo_2", brand: "Mastercard", last4: "8210", expiry: "03/27" },
+  ]);
+  const [selectedCard, setSelectedCard] = useState<string | null>("card_demo_1");
+  const [showAddCard, setShowAddCard] = useState(false);
+  const [cardsLoading, setCardsLoading] = useState(false);
+  const [setupClientSecret, setSetupClientSecret] = useState<string | null>(null);
+
+  /* Step 3 */
+  const [accountMode, setAccountMode] = useState<"create" | "login" | null>(null);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+
+  /* Connexion inline (step 1) */
+  const [showInlineLogin, setShowInlineLogin] = useState(false);
+  const [inlineEmail, setInlineEmail] = useState("");
+  const [inlinePassword, setInlinePassword] = useState("");
+  const [inlineError, setInlineError] = useState("");
+  const [inlineLoading, setInlineLoading] = useState(false);
+
+  /* Step 4 */
+  const [isMatching, setIsMatching] = useState(false);
+  const [matched, setMatched] = useState(false);
+  const [matchSteps, setMatchSteps] = useState(0);
+
+  /* Transition key — force re-mount for animation */
+  const [stepKey, setStepKey] = useState(0);
+
+  const trade = TRADES.find(t => t.id === selectedTrade);
+  const tradeName = selectedTrade === "autre" ? customTrade : (trade?.name ?? "");
+  const isLoggedIn = !!session?.user;
+
+  useEffect(() => {
+    setStepKey(k => k + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
+
+  /* Fetch saved cards when logged in and on step 2 */
+  useEffect(() => {
+    if (!isLoggedIn || step !== 2 || paymentMethod !== "card") return;
+    let cancelled = false;
+    setCardsLoading(true);
+    fetch("/api/payment-methods/check")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (cancelled || !data) { if (!cancelled) setCardsLoading(false); return; }
+        const cards = (data.cards ?? []).map((c: { id: string; card?: { brand: string; last4: string; exp_month: number; exp_year: number } }) => ({
+          id: c.id,
+          brand: c.card?.brand ?? "Visa",
+          last4: c.card?.last4 ?? "****",
+          expiry: c.card ? `${String(c.card.exp_month).padStart(2, "0")}/${String(c.card.exp_year).slice(-2)}` : "",
+        }));
+        // Ne remplacer que si l'API retourne des vraies cartes
+        if (cards.length > 0) {
+          setSavedCards(cards);
+          if (!selectedCard) setSelectedCard(cards[0].id);
+        }
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setCardsLoading(false); });
+    return () => { cancelled = true; };
+  }, [isLoggedIn, step, paymentMethod]);
+
+  /* Pre-fill from session */
+  useEffect(() => {
+    if (session?.user) {
+      if (session.user.name) {
+        const parts = session.user.name.split(" ");
+        setFirstName(parts[0] || "");
+        setLastName(parts.slice(1).join(" ") || "");
+      }
+      if (session.user.email) setEmail(session.user.email);
+    }
+  }, [session]);
+
+  const canNext = (): boolean => {
+    switch (step) {
+      case 0: return !!selectedTrade && (selectedTrade !== "autre" || customTrade.trim().length >= 3);
+      case 1: return firstName.trim().length >= 2 && email.includes("@") && address.trim().length >= 5 && description.trim().length >= 10;
+      case 2: return paymentMethod === "cash" || (paymentMethod === "card" && (isLoggedIn ? !!selectedCard : true));
+      case 3: return isLoggedIn || (accountMode === "create" && password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) || (accountMode === "login" && loginEmail.includes("@") && loginPassword.length >= 1);
+      default: return true;
+    }
+  };
+
+  const startMatching = () => {
+    setIsMatching(true);
+    setMatched(false);
+    setMatchSteps(0);
+    setTimeout(() => setMatchSteps(1), 800);
+    setTimeout(() => setMatchSteps(2), 1600);
+    setTimeout(() => setMatchSteps(3), 2400);
+    setTimeout(() => {
+      setIsMatching(false);
+      setMatched(true);
+      // Persister l'intervention en cours dans localStorage pour le dashboard + navbar
+      try {
+        localStorage.setItem("nova_active_mission", JSON.stringify({
+          id: "m_" + Date.now(),
+          trade: tradeName,
+          address,
+          isUrgent,
+          paymentMethod,
+          status: "SEARCHING", // SEARCHING → EN_ROUTE → ON_SITE → DEVIS_SIGNED
+          createdAt: new Date().toISOString(),
+        }));
+      } catch {}
+    }, 3200);
+    setTimeout(() => {
+      router.push("/dashboard");
+    }, 6500);
+  };
+
+  const handleNext = async () => {
+    if (step === 2 && isLoggedIn) {
+      setStep(4);
+      startMatching();
+      return;
+    }
+    if (step === 3) {
+      if (isLoggedIn) {
+        setStep(4);
+        startMatching();
+        return;
+      }
+      setAuthError("");
+      setAuthLoading(true);
+
+      try {
+        if (accountMode === "create") {
+          /* 1. Créer le compte en BDD */
+          const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+          const res = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: fullName,
+              email: email.trim(),
+              password,
+              role: "CLIENT",
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            setAuthError(data.error ?? "Erreur lors de la création du compte");
+            setAuthLoading(false);
+            return;
+          }
+
+          /* 2. Connecter la session automatiquement */
+          const login = await signIn("credentials", {
+            email: email.trim(),
+            password,
+            redirect: false,
+          });
+          if (login?.error) {
+            setAuthError("Compte créé mais connexion échouée. Essayez de vous connecter.");
+            setAuthLoading(false);
+            return;
+          }
+        }
+
+        if (accountMode === "login") {
+          const login = await signIn("credentials", {
+            email: loginEmail.trim(),
+            password: loginPassword,
+            redirect: false,
+          });
+          if (login?.error) {
+            setAuthError("Email ou mot de passe incorrect");
+            setAuthLoading(false);
+            return;
+          }
+        }
+      } catch {
+        setAuthError("Erreur de connexion au serveur");
+        setAuthLoading(false);
+        return;
+      }
+
+      setAuthLoading(false);
+      setStep(4);
+      startMatching();
+      return;
+    }
+    setStep(s => s + 1);
+  };
+
+  /* ---------------------------------------------------------------- */
+  /*  Input helper                                                     */
+  /* ---------------------------------------------------------------- */
+
+  const fieldClass = "w-full px-3 py-2.5 rounded-[6px] border border-border bg-white text-sm text-navy placeholder:text-gray-400 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none transition-colors duration-200";
+  const fieldWithIconClass = "w-full pl-9 pr-3 py-2.5 rounded-[6px] border border-border bg-white text-sm text-navy placeholder:text-gray-400 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none transition-colors duration-200";
+  const labelClass = "text-xs font-semibold text-navy mb-1 block";
+
+  /* ---------------------------------------------------------------- */
+  /*  Render                                                           */
+  /* ---------------------------------------------------------------- */
+
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-lightSage" aria-hidden="true">
-      <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M2 10h20" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
+    <div className="bg-bgPage flex flex-col min-h-screen">
+
+      {/* ─── Sticky header ─── */}
+      <header className="sticky top-0 z-40 bg-bgPage/90 backdrop-blur-md border-b border-border">
+        <div className="max-w-5xl mx-auto px-5 h-14 flex items-center gap-3">
+          {step > 0 && step < 4 ? (
+            <button
+              onClick={() => setStep(s => s - 1)}
+              className="w-8 h-8 rounded-[6px] bg-forest/8 flex items-center justify-center text-forest hover:bg-forest/15 transition-colors duration-200 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+          ) : null}
+          <span className="flex-1 text-sm font-bold text-navy font-heading">{STEP_TITLES[step]}</span>
+          {step < 4 && (
+            <span className="text-xs text-grayText font-mono tabular-nums bg-surface px-2 py-1 rounded-[6px]">{step + 1}/5</span>
+          )}
+        </div>
+
+        {/* Progress bar */}
+        <div className="max-w-5xl mx-auto px-5 pb-2 flex gap-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className={cn(
+                "h-[3px] flex-1 rounded-sm transition-all duration-500",
+                i <= step ? "bg-forest" : "bg-border",
+              )}
+            />
+          ))}
+        </div>
+      </header>
+
+      {/* ─── Main content ─── */}
+      <main className={cn("max-w-5xl mx-auto w-full px-5 py-6", step === 0 && selectedTrade !== "autre" ? "pb-6" : "pb-32")}>
+       <div
+         key={stepKey}
+         className="animate-stepIn"
+         style={{ animationDuration: "350ms", animationFillMode: "both" }}
+       >
+        {/* ════════════ STEP 0 — Domaine ════════════ */}
+        {step === 0 && (
+          <div>
+            {/* Hero carte interactive — localisation */}
+            <LocationMap onLocationChange={(addr) => { setAddress(addr); setAddressConfirmed(true); }} />
+
+            {/* Hero banner with image */}
+            <div className="relative rounded-[6px] overflow-hidden mb-6">
+              <Image
+                src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&h=400&fit=crop"
+                alt="Artisan en intervention"
+                width={1200}
+                height={400}
+                className="w-full h-[200px] md:h-[240px] object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-deepForest/95 via-deepForest/80 to-transparent" />
+              <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-8">
+                <h2 className="text-xl md:text-2xl font-extrabold font-heading leading-tight mb-2 text-white max-w-md">
+                  De quel service avez-vous besoin ?
+                </h2>
+                <p className="text-sm text-white/70 max-w-sm leading-relaxed">
+                  Sélectionnez votre domaine. Un artisan certifié sera trouvé automatiquement.
+                </p>
+                <div className="flex items-center gap-5 mt-4">
+                  {[
+                    { icon: Shield, label: "Certifiés" },
+                    { icon: Lock, label: "Séquestre" },
+                    { icon: Clock, label: "< 30 min" },
+                  ].map(({ icon: I, label }) => (
+                    <div key={label} className="flex items-center gap-1.5">
+                      <I className="w-3.5 h-3.5 text-lightSage" />
+                      <span className="text-[11px] text-white/60 font-medium">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Service grid 2x4 avec images */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {TRADES.filter(t => t.id !== "autre").map(t => {
+                const sel = selectedTrade === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setSelectedTrade(t.id);
+                      setTimeout(() => setStep(1), 400);
+                    }}
+                    className={cn(
+                      "relative flex flex-col rounded-[6px] border overflow-hidden transition-all duration-200 text-left cursor-pointer group",
+                      sel
+                        ? "border-forest shadow-md scale-[0.97]"
+                        : "border-border bg-white hover:border-forest/30 hover:shadow-sm",
+                    )}
+                  >
+                    {/* Image */}
+                    <div className="relative h-24 md:h-28 overflow-hidden">
+                      <Image
+                        src={t.img}
+                        alt={t.name}
+                        width={400}
+                        height={250}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {sel && (
+                        <div className="absolute inset-0 bg-forest/30" />
+                      )}
+                      {sel && (
+                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-forest flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    {/* Texte */}
+                    <div className="p-3 flex-1 flex flex-col">
+                      <div className="text-[13px] font-bold text-navy mb-0.5">{t.name}</div>
+                      <div className="text-[10px] text-grayText leading-snug flex-1">{t.desc}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Autre — pleine largeur */}
+            <button
+              onClick={() => setSelectedTrade("autre")}
+              className={cn(
+                "w-full mt-3 flex items-center gap-3 px-4 py-3.5 rounded-[6px] border transition-all duration-200 text-left cursor-pointer",
+                selectedTrade === "autre"
+                  ? "border-forest bg-forest/5 shadow-sm"
+                  : "border-border bg-white hover:border-forest/30",
+              )}
+            >
+              <div className={cn(
+                "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",
+                selectedTrade === "autre" ? "border-forest bg-forest" : "border-gray-300",
+              )}>
+                {selectedTrade === "autre" && <Check className="w-3 h-3 text-white" />}
+              </div>
+              <div className="flex-1">
+                <span className="text-sm font-semibold text-navy">Autre</span>
+                <span className="text-xs text-grayText ml-2">Précisez votre besoin</span>
+              </div>
+              <ChevronRight className={cn("w-4 h-4 shrink-0", selectedTrade === "autre" ? "text-forest" : "text-gray-300")} />
+            </button>
+
+            {/* Champ libre si "Autre" */}
+            {selectedTrade === "autre" && (
+              <div className="mt-3">
+                <label className="text-xs font-semibold text-navy mb-1 block">Précisez le service souhaité *</label>
+                <input
+                  type="text"
+                  value={customTrade}
+                  onChange={e => setCustomTrade(e.target.value)}
+                  placeholder="Ex : isolation, domotique, vitrerie..."
+                  className="w-full px-3 py-2.5 rounded-[6px] border border-border bg-white text-sm text-navy placeholder:text-gray-400 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none transition-colors duration-200"
+                  autoFocus
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ════════════ STEP 1 — Détails + Urgence ════════════ */}
+        {step === 1 && (
+          <div className="space-y-5">
+            {/* Trade badge */}
+            {selectedTrade && (
+              <div className="flex items-center gap-2.5 pb-4 border-b border-border">
+                <div className="w-8 h-8 rounded-[6px] bg-forest/10 flex items-center justify-center">
+                  <span className="text-xs font-bold text-forest">{tradeName.charAt(0).toUpperCase()}</span>
+                </div>
+                <span className="text-sm font-bold text-navy">{tradeName}</span>
+              </div>
+            )}
+
+            {/* Urgence toggle */}
+            <div>
+              <label className="text-xs font-semibold text-navy mb-2 block uppercase tracking-wide">Type d&apos;intervention</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setIsUrgent(false)}
+                  className={cn(
+                    "p-4 rounded-[6px] border-2 text-left transition-all duration-200 cursor-pointer",
+                    !isUrgent
+                      ? "border-forest bg-forest/4 shadow-sm"
+                      : "border-border bg-white hover:border-forest/30",
+                  )}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-4 h-4 text-forest" />
+                    <span className="text-[13px] font-bold text-navy">Classique</span>
+                  </div>
+                  <p className="text-[11px] text-grayText leading-snug">Planifiée selon vos disponibilités. Devis sur place avant travaux.</p>
+                  {!isUrgent && (
+                    <div className="mt-3 flex items-center gap-1">
+                      <div className="w-4 h-4 rounded-full bg-forest flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5 text-white" />
+                      </div>
+                      <span className="text-[11px] font-semibold text-forest">Sélectionné</span>
+                    </div>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => setIsUrgent(true)}
+                  className={cn(
+                    "p-4 rounded-[6px] border-2 text-left transition-all duration-200 cursor-pointer",
+                    isUrgent
+                      ? "border-red bg-red/4 shadow-sm"
+                      : "border-border bg-white hover:border-red/30",
+                  )}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Zap className="w-4 h-4 text-red" />
+                    <span className="text-[13px] font-bold text-navy">Urgence 24h/24</span>
+                  </div>
+                  <p className="text-[11px] text-grayText leading-snug">Intervention rapide. Artisan disponible dans les plus brefs délais.</p>
+                  {isUrgent && (
+                    <div className="mt-3 flex items-center gap-1">
+                      <div className="w-4 h-4 rounded-full bg-red flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5 text-white" />
+                      </div>
+                      <span className="text-[11px] font-semibold text-red">Sélectionné</span>
+                    </div>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Connexion inline ou formulaire infos */}
+            <div>
+              {!isLoggedIn && (
+                <div className="mb-4">
+                  {!showInlineLogin ? (
+                    <button
+                      onClick={() => setShowInlineLogin(true)}
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-[6px] bg-forest text-white text-sm font-bold hover:bg-deepForest transition-colors duration-200 cursor-pointer shadow-sm"
+                    >
+                      <LogIn className="w-4 h-4" />
+                      J&apos;ai déjà un compte
+                    </button>
+                  ) : (
+                    <div className="p-4 rounded-[6px] bg-white border border-border shadow-sm space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold text-navy">Connectez-vous</span>
+                        <button
+                          onClick={() => { setShowInlineLogin(false); setInlineError(""); }}
+                          className="text-xs text-grayText hover:text-navy cursor-pointer"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                      <div>
+                        <label className={labelClass}>Email</label>
+                        <input
+                          type="email"
+                          value={inlineEmail}
+                          onChange={e => { setInlineEmail(e.target.value); setInlineError(""); }}
+                          placeholder="votre@email.fr"
+                          className={fieldClass}
+                        />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Mot de passe</label>
+                        <input
+                          type="password"
+                          value={inlinePassword}
+                          onChange={e => { setInlinePassword(e.target.value); setInlineError(""); }}
+                          placeholder="Votre mot de passe"
+                          className={fieldClass}
+                        />
+                      </div>
+                      {inlineError && (
+                        <div className="flex items-center gap-2 text-xs text-red font-medium">
+                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                          {inlineError}
+                        </div>
+                      )}
+                      <button
+                        onClick={async () => {
+                          if (!inlineEmail.includes("@") || !inlinePassword) {
+                            setInlineError("Veuillez remplir tous les champs");
+                            return;
+                          }
+                          setInlineLoading(true);
+                          setInlineError("");
+                          const res = await signIn("credentials", {
+                            email: inlineEmail.trim(),
+                            password: inlinePassword,
+                            redirect: false,
+                          });
+                          setInlineLoading(false);
+                          if (res?.error) {
+                            setInlineError("Email ou mot de passe incorrect");
+                          } else {
+                            setShowInlineLogin(false);
+                            // Passer directement à l'étape paiement
+                            setTimeout(() => setStep(2), 400);
+                          }
+                        }}
+                        disabled={inlineLoading}
+                        className={cn(
+                          "w-full py-2.5 rounded-[6px] text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200",
+                          inlineLoading
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-gradient-to-r from-deepForest to-forest text-white shadow-sm hover:shadow-md cursor-pointer",
+                        )}
+                      >
+                        {inlineLoading ? (
+                          <><Loader2 className="w-4 h-4 animate-spin" /> Connexion...</>
+                        ) : (
+                          <>Se connecter</>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {isLoggedIn && (
+                <div className="mb-4 p-3 rounded-[6px] bg-surface border border-forest/10 flex items-center gap-2">
+                  <Check className="w-4 h-4 text-forest shrink-0" />
+                  <span className="text-xs text-navy font-medium">
+                    Connecté en tant que <strong>{session?.user?.name ?? session?.user?.email}</strong>
+                  </span>
+                </div>
+              )}
+
+              <label className="text-xs font-semibold text-navy mb-3 block uppercase tracking-wide">Vos informations</label>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelClass}>Prénom *</label>
+                    <div className="relative">
+                      <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                      <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Jean" className={fieldWithIconClass} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className={labelClass}>Nom</label>
+                    <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Dupont" className={fieldClass} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Email *</label>
+                  <div className="relative">
+                    <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jean@exemple.fr" className={fieldWithIconClass} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Téléphone</label>
+                  <div className="relative">
+                    <Phone className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                    <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="06 12 34 56 78" className={fieldWithIconClass} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Adresse d&apos;intervention *</label>
+
+                  {/* Adresse confirmée — affichage compact */}
+                  {addressConfirmed && !addressManual ? (
+                    <div className="flex items-center gap-2 p-2.5 rounded-[6px] bg-forest/5 border border-forest/20">
+                      <div className="w-5 h-5 rounded-full bg-forest flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-[12px] text-navy font-medium flex-1 truncate">{address}</span>
+                      <button
+                        type="button"
+                        onClick={() => { setAddressConfirmed(false); setAddress(""); setAddressManual(false); setAddressNotFound(false); }}
+                        className="text-[11px] text-grayText hover:text-navy font-medium cursor-pointer"
+                      >
+                        Modifier
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {/* Champ de saisie avec autocomplete */}
+                      <div className="relative">
+                        <div className="relative flex gap-2">
+                          <div className="relative flex-1">
+                            <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                            <input
+                              type="text"
+                              value={address}
+                              onChange={e => {
+                                const val = e.target.value;
+                                setAddress(val);
+                                setAddressConfirmed(false);
+                                setAddressNotFound(false);
+                                if (addressManual) return;
+                                if (addressDebounce.current) clearTimeout(addressDebounce.current);
+                                if (val.length < 3) { setAddressSuggestions([]); return; }
+                                addressDebounce.current = setTimeout(async () => {
+                                  setAddressSearching(true);
+                                  try {
+                                    const res = await fetch(
+                                      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val)}&countrycodes=fr&limit=5&addressdetails=1`,
+                                      { headers: { "Accept-Language": "fr" } }
+                                    );
+                                    const data = await res.json();
+                                    setAddressSuggestions(data);
+                                    if (data.length === 0 && val.length >= 5) setAddressNotFound(true);
+                                    else setAddressNotFound(false);
+                                  } catch { setAddressSuggestions([]); }
+                                  setAddressSearching(false);
+                                }, 400);
+                              }}
+                              placeholder={addressManual ? "Saisissez votre adresse complète..." : "12 rue de Rivoli, 75004 Paris"}
+                              className={fieldWithIconClass}
+                            />
+                            {addressSearching && (
+                              <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-forest animate-spin" />
+                            )}
+                          </div>
+                          {!address && !addressManual && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!navigator.geolocation) return;
+                                setLocating(true);
+                                navigator.geolocation.getCurrentPosition(
+                                  async (pos) => {
+                                    try {
+                                      const res = await fetch(
+                                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&addressdetails=1`,
+                                        { headers: { "Accept-Language": "fr" } }
+                                      );
+                                      const data = await res.json();
+                                      if (data.address) {
+                                        const a = data.address;
+                                        const parts = [a.house_number, a.road, a.postcode, a.city || a.town || a.village || a.municipality].filter(Boolean);
+                                        const addr = parts.length >= 2 ? parts.join(" ") : data.display_name.split(",").slice(0, 3).join(",").trim();
+                                        setAddress(addr);
+                                        setAddressConfirmed(true);
+                                      }
+                                    } catch {}
+                                    setLocating(false);
+                                  },
+                                  () => setLocating(false),
+                                  { enableHighAccuracy: true, timeout: 10000 }
+                                );
+                              }}
+                              className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-[6px] bg-forest/8 text-forest text-[11px] font-semibold hover:bg-forest/15 transition-colors cursor-pointer border border-forest/20"
+                            >
+                              {locating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Navigation className="w-3.5 h-3.5" />}
+                              Me localiser
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Suggestions dropdown */}
+                        {addressSuggestions.length > 0 && !addressManual && (
+                          <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white rounded-[6px] shadow-lg border border-border overflow-hidden max-h-[200px] overflow-y-auto">
+                            {addressSuggestions.map((s, i) => (
+                              <button
+                                key={i}
+                                type="button"
+                                onClick={() => {
+                                  setAddress(s.display_name.split(",").slice(0, 4).join(",").trim());
+                                  setAddressSuggestions([]);
+                                  setAddressConfirmed(true);
+                                  setAddressNotFound(false);
+                                }}
+                                className="w-full text-left px-3 py-2.5 hover:bg-bgPage transition-colors flex items-start gap-2 cursor-pointer border-b border-border/30 last:border-0"
+                              >
+                                <MapPin className="w-3.5 h-3.5 text-forest shrink-0 mt-0.5" />
+                                <span className="text-[11px] text-navy leading-snug">{s.display_name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Adresse introuvable */}
+                      {addressNotFound && !addressManual && (
+                        <div className="flex items-start gap-2.5 p-3 rounded-[6px] bg-gold/8 border border-gold/20">
+                          <AlertTriangle className="w-4 h-4 text-gold shrink-0 mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-[12px] font-semibold text-navy mb-1">Adresse introuvable</p>
+                            <p className="text-[11px] text-grayText leading-snug mb-2">Nous n&apos;avons pas trouvé cette adresse. Vous pouvez la saisir manuellement.</p>
+                            <button
+                              type="button"
+                              onClick={() => { setAddressManual(true); setAddressSuggestions([]); setAddressNotFound(false); }}
+                              className="text-[11px] font-bold text-forest hover:text-deepForest cursor-pointer flex items-center gap-1"
+                            >
+                              <FileText className="w-3 h-3" />
+                              Entrer l&apos;adresse manuellement
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Mode manuel activé */}
+                      {addressManual && (
+                        <div className="flex items-center gap-2 p-2 rounded-[6px] bg-surface border border-border/60">
+                          <FileText className="w-3.5 h-3.5 text-grayText shrink-0" />
+                          <span className="text-[11px] text-grayText flex-1">Mode saisie manuelle — la vérification est désactivée</span>
+                          <button
+                            type="button"
+                            onClick={() => { setAddressManual(false); setAddress(""); setAddressConfirmed(false); }}
+                            className="text-[11px] text-forest font-semibold hover:text-deepForest cursor-pointer"
+                          >
+                            Réactiver
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className={labelClass}>Description du besoin * <span className="font-normal text-grayText">(10 car. min)</span></label>
+                  <div className="relative">
+                    <FileText className="absolute left-2.5 top-2.5 w-4 h-4 text-grayText" />
+                    <textarea
+                      value={description}
+                      onChange={e => setDescription(e.target.value)}
+                      placeholder="Décrivez votre problème ou le travail à réaliser..."
+                      rows={4}
+                      className="w-full pl-9 pr-3 py-2.5 rounded-[6px] border border-border bg-white text-sm text-navy placeholder:text-gray-400 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none transition-colors duration-200 resize-none"
+                    />
+                  </div>
+                  <div className="flex justify-end mt-1">
+                    <span className={cn("text-xs font-mono", description.trim().length >= 10 ? "text-success" : "text-grayText")}>
+                      {description.trim().length}/10{description.trim().length >= 10 && " \u2713"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ════════════ STEP 2 — Paiement ════════════ */}
+        {step === 2 && (
+          <div>
+            <h2 className="text-xl font-extrabold text-navy font-heading mb-1">Comment souhaitez-vous régler ?</h2>
+            <p className="text-sm text-grayText mb-6">Ce choix déterminera comment vous réglerez l&apos;artisan après l&apos;intervention.</p>
+
+            <div className="space-y-3">
+              {/* Carte */}
+              <button
+                onClick={() => setPaymentMethod("card")}
+                className={cn(
+                  "w-full flex items-start gap-4 p-5 rounded-[6px] border-2 transition-all duration-200 text-left cursor-pointer",
+                  paymentMethod === "card"
+                    ? "border-forest bg-forest/4 shadow-sm"
+                    : "border-border bg-white hover:border-forest/30",
+                )}
+              >
+                <div className="w-11 h-11 rounded-[6px] bg-forest/10 flex items-center justify-center shrink-0 mt-0.5">
+                  <CreditCard className="w-5 h-5 text-forest" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-bold text-navy">Paiement en ligne</div>
+                  <div className="text-xs text-grayText mt-0.5">Carte bancaire, Apple Pay, virement bancaire</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-surface border border-forest/10">
+                    <Shield className="w-3 h-3 text-forest" />
+                    <span className="text-[11px] text-forest font-semibold">Séquestre activé — artisan payé après votre validation</span>
+                  </div>
+                </div>
+                <div className={cn(
+                  "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1",
+                  paymentMethod === "card" ? "border-forest bg-forest" : "border-gray-300",
+                )}>
+                  {paymentMethod === "card" && <Check className="w-3 h-3 text-white" />}
+                </div>
+              </button>
+
+              {/* Espèces */}
+              <button
+                onClick={() => setPaymentMethod("cash")}
+                className={cn(
+                  "w-full flex items-start gap-4 p-5 rounded-[6px] border-2 transition-all duration-200 text-left cursor-pointer",
+                  paymentMethod === "cash"
+                    ? "border-forest bg-forest/4 shadow-sm"
+                    : "border-border bg-white hover:border-forest/30",
+                )}
+              >
+                <div className="w-11 h-11 rounded-[6px] bg-gold/10 flex items-center justify-center shrink-0 mt-0.5">
+                  <Banknote className="w-5 h-5 text-gold" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-bold text-navy">Paiement en espèces</div>
+                  <div className="text-xs text-grayText mt-0.5">Réglez directement l&apos;artisan après l&apos;intervention</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-amber-50 border border-amber-200">
+                    <AlertTriangle className="w-3 h-3 text-amber-600" />
+                    <span className="text-[11px] text-amber-700 font-medium">Le service de séquestre ne sera pas disponible</span>
+                  </div>
+                </div>
+                <div className={cn(
+                  "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1",
+                  paymentMethod === "cash" ? "border-forest bg-forest" : "border-gray-300",
+                )}>
+                  {paymentMethod === "cash" && <Check className="w-3 h-3 text-white" />}
+                </div>
+              </button>
+            </div>
+
+            {/* Séquestre explainer */}
+            {paymentMethod === "card" && (
+              <div className="mt-6 p-4 rounded-[6px] bg-white border border-border shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lock className="w-4 h-4 text-forest" />
+                  <span className="text-sm font-bold text-navy">Comment fonctionne le séquestre ?</span>
+                </div>
+                <div className="space-y-2.5">
+                  {[
+                    { n: "1", text: "Votre paiement est bloqué sur un compte sécurisé Nova" },
+                    { n: "2", text: "L'artisan se déplace et réalise l'intervention" },
+                    { n: "3", text: "Vous validez la qualité du travail" },
+                    { n: "4", text: "L'artisan est payé — vous êtes protégé à 100%" },
+                  ].map(({ n, text }) => (
+                    <div key={n} className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-[6px] bg-forest/10 flex items-center justify-center shrink-0">
+                        <span className="text-[11px] font-bold text-forest">{n}</span>
+                      </div>
+                      <span className="text-xs text-grayText leading-relaxed pt-0.5">{text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sélection de carte (utilisateur connecté + paiement en ligne) */}
+            {paymentMethod === "card" && isLoggedIn && (
+              <div className="mt-5 p-4 rounded-[6px] bg-white border border-border shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-bold text-navy">Votre moyen de paiement</span>
+                  {cardsLoading && <Loader2 className="w-4 h-4 text-forest animate-spin" />}
+                </div>
+
+                {/* Cartes sauvegardées */}
+                {savedCards.length > 0 && (
+                  <div className="space-y-2 mb-3">
+                    {savedCards.map(card => (
+                      <button
+                        key={card.id}
+                        onClick={() => { setSelectedCard(card.id); setShowAddCard(false); }}
+                        className={cn(
+                          "w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] border transition-all duration-200 text-left cursor-pointer",
+                          selectedCard === card.id
+                            ? "border-forest bg-forest/4"
+                            : "border-border bg-bgPage hover:border-forest/30",
+                        )}
+                      >
+                        <div className={cn(
+                          "w-10 h-6 rounded-[4px] flex items-center justify-center text-[9px] font-bold text-white",
+                          card.brand.toLowerCase() === "visa" ? "bg-[#1A1F71]" :
+                          card.brand.toLowerCase() === "mastercard" ? "bg-[#EB001B]" : "bg-navy",
+                        )}>
+                          {card.brand.toUpperCase().slice(0, 4)}
+                        </div>
+                        <div className="flex-1">
+                          <span className="text-xs font-semibold text-navy">{card.brand} •••• {card.last4}</span>
+                          <span className="text-[11px] text-grayText ml-2">Exp. {card.expiry}</span>
+                        </div>
+                        <div className={cn(
+                          "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                          selectedCard === card.id ? "border-forest bg-forest" : "border-gray-300",
+                        )}>
+                          {selectedCard === card.id && <Check className="w-2.5 h-2.5 text-white" />}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Aucune carte */}
+                {!cardsLoading && savedCards.length === 0 && !showAddCard && (
+                  <p className="text-xs text-grayText mb-3">Aucun moyen de paiement enregistré.</p>
+                )}
+
+                {/* Ajouter une carte via Stripe Elements */}
+                {showAddCard && setupClientSecret ? (
+                  <Elements stripe={stripePromise} options={{ clientSecret: setupClientSecret, appearance: { theme: "stripe", variables: { colorPrimary: "#1B6B4E", borderRadius: "6px" } } }}>
+                    <StripeCardForm
+                      onSuccess={() => {
+                        setShowAddCard(false);
+                        setSetupClientSecret(null);
+                        // Recharger les cartes
+                        setCardsLoading(true);
+                        fetch("/api/payment-methods/check")
+                          .then(r => r.ok ? r.json() : { cards: [] })
+                          .then(data => {
+                            const cards = (data.cards ?? []).map((c: { id: string; card?: { brand: string; last4: string; exp_month: number; exp_year: number } }) => ({
+                              id: c.id,
+                              brand: c.card?.brand ?? "Visa",
+                              last4: c.card?.last4 ?? "****",
+                              expiry: c.card ? `${String(c.card.exp_month).padStart(2, "0")}/${String(c.card.exp_year).slice(-2)}` : "",
+                            }));
+                            setSavedCards(cards);
+                            if (cards.length > 0) setSelectedCard(cards[cards.length - 1].id);
+                          })
+                          .catch(() => {})
+                          .finally(() => setCardsLoading(false));
+                      }}
+                      onCancel={() => { setShowAddCard(false); setSetupClientSecret(null); }}
+                    />
+                  </Elements>
+                ) : showAddCard ? (
+                  <div className="p-4 rounded-[6px] bg-bgPage border border-border flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 text-forest animate-spin" />
+                    <span className="text-xs text-grayText">Chargement du formulaire sécurisé...</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      setShowAddCard(true);
+                      try {
+                        const res = await fetch("/api/setup-intent", { method: "POST" });
+                        const data = await res.json();
+                        if (data?.clientSecret) {
+                          setSetupClientSecret(data.clientSecret);
+                        }
+                      } catch {}
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[6px] border border-dashed border-forest/25 text-xs font-semibold text-forest hover:bg-forest/4 transition-colors duration-200 cursor-pointer"
+                  >
+                    + Ajouter une carte
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ════════════ STEP 3 — Compte ════════════ */}
+        {step === 3 && (
+          <div>
+            {isLoggedIn ? (
+              <div className="py-12 text-center">
+                <div className="w-14 h-14 rounded-[6px] bg-success/10 flex items-center justify-center mx-auto mb-4">
+                  <Check className="w-7 h-7 text-success" />
+                </div>
+                <h2 className="text-lg font-extrabold text-navy font-heading mb-2">Vous êtes connecté</h2>
+                <p className="text-sm text-grayText">
+                  Bonjour <strong className="text-navy">{session?.user?.name ?? ""}</strong>. Votre demande sera liée à votre compte.
+                </p>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-xl font-extrabold text-navy font-heading mb-1">Finalisez votre demande</h2>
+                <p className="text-sm text-grayText mb-6">
+                  Créez un compte avec les informations saisies ou connectez-vous à un compte existant.
+                </p>
+
+                {/* Selector */}
+                <div className="grid grid-cols-2 gap-3 mb-5">
+                  <button
+                    onClick={() => setAccountMode("create")}
+                    className={cn(
+                      "p-4 rounded-[6px] border-2 text-center transition-all duration-200 cursor-pointer",
+                      accountMode === "create"
+                        ? "border-forest bg-forest/4"
+                        : "border-border bg-white hover:border-forest/30",
+                    )}
+                  >
+                    <User className="w-5 h-5 mx-auto mb-2 text-forest" />
+                    <div className="text-xs font-bold text-navy">Créer un compte</div>
+                    <div className="text-[10px] text-grayText mt-0.5">Avec vos informations</div>
+                  </button>
+                  <button
+                    onClick={() => setAccountMode("login")}
+                    className={cn(
+                      "p-4 rounded-[6px] border-2 text-center transition-all duration-200 cursor-pointer",
+                      accountMode === "login"
+                        ? "border-forest bg-forest/4"
+                        : "border-border bg-white hover:border-forest/30",
+                    )}
+                  >
+                    <LogIn className="w-5 h-5 mx-auto mb-2 text-forest" />
+                    <div className="text-xs font-bold text-navy">Se connecter</div>
+                    <div className="text-[10px] text-grayText mt-0.5">Compte existant</div>
+                  </button>
+                </div>
+
+                {/* Create */}
+                {accountMode === "create" && (
+                  <div className="p-4 rounded-[6px] bg-white border border-border shadow-sm space-y-3">
+                    <div className="flex items-center gap-2 pb-3 border-b border-border">
+                      <div className="w-6 h-6 rounded-[6px] bg-forest/10 flex items-center justify-center">
+                        <User className="w-3 h-3 text-forest" />
+                      </div>
+                      <span className="text-sm font-bold text-navy">Votre compte Nova</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { label: "Prénom", value: firstName },
+                        { label: "Nom", value: lastName },
+                        { label: "Email", value: email },
+                      ].map(({ label, value }) => (
+                        <div key={label} className="p-2 rounded-[6px] bg-bgPage">
+                          <div className="text-[10px] text-grayText uppercase tracking-wide">{label}</div>
+                          <div className="text-xs text-navy font-medium truncate">{value || "—"}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div>
+                      <label className={labelClass}>Mot de passe *</label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={e => { setPassword(e.target.value); setAuthError(""); }}
+                        placeholder="8 caractères, 1 majuscule, 1 chiffre"
+                        className={fieldClass}
+                      />
+                      <div className="flex gap-3 mt-2">
+                        {[
+                          { ok: password.length >= 8, label: "8 caractères" },
+                          { ok: /[A-Z]/.test(password), label: "1 majuscule" },
+                          { ok: /[0-9]/.test(password), label: "1 chiffre" },
+                        ].map(({ ok, label }) => (
+                          <span key={label} className={cn("text-[11px] font-medium", ok ? "text-success" : "text-grayText")}>
+                            {ok ? "\u2713" : "\u2022"} {label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-grayText">Vos informations seront utilisées pour créer votre compte Nova.</p>
+                  </div>
+                )}
+
+                {/* Login */}
+                {accountMode === "login" && (
+                  <div className="p-4 rounded-[6px] bg-white border border-border shadow-sm space-y-3">
+                    <div>
+                      <label className={labelClass}>Email</label>
+                      <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="votre@email.fr" className={fieldClass} />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Mot de passe</label>
+                      <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} placeholder="Votre mot de passe" className={fieldClass} />
+                    </div>
+                    <p className="text-[11px] text-grayText">Vos informations saisies seront automatiquement liées à votre demande.</p>
+                  </div>
+                )}
+
+                {/* Auth error */}
+                {authError && (
+                  <div className="mt-4 p-3 rounded-[6px] bg-red/5 border border-red/20 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-red shrink-0" />
+                    <span className="text-xs text-red font-medium">{authError}</span>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ════════════ STEP 4 — Matching ════════════ */}
+        {step === 4 && (
+          <div className="py-8">
+            {isMatching && (
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-[6px] bg-forest/10 flex items-center justify-center mx-auto mb-6">
+                  <Loader2 className="w-8 h-8 text-forest animate-spin" />
+                </div>
+                <h2 className="text-xl font-extrabold text-navy font-heading mb-2">
+                  Recherche en cours...
+                </h2>
+                <p className="text-sm text-grayText mb-8">
+                  Nous trouvons l&apos;artisan certifié le plus proche de <strong className="text-navy">{address}</strong>
+                </p>
+                <div className="max-w-lg mx-auto space-y-3 text-left">
+                  {[
+                    "Vérification des disponibilités",
+                    "Analyse de la zone géographique",
+                    "Sélection du meilleur profil",
+                  ].map((label, i) => (
+                    <div
+                      key={label}
+                      className={cn(
+                        "flex items-center gap-3 text-sm transition-opacity duration-500",
+                        matchSteps > i ? "opacity-100" : "opacity-20",
+                      )}
+                    >
+                      <div className={cn(
+                        "w-5 h-5 rounded-[6px] flex items-center justify-center shrink-0",
+                        matchSteps > i ? "bg-forest" : "bg-border",
+                      )}>
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                      <span className={matchSteps > i ? "text-navy" : "text-grayText"}>{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {matched && (
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-[6px] bg-success/10 flex items-center justify-center mx-auto mb-6">
+                  <Check className="w-8 h-8 text-success" />
+                </div>
+                <h2 className="text-xl font-extrabold text-navy font-heading mb-2">Artisan trouvé !</h2>
+                <p className="text-sm text-grayText mb-8">
+                  Un artisan certifié en <strong className="text-navy">{tradeName}</strong> proche de chez vous a été sélectionné.
+                  {isUrgent && " Il est en route vers votre adresse."}
+                </p>
+
+                {/* Tracking en temps réel si urgence */}
+                {isUrgent && (
+                  <div className="bg-white rounded-[6px] border border-border shadow-sm p-5 text-left max-w-xl mx-auto mb-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red animate-pulse" />
+                      <span className="text-xs font-bold text-red uppercase tracking-wide">En direct — Urgence</span>
+                    </div>
+
+                    {/* Timeline tracking */}
+                    <div className="space-y-0">
+                      {[
+                        { label: "Demande envoyée", sub: "Votre demande a été transmise", done: true, time: "À l\u2019instant" },
+                        { label: "Artisan notifié", sub: "L\u2019artisan le plus proche a accepté", done: true, time: "Il y a 10s" },
+                        { label: "En route", sub: "L\u2019artisan se dirige vers votre adresse", done: true, active: true, time: "Maintenant" },
+                        { label: "Arrivée estimée", sub: address, done: false, time: "~20 min" },
+                      ].map((s, i, arr) => (
+                        <div key={s.label} className="flex gap-3">
+                          <div className="flex flex-col items-center">
+                            <div className={cn(
+                              "w-7 h-7 rounded-full flex items-center justify-center shrink-0 border-2",
+                              s.active ? "border-forest bg-forest" :
+                              s.done ? "border-forest bg-forest" : "border-gray-300 bg-white",
+                            )}>
+                              {s.done ? <Check className="w-3.5 h-3.5 text-white" /> :
+                               <span className="text-[11px] text-grayText font-bold">{i + 1}</span>}
+                            </div>
+                            {i < arr.length - 1 && (
+                              <div className={cn("w-0.5 h-10 my-1", s.done ? "bg-forest" : "bg-border")} />
+                            )}
+                          </div>
+                          <div className={cn("pb-4", i === arr.length - 1 && "pb-0")}>
+                            <div className="flex items-center gap-2">
+                              <span className={cn("text-sm font-semibold", s.active ? "text-forest" : s.done ? "text-navy" : "text-grayText")}>{s.label}</span>
+                              {s.active && <span className="px-1.5 py-0.5 rounded-[4px] bg-forest/10 text-[10px] font-bold text-forest">EN COURS</span>}
+                            </div>
+                            <span className="text-xs text-grayText">{s.sub}</span>
+                            <span className="block text-[11px] text-grayText/60 font-mono mt-0.5">{s.time}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* ETA bar */}
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-semibold text-navy">Temps d&apos;arrivée estimé</span>
+                        <span className="text-lg font-bold text-forest font-mono">~20 min</span>
+                      </div>
+                      <div className="w-full h-2 bg-border rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-forest to-sage rounded-full animate-pulse" style={{ width: "35%" }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Recap */}
+                <div className="bg-white rounded-[6px] border border-border shadow-sm p-5 text-left max-w-xl mx-auto">
+                  <div className="text-[11px] font-bold text-grayText uppercase tracking-wider mb-3">Récapitulatif</div>
+                  {[
+                    { label: "Domaine", value: tradeName },
+                    { label: "Adresse", value: address },
+                    { label: "Paiement", value: paymentMethod === "card" ? "En ligne (séquestre)" : "Espèces" },
+                    { label: "Type", value: isUrgent ? "Urgence 24h" : "Classique" },
+                  ].map(({ label, value }, i, arr) => (
+                    <div key={label} className={cn(
+                      "flex justify-between py-2.5 text-sm",
+                      i < arr.length - 1 && "border-b border-border/50",
+                    )}>
+                      <span className="text-grayText">{label}</span>
+                      <span className="font-semibold text-navy text-right">{value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 space-y-3 max-w-xl mx-auto">
+                  <Link
+                    href="/dashboard"
+                    className="block w-full py-3.5 rounded-[6px] bg-gradient-to-r from-deepForest to-forest text-white text-sm font-bold text-center shadow-md hover:shadow-lg transition-shadow duration-200"
+                  >
+                    Accéder au tableau de bord
+                  </Link>
+                  <p className="text-xs text-grayText flex items-center justify-center gap-1.5">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Redirection automatique vers votre tableau de bord...
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+       </div>
+      </main>
+
+      {/* ─── Sticky CTA ─── */}
+      {step > 0 && step < 4 || (step === 0 && selectedTrade === "autre") ? (
+        <div className="fixed bottom-0 inset-x-0 bg-bgPage/90 backdrop-blur-md border-t border-border z-30">
+          <div className="max-w-5xl mx-auto px-5 py-4">
+            <button
+              onClick={handleNext}
+              disabled={!canNext() || authLoading}
+              className={cn(
+                "w-full py-3.5 rounded-[6px] text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2",
+                canNext() && !authLoading
+                  ? "bg-gradient-to-r from-deepForest to-forest text-white shadow-md hover:shadow-lg cursor-pointer"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed",
+              )}
+            >
+              {authLoading ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Chargement...</>
+              ) : step === 3 && isLoggedIn ? "Lancer la recherche" :
+               step === 3 && accountMode === "create" ? "Créer mon compte et lancer" :
+               step === 3 && accountMode === "login" ? "Se connecter et lancer" :
+               "Continuer"}
+              {!authLoading && <ArrowRight className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }

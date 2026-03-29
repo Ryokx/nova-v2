@@ -5,11 +5,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
+  Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { ConfirmModal } from "../../components/ui";
+import { API_BASE_URL, API_ROUTES } from "../../constants/api";
 
 /* ── Plans ── */
 interface Plan {
@@ -139,6 +142,7 @@ export function SubscriptionScreen({ navigation }: { navigation: any }) {
   const [billingAnnual, setBillingAnnual] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const getPrice = (plan: Plan) => billingAnnual ? plan.priceAnnual : plan.priceMonthly;
   const getPriceNote = (plan: Plan) => plan.id === "starter" ? "" : billingAnnual ? "/mois • engagement annuel" : "/mois • sans engagement";
@@ -146,35 +150,62 @@ export function SubscriptionScreen({ navigation }: { navigation: any }) {
 
   const currentPlan = plans.find((p) => p.id === activePlan)!;
 
+  const startCheckout = async (plan: Plan) => {
+    if (plan.id === "starter") return;
+    try {
+      setLoadingPlan(plan.id);
+      const res = await fetch(`${API_BASE_URL}${API_ROUTES.subscriptions}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: plan.id,
+          billing: billingAnnual ? "annual" : "monthly",
+        }),
+      });
+      const data = await res.json();
+      if (data?.url) {
+        await Linking.openURL(data.url);
+      } else {
+        throw new Error("No checkout URL");
+      }
+    } catch {
+      Alert.alert("Erreur", "Impossible de lancer le paiement. Veuillez réessayer.");
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
   const handleChangePlan = (plan: Plan) => {
     if (plan.id === activePlan) return;
 
     const isUpgrade = plans.indexOf(plan) > plans.indexOf(currentPlan);
-    const isDowngrade = plans.indexOf(plan) < plans.indexOf(currentPlan);
 
     setModal({
       visible: true,
       type: isUpgrade ? ("info" as any) : ("warning" as any),
       title: isUpgrade ? `Passer à ${plan.name}` : `Descendre à ${plan.name}`,
       message: isUpgrade
-        ? `Votre abonnement passera à ${plan.name} (${getPrice(plan)}${getPriceNote(plan)}) immédiatement.\n\nVous bénéficierez de tous les avantages ${plan.name} dès maintenant. La différence au prorata sera facturée sur votre prochaine échéance.`
+        ? `Votre abonnement passera à ${plan.name} (${getPrice(plan)}${getPriceNote(plan)}) immédiatement.\n\nVous allez être redirigé vers le paiement sécurisé Stripe.`
         : `Votre abonnement passera à ${plan.name} (${getPrice(plan)}${getPriceNote(plan)}) à la fin de votre période en cours (20 avril 2026).\n\nVous conservez les avantages ${currentPlan.name} jusqu'à cette date.`,
       actions: [
         { label: "Annuler", variant: "outline", onPress: () => setModal((m) => ({ ...m, visible: false })) },
         {
-          label: "Confirmer",
+          label: isUpgrade ? "Payer maintenant" : "Confirmer",
           onPress: () => {
-            setActivePlan(plan.id);
-            setCancelling(false);
-            setModal({
-              visible: true,
-              type: "success" as any,
-              title: isUpgrade ? "Abonnement mis à jour !" : "Changement programmé",
-              message: isUpgrade
-                ? `Vous êtes maintenant sur le forfait ${plan.name}. Profitez de vos nouveaux avantages !`
-                : `Votre passage à ${plan.name} prendra effet le 20 avril 2026.`,
-              actions: [{ label: "Parfait", onPress: () => setModal((m) => ({ ...m, visible: false })) }],
-            });
+            setModal((m) => ({ ...m, visible: false }));
+            if (isUpgrade && plan.id !== "starter") {
+              startCheckout(plan);
+            } else {
+              setActivePlan(plan.id);
+              setCancelling(false);
+              setModal({
+                visible: true,
+                type: "success" as any,
+                title: "Changement programmé",
+                message: `Votre passage à ${plan.name} prendra effet le 20 avril 2026.`,
+                actions: [{ label: "Parfait", onPress: () => setModal((m) => ({ ...m, visible: false })) }],
+              });
+            }
           },
         },
       ],
@@ -367,12 +398,13 @@ export function SubscriptionScreen({ navigation }: { navigation: any }) {
                   {/* CTA */}
                   {!isCurrent && (
                     <TouchableOpacity
-                      style={[styles.planCta, { backgroundColor: plan.color }]}
+                      style={[styles.planCta, { backgroundColor: plan.color }, loadingPlan === plan.id && { opacity: 0.7 }]}
                       activeOpacity={0.85}
                       onPress={() => handleChangePlan(plan)}
+                      disabled={loadingPlan !== null}
                     >
                       <Text style={styles.planCtaText}>
-                        {plans.indexOf(plan) > plans.indexOf(currentPlan) ? "Passer à " : "Descendre à "}{plan.name}
+                        {loadingPlan === plan.id ? "Chargement..." : (plans.indexOf(plan) > plans.indexOf(currentPlan) ? "Passer à " : "Descendre à ") + plan.name}
                       </Text>
                     </TouchableOpacity>
                   )}

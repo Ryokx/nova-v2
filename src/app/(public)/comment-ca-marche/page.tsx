@@ -1,753 +1,738 @@
 /**
  * Page "Comment ça marche" — /comment-ca-marche
  *
- * Page marketing destinée aux particuliers.
- * Explique le fonctionnement de Nova en plusieurs sections :
- * 1. HERO : titre animé avec rotation de mots-clés métier
- * 2. AVANT/APRÈS : histoires d'arnaques vs succès avec Nova (carrousel)
- * 3. TABLEAU COMPARATIF : "Sans Nova" vs "Avec Nova" (7 critères)
- * 4. 3 ÉTAPES : réserver, devis sur place, validation Nova
- * 5. SÉQUESTRE VISUEL : parcours du paiement en 4 étapes
- * 6. PILIERS DE CONFIANCE : 6 garanties Nova
- * 7. FAQ : questions fréquentes (accordéon)
- * 8. CTA FINAL : appel à l'action
+ * Ancienne landing page transformée en page explicative.
+ * Structure en 7 sections :
+ * 1. HERO : titre accrocheur + mockup téléphone flottant
+ * 2. TRUST (Bento grid) : séquestre, certifications, validation
+ * 3. HOW IT WORKS : 4 étapes du parcours utilisateur
+ * 4. DEMO PREVIEW : cartes pour tester en mode client ou artisan
+ * 5. MOBILE APP : présentation de l'application mobile + features
+ * 6. TESTIMONIALS : avis clients (1 mis en avant + 2 empilés)
+ * 7. FINAL CTA : appel à l'action pour créer un compte
  *
- * Inclut aussi une modale de recherche d'artisan en 4 étapes
- * (catégorie → description → chargement → résultats).
+ * Page statique (Server Component) — pas de "use client".
  */
-"use client";
-
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
-  Shield, Lock, Check, X, Star, ArrowRight, Clock,
-  MapPin, Camera
+  Shield,
+  Lock,
+  Check,
+  FileText,
+  Home,
+  Search,
+  ClipboardList,
+  Bell,
+  User,
+  Smartphone,
+  PenTool,
+  Video,
+  Moon,
+  AlertTriangle,
+  Wrench,
+  Star,
+  ArrowRight,
+  ChevronRight,
+  Zap,
+  BadgeCheck,
+  MapPin,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-/** Mots qui s'alternent dans le titre du hero (animation de rotation) */
-const heroWords = ["un plombier", "un électricien", "un serrurier"];
+/* ━━━ Icônes SVG personnalisées ━━━ */
 
-/** Catégories de métiers pour la modale de recherche */
-const categories = [
-  { name: "Plomberie", emoji: "\u{1F527}", desc: "Fuites, robinetterie, chauffe-eau" },
-  { name: "Électricité", emoji: "\u26A1", desc: "Tableaux, prises, dépannage" },
-  { name: "Serrurerie", emoji: "\u{1F511}", desc: "Ouverture, blindage, cylindres" },
-  { name: "Chauffage", emoji: "\u{1F525}", desc: "Chaudières, radiateurs, PAC" },
-  { name: "Peinture", emoji: "\u{1F3A8}", desc: "Intérieur, extérieur, enduits" },
-  { name: "Maçonnerie", emoji: "\u{1F9F1}", desc: "Murs, terrasses, rénovation" },
-];
+/** Icône bouclier avec coche (utilisée dans les sections confiance) */
+const ShieldIcon = ({ size = 28, color = "#1B6B4E" }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill={color} opacity=".12" />
+    <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" stroke={color} strokeWidth="1.5" fill="none" />
+    <path d="M9 12l2 2 4-4" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
-/** Témoignages négatifs "Sans Nova" (arnaques réelles) */
-const horrorStories = [
-  { name: "Laurent P.", city: "Bordeaux", cat: "Plomberie", init: "LP", amount: "200\u20AC perdus", text: "Plombier trouvé sur un site d\u2019annonces. 200\u20AC d\u2019avance en liquide. Le lendemain, la fuite avait repris. Numéro coupé. Plus personne." },
-  { name: "Marine K.", city: "Paris 9e", cat: "Serrurerie", init: "MK", amount: "650\u20AC pour 3 min", text: "Serrurier Google : 89\u20AC au téléphone. Sur place : 650\u20AC. Enfermée dehors, pas le choix. Il ouvre en 3 minutes avec un outil basique." },
-  { name: "Fabien R.", city: "Lyon", cat: "Électricité", init: "FR", amount: "4 800\u20AC à refaire", text: "\"Électricien\" sans décennale. Tableau refait. 3 mois plus tard : court-circuit. Installation non conforme aux normes. Tout à refaire." },
-];
+/** Icône cadenas (utilisée dans les sections séquestre) */
+const LockIcon = ({ size = 18, color = "#1B6B4E" }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="5" y="11" width="14" height="10" rx="2" stroke={color} strokeWidth="1.5" />
+    <path d="M8 11V7a4 4 0 118 0v4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="12" cy="16" r="1.5" fill={color} />
+  </svg>
+);
 
-/** Témoignages positifs "Avec Nova" (interventions réussies) */
-const successStories = [
-  { name: "Sophie M.", city: "Paris 15e", cat: "Plomberie urgente", init: "SM", amount: "380\u20AC \u2014 prix juste, validé", text: "Fuite d\u2019eau un dimanche soir. Plombier trouvé en 10 min. Arrivé en 45 min. Tout réparé proprement. J\u2019ai payé uniquement quand Nova a confirmé que le travail était conforme." },
-  { name: "Claire D.", city: "Paris 11e", cat: "Serrurerie", init: "CD", amount: "195\u20AC \u2014 tarif transparent", text: "Porte claquée à 22h. Serrurier trouvé en 15 min sur Nova. Il était là en 30 min. Et surtout, le prix correspondait au devis fait sur place. Pas un euro de plus." },
-  { name: "Thomas G.", city: "Lyon 3e", cat: "Électricité", init: "TG", amount: "1 450\u20AC \u2014 devis respecté", text: "Tableau électrique à refaire. L\u2019artisan est venu, a fait le devis devant moi, et a tout refait en une journée. Nova a vérifié avant de le payer. La tranquillité totale." },
-];
+/** Icône d'onglet pour la barre de navigation du mockup téléphone */
+const TabIcon = ({ icon: Icon, active = false }: { icon: React.ElementType; active?: boolean }) => (
+  <Icon className={`w-[14px] h-[14px] ${active ? "text-forest" : "text-grayText/40"}`} strokeWidth={active ? 2.5 : 1.5} />
+);
 
-/** Lignes du tableau comparatif "Sans Nova" vs "Avec Nova" */
-const comparisonRows = [
-  { label: "Trouver un artisan", sans: "Au hasard sur Google ou bouche-à-oreille", avec: "Artisans certifiés : SIRET, décennale, qualifications" },
-  { label: "Vérification", sans: "Aucune \u2014 vous faites confiance aveuglément", avec: "Documents analysés par IA + équipe Nova" },
-  { label: "Le devis", sans: "Annoncé au téléphone, gonflé sur place", avec: "Fait sur place, devant vous, sans surprise" },
-  { label: "Le paiement", sans: "En liquide ou virement direct \u2014 aucune garantie", avec: "Séquestre sécurisé \u2014 l\u2019artisan n\u2019est payé qu\u2019après validation" },
-  { label: "Si ça se passe mal", sans: "Aucun recours, artisan injoignable", avec: "Nova arbitre avec preuves (photos, devis signé)" },
-  { label: "Les avis", sans: "Invérifiables, achetés, parfois faux", avec: "100% liés à une mission réelle et un paiement" },
-  { label: "En urgence", sans: "Vous prenez le premier venu, dans la panique", avec: "Artisan vérifié en 45 min, paiement toujours sécurisé" },
-];
+import { ScrollRevealInit } from "@/components/features/scroll-reveal";
 
-/** Les 6 piliers de confiance Nova */
-const trustPillars = [
-  { num: "01", title: "Artisans audités", desc: "SIRET, décennale, qualifications. Documents analysés par IA." },
-  { num: "02", title: "Séquestre sécurisé", desc: "Votre argent est bloqué. L\u2019artisan n\u2019est payé qu\u2019après notre validation." },
-  { num: "03", title: "Nous validons", desc: "Vous ne validez pas vous-même. Nova est le tiers de confiance." },
-  { num: "04", title: "Avis authentiques", desc: "Chaque note est liée à une mission réelle et un paiement vérifié." },
-  { num: "05", title: "Urgences 45 min", desc: "Artisans disponibles, déjà vérifiés. Paiement sécurisé même en urgence." },
-  { num: "06", title: "Protection litiges", desc: "Nova arbitre avec preuves. 97% résolus en faveur du client." },
-];
+/** Séparateur oblique — couleur = section du dessus, se superpose sur la section du dessous */
+const SlantDivider = ({ color, flip = false }: { color: string; flip?: boolean }) => (
+  <div className="relative h-[60px] md:h-[80px] -mb-[60px] md:-mb-[80px] pointer-events-none" style={{ zIndex: 2 }}>
+    <svg
+      viewBox="0 0 1440 80"
+      preserveAspectRatio="none"
+      className="w-full h-full"
+      style={flip ? { transform: "scaleX(-1)" } : undefined}
+    >
+      <path d="M0,0 L1440,0 L1440,40 L0,80 Z" fill={color} />
+    </svg>
+  </div>
+);
 
-/** Questions fréquentes pour la section FAQ (accordéon) */
-const faqItems = [
-  { q: "C\u2019est vraiment gratuit pour les particuliers ?", a: "Oui, totalement. Aucun frais d\u2019inscription, aucun abonnement, aucun frais caché. Vous payez uniquement le montant de l\u2019intervention de l\u2019artisan. La commission Nova est incluse dans le prix affiché \u2014 ce que vous voyez est ce que vous payez." },
-  { q: "Comment fonctionne le paiement sécurisé ?", a: "Quand vous réservez un artisan, vous payez en ligne par carte bancaire. L\u2019argent est immédiatement bloqué sur un compte séquestre sécurisé. L\u2019artisan intervient chez vous. Ensuite, Nova vérifie que l\u2019intervention est conforme au devis signé. Ce n\u2019est qu\u2019après cette validation que le paiement est libéré à l\u2019artisan. Si l\u2019intervention n\u2019est pas conforme, vous êtes remboursé." },
-  { q: "Comment les artisans sont-ils vérifiés ?", a: "Chaque artisan passe un processus de vérification en 3 étapes : vérification du SIRET actif via l\u2019INSEE, contrôle de l\u2019assurance décennale en cours de validité, et validation des qualifications professionnelles (RGE, Qualibat, etc.). Les documents sont analysés par notre IA puis vérifiés par notre équipe." },
-  { q: "Combien coûte une intervention ?", a: "Le prix dépend de l\u2019intervention. L\u2019artisan se déplace chez vous et fait le devis sur place, devant vous \u2014 jamais au téléphone. Vous voyez exactement ce qui sera fait et à quel prix avant de confirmer." },
-  { q: "Que se passe-t-il en cas de litige ?", a: "Nova est votre tiers de confiance. En cas de problème, notre équipe intervient et arbitre avec les preuves disponibles : photos avant/après, devis signé numériquement, horodatage de l\u2019intervention. Si le travail n\u2019est pas conforme au devis, vous êtes remboursé via le séquestre." },
-  { q: "En combien de temps suis-je remboursé ?", a: "En cas de non-conformité validée par Nova, le remboursement est déclenché sous 48h ouvrées. Le montant est recrédité sur votre carte bancaire dans un délai de 3 à 5 jours selon votre banque." },
-  { q: "Je peux avoir un artisan en urgence ?", a: "Oui. Notre service urgence met en relation avec des artisans disponibles immédiatement dans votre secteur. L\u2019artisan arrive en 45 minutes en moyenne. Le paiement reste sécurisé par séquestre, même en urgence." },
-  { q: "Quelles zones géographiques sont couvertes ?", a: "Nova est disponible à Paris et en Île-de-France au lancement. L\u2019expansion vers Lyon, Marseille et Bordeaux est prévue dans les prochains mois." },
-  { q: "Comment s\u2019inscrire ?", a: "L\u2019inscription prend 30 secondes. Vous créez votre compte avec votre email, sans carte bancaire requise. Vous pouvez immédiatement chercher des artisans. La carte bancaire n\u2019est demandée qu\u2019au moment de réserver." },
-  { q: "Les avis sont-ils fiables ?", a: "100% fiables. Seuls les clients ayant payé et finalisé une mission réelle via Nova peuvent laisser un avis. Chaque note est liée à une transaction vérifiée. Il est impossible de poster un faux avis." },
-];
-
-export default function CommentCaMarchePage() {
-  /* ── État du hero (rotation de mots) ── */
-  const [wordIndex, setWordIndex] = useState(0);
-
-  /* ── État du carrousel de témoignages avant/après ── */
-  const [activeStory, setActiveStory] = useState(0);
-
-  /* ── État de la FAQ (index de l'item ouvert) ── */
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  /* ── État de la modale de recherche d'artisan ── */
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchStep, setSearchStep] = useState(0);
-  const [searchCat, setSearchCat] = useState("");
-  const [searchVille, setSearchVille] = useState("");
-  const [searchDesc, setSearchDesc] = useState("");
-  const [searchPhotos, setSearchPhotos] = useState(0);
-  const [geoLoading, setGeoLoading] = useState(false);
-
-  /** Rotation automatique des mots du hero (toutes les 3,5 secondes) */
-  useEffect(() => {
-    const interval = setInterval(() => setWordIndex((i) => (i + 1) % heroWords.length), 3500);
-    return () => clearInterval(interval);
-  }, []);
-
-  /** Rotation automatique des témoignages (toutes les 6 secondes) */
-  useEffect(() => {
-    const interval = setInterval(() => setActiveStory((i) => (i + 1) % 3), 6000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const router = useRouter();
-
-  /** Redirige vers la page de recherche d'artisans */
-  const openSearch = () => {
-    router.push("/artisans");
-  };
-
+export default function HomePage() {
   return (
-    <>
-      {/* ══════ HERO ══════ */}
-      <section className="relative overflow-hidden bg-bgPage">
-        {/* Decorative blobs */}
-        <div className="absolute -top-[10%] -right-[5%] w-1/2 h-[80%] bg-[radial-gradient(ellipse,rgba(27,107,78,0.07),transparent_70%)] pointer-events-none" />
-        <div className="absolute -bottom-[15%] -left-[8%] w-[40%] h-[60%] bg-[radial-gradient(ellipse,rgba(45,155,110,0.05),transparent_70%)] pointer-events-none" />
-        <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1.5px 1.5px, #1B6B4E 1px, transparent 0)", backgroundSize: "36px 36px" }} />
+    <div>
+      <ScrollRevealInit />
+      {/* ══════════════════════════════════════════════════
+          SECTION 1 — HERO
+          Titre accrocheur + badges de confiance + CTAs
+          + mockup téléphone flottant à droite (desktop)
+      ══════════════════════════════════════════════════ */}
+      <section
+        className="relative overflow-hidden min-h-[calc(100vh-72px)] flex items-center px-5 md:px-10"
+        style={{ background: "linear-gradient(160deg, #F5FAF7 0%, #E8F5EE 35%, #D4EBE0 70%, #C8E6D5 100%)" }}
+      >
+        {/* Blobs décoratifs d'arrière-plan */}
+        <div className="absolute -top-[120px] -right-[80px] w-[500px] h-[500px] rounded-full bg-forest/[0.06] blur-[100px]" />
+        <div className="absolute -bottom-[100px] -left-[60px] w-[350px] h-[350px] rounded-full bg-gold/[0.05] blur-[80px]" />
+        <div className="absolute top-[30%] left-[25%] w-[250px] h-[250px] rounded-full bg-sage/[0.04] blur-[60px]" />
 
-        <div className="max-w-[700px] mx-auto px-5 md:px-10 pt-10 md:pt-24 pb-6 md:pb-10 text-center relative z-10">
-          {/* Double badge */}
-          <div className="flex gap-2 justify-center flex-wrap mb-3.5 animate-fadeIn">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-surface text-forest">
-              <Lock className="w-3.5 h-3.5" />
-              <span className="font-mono text-[11px] font-semibold">Paiement 100% sécurisé</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border border-border">
-              <span className="font-heading text-[13px] font-extrabold text-forest">0&euro;</span>
-              <span className="font-mono text-[11px] font-semibold text-grayText">Gratuit pour les particuliers</span>
-            </span>
-          </div>
+        <div className="max-w-[1140px] mx-auto w-full flex items-center gap-20 relative z-10">
 
-          {/* Offer pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-[5px] bg-gradient-to-br from-deepForest to-forest mb-5 animate-fadeIn">
-            <span className="text-sm">&#127873;</span>
-            <span className="font-body text-xs font-semibold text-white">1er déplacement offert à l&apos;inscription</span>
-          </div>
+          {/* ── Colonne gauche : contenu texte ── */}
+          <div className="flex-1 min-w-0 py-16 md:py-20">
 
-          {/* H1 */}
-          <h1 className="font-heading text-[32px] md:text-[50px] font-extrabold text-navy leading-[1.12] tracking-tight mb-4">
-            Vous cherchez<br />
-            <span key={wordIndex} className="text-forest inline-block animate-fadeIn">{heroWords[wordIndex]}</span>{" "}
-            de confiance ?
-          </h1>
+            {/* Titre principal en 2 lignes */}
+            <h1 className="font-heading text-[36px] md:text-[54px] font-extrabold text-navy leading-[1.08] tracking-[-1.5px] mb-2 motion-safe:animate-pageIn motion-safe:[animation-delay:80ms]" style={{ textWrap: "balance" as never }}>
+              Fini les artisans{" "}
+              <span className="text-red/50 line-through decoration-[3px] decoration-red/30">douteux</span>
+            </h1>
+            <h1 className="font-heading text-[36px] md:text-[54px] font-extrabold leading-[1.08] tracking-[-1.5px] mb-7 motion-safe:animate-pageIn motion-safe:[animation-delay:160ms]">
+              <span className="inline-block overflow-hidden whitespace-nowrap animate-typing border-r-[3px] border-forest">
+                <span className="bg-gradient-to-r from-deepForest via-forest to-sage bg-clip-text text-transparent">
+                  Place aux certifiés.
+                </span>
+              </span>
+            </h1>
 
-          {/* Subtitle */}
-          <p className="font-body text-[15px] md:text-lg text-grayText leading-relaxed max-w-[520px] mx-auto mb-7">
-            Artisans vérifiés SIRET + décennale. Paiement bloqué en séquestre. L&apos;artisan n&apos;est payé qu&apos;après validation par Nova.
-          </p>
+            {/* Sous-titre explicatif */}
+            <p className="text-[17px] text-navy/60 leading-[1.75] max-w-[480px] mb-5 motion-safe:animate-pageIn motion-safe:[animation-delay:240ms]">
+              Nova vérifie chaque artisan <span className="font-semibold text-navy">(SIRET, décennale, RGE)</span> et bloque votre paiement en <span className="font-semibold text-navy">séquestre</span> jusqu&apos;à validation de l&apos;intervention.
+            </p>
 
-          {/* CTAs */}
-          <div className="flex gap-3 justify-center flex-wrap mb-5">
-            <Button size="lg" onClick={openSearch} className="bg-deepForest hover:bg-deepForest/90">
-              Trouver un artisan <ArrowRight className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="lg" onClick={() => document.getElementById("s-how")?.scrollIntoView({ behavior: "smooth" })}>
-              Comment ça marche
-            </Button>
-          </div>
-
-          {/* Trust micro-pills */}
-          <div className="flex gap-4 md:gap-5 justify-center flex-wrap">
-            {[
-              { icon: <Shield className="w-3.5 h-3.5 text-forest" />, text: "Artisans vérifiés" },
-              { icon: <Lock className="w-3.5 h-3.5 text-forest" />, text: "Séquestre sécurisé" },
-              { icon: <Check className="w-3.5 h-3.5 text-forest" />, text: "Sans carte bancaire" },
-              { icon: <Clock className="w-3.5 h-3.5 text-forest" />, text: "Inscription 30 sec" },
-            ].map((p, i) => (
-              <div key={i} className="flex items-center gap-1.5">
-                {p.icon}
-                <span className="font-body text-[11px] text-grayText font-medium">{p.text}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Activity indicator */}
-          <div className="flex items-center justify-center gap-1.5 mt-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-            <span className="font-body text-[11px] text-grayText">14 interventions réalisées aujourd&apos;hui</span>
-          </div>
-        </div>
-
-        {/* ══════ BEFORE/AFTER STORIES ══════ */}
-        <div className="max-w-[1060px] mx-auto px-5 md:px-10 pb-12 md:pb-20 relative z-10">
-          {/* Divider */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-px flex-1 bg-border" />
-            <span className="font-mono text-[11px] text-grayText tracking-widest uppercase">Avant vs Avec Nova</span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 rounded-3xl overflow-hidden shadow-lg border border-border">
-            {/* SANS NOVA */}
-            <div className="bg-[#FFFBFB] p-6 md:p-8 relative md:border-r border-b md:border-b-0 border-border">
-              <div className="absolute top-0 left-0 w-full md:w-1 h-1 md:h-full bg-gradient-to-b from-red to-[#F5841F]" />
-              <div className="flex items-center gap-2 mb-5">
-                <span className="w-2.5 h-2.5 rounded-full bg-red shadow-[0_0_8px_rgba(232,48,42,0.3)] animate-pulse" />
-                <span className="font-mono text-[11px] font-bold text-red tracking-widest uppercase">Sans Nova</span>
-                <div className="ml-auto flex gap-1">
-                  {[0, 1, 2].map((i) => (
-                    <button key={i} onClick={() => setActiveStory(i)}
-                      className={`h-[7px] rounded-full border-0 transition-all ${activeStory === i ? "w-5 bg-red" : "w-[7px] bg-border"}`} />
-                  ))}
-                </div>
-              </div>
-
-              {horrorStories.map((story, i) => (
-                <div key={i} className={`${activeStory === i ? "block animate-fadeIn" : "hidden"}`}>
-                  <p className="font-body text-[15px] md:text-[17px] text-navy leading-relaxed mb-5 min-h-0 md:min-h-[100px]">&ldquo;{story.text}&rdquo;</p>
-                  <div className="inline-flex items-center gap-2 bg-red/10 rounded-[5px] px-4 py-2.5 mb-4">
-                    <X className="w-3.5 h-3.5 text-red" />
-                    <span className="font-heading text-[15px] font-extrabold text-red">{story.amount}</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-[5px] bg-red/10 flex items-center justify-center font-mono text-[11px] font-semibold text-red">{story.init}</div>
-                    <div>
-                      <div className="font-body text-[13px] font-semibold text-navy">{story.name}</div>
-                      <div className="font-body text-[11px] text-grayText">{story.city} &mdash; {story.cat}</div>
-                    </div>
-                  </div>
+            {/* Micro-badges de confiance */}
+            <div className="flex gap-5 mb-9 flex-wrap motion-safe:animate-pageIn motion-safe:[animation-delay:320ms]">
+              {[
+                { icon: <Shield className="w-4 h-4 text-forest" />, text: "Artisans vérifiés" },
+                { icon: <Lock className="w-4 h-4 text-forest" />, text: "Paiement séquestre" },
+                { icon: <BadgeCheck className="w-4 h-4 text-forest" />, text: "0% d'impayés" },
+              ].map((b) => (
+                <div key={b.text} className="flex items-center gap-2 text-[13px] font-semibold text-deepForest/80">
+                  <div className="w-7 h-7 rounded-lg bg-forest/[0.07] flex items-center justify-center">{b.icon}</div>
+                  {b.text}
                 </div>
               ))}
+            </div>
 
-              <div className="mt-5 pt-4 border-t border-red/10 space-y-1.5">
-                {["Aucune vérification", "Paiement sans garantie", "Zéro recours possible"].map((t, j) => (
-                  <div key={j} className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-red/10 flex items-center justify-center shrink-0"><X className="w-2.5 h-2.5 text-red" /></div>
-                    <span className="font-body text-xs text-grayText">{t}</span>
+            {/* Boutons d'appel à l'action */}
+            <div className="flex gap-3 flex-wrap motion-safe:animate-pageIn motion-safe:[animation-delay:400ms]">
+              <Link
+                href="/"
+                className="group flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-br from-deepForest to-forest text-white text-[15px] font-bold font-heading shadow-[0_8px_24px_rgba(10,64,48,0.3)] hover:shadow-[0_12px_32px_rgba(10,64,48,0.4)] active:scale-[0.97] transition-all duration-200 cursor-pointer"
+              >
+                Trouver mon artisan
+                <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+              {/* App Store */}
+              <a
+                href="https://apps.apple.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-black text-white hover:bg-black/90 active:scale-[0.97] transition-all duration-200 cursor-pointer"
+              >
+                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                </svg>
+                <div className="text-left">
+                  <div className="text-[9px] leading-none opacity-80">Télécharger sur</div>
+                  <div className="text-[14px] font-semibold leading-tight">App Store</div>
+                </div>
+              </a>
+              {/* Google Play */}
+              <a
+                href="https://play.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-white text-navy border border-border/60 hover:bg-gray-50 active:scale-[0.97] transition-all duration-200 cursor-pointer"
+              >
+                <svg viewBox="0 0 24 24" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4"/>
+                  <path d="M17.658 8.344L5.796.756C5.1.35 4.345.292 3.61 1.814L13.793 12l3.865-3.656z" fill="#EA4335"/>
+                  <path d="M3.61 22.186c.735 1.522 1.49 1.464 2.186 1.058l11.862-7.588L13.793 12 3.61 22.186z" fill="#34A853"/>
+                  <path d="M20.847 10.262l-3.19-1.918L13.794 12l3.865 3.656 3.19-1.918c1.078-.672 1.078-2.804-.002-3.476z" fill="#FBBC05"/>
+                </svg>
+                <div className="text-left">
+                  <div className="text-[9px] leading-none text-grayText">Disponible sur</div>
+                  <div className="text-[14px] font-semibold leading-tight">Google Play</div>
+                </div>
+              </a>
+            </div>
+
+            {/* Preuve sociale (avatars + texte) */}
+            <div className="flex items-center gap-3 mt-8 motion-safe:animate-pageIn motion-safe:[animation-delay:500ms]">
+              <div className="flex">
+                {["SL", "PM", "CD", "AM"].map((ini, i) => (
+                  <div key={ini} className="w-8 h-8 rounded-full border-[2.5px] border-bgPage flex items-center justify-center text-[9px] font-bold text-forest shadow-sm" style={{ background: `hsl(${150 + i * 25}, 30%, 87%)`, marginLeft: i > 0 ? -8 : 0, zIndex: 4 - i }}>
+                    {ini}
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* AVEC NOVA */}
-            <div className="bg-bgPage p-6 md:p-8 relative">
-              <div className="absolute top-0 right-0 w-full md:w-1 h-1 md:h-full bg-gradient-to-b from-forest to-success" />
-              <div className="flex items-center gap-2 mb-5">
-                <span className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_8px_rgba(34,200,138,0.3)]" />
-                <span className="font-mono text-[11px] font-bold text-forest tracking-widest uppercase">Avec Nova</span>
-                <div className="ml-auto flex gap-0.5">
-                  {[1, 2, 3, 4, 5].map((i) => <Star key={i} className="w-4 h-4 fill-gold text-gold" />)}
-                </div>
+              <div className="text-[13px] text-navy/50">
+                <span className="font-bold text-navy/80">Rejoignez-les</span> — Gratuit, sans engagement
               </div>
+            </div>
+          </div>
 
-              {successStories.map((story, i) => (
-                <div key={i} className={`${activeStory === i ? "block animate-fadeIn" : "hidden"}`}>
-                  <p className="font-body text-[15px] md:text-[17px] text-navy leading-relaxed mb-5 min-h-0 md:min-h-[100px]">&ldquo;{story.text}&rdquo;</p>
-                  <div className="inline-flex items-center gap-2 bg-surface rounded-[5px] px-4 py-2.5 mb-4">
-                    <Check className="w-4 h-4 text-forest" />
-                    <span className="font-heading text-[15px] font-extrabold text-forest">{story.amount}</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-[5px] bg-gradient-to-br from-forest to-sage flex items-center justify-center font-mono text-[11px] font-semibold text-white">{story.init}</div>
-                    <div>
-                      <div className="font-body text-[13px] font-semibold text-navy">{story.name}</div>
-                      <div className="font-body text-[11px] text-grayText">{story.city} &mdash; {story.cat}</div>
+          {/* ── Colonne droite : mockup téléphone flottant (desktop uniquement) ── */}
+          <div className="hidden lg:block flex-none w-[320px] relative motion-safe:animate-pageIn motion-safe:[animation-delay:300ms]">
+            <div className="w-[280px] h-[560px] rounded-[36px] bg-navy p-2.5 shadow-[0_40px_100px_rgba(10,22,40,0.25)] motion-safe:animate-float">
+              {/* Dynamic Island (encoche iPhone) */}
+              <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[90px] h-[26px] rounded-b-2xl bg-navy z-10">
+                <div className="w-11 h-1 rounded-full bg-white/[0.12] mx-auto mt-3.5" />
+              </div>
+              {/* Écran du téléphone */}
+              <div className="w-full h-full rounded-[32px] overflow-hidden" style={{ background: "linear-gradient(170deg, #E8F5EE, #F5FAF7)" }}>
+                <div className="pt-[34px] px-3.5">
+                  {/* Barre de navigation app */}
+                  <div className="flex items-center mb-3">
+                    <span className="font-heading text-[13px] font-extrabold text-navy tracking-tight">Nova</span>
+                    <div className="w-[3px] h-[3px] rounded-full bg-gold ml-0.5" />
+                    <div className="ml-auto w-6 h-6 rounded-lg bg-surface flex items-center justify-center">
+                      <LockIcon size={12} />
                     </div>
                   </div>
-                </div>
-              ))}
+                  <div className="font-heading text-sm font-extrabold text-navy mb-3">Bonjour Sophie</div>
 
-              <div className="mt-5 pt-4 border-t border-border space-y-1.5">
-                {["Artisan certifié SIRET + décennale", "Devis fait sur place, pas au téléphone", "Paiement séquestre \u2014 vous ne risquez rien"].map((t, j) => (
-                  <div key={j} className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-surface flex items-center justify-center shrink-0"><Check className="w-2.5 h-2.5 text-forest" /></div>
-                    <span className="font-body text-xs text-navy/70">{t}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Trust strip */}
-          <div className="flex gap-4 md:gap-6 justify-center mt-7 flex-wrap">
-            {[
-              { v: "1 200+", l: "artisans vérifiés" },
-              { v: "4.7/5", l: "satisfaction" },
-              { v: "0", l: "arnaque" },
-              { v: "45 min", l: "délai urgence" },
-            ].map((s, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span className="font-heading text-base font-extrabold text-deepForest">{s.v}</span>
-                <span className="font-body text-xs text-grayText">{s.l}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════ COMPARISON TABLE ══════ */}
-      <section className="px-5 md:px-10 py-12 md:py-20 bg-bgPage">
-        <div className="max-w-[820px] mx-auto">
-          <div className="text-center mb-8 md:mb-10">
-            <div className="font-mono text-xs text-forest tracking-widest uppercase mb-2.5">Comparatif</div>
-            <h2 className="font-heading text-2xl md:text-[34px] font-extrabold text-navy">La différence est claire</h2>
-          </div>
-
-          {/* Column headers */}
-          <div className="hidden md:grid grid-cols-3 mb-1">
-            <div />
-            <div className="px-5 py-3.5 bg-red/10 rounded-tl-xl text-center">
-              <span className="font-mono text-[11px] font-bold text-red tracking-wider uppercase">Sans Nova</span>
-            </div>
-            <div className="px-5 py-3.5 bg-deepForest rounded-tr-xl text-center">
-              <span className="font-mono text-[11px] font-bold text-white tracking-wider uppercase">Avec Nova</span>
-            </div>
-          </div>
-
-          {/* Rows */}
-          {comparisonRows.map((row, i) => (
-            <div key={i} className={`grid grid-cols-1 md:grid-cols-3 border-b border-border ${i % 2 === 0 ? "bg-white" : "bg-bgPage"} ${i === comparisonRows.length - 1 ? "rounded-b-xl border-b-0" : ""}`}>
-              <div className="hidden md:flex items-center px-5 py-4">
-                <span className="font-heading text-[13px] font-bold text-navy">{row.label}</span>
-              </div>
-              <div className="flex items-start gap-2.5 px-4 md:px-5 py-3 md:py-4 md:border-l border-border md:border-r">
-                <div className="md:hidden font-heading text-[10px] font-bold text-grayText uppercase mb-1 w-full">{row.label}</div>
-                <div className="w-4 h-4 rounded bg-red/10 flex items-center justify-center shrink-0 mt-0.5"><X className="w-2.5 h-2.5 text-red" /></div>
-                <span className="font-body text-xs text-grayText leading-relaxed">{row.sans}</span>
-              </div>
-              <div className="flex items-start gap-2.5 px-4 md:px-5 py-3 md:py-4">
-                <div className="w-4 h-4 rounded bg-surface flex items-center justify-center shrink-0 mt-0.5"><Check className="w-2.5 h-2.5 text-forest" /></div>
-                <span className="font-body text-xs text-navy leading-relaxed font-medium">{row.avec}</span>
-              </div>
-            </div>
-          ))}
-
-          {/* Synthesis card */}
-          <div className="mt-7 bg-white rounded-2xl border border-border p-6 md:p-8 flex flex-col md:flex-row items-center gap-5 md:gap-8 shadow-sm">
-            <div className="flex-1">
-              <h3 className="font-heading text-lg md:text-[22px] font-extrabold text-navy mb-2">En résumé : 0 risque pour vous.</h3>
-              <p className="font-body text-[13px] text-grayText leading-relaxed">Artisan vérifié, devis sur place, paiement bloqué jusqu&apos;à notre validation. Vous ne payez que quand tout est conforme. Et c&apos;est gratuit.</p>
-            </div>
-            <Button size="lg" onClick={openSearch} className="shrink-0 whitespace-nowrap bg-deepForest hover:bg-deepForest/90">
-              Trouver un artisan <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════ 3 STEPS ══════ */}
-      <section id="s-how" className="px-5 md:px-10 py-12 md:py-20 bg-white scroll-mt-16">
-        <div className="max-w-[900px] mx-auto">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="font-mono text-xs text-forest tracking-widest uppercase mb-2.5">Simple et sécurisé</div>
-            <h2 className="font-heading text-2xl md:text-[34px] font-extrabold text-navy">3 étapes. Zéro risque.</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-            {[
-              { s: "01", t: "Réservez un artisan certifié", d: "Choisissez parmi des artisans vérifiés. Vous payez et l\u2019argent est bloqué.", h: "Votre argent est protégé" },
-              { s: "02", t: "L\u2019artisan chiffre sur place", d: "Il se déplace, diagnostique et fait le devis devant vous. Pas de surprise.", h: "Le devis est fait devant vous" },
-              { s: "03", t: "Nous validons, il est payé", d: "Nova vérifie. Ce n\u2019est pas vous qui validez \u2014 c\u2019est nous.", h: "Nous sommes votre garantie" },
-            ].map((step, i) => (
-              <div key={i} className="p-6 md:p-7 rounded-[5px] bg-bgPage border border-border flex flex-col">
-                <div className="font-mono text-4xl font-extrabold text-border mb-2">{step.s}</div>
-                <h3 className="font-heading text-[17px] md:text-[19px] font-extrabold text-navy mb-2.5">{step.t}</h3>
-                <p className="font-body text-[13px] text-grayText leading-relaxed flex-1">{step.d}</p>
-                <div className="mt-4 px-3.5 py-2 rounded-lg bg-surface flex items-center gap-1.5">
-                  <Check className="w-4 h-4 text-forest" />
-                  <span className="font-body text-xs font-semibold text-forest">{step.h}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════ ESCROW VISUAL ══════ */}
-      <section className="px-5 md:px-10 py-10 md:py-16 bg-gradient-to-br from-deepForest to-forest">
-        <div className="max-w-[800px] mx-auto text-center">
-          <h3 className="font-heading text-lg md:text-[22px] font-bold text-white mb-6 md:mb-8">Le parcours de votre paiement</h3>
-          <div className="flex flex-col md:flex-row">
-            {[
-              { l: "Paiement bloqué", d: "Vous payez en ligne", n: "01" },
-              { l: "Mission en cours", d: "L\u2019artisan intervient", n: "02" },
-              { l: "Nous validons", d: "Nova vérifie", n: "03" },
-              { l: "Artisan payé", d: "Tout est conforme", n: "04" },
-            ].map((step, i) => (
-              <div key={i} className="flex-1 text-center py-3.5 md:py-4 md:px-2.5 relative">
-                {i < 3 && <div className="hidden md:block absolute top-5 left-[60%] w-[80%] h-0.5 bg-white/10" />}
-                <div className="w-[42px] h-[42px] rounded-full bg-white/10 border-2 border-white/25 flex items-center justify-center mx-auto mb-2 font-mono font-bold text-sm text-lightSage relative z-10">
-                  {step.n}
-                </div>
-                <div className="font-body text-[13px] font-bold text-white">{step.l}</div>
-                <div className="font-body text-[11px] text-white/50 mt-0.5">{step.d}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════ TRUST PILLARS ══════ */}
-      <section className="px-5 md:px-10 py-12 md:py-20 bg-bgPage">
-        <div className="max-w-[900px] mx-auto">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="font-mono text-xs text-forest tracking-widest uppercase mb-2.5">Nos garanties</div>
-            <h2 className="font-heading text-2xl md:text-[34px] font-extrabold text-navy">Pourquoi nous faire confiance ?</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 md:gap-4">
-            {trustPillars.map((p, i) => (
-              <div key={i} className="p-5 md:p-6 rounded-[5px] bg-white border border-border hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                <div className="w-9 h-9 rounded-[5px] bg-surface flex items-center justify-center font-mono text-xs font-bold text-forest mb-3.5">{p.num}</div>
-                <h3 className="font-heading text-base font-bold text-navy mb-1.5">{p.title}</h3>
-                <p className="font-body text-[13px] text-grayText leading-relaxed">{p.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════ FAQ ══════ */}
-      <section className="px-5 md:px-10 py-12 md:py-20 bg-bgPage">
-        <div className="max-w-[680px] mx-auto">
-          <div className="text-center mb-8">
-            <div className="font-mono text-xs text-forest tracking-widest uppercase mb-2.5">FAQ</div>
-            <h2 className="font-heading text-[22px] md:text-[28px] font-extrabold text-navy">Questions fréquentes</h2>
-          </div>
-          <div className="divide-y divide-border">
-            {faqItems.map((item, i) => (
-              <div key={i}>
-                <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between py-4.5 text-left group">
-                  <span className="font-body text-sm md:text-[15px] font-semibold text-navy pr-4">{item.q}</span>
-                  <span className={`font-mono text-lg text-forest shrink-0 transition-transform duration-200 ${openFaq === i ? "rotate-45" : ""}`}>+</span>
-                </button>
-                {openFaq === i && (
-                  <div className="pb-4 font-body text-[13px] text-grayText leading-relaxed animate-fadeIn">{item.a}</div>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <p className="font-body text-sm text-grayText mb-4">Vous avez encore des questions ? Trouvez un artisan et voyez par vous-même.</p>
-            <Button onClick={openSearch} className="bg-deepForest hover:bg-deepForest/90">
-              Trouver un artisan <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════ FINAL CTA ══════ */}
-      <section className="px-5 md:px-10 py-12 md:py-20 bg-gradient-to-br from-deepForest to-forest text-white text-center relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(142,207,176,0.08),transparent_70%)]" />
-        <div className="absolute top-[10%] right-[8%] opacity-[0.04]">
-          <Shield className="w-[120px] h-[120px] text-white" />
-        </div>
-
-        <div className="max-w-[640px] mx-auto relative z-10">
-          {/* Pain reminder */}
-          <div className="inline-flex items-center gap-2 bg-white/[0.08] rounded-full px-4 py-1.5 mb-6 border border-white/10">
-            <X className="w-3.5 h-3.5 text-white/50" />
-            <span className="font-body text-xs text-white/60">200&euro; perdus, 650&euro; pour 3 min, 4 800&euro; à refaire...</span>
-          </div>
-
-          <h2 className="font-heading text-[26px] md:text-[40px] font-extrabold text-white mb-3.5 leading-[1.15]">
-            Ne prenez plus<br />ce risque.
-          </h2>
-          <p className="font-body text-[15px] md:text-[17px] text-white/65 leading-relaxed max-w-[480px] mx-auto mb-9">
-            Artisan vérifié SIRET + décennale. Paiement bloqué jusqu&apos;à validation. C&apos;est gratuit pour vous.
-          </p>
-
-          <Button size="lg" onClick={openSearch}
-            className="bg-white text-deepForest hover:bg-white/90 text-[17px] font-extrabold px-10 py-5 rounded-[5px] animate-[pulse_2s_infinite] mb-4">
-            Trouver un artisan <ArrowRight className="w-4 h-4" />
-          </Button>
-
-          <div className="flex justify-center gap-1.5 mb-8 flex-wrap">
-            {["30 secondes", "Sans carte bancaire", "Gratuit"].map((t, i) => (
-              <span key={i} className="font-mono text-[11px] text-white/40">{t}{i < 2 ? " \u00B7" : ""}</span>
-            ))}
-          </div>
-
-          <div className="flex gap-3 md:gap-5 justify-center flex-wrap">
-            {[
-              { icon: <Shield className="w-4 h-4 text-lightSage" />, text: "Artisans vérifiés" },
-              { icon: <Lock className="w-4 h-4 text-lightSage" />, text: "Paiement séquestre" },
-              { icon: <Check className="w-4 h-4 text-lightSage" />, text: "Validation Nova" },
-            ].map((g, i) => (
-              <div key={i} className="flex items-center gap-2 bg-white/[0.06] rounded-[5px] px-3.5 py-2">
-                {g.icon}
-                <span className="font-body text-xs text-white/60 font-medium">{g.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════ SEARCH MODAL ══════ */}
-      {showSearch && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-navy/50 backdrop-blur-sm"
-          onClick={() => setShowSearch(false)}>
-          <div onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-[520px] bg-white rounded-3xl shadow-2xl max-h-[88vh] overflow-y-auto animate-slideUp">
-
-            {/* Step 0: Category + City */}
-            {searchStep === 0 && (
-              <div className="p-6 md:p-9">
-                <div className="flex justify-between items-start mb-5">
-                  <div>
-                    <h2 className="font-heading text-xl md:text-2xl font-extrabold text-navy mb-1">Trouvez votre artisan</h2>
-                    <p className="font-body text-[13px] text-grayText">Gratuit et sans engagement</p>
-                  </div>
-                  <button onClick={() => setShowSearch(false)}
-                    className="w-8 h-8 rounded-lg border border-border bg-white flex items-center justify-center hover:bg-surface">
-                    <X className="w-3.5 h-3.5 text-grayText" />
-                  </button>
-                </div>
-
-                {/* Offer reminder */}
-                <div className="flex items-center gap-2 bg-gradient-to-br from-deepForest to-forest rounded-[5px] px-3.5 py-2.5 mb-5">
-                  <span className="text-base">&#127873;</span>
-                  <div>
-                    <div className="font-body text-[11px] font-bold text-white">1er déplacement offert</div>
-                    <div className="font-body text-[10px] text-white/60">Pour votre première intervention à l&apos;inscription</div>
-                  </div>
-                </div>
-
-                {/* Category grid */}
-                <div className="mb-5">
-                  <div className="font-body text-xs font-semibold text-grayText mb-2.5">De quel artisan avez-vous besoin ?</div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {categories.map((cat, i) => (
-                      <button key={i} onClick={() => setSearchCat(cat.name)}
-                        className={`p-3.5 rounded-xl text-center transition-all ${searchCat === cat.name ? "bg-surface border-2 border-forest" : "bg-bgPage border-2 border-transparent"}`}>
-                        <div className="text-[22px] mb-1">{cat.emoji}</div>
-                        <div className={`font-body text-[11px] font-semibold ${searchCat === cat.name ? "text-forest" : "text-navy"}`}>{cat.name}</div>
-                      </button>
+                  {/* Mini cartes de statistiques */}
+                  <div className="flex gap-[5px] mb-2.5">
+                    {[{ v: "2", l: "En cours", c: "text-success" }, { v: "570€", l: "Séquestre", c: "text-forest" }].map((k) => (
+                      <div key={k.l} className="flex-1 bg-white rounded-lg py-[7px] px-1.5 text-center border border-border/50 shadow-sm">
+                        <div className={`font-mono text-xs font-bold ${k.c}`}>{k.v}</div>
+                        <div className="text-[7px] text-grayText">{k.l}</div>
+                      </div>
                     ))}
                   </div>
-                </div>
 
-                {/* City */}
-                <div className="mb-6">
-                  <div className="font-body text-xs font-semibold text-grayText mb-2">Dans quelle ville ?</div>
-                  <div className="flex gap-2">
-                    <input value={searchVille} onChange={(e) => setSearchVille(e.target.value)}
-                      placeholder="Ex : Paris 15e, Lyon..."
-                      className="flex-1 px-4 py-3 rounded-xl border border-border bg-bgPage font-body text-sm text-navy placeholder:text-grayText/60 focus:outline-none focus:ring-2 focus:ring-forest/30" />
-                    <button onClick={() => {
-                      setGeoLoading(true);
-                      if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                          () => { setSearchVille("Ma position actuelle"); setGeoLoading(false); },
-                          () => { setSearchVille("Paris"); setGeoLoading(false); }
-                        );
-                      } else { setSearchVille("Paris"); setGeoLoading(false); }
-                    }}
-                      className="px-3.5 py-3 rounded-xl border border-border bg-bgPage hover:bg-surface transition-colors shrink-0">
-                      {geoLoading ? (
-                        <div className="w-4 h-4 rounded-full border-2 border-border border-t-forest animate-spin" />
-                      ) : (
-                        <MapPin className="w-[18px] h-[18px] text-forest" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <button disabled={!searchCat || !searchVille.trim()} onClick={() => setSearchStep(1)}
-                  className={`w-full py-3.5 rounded-xl border-0 font-heading text-[15px] font-bold flex items-center justify-center gap-2 transition-all ${searchCat && searchVille.trim() ? "bg-deepForest text-white cursor-pointer" : "bg-border text-grayText cursor-default"}`}>
-                  Continuer <ArrowRight className="w-4 h-4" />
-                </button>
-
-                <div className="flex justify-center gap-4 mt-4">
-                  {[0, 1, 2, 3].map((i) => <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? "w-5 bg-forest" : "w-2 bg-border"}`} />)}
-                </div>
-              </div>
-            )}
-
-            {/* Step 1: Describe */}
-            {searchStep === 1 && (
-              <div className="p-6 md:p-9 animate-fadeIn">
-                <div className="flex justify-between items-start mb-5">
-                  <div>
-                    <h2 className="font-heading text-lg md:text-[22px] font-extrabold text-navy mb-1">Décrivez votre besoin</h2>
-                    <p className="font-body text-[13px] text-grayText">{searchCat} à {searchVille}</p>
-                  </div>
-                  <button onClick={() => setSearchStep(0)}
-                    className="px-3 py-1.5 rounded-lg border border-border bg-white font-body text-[11px] text-grayText hover:bg-surface">
-                    Retour
-                  </button>
-                </div>
-
-                <div className="mb-5">
-                  <div className="font-body text-xs font-semibold text-grayText mb-2">Quel est le problème ?</div>
-                  <textarea value={searchDesc} onChange={(e) => setSearchDesc(e.target.value)}
-                    placeholder="Ex : Fuite sous l&apos;évier de la cuisine, le joint semble usé..."
-                    rows={4}
-                    className="w-full px-4 py-3 rounded-xl border border-border bg-bgPage font-body text-sm text-navy placeholder:text-grayText/60 focus:outline-none focus:ring-2 focus:ring-forest/30 resize-y leading-relaxed" />
-                </div>
-
-                <div className="mb-6">
-                  <div className="font-body text-xs font-semibold text-grayText mb-2">
-                    Photos <span className="font-normal text-grayText/70">(optionnel)</span>
-                  </div>
-                  <div className="flex gap-2.5">
-                    {[0, 1, 2].map((i) => (
-                      <button key={i} onClick={() => setSearchPhotos(Math.max(searchPhotos, i + 1))}
-                        className={`w-20 h-20 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-all ${i < searchPhotos ? "border-forest bg-surface" : "border-border bg-bgPage"}`}>
-                        {i < searchPhotos ? (
-                          <>
-                            <Check className="w-4 h-4 text-forest" />
-                            <span className="font-body text-[9px] text-forest mt-1">Photo {i + 1}</span>
-                          </>
-                        ) : (
-                          <>
-                            <Camera className="w-5 h-5 text-grayText" />
-                            <span className="font-body text-[9px] text-grayText mt-1">Ajouter</span>
-                          </>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <button onClick={() => { setSearchStep(2); setTimeout(() => setSearchStep(3), 2200); }}
-                  className="w-full py-3.5 rounded-xl bg-deepForest text-white font-heading text-[15px] font-bold flex items-center justify-center gap-2 border-0 cursor-pointer">
-                  Rechercher des artisans <ArrowRight className="w-4 h-4" />
-                </button>
-                <button onClick={() => { setSearchStep(2); setTimeout(() => setSearchStep(3), 2200); }}
-                  className="w-full py-2.5 bg-transparent border-0 text-grayText font-body text-xs mt-2 cursor-pointer">
-                  Passer cette étape
-                </button>
-
-                <div className="flex justify-center gap-4 mt-4">
-                  {[0, 1, 2, 3].map((i) => <div key={i} className={`h-1 rounded-full transition-all ${i <= 1 ? "bg-forest" : "bg-border"} ${i === 1 ? "w-5" : "w-2"}`} />)}
-                </div>
-              </div>
-            )}
-
-            {/* Step 2: Loading */}
-            {searchStep === 2 && (
-              <div className="px-9 py-16 text-center">
-                <div className="w-12 h-12 rounded-full border-[3px] border-border border-t-forest animate-spin mx-auto mb-5" />
-                <h3 className="font-heading text-lg font-bold text-navy mb-1.5">Recherche en cours...</h3>
-                <p className="font-body text-[13px] text-grayText mb-5">
-                  Nous cherchons les meilleurs artisans en {searchCat} à {searchVille}
-                </p>
-                {searchDesc && (
-                  <div className="font-body text-[11px] text-grayText bg-bgPage rounded-lg px-3 py-2 max-w-[300px] mx-auto">
-                    Votre description sera transmise aux artisans
-                  </div>
-                )}
-                <div className="flex justify-center gap-4 mt-5">
-                  {[0, 1, 2, 3].map((i) => <div key={i} className={`h-1 rounded-full ${i <= 2 ? "bg-forest" : "bg-border"} ${i === 2 ? "w-5" : "w-2"}`} />)}
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Results */}
-            {searchStep === 3 && (
-              <div className="p-6 md:p-8 animate-fadeIn">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h2 className="font-heading text-lg md:text-[22px] font-extrabold text-navy mb-1">3 artisans disponibles</h2>
-                    <p className="font-body text-xs text-grayText">{searchCat} à {searchVille}</p>
-                  </div>
-                  <button onClick={() => setShowSearch(false)}
-                    className="w-8 h-8 rounded-lg border border-border bg-white flex items-center justify-center hover:bg-surface">
-                    <X className="w-3.5 h-3.5 text-grayText" />
-                  </button>
-                </div>
-
-                {/* Offer reminder */}
-                <div className="flex items-center gap-2 bg-surface rounded-lg px-3 py-2 mb-2.5">
-                  <span className="text-sm">&#127873;</span>
-                  <span className="font-body text-[11px] font-semibold text-forest">Rappel : 1er déplacement offert à l&apos;inscription</span>
-                </div>
-
-                {/* Urgency */}
-                <div className="flex items-center gap-2 rounded-lg px-3 py-2 mb-4 bg-gold/5 border border-gold/10">
-                  <span className="w-2 h-2 rounded-full bg-gold animate-pulse shrink-0" />
-                  <span className="font-body text-[11px] text-grayText">
-                    <span className="font-semibold text-navy">{7 + Math.floor(Math.random() * 8)} personnes</span> recherchent un artisan en {searchCat} dans votre secteur
-                  </span>
-                </div>
-
-                {/* Artisan results */}
-                <div className="space-y-3 mb-5">
+                  {/* Cartes de missions dans le mockup */}
                   {[
-                    { name: "Paul Lefevre", note: 4.8, missions: 127, delai: "Disponible demain", init: "PL", verified: ["SIRET", "Décennale", "RGE"], available: false },
-                    { name: "Nicolas Martin", note: 4.9, missions: 89, delai: "Disponible aujourd\u2019hui", init: "NM", verified: ["SIRET", "Décennale"], available: true },
-                    { name: "David Richard", note: 4.6, missions: 54, delai: "Disponible lundi", init: "DR", verified: ["SIRET", "Décennale", "Qualibat"], available: false },
-                  ].map((artisan, i) => (
-                    <div key={i} className="p-4 md:p-5 rounded-2xl bg-bgPage border border-border hover:border-forest/25 hover:shadow-md transition-all">
-                      <div className="flex items-center gap-3 mb-2.5">
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-forest to-sage flex items-center justify-center font-mono text-sm font-bold text-white">{artisan.init}</div>
-                        <div className="flex-1">
-                          <div className="font-heading text-[15px] font-bold text-navy">{artisan.name}</div>
-                          <div className="font-body text-[11px] text-grayText">{artisan.missions} missions réalisées</div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 fill-gold text-gold" />
-                          <span className="font-mono text-sm font-bold text-navy">{artisan.note}</span>
-                        </div>
+                    { ini: "JM", name: "Jean-Michel P.", desc: "Réparation fuite", badge: "En cours", bColor: "#22C88A" },
+                    { ini: "SM", name: "Sophie M.", desc: "Prise électrique", badge: "Terminée", bColor: "#1B6B4E" },
+                    { ini: "KB", name: "Karim B.", desc: "Serrure", badge: "Validée", bColor: "#F5A623" },
+                  ].map((m) => (
+                    <div key={m.ini} className="bg-white rounded-lg p-2 mb-[5px] border border-border/30 shadow-sm flex gap-2 items-center">
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-surface to-border flex items-center justify-center text-[8px] font-bold text-forest">{m.ini}</div>
+                      <div className="flex-1">
+                        <div className="text-[10px] font-bold text-navy">{m.name}</div>
+                        <div className="text-[8px] text-grayText">{m.desc}</div>
                       </div>
-                      <div className="flex gap-1.5 mb-2.5 flex-wrap">
-                        {artisan.verified.map((v, j) => (
-                          <span key={j} className="inline-flex items-center gap-1 bg-surface rounded-md px-2 py-0.5">
-                            <Check className="w-3 h-3 text-forest" />
-                            <span className="font-mono text-[9px] font-semibold text-forest">{v}</span>
-                          </span>
-                        ))}
+                      <span className="text-[7px] font-bold px-[5px] py-[2px] rounded-sm" style={{ color: m.bColor, background: m.bColor + "15" }}>{m.badge}</span>
+                    </div>
+                  ))}
+
+                  {/* Carte séquestre dans le mockup */}
+                  <div className="bg-gradient-to-br from-deepForest to-forest rounded-xl p-2.5 mt-2 shadow-[0_4px_16px_rgba(10,64,48,0.2)]">
+                    <div className="flex items-center gap-[5px] mb-1">
+                      <LockIcon size={10} color="#8ECFB0" />
+                      <span className="text-[8px] font-bold text-lightSage">Paiement en séquestre</span>
+                    </div>
+                    <div className="font-mono text-base font-bold text-white">570,00 €</div>
+                    <div className="w-full h-1 rounded-full bg-white/10 mt-1.5">
+                      <div className="w-[65%] h-full rounded-full bg-lightSage/60" />
+                    </div>
+                    <div className="text-[7px] text-white/50 mt-1">Protégé jusqu&apos;à validation</div>
+                  </div>
+
+                  {/* Barre d'onglets du téléphone */}
+                  <div className="flex justify-around pt-2.5 mt-2.5 border-t border-surface">
+                    <TabIcon icon={Home} active />
+                    <TabIcon icon={Search} />
+                    <TabIcon icon={ClipboardList} />
+                    <TabIcon icon={Bell} />
+                    <TabIcon icon={User} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Carte flottante — "Intervention validée" */}
+            <div className="absolute top-16 -left-[70px] bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-border/40 flex items-center gap-2.5 max-w-[210px] motion-safe:animate-pageIn motion-safe:[animation-delay:700ms]">
+              <div className="relative">
+                <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
+                  <Check className="w-4 h-4 text-success" />
+                </div>
+                <div className="absolute inset-0 rounded-lg bg-success/20 motion-safe:animate-pulse-ring" />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold text-navy">Intervention validée</div>
+                <div className="text-[9px] text-grayText">Paiement libéré • 320€</div>
+              </div>
+            </div>
+
+            {/* Carte flottante — "Artisan certifié" */}
+            <div className="absolute bottom-[90px] -right-[40px] bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-border/40 flex items-center gap-2.5 motion-safe:animate-pageIn motion-safe:[animation-delay:900ms]">
+              <div className="w-8 h-8 rounded-lg bg-forest/[0.08] flex items-center justify-center">
+                <ShieldIcon size={16} />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold text-navy">Artisan certifié</div>
+                <div className="text-[9px] text-grayText">SIRET • Décennale • RGE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <SlantDivider color="#C8E6D5" />
+
+      {/* ══════════════════════════════════════════════════
+          SECTION 2 — TRUST (Bento Grid)
+          3 cartes : séquestre (mise en avant), certifications, validation
+      ══════════════════════════════════════════════════ */}
+      <section className="pt-32 pb-20 px-5 md:px-10 bg-white">
+        <div data-reveal className="reveal-up max-w-[1140px] mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="font-heading text-[32px] md:text-[38px] font-extrabold text-navy mb-3" style={{ textWrap: "balance" as never }}>
+              Un système de confiance unique
+            </h2>
+            <p className="text-[16px] text-navy/50 max-w-[460px] mx-auto leading-relaxed">
+              Votre argent est protégé, vos artisans sont vérifiés, chaque mission est contrôlée.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            {/* Carte principale — Séquestre (occupe 2 rangées) */}
+            <div className="md:row-span-2 group relative p-8 rounded-2xl overflow-hidden cursor-default" style={{ background: "linear-gradient(160deg, #0A4030 0%, #1B6B4E 100%)" }}>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-5">
+                  <LockIcon size={28} color="#8ECFB0" />
+                </div>
+                <h3 className="font-heading text-2xl font-extrabold text-white mb-2">Paiement séquestre</h3>
+                <p className="text-[15px] text-white/70 leading-relaxed mb-6 max-w-[380px]">
+                  Votre argent est bloqué sur un compte sécurisé dès la signature du devis. L&apos;artisan n&apos;est payé qu&apos;après votre validation.
+                </p>
+
+                {/* Visualisation du flux séquestre en 4 étapes */}
+                <div className="flex items-center gap-3 mb-4">
+                  {[
+                    { label: "Vous payez", icon: <CreditCardIcon /> },
+                    { label: "Séquestre", icon: <Lock className="w-4 h-4 text-lightSage" /> },
+                    { label: "Validation", icon: <Check className="w-4 h-4 text-lightSage" /> },
+                    { label: "Artisan payé", icon: <BadgeCheck className="w-4 h-4 text-lightSage" /> },
+                  ].map((step, i) => (
+                    <div key={step.label} className="flex items-center gap-3">
+                      <div className="flex flex-col items-center gap-1.5">
+                        <div className="w-9 h-9 rounded-lg bg-white/[0.12] flex items-center justify-center">{step.icon}</div>
+                        <span className="text-[9px] font-semibold text-white/60 whitespace-nowrap">{step.label}</span>
                       </div>
-                      <div className="flex items-center gap-2 mb-2.5">
-                        <span className={`w-1.5 h-1.5 rounded-full ${artisan.available ? "bg-success" : "bg-grayText"}`} />
-                        <span className={`font-body text-[11px] ${artisan.available ? "text-success font-semibold" : "text-grayText"}`}>{artisan.delai}</span>
-                      </div>
-                      <button onClick={() => window.location.href = "/login"}
-                        className="w-full py-2.5 rounded-[5px] bg-deepForest text-white font-body text-[13px] font-semibold flex items-center justify-center gap-1.5 border-0 cursor-pointer hover:bg-deepForest/90 transition-colors">
-                        Contacter cet artisan <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
+                      {i < 3 && <div className="w-6 h-[2px] bg-lightSage/30 rounded-full mt-[-14px]" />}
                     </div>
                   ))}
                 </div>
 
-                {/* Login gate */}
-                <div className="bg-bgPage rounded-xl p-3.5 border border-border flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-surface flex items-center justify-center shrink-0">
-                    <Lock className="w-4 h-4 text-forest" />
-                  </div>
-                  <div>
-                    <div className="font-body text-xs font-semibold text-navy">Inscrivez-vous pour contacter un artisan</div>
-                    <div className="font-body text-[11px] text-grayText">30 sec &bull; Sans carte bancaire &bull; 1er déplacement offert</div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center gap-4 mt-4">
-                  {[0, 1, 2, 3].map((i) => <div key={i} className={`h-1 rounded-full bg-forest ${i === 3 ? "w-5" : "w-2"}`} />)}
+                <div className="inline-flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2 text-[13px] font-bold text-lightSage">
+                  <Lock className="w-3.5 h-3.5" /> 0€ de risque pour vous
                 </div>
               </div>
-            )}
+              {/* Effet lumineux décoratif */}
+              <div className="absolute -bottom-20 -right-20 w-[250px] h-[250px] rounded-full bg-sage/[0.15] blur-[80px]" />
+            </div>
+
+            {/* Carte — Certifications artisans */}
+            <div className="group p-7 rounded-2xl bg-bgPage border border-border/50 hover:border-forest/20 hover:shadow-lg active:scale-[0.99] transition-all duration-200 cursor-default">
+              <div className="w-12 h-12 rounded-xl bg-forest/[0.08] group-hover:bg-forest/[0.12] flex items-center justify-center mb-4 transition-colors">
+                <ShieldIcon size={26} />
+              </div>
+              <h3 className="font-heading text-xl font-bold text-navy mb-2">Artisans certifiés</h3>
+              <p className="text-[14px] text-navy/55 leading-relaxed mb-4">
+                Chaque artisan est audité et vérifié avant d&apos;être référencé. Documents obligatoires contrôlés par notre équipe.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {["SIRET vérifié", "Décennale", "Pièce d'identité"].map((tag) => (
+                  <span key={tag} className="inline-flex items-center gap-1 text-[11px] font-bold text-forest bg-forest/[0.06] px-2.5 py-1 rounded-lg">
+                    <Check className="w-3 h-3" /> {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Carte — Validation Nova */}
+            <div className="group p-7 rounded-2xl bg-bgPage border border-border/50 hover:border-forest/20 hover:shadow-lg active:scale-[0.99] transition-all duration-200 cursor-default">
+              <div className="w-12 h-12 rounded-xl bg-forest/[0.08] group-hover:bg-forest/[0.12] flex items-center justify-center mb-4 transition-colors">
+                <Check className="w-6 h-6 text-forest" />
+              </div>
+              <h3 className="font-heading text-xl font-bold text-navy mb-2">Validation Nova</h3>
+              <p className="text-[14px] text-navy/55 leading-relaxed mb-4">
+                Notre équipe contrôle et valide chaque mission avant de libérer le paiement. Vous gardez le contrôle total.
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 text-[12px] font-bold text-success">
+                  <div className="relative">
+                    <div className="w-2 h-2 rounded-full bg-success" />
+                    <div className="absolute inset-0 w-2 h-2 rounded-full bg-success motion-safe:animate-pulse-ring" />
+                  </div>
+                  100% des missions contrôlées
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      )}
-    </>
+      </section>
+
+      <SlantDivider color="#ffffff" flip />
+
+      {/* ══════════════════════════════════════════════════
+          SECTION 3 — COMMENT ÇA MARCHE (4 étapes)
+      ══════════════════════════════════════════════════ */}
+      <section className="pt-32 pb-20 px-5 md:px-10 bg-bgPage">
+        <div data-reveal className="reveal-up max-w-[960px] mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="font-heading text-[32px] md:text-[38px] font-extrabold text-navy mb-3">Comment ça marche</h2>
+            <p className="text-[16px] text-navy/50">De la recherche à la validation, en 4 étapes.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-0 relative">
+            {/* Ligne de connexion entre les étapes (desktop) */}
+            <div className="hidden md:block absolute top-7 left-[12.5%] right-[12.5%] h-[2px] bg-border/60 z-0" />
+
+            {[
+              { icon: <Search className="w-5 h-5" />, title: "Trouvez", desc: "Recherchez un artisan certifié par catégorie ou urgence", accent: "from-forest to-sage" },
+              { icon: <FileText className="w-5 h-5" />, title: "Réservez", desc: "Prenez rendez-vous et acceptez le devis en ligne", accent: "from-forest to-sage" },
+              { icon: <Lock className="w-5 h-5" />, title: "Payez en séquestre", desc: "Votre argent est bloqué, pas débité", accent: "from-deepForest to-forest" },
+              { icon: <Check className="w-5 h-5" />, title: "On valide", desc: "Nova vérifie la mission et libère le paiement", accent: "from-deepForest to-forest" },
+            ].map((s, i) => (
+              <div key={i} className="flex flex-col items-center text-center relative z-10">
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.accent} text-white flex items-center justify-center mb-4 shadow-[0_4px_14px_rgba(10,64,48,0.2)]`}>
+                  {s.icon}
+                </div>
+                <h4 className="text-[15px] font-bold text-navy mb-1.5">{s.title}</h4>
+                <p className="text-[13px] text-navy/45 leading-snug px-2 max-w-[180px]">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <SlantDivider color="#F5FAF7" />
+
+      {/* ══════════════════════════════════════════════════
+          SECTION 4 — DEMO PREVIEW
+          2 cartes glassmorphism : mode client / mode artisan
+      ══════════════════════════════════════════════════ */}
+      <section data-navbar-dark className="pt-32 pb-20 px-5 md:px-10 overflow-hidden" style={{ background: "linear-gradient(170deg, #0A4030 0%, #143D2E 50%, #1B6B4E 100%)" }}>
+        <div data-reveal className="reveal-up max-w-[1140px] mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 bg-white/[0.08] rounded-lg px-4 py-2 mb-5 text-[12px] font-semibold text-white/70">
+              <Zap className="w-3.5 h-3.5" /> Découvrez la plateforme
+            </div>
+            <h2 className="font-heading text-[32px] md:text-[40px] font-extrabold text-white mb-3" style={{ textWrap: "balance" as never }}>
+              Testez Nova en mode démo
+            </h2>
+            <p className="text-[16px] text-white/55 max-w-[480px] mx-auto leading-relaxed">
+              Explorez l&apos;interface complète sans créer de compte.
+            </p>
+          </div>
+
+          {/* Cartes démo : client et artisan */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[840px] mx-auto mb-14">
+            {/* Carte — Mode client */}
+            <Link href="/login" className="group relative bg-white/[0.06] backdrop-blur-xl rounded-2xl p-7 border border-white/[0.1] hover:bg-white/[0.1] hover:border-white/[0.18] active:scale-[0.98] transition-all duration-200 cursor-pointer overflow-hidden">
+              <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-lightSage/[0.04] rounded-full blur-[60px] -translate-y-1/2 translate-x-1/3" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-xl bg-white/[0.1] flex items-center justify-center mb-5">
+                  <Home className="w-7 h-7 text-lightSage" />
+                </div>
+                <h3 className="font-heading text-[22px] font-extrabold text-white mb-2">Je suis particulier</h3>
+                <p className="text-[14px] text-white/55 leading-relaxed mb-5">
+                  Trouvez un artisan certifié, réservez en ligne, payez en séquestre. Suivi temps réel.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {["Recherche artisans", "Réservation", "Vidéo diagnostic", "Signature devis", "Paiement 3x/4x", "Suivi live"].map((f) => (
+                    <span key={f} className="px-2.5 py-1 rounded-lg bg-lightSage/[0.12] text-lightSage/90 text-[11px] font-semibold">{f}</span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-lightSage font-bold text-[15px] group-hover:gap-3 transition-all duration-200">
+                  Explorer le mode client <ChevronRight className="w-4 h-4" />
+                </div>
+              </div>
+            </Link>
+
+            {/* Carte — Mode artisan */}
+            <Link href="/login" className="group relative bg-white/[0.06] backdrop-blur-xl rounded-2xl p-7 border border-white/[0.1] hover:bg-white/[0.1] hover:border-white/[0.18] active:scale-[0.98] transition-all duration-200 cursor-pointer overflow-hidden">
+              <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-gold/[0.04] rounded-full blur-[60px] -translate-y-1/2 translate-x-1/3" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-xl bg-white/[0.1] flex items-center justify-center mb-5">
+                  <Wrench className="w-7 h-7 text-[#F5D090]" />
+                </div>
+                <h3 className="font-heading text-[22px] font-extrabold text-white mb-2">Je suis artisan</h3>
+                <p className="text-[14px] text-white/55 leading-relaxed mb-5">
+                  Gérez vos missions, créez vos devis et factures, suivez vos paiements.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {["Dashboard KPIs", "Devis en ligne", "Facturation auto", "Comptabilité", "QR code profil", "Carnet clients"].map((f) => (
+                    <span key={f} className="px-2.5 py-1 rounded-lg bg-gold/[0.12] text-[#F5D090]/90 text-[11px] font-semibold">{f}</span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-[#F5D090] font-bold text-[15px] group-hover:gap-3 transition-all duration-200">
+                  Explorer le mode artisan <ChevronRight className="w-4 h-4" />
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          {/* Fonctionnalités clés en grille */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-[900px] mx-auto">
+            {[
+              { icon: <LockIcon size={20} color="#8ECFB0" />, title: "Séquestre", desc: "Paiement bloqué" },
+              { icon: <ShieldIcon size={20} color="#8ECFB0" />, title: "Certifications", desc: "SIRET, décennale, RGE" },
+              { icon: <MapPin className="w-5 h-5 text-lightSage" />, title: "Suivi live", desc: "En route → sur place → fini" },
+              { icon: <FileText className="w-5 h-5 text-lightSage" />, title: "100% en ligne", desc: "Devis, facture, compta" },
+            ].map((f) => (
+              <div key={f.title} className="text-center py-4 px-3 rounded-xl bg-white/[0.03]">
+                <div className="w-10 h-10 rounded-xl bg-white/[0.07] flex items-center justify-center mx-auto mb-2">{f.icon}</div>
+                <div className="text-[13px] font-bold text-white mb-0.5">{f.title}</div>
+                <div className="text-[11px] text-white/45">{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <SlantDivider color="#1B6B4E" flip />
+
+      {/* ══════════════════════════════════════════════════
+          SECTION 5 — APPLICATION MOBILE
+          Mockup téléphone + liste de fonctionnalités + boutons stores
+      ══════════════════════════════════════════════════ */}
+      <section className="pt-32 pb-20 px-5 md:px-10 bg-white overflow-hidden">
+        <div data-reveal className="reveal-up max-w-[1140px] mx-auto flex items-center gap-20 flex-wrap">
+
+          {/* Mockup téléphone (desktop uniquement) */}
+          <div className="hidden md:block flex-none relative">
+            <div className="w-[260px] h-[530px] rounded-[36px] bg-navy p-2.5 shadow-[0_24px_64px_rgba(10,22,40,0.18)] relative">
+              <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[90px] h-[24px] rounded-b-[16px] bg-navy z-10">
+                <div className="w-[46px] h-1 rounded-full bg-white/[0.12] mx-auto mt-3" />
+              </div>
+              <div className="w-full h-full rounded-[32px] overflow-hidden" style={{ background: "linear-gradient(170deg, #E8F5EE 0%, #F5FAF7 100%)" }}>
+                <div className="pt-3 px-4 flex justify-between items-center">
+                  <span className="text-[10px] font-semibold text-navy">9:41</span>
+                  <div className="w-3 h-2 rounded-sm border border-navy"><div className="w-[70%] h-full bg-navy rounded-sm" /></div>
+                </div>
+                <div className="px-3.5 pt-3">
+                  <div className="flex items-center gap-1.5 mb-3">
+                    <ShieldIcon size={15} />
+                    <span className="font-heading text-[13px] font-extrabold text-navy">Nova</span>
+                  </div>
+                  <div className="text-[10px] text-grayText mb-0.5">Bonjour Sophie</div>
+                  <div className="font-heading text-[14px] font-extrabold text-navy mb-2.5">Votre espace</div>
+                  <div className="flex gap-1 mb-2.5">
+                    {[{ v: "2", l: "En cours" }, { v: "570€", l: "Séquestre" }, { v: "8", l: "Terminées" }].map((k) => (
+                      <div key={k.l} className="flex-1 bg-white rounded-lg py-1.5 px-1 text-center border border-border/40 shadow-sm">
+                        <div className="font-mono text-[11px] font-bold text-forest">{k.v}</div>
+                        <div className="text-[7px] text-grayText">{k.l}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {[
+                    { ini: "JM", name: "Jean-Michel P.", desc: "Réparation fuite • 15 mars", status: "En cours", color: "text-success" },
+                    { ini: "SM", name: "Sophie M.", desc: "Prise électrique • 10 mars", status: "Terminée", color: "text-forest" },
+                  ].map((m) => (
+                    <div key={m.ini} className="bg-white rounded-lg p-2 mb-1.5 border border-border/30 shadow-sm flex gap-2 items-center">
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-surface to-border flex items-center justify-center text-[9px] font-bold text-forest">{m.ini}</div>
+                      <div className="flex-1">
+                        <div className="text-[10px] font-bold text-navy">{m.name}</div>
+                        <div className="text-[8px] text-grayText">{m.desc}</div>
+                      </div>
+                      <span className={`text-[7px] font-bold ${m.color} bg-surface px-1.5 py-0.5 rounded-sm`}>{m.status}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-around pt-2 mt-2 border-t border-surface">
+                    <TabIcon icon={Home} active />
+                    <TabIcon icon={Search} />
+                    <TabIcon icon={ClipboardList} />
+                    <TabIcon icon={Bell} />
+                    <TabIcon icon={User} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Badge "Nouveau" */}
+            <div className="absolute top-8 -right-3 bg-red text-white px-3 py-1 rounded-lg text-[10px] font-bold shadow-[0_4px_12px_rgba(232,48,42,0.25)]">Nouveau</div>
+          </div>
+
+          {/* Contenu texte : fonctionnalités de l'app */}
+          <div className="flex-1 min-w-[280px]">
+            <div className="inline-flex items-center gap-2 bg-forest/[0.05] rounded-lg px-4 py-2 mb-6 text-[12px] font-semibold text-deepForest/70">
+              <Smartphone className="w-4 h-4" /> Application mobile
+            </div>
+            <h2 className="font-heading text-[30px] md:text-[36px] font-extrabold text-navy mb-3" style={{ textWrap: "balance" as never }}>Nova dans votre poche</h2>
+            <p className="text-[15px] text-navy/50 leading-relaxed mb-8 max-w-[440px]">
+              Notifications en temps réel, suivi artisan, signature de devis et paiement en séquestre — où que vous soyez.
+            </p>
+
+            {/* Liste des fonctionnalités mobiles */}
+            <div className="flex flex-col gap-4 mb-8">
+              {[
+                { icon: <Bell className="w-5 h-5 text-forest" />, title: "Notifications push", desc: "Nouveau devis, artisan en route, intervention terminée" },
+                { icon: <PenTool className="w-5 h-5 text-forest" />, title: "Signature tactile", desc: "Signez vos devis directement sur l'écran" },
+                { icon: <Video className="w-5 h-5 text-forest" />, title: "Vidéo diagnostic", desc: "Filmez votre problème avant l'intervention" },
+                { icon: <Moon className="w-5 h-5 text-forest" />, title: "Mode sombre", desc: "Interface confortable de jour comme de nuit" },
+              ].map((f) => (
+                <div key={f.title} className="flex gap-3.5 items-start group">
+                  <div className="w-10 h-10 rounded-xl bg-forest/[0.06] group-hover:bg-forest/[0.1] border border-border/40 flex items-center justify-center shrink-0 transition-colors">{f.icon}</div>
+                  <div>
+                    <div className="text-[14px] font-bold text-navy mb-0.5">{f.title}</div>
+                    <div className="text-[13px] text-navy/45 leading-snug">{f.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Boutons App Store / Google Play */}
+            <div className="flex gap-3 flex-wrap">
+              <button className="flex items-center gap-2.5 bg-navy rounded-xl px-5 py-2.5 cursor-pointer hover:bg-navy/90 active:scale-[0.97] transition-all" aria-label="Télécharger sur l'App Store">
+                <svg width="22" height="22" viewBox="0 0 814 1000" fill="#fff" aria-hidden="true"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57.8-155.5-127.4c-58.3-81.6-105.6-210.8-105.6-334.1C0 397.1 78.6 283.9 190.5 283.9c64.2 0 117.8 42.8 155.5 42.8 39 0 99.7-45.2 172.8-45.2 27.8 0 127.7 2.5 193.3 59.4z" /><path d="M554.1 0c-7.8 66.3-67.8 134.3-134.2 134.3-12 0-24-1.3-24-13.3 0-5.8 5.8-28.3 29-57.7C449.8 32.7 515.5 0 554.1 0z" /></svg>
+                <div>
+                  <div className="text-[9px] text-white/60">Télécharger sur</div>
+                  <div className="text-[14px] font-semibold text-white">App Store</div>
+                </div>
+              </button>
+              <button className="flex items-center gap-2.5 bg-navy rounded-xl px-5 py-2.5 cursor-pointer hover:bg-navy/90 active:scale-[0.97] transition-all" aria-label="Disponible sur Google Play">
+                <svg width="20" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l12.8 8.5a1 1 0 010 1.6l-12.8 8.5c-.66.5-1.6.03-1.6-.8z" fill="#fff" /></svg>
+                <div>
+                  <div className="text-[9px] text-white/60">Disponible sur</div>
+                  <div className="text-[14px] font-semibold text-white">Google Play</div>
+                </div>
+              </button>
+            </div>
+            <p className="text-[11px] text-navy/30 mt-3">iOS 15+ et Android 12+. Gratuit.</p>
+          </div>
+        </div>
+      </section>
+
+      <SlantDivider color="#ffffff" />
+
+      {/* ══════════════════════════════════════════════════
+          SECTION 6 — TÉMOIGNAGES
+          1 avis mis en avant (large) + 2 avis empilés
+      ══════════════════════════════════════════════════ */}
+      <section className="pt-32 pb-20 px-5 md:px-10 bg-bgPage">
+        <div data-reveal className="reveal-up max-w-[1140px] mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="font-heading text-[32px] md:text-[38px] font-extrabold text-navy mb-3">Ils nous font confiance</h2>
+            <p className="text-[16px] text-navy/50">Des particuliers satisfaits partout en France.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Témoignage principal (occupe 2 colonnes) */}
+            <div className="md:col-span-2 bg-white rounded-2xl p-8 border border-border/40 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex gap-0.5 mb-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-gold text-gold" />
+                ))}
+              </div>
+              <p className="text-[17px] text-navy/70 leading-relaxed mb-6 max-w-[520px]">
+                &ldquo;Le séquestre m&apos;a rassurée. Je savais que mon argent était protégé tant que l&apos;intervention n&apos;était pas terminée. L&apos;artisan était ponctuel, professionnel, et le suivi en temps réel m&apos;a permis de voir exactement quand il arrivait.&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-surface to-border flex items-center justify-center text-sm font-bold text-forest">CL</div>
+                <div>
+                  <div className="text-[14px] font-bold text-navy">Caroline L.</div>
+                  <div className="text-[12px] text-navy/40">Paris 4e — Plomberie</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Témoignages secondaires empilés */}
+            <div className="flex flex-col gap-5">
+              {[
+                { name: "Pierre M.", city: "Lyon 6e", service: "Urgence", text: "Fuite d'eau un dimanche soir, intervention en 1h30. Le suivi en temps réel est top." },
+                { name: "Amélie R.", city: "Bordeaux", service: "Électricité", text: "J'ai signé le devis en ligne, payé en 3x. Aucune surprise sur la facture." },
+              ].map((t) => (
+                <div key={t.name} className="bg-white rounded-2xl p-6 border border-border/40 shadow-sm hover:shadow-md transition-shadow flex-1">
+                  <div className="flex gap-0.5 mb-3">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
+                    ))}
+                  </div>
+                  <p className="text-[13px] text-navy/60 leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-surface to-border flex items-center justify-center text-[10px] font-bold text-forest">
+                      {t.name[0]}{t.name.split(" ")[1]?.[0]}
+                    </div>
+                    <div>
+                      <div className="text-[12px] font-bold text-navy">{t.name}</div>
+                      <div className="text-[10px] text-navy/35">{t.city} — {t.service}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <SlantDivider color="#F5FAF7" flip />
+
+      {/* ══════════════════════════════════════════════════
+          SECTION 7 — CTA FINAL
+          Appel à l'action pour créer un compte (fond vert dégradé)
+      ══════════════════════════════════════════════════ */}
+      <section data-navbar-dark className="relative pt-32 pb-24 px-5 md:px-10 text-center overflow-hidden" style={{ background: "linear-gradient(160deg, #0A4030 0%, #1B6B4E 50%, #2D9B6E 100%)" }}>
+        {/* Effets lumineux décoratifs */}
+        <div className="absolute inset-0">
+          <div className="absolute top-[15%] left-[8%] w-[300px] h-[300px] rounded-full bg-white/[0.03] blur-[80px]" />
+          <div className="absolute bottom-[10%] right-[12%] w-[350px] h-[350px] rounded-full bg-gold/[0.03] blur-[100px]" />
+        </div>
+
+        <div data-reveal className="reveal-up relative z-10 max-w-[600px] mx-auto">
+          <div className="inline-flex items-center gap-2 bg-white/[0.08] rounded-lg px-4 py-2 mb-6 text-[12px] font-semibold text-white/70">
+            <Shield className="w-3.5 h-3.5" /> 100% gratuit, sans engagement
+          </div>
+          <h2 className="font-heading text-[32px] md:text-[44px] font-extrabold text-white mb-4 leading-[1.1]" style={{ textWrap: "balance" as never }}>
+            Prêt à trouver votre artisan de confiance ?
+          </h2>
+          <p className="text-[16px] text-white/55 mb-9 leading-relaxed">
+            Rejoignez des milliers de particuliers qui font confiance à Nova pour leurs travaux.
+          </p>
+          <div className="flex gap-3 justify-center flex-wrap">
+            <Link
+              href="/signup"
+              className="group inline-flex items-center gap-2 px-9 py-4 rounded-xl bg-white text-deepForest text-[15px] font-bold shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] active:scale-[0.97] transition-all duration-200 cursor-pointer"
+            >
+              Créer un compte gratuitement
+              <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              href="/devenir-partenaire"
+              className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white/[0.08] border border-white/[0.15] text-white text-[15px] font-semibold hover:bg-white/[0.12] active:scale-[0.97] transition-all duration-200 cursor-pointer"
+            >
+              Je suis artisan
+            </Link>
+          </div>
+          <p className="text-[11px] text-white/35 mt-6">Aucune carte bancaire requise</p>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/** Icône carte de crédit (utilisée dans la visualisation du flux séquestre) */
+function CreditCardIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-lightSage" aria-hidden="true">
+      <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M2 10h20" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
   );
 }

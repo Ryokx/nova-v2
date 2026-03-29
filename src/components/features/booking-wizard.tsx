@@ -594,6 +594,7 @@ export function BookingWizard({ artisan, category, isUrgency, onBack }: BookingW
               <div className="flex-1">
                 <div className="text-sm font-bold text-navy">Paiement en espèces</div>
                 <div className="text-xs text-grayText mt-0.5">Vous payez directement l&apos;artisan après l&apos;intervention</div>
+                <div className="text-xs text-amber-600 mt-1">⚠️ Le service de séquestre ne sera pas disponible avec ce mode de paiement.</div>
               </div>
               <div className={cn(
                 "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",

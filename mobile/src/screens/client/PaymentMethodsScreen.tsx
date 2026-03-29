@@ -7,11 +7,14 @@ import {
   TouchableOpacity,
   TextInput,
   Platform,
+  Alert,
+  Linking,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { ConfirmModal } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
+import { API_BASE_URL, API_ROUTES } from "../../constants/api";
 
 interface SavedCard {
   id: number;
@@ -65,7 +68,7 @@ export function PaymentMethodsScreen({
     return first === "5" ? "Mastercard" : "Visa";
   };
 
-  const handleAddCard = () => {
+  const handleAddCard = async () => {
     const digits = newCardNumber.replace(/\s/g, "");
     if (digits.length < 16) {
       setModal({ visible: true, type: "warning", title: "Numéro incomplet", message: "Le numéro de carte doit contenir 16 chiffres.", actions: [{ label: "OK", onPress: () => setModal(m => ({ ...m, visible: false })) }] });
@@ -80,12 +83,29 @@ export function PaymentMethodsScreen({
       return;
     }
 
+    // Créer un SetupIntent sur le backend pour enregistrer la carte de façon sécurisée
+    try {
+      const res = await fetch(`${API_BASE_URL}${API_ROUTES.setupIntent}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      // Si le backend retourne une URL Stripe hosted (setup session), l'ouvrir dans le navigateur
+      if (data?.url) {
+        await Linking.openURL(data.url);
+        return;
+      }
+      // Sinon enregistrement optimiste local (dev/fallback)
+    } catch {
+      // Fallback en dev si l'API n'est pas accessible
+    }
+
     const newCard: SavedCard = {
       id: Date.now(),
       type: detectCardType(newCardNumber),
       last4: digits.slice(-4),
       expiry: newCardExpiry,
-      holder: newCardHolder || "Sophie Lefèvre",
+      holder: newCardHolder || "Titulaire",
     };
 
     setCards(prev => [...prev, newCard]);

@@ -40,4 +40,11 @@ export const API_ROUTES = {
 
   // Invoices
   invoices: "/api/invoices",
+
+  // Stripe
+  setupIntent: "/api/setup-intent",
+  paymentMethodsCheck: "/api/payment-methods/check",
+  subscriptions: "/api/subscriptions",
+  subscriptionsAddons: "/api/subscriptions/addons",
+  instantPay: "/api/artisan/instant-pay",
 } as const;

@@ -57,4 +57,62 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
+
+  /* Scroll reveal animation — bas vers haut */
+  .reveal-up {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal-up.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Step transition animation */
+  .animate-stepIn {
+    animation: stepIn 350ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Typing animation */
+  .animate-typing {
+    max-width: 0;
+    border-right-color: #1B6B4E;
+    animation: typing 2s steps(20, end) 0.5s forwards, blinkThenHide 3s step-end 0.5s both;
+  }
+}
+
+@keyframes stepIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes typing {
+  from { max-width: 0; }
+  to { max-width: 100%; }
+}
+
+/* Blink pendant 2s de typing puis disparaît */
+@keyframes blinkThenHide {
+  0%  { border-right-color: #1B6B4E; }
+  10% { border-right-color: transparent; }
+  20% { border-right-color: #1B6B4E; }
+  30% { border-right-color: transparent; }
+  40% { border-right-color: #1B6B4E; }
+  50% { border-right-color: transparent; }
+  60% { border-right-color: #1B6B4E; }
+  66% { border-right-color: transparent; }
+  /* Typing terminé (~2s/3s = 66%) — dernier blink puis disparition */
+  70% { border-right-color: #1B6B4E; }
+  76% { border-right-color: transparent; }
+  80% { border-right-color: #1B6B4E; }
+  86% { border-right-color: transparent; }
+  90%, 100% { border-right-color: transparent; border-right-width: 0; }
 }

@@ -23,8 +23,94 @@ import {
   Menu, X, LayoutDashboard, FileText, CreditCard, Megaphone,
   Globe, UserCircle, Calculator, ChevronDown, Wrench, Search,
   Shield, ClipboardList, Bell, Heart, LogOut, ArrowRight, Zap,
+  MapPin, Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+/* ━━━ Bannière de suivi intervention en cours ━━━ */
+
+interface ActiveMission {
+  id: string;
+  status: string;
+  trade?: string;
+  artisanName?: string;
+  eta?: string;
+}
+
+function TrackingBanner() {
+  const { data: session } = useSession();
+  const [mission, setMission] = useState<ActiveMission | null>(null);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    if (!session?.user) { setMission(null); return; }
+
+    const readMission = () => {
+      try {
+        const raw = localStorage.getItem("nova_active_mission");
+        if (!raw) { setMission(null); return; }
+        const data = JSON.parse(raw);
+        // Masquer si statut avancé (devis signé ou plus)
+        if (["DEVIS_SIGNED", "COMPLETED", "RELEASED", "CANCELLED"].includes(data.status)) {
+          localStorage.removeItem("nova_active_mission");
+          setMission(null);
+          return;
+        }
+        setMission({
+          id: data.id,
+          status: data.status,
+          trade: data.trade,
+          artisanName: undefined,
+          eta: data.isUrgent ? "~20 min" : undefined,
+        });
+      } catch {
+        setMission(null);
+      }
+    };
+
+    readMission();
+    // Poll localStorage + événement storage (cross-tab)
+    const interval = setInterval(readMission, 5_000);
+    const onStorage = (e: StorageEvent) => { if (e.key === "nova_active_mission") readMission(); };
+    window.addEventListener("storage", onStorage);
+    return () => { clearInterval(interval); window.removeEventListener("storage", onStorage); };
+  }, [session]);
+
+  if (!mission || dismissed) return null;
+
+  return (
+    <div className="bg-gradient-to-r from-deepForest to-forest text-white">
+      <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-3">
+        <div className="w-2 h-2 rounded-full bg-white animate-pulse shrink-0" />
+        <MapPin className="w-3.5 h-3.5 shrink-0 opacity-80" />
+        <div className="flex-1 min-w-0 flex items-center gap-2 text-xs font-medium">
+          <span className="truncate">
+            Intervention en cours{mission.trade ? ` — ${mission.trade}` : ""}
+            {mission.artisanName ? ` avec ${mission.artisanName}` : ""}
+          </span>
+          {mission.eta && (
+            <span className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/15 text-[10px] font-bold shrink-0">
+              <Clock className="w-3 h-3" /> {mission.eta}
+            </span>
+          )}
+        </div>
+        <Link
+          href={`/tracking/${mission.id}`}
+          className="shrink-0 px-3 py-1 rounded-[6px] bg-white/20 hover:bg-white/30 text-xs font-bold transition-colors duration-200 cursor-pointer flex items-center gap-1"
+        >
+          Suivre <ArrowRight className="w-3 h-3" />
+        </Link>
+        <button
+          onClick={() => setDismissed(true)}
+          className="shrink-0 w-5 h-5 flex items-center justify-center rounded-[4px] hover:bg-white/20 transition-colors cursor-pointer"
+          aria-label="Fermer"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /* ━━━ Définition des liens de navigation ━━━ */
 
@@ -86,9 +172,8 @@ export function Navbar() {
 
   /** Liens affichés dans la navbar publique */
   const publicLinks = [
-    { href: "/artisans", label: "Trouver un artisan", icon: Search },
+    { href: "/", label: "Trouver un artisan", icon: Search },
     { href: "/comment-ca-marche", label: "Comment ça marche", icon: Wrench },
-    { href: "/serrurier-urgence", label: "Urgences 24h/24", icon: Zap },
   ];
 
   /* ━━━ Détection des sections sombres (navbar publique seulement) ━━━ */
@@ -201,8 +286,9 @@ export function Navbar() {
   if (showAuthNavbar) {
     return (
       <>
-        {/* Spacer pour compenser la navbar fixe */}
+        {/* Spacer pour compenser la navbar fixe + banner */}
         <div className="h-[56px]" />
+        <TrackingBanner />
 
         <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-white border-b border-border/60 shadow-sm px-5 flex items-center justify-between">
           {/* Logo — redirige vers le dashboard approprié */}

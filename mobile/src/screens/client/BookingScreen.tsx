@@ -64,6 +64,7 @@ export function BookingScreen({
   const [description, setDescription] = useState("");
   const [media, setMedia] = useState<{ uri: string; type: "image" | "video" }[]>([]);
   const [confirmed, setConfirmed] = useState(false);
+  const [paymentType, setPaymentType] = useState<"card" | "cash" | null>("card");
   const [savedCards] = useState([
     { id: 0, type: "Visa", last4: "6411", expiry: "09/28" },
     { id: 1, type: "Mastercard", last4: "8923", expiry: "03/27" },
@@ -310,60 +311,100 @@ export function BookingScreen({
               Un moyen de paiement est requis pour garantir la réservation. Vous ne serez débité qu'après acceptation du devis.
             </Text>
 
-            {/* Saved cards */}
-            {savedCards.map((card) => (
+            {/* Type selector: Carte / Espèces */}
+            <View style={styles.payTypeRow}>
               <TouchableOpacity
-                key={card.id}
-                style={[styles.payCard, selectedCard === card.id && styles.payCardSelected]}
-                onPress={() => { setSelectedCard(card.id); setShowAddCard(false); }}
-                activeOpacity={0.85}
+                style={[styles.payTypeBtn, paymentType === "card" && styles.payTypeBtnSel]}
+                onPress={() => setPaymentType("card")}
+                activeOpacity={0.8}
               >
-                <View style={[styles.payCardIcon, { backgroundColor: card.type === "Visa" ? "#1A1F71" : "#EB001B" }]}>
-                  <Text style={styles.payCardIconText}>{card.type === "Visa" ? "VISA" : "MC"}</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.payCardName}>{card.type} •••• {card.last4}</Text>
-                  <Text style={styles.payCardExp}>Exp. {card.expiry}</Text>
-                </View>
-                <View style={[styles.payRadio, selectedCard === card.id && styles.payRadioSel]} />
+                <MaterialCommunityIcons name="credit-card" size={16} color={paymentType === "card" ? Colors.white : Colors.forest} />
+                <Text style={[styles.payTypeBtnText, paymentType === "card" && styles.payTypeBtnTextSel]}>Carte / En ligne</Text>
               </TouchableOpacity>
-            ))}
-
-            {/* Apple/Google Pay */}
-            <TouchableOpacity
-              style={[styles.payCard, selectedCard === -1 && styles.payCardSelected]}
-              onPress={() => { setSelectedCard(-1); setShowAddCard(false); }}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.payCardIcon, { backgroundColor: "#000" }]}>
-                <MaterialCommunityIcons name="apple" size={16} color="#fff" />
-              </View>
-              <Text style={[styles.payCardName, { flex: 1 }]}>Apple Pay / Google Pay</Text>
-              <View style={[styles.payRadio, selectedCard === -1 && styles.payRadioSel]} />
-            </TouchableOpacity>
-
-            {/* Add new card */}
-            {showAddCard ? (
-              <View style={styles.addNewCardForm}>
-                <TextInput style={styles.addNewCardInput} placeholder="Numéro de carte" placeholderTextColor={Colors.textHint} value={newCardNum} onChangeText={(t) => setNewCardNum(t.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim())} keyboardType="number-pad" maxLength={19} />
-                <View style={{ flexDirection: "row", gap: 10 }}>
-                  <TextInput style={[styles.addNewCardInput, { flex: 1 }]} placeholder="MM/AA" placeholderTextColor={Colors.textHint} value={newCardExp} onChangeText={(t) => { const d = t.replace(/\D/g, "").slice(0, 4); setNewCardExp(d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d); }} keyboardType="number-pad" maxLength={5} />
-                  <TextInput style={[styles.addNewCardInput, { flex: 1 }]} placeholder="CVV" placeholderTextColor={Colors.textHint} value={newCardCvv} onChangeText={(t) => setNewCardCvv(t.replace(/\D/g, "").slice(0, 3))} keyboardType="number-pad" maxLength={3} secureTextEntry />
-                </View>
-              </View>
-            ) : (
-              <TouchableOpacity style={styles.addNewCardBtn} onPress={() => setShowAddCard(true)}>
-                <MaterialCommunityIcons name="plus-circle-outline" size={16} color={Colors.forest} />
-                <Text style={styles.addNewCardBtnText}>Ajouter une carte</Text>
+              <TouchableOpacity
+                style={[styles.payTypeBtn, paymentType === "cash" && styles.payTypeBtnSel]}
+                onPress={() => setPaymentType("cash")}
+                activeOpacity={0.8}
+              >
+                <MaterialCommunityIcons name="cash" size={16} color={paymentType === "cash" ? Colors.white : Colors.forest} />
+                <Text style={[styles.payTypeBtnText, paymentType === "cash" && styles.payTypeBtnTextSel]}>Espèces</Text>
               </TouchableOpacity>
-            )}
-
-            <View style={styles.escrowBadge}>
-              <MaterialCommunityIcons name="shield-lock" size={14} color={Colors.forest} />
-              <Text style={styles.escrowBadgeText}>Aucun débit maintenant. Votre carte ne sera utilisée qu'après signature du devis sur place.</Text>
             </View>
 
-            <Button title="Suivant" onPress={() => setStep(3)} fullWidth size="lg" disabled={selectedCard === null && !showAddCard} />
+            {/* Espèces — avertissement séquestre */}
+            {paymentType === "cash" && (
+              <View style={styles.cashWarning}>
+                <MaterialCommunityIcons name="alert" size={16} color="#D97706" />
+                <Text style={styles.cashWarningText}>
+                  Le service de séquestre ne sera pas disponible avec ce mode de paiement. Vous payez directement l'artisan après l'intervention.
+                </Text>
+              </View>
+            )}
+
+            {/* Carte — saved cards + add card */}
+            {paymentType === "card" && (
+              <>
+                {savedCards.map((card) => (
+                  <TouchableOpacity
+                    key={card.id}
+                    style={[styles.payCard, selectedCard === card.id && styles.payCardSelected]}
+                    onPress={() => { setSelectedCard(card.id); setShowAddCard(false); }}
+                    activeOpacity={0.85}
+                  >
+                    <View style={[styles.payCardIcon, { backgroundColor: card.type === "Visa" ? "#1A1F71" : "#EB001B" }]}>
+                      <Text style={styles.payCardIconText}>{card.type === "Visa" ? "VISA" : "MC"}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.payCardName}>{card.type} •••• {card.last4}</Text>
+                      <Text style={styles.payCardExp}>Exp. {card.expiry}</Text>
+                    </View>
+                    <View style={[styles.payRadio, selectedCard === card.id && styles.payRadioSel]} />
+                  </TouchableOpacity>
+                ))}
+
+                {/* Apple/Google Pay */}
+                <TouchableOpacity
+                  style={[styles.payCard, selectedCard === -1 && styles.payCardSelected]}
+                  onPress={() => { setSelectedCard(-1); setShowAddCard(false); }}
+                  activeOpacity={0.85}
+                >
+                  <View style={[styles.payCardIcon, { backgroundColor: "#000" }]}>
+                    <MaterialCommunityIcons name="apple" size={16} color="#fff" />
+                  </View>
+                  <Text style={[styles.payCardName, { flex: 1 }]}>Apple Pay / Google Pay</Text>
+                  <View style={[styles.payRadio, selectedCard === -1 && styles.payRadioSel]} />
+                </TouchableOpacity>
+
+                {/* Add new card */}
+                {showAddCard ? (
+                  <View style={styles.addNewCardForm}>
+                    <TextInput style={styles.addNewCardInput} placeholder="Numéro de carte" placeholderTextColor={Colors.textHint} value={newCardNum} onChangeText={(t) => setNewCardNum(t.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim())} keyboardType="number-pad" maxLength={19} />
+                    <View style={{ flexDirection: "row", gap: 10 }}>
+                      <TextInput style={[styles.addNewCardInput, { flex: 1 }]} placeholder="MM/AA" placeholderTextColor={Colors.textHint} value={newCardExp} onChangeText={(t) => { const d = t.replace(/\D/g, "").slice(0, 4); setNewCardExp(d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d); }} keyboardType="number-pad" maxLength={5} />
+                      <TextInput style={[styles.addNewCardInput, { flex: 1 }]} placeholder="CVV" placeholderTextColor={Colors.textHint} value={newCardCvv} onChangeText={(t) => setNewCardCvv(t.replace(/\D/g, "").slice(0, 3))} keyboardType="number-pad" maxLength={3} secureTextEntry />
+                    </View>
+                  </View>
+                ) : (
+                  <TouchableOpacity style={styles.addNewCardBtn} onPress={() => setShowAddCard(true)}>
+                    <MaterialCommunityIcons name="plus-circle-outline" size={16} color={Colors.forest} />
+                    <Text style={styles.addNewCardBtnText}>Ajouter une carte</Text>
+                  </TouchableOpacity>
+                )}
+
+                <View style={styles.escrowBadge}>
+                  <MaterialCommunityIcons name="shield-lock" size={14} color={Colors.forest} />
+                  <Text style={styles.escrowBadgeText}>Aucun débit maintenant. Votre carte ne sera utilisée qu'après signature du devis sur place.</Text>
+                </View>
+              </>
+            )}
+
+            <Button
+              title="Suivant"
+              onPress={() => setStep(3)}
+              fullWidth
+              size="lg"
+              disabled={paymentType === "card" && selectedCard === null && !showAddCard}
+            />
           </View>
         )}
 
@@ -585,6 +626,21 @@ const styles = StyleSheet.create({
 
   /* Payment step */
   paymentDesc: { fontFamily: "DMSans_400Regular", fontSize: 13, color: Colors.textSecondary, lineHeight: 20, marginBottom: 16 },
+  payTypeRow: { flexDirection: "row", gap: 8, marginBottom: 16 },
+  payTypeBtn: {
+    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+    paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, borderColor: Colors.border,
+    backgroundColor: Colors.white,
+  },
+  payTypeBtnSel: { backgroundColor: Colors.forest, borderColor: Colors.forest },
+  payTypeBtnText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.forest },
+  payTypeBtnTextSel: { color: Colors.white },
+  cashWarning: {
+    flexDirection: "row", alignItems: "flex-start", gap: 10,
+    backgroundColor: "#FFFBEB", borderRadius: 14, padding: 14,
+    borderWidth: 1, borderColor: "#FDE68A", marginBottom: 16,
+  },
+  cashWarningText: { flex: 1, fontSize: 13, color: "#92400E", lineHeight: 19, fontFamily: "DMSans_400Regular" },
   payCard: {
     flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: Colors.white,
     borderRadius: 14, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: Colors.border,

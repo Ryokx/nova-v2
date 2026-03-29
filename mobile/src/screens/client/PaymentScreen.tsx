@@ -5,17 +5,18 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Alert,
+  Linking,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Radii, Shadows } from "../../constants/theme";
 import { Button, Card, EscrowStepper, Input } from "../../components/ui";
 import type { RootStackScreenProps } from "../../navigation/types";
+import { API_BASE_URL, API_ROUTES } from "../../constants/api";
 
+type PaymentMode = "online" | "cash";
 type PaymentMethod = "cb" | "virement" | "apple";
 type Installment = "1x" | "2x" | "3x" | "4x";
-
-const AMOUNT = 320;
-const AMOUNT_FMT = "320,00";
 
 const METHODS: { id: PaymentMethod; label: string; icon: string }[] = [
   { id: "cb", label: "Carte bancaire", icon: "credit-card" },
@@ -23,18 +24,11 @@ const METHODS: { id: PaymentMethod; label: string; icon: string }[] = [
   { id: "apple", label: "Apple Pay", icon: "" },
 ];
 
-const INSTALLMENTS: {
-  id: Installment;
-  label: string;
-  amount: string;
-  monthly: string;
-  sub: string;
-  badge?: string;
-}[] = [
-  { id: "1x", label: "1x", amount: `${AMOUNT_FMT} €`, monthly: `${AMOUNT_FMT} €`, sub: "Paiement unique" },
-  { id: "2x", label: "2x", amount: "160,00 €", monthly: "160,00 €/mois", sub: "Sans frais", badge: "Sans frais" },
-  { id: "3x", label: "3x", amount: "106,67 €", monthly: "106,67 €/mois", sub: "Sans frais", badge: "Sans frais" },
-  { id: "4x", label: "4x", amount: "80,00 €", monthly: "80,00 €/mois", sub: "Sans frais", badge: "Populaire" },
+const INSTALLMENT_OPTIONS: { id: Installment; label: string; badge?: string }[] = [
+  { id: "1x", label: "1x" },
+  { id: "2x", label: "2x", badge: "Sans frais" },
+  { id: "3x", label: "3x", badge: "Sans frais" },
+  { id: "4x", label: "4x", badge: "Populaire" },
 ];
 
 const KLARNA_COLOR = "#FFB3C7";
@@ -42,13 +36,50 @@ const KLARNA_TEXT = "#17120F";
 
 export function PaymentScreen({
   navigation,
+  route,
 }: RootStackScreenProps<"Payment">) {
+  const { missionId, amount: routeAmount } = route.params;
+  const AMOUNT = routeAmount ?? 320;
+  const AMOUNT_FMT = AMOUNT.toFixed(2).replace(".", ",");
+
+  const [paymentMode, setPaymentMode] = useState<PaymentMode>("online");
   const [method, setMethod] = useState<PaymentMethod>("cb");
   const [installment, setInstallment] = useState<Installment>("1x");
+  const [loading, setLoading] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const nav = navigation as any;
 
   const isKlarna = installment !== "1x";
+
+  const handlePay = async () => {
+    if (paymentMode === "cash") {
+      navigation.navigate("Tracking", { missionId: missionId ?? "1" });
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE_URL}${API_ROUTES.payments}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          missionId: missionId ?? "1",
+          amount: AMOUNT * 100,
+          paymentMethod: method === "cb" ? "card" : method === "virement" ? "bank_transfer" : "apple_pay",
+          installments: parseInt(installment.replace("x", ""), 10),
+        }),
+      });
+      const data = await res.json();
+      if (data?.url) {
+        await Linking.openURL(data.url);
+      } else {
+        navigation.navigate("Tracking", { missionId: missionId ?? "1" });
+      }
+    } catch {
+      Alert.alert("Erreur", "Impossible de lancer le paiement. Veuillez réessayer.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.root}>
@@ -73,7 +104,40 @@ export function PaymentScreen({
         {/* Amount display */}
         <Text style={styles.amount}>{AMOUNT_FMT}€</Text>
 
-        {/* Payment methods */}
+        {/* Mode selector: En ligne / Espèces */}
+        <Text style={styles.sectionLabel}>Mode de règlement</Text>
+        <View style={styles.modeRow}>
+          <TouchableOpacity
+            style={[styles.modeBtn, paymentMode === "online" && styles.modeBtnSel]}
+            onPress={() => setPaymentMode("online")}
+            activeOpacity={0.8}
+          >
+            <MaterialCommunityIcons name="credit-card" size={16} color={paymentMode === "online" ? Colors.white : Colors.forest} />
+            <Text style={[styles.modeBtnText, paymentMode === "online" && styles.modeBtnTextSel]}>En ligne</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.modeBtn, paymentMode === "cash" && styles.modeBtnSel]}
+            onPress={() => setPaymentMode("cash")}
+            activeOpacity={0.8}
+          >
+            <MaterialCommunityIcons name="cash" size={16} color={paymentMode === "cash" ? Colors.white : Colors.forest} />
+            <Text style={[styles.modeBtnText, paymentMode === "cash" && styles.modeBtnTextSel]}>Espèces</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Espèces warning */}
+        {paymentMode === "cash" && (
+          <View style={styles.cashWarning}>
+            <MaterialCommunityIcons name="alert" size={16} color="#D97706" />
+            <Text style={styles.cashWarningText}>
+              Le service de séquestre ne sera pas disponible avec ce mode de paiement. Vous payez directement l'artisan après l'intervention.
+            </Text>
+          </View>
+        )}
+
+        {/* Payment methods (online only) */}
+        {paymentMode === "online" && (
+          <>
         <Text style={styles.sectionLabel}>Mode de paiement</Text>
         {METHODS.map((m) => (
           <TouchableOpacity
@@ -114,8 +178,10 @@ export function PaymentScreen({
         </View>
 
         <View style={styles.installGrid}>
-          {INSTALLMENTS.map((inst) => {
+          {INSTALLMENT_OPTIONS.map((inst) => {
             const selected = installment === inst.id;
+            const n = parseInt(inst.id.replace("x", ""), 10);
+            const monthlyAmt = (AMOUNT / n).toFixed(2).replace(".", ",");
             return (
               <TouchableOpacity
                 key={inst.id}
@@ -137,7 +203,7 @@ export function PaymentScreen({
                   {inst.label}
                 </Text>
                 <Text style={[styles.installAmount, selected && styles.installAmountSel]}>
-                  {inst.monthly}
+                  {n === 1 ? `${AMOUNT_FMT} €` : `${monthlyAmt} €/mois`}
                 </Text>
                 {inst.id !== "1x" && (
                   <Text style={[styles.installSub, selected && { color: "rgba(255,255,255,0.7)" }]}>
@@ -223,9 +289,11 @@ export function PaymentScreen({
             </View>
           </View>
         )}
+          </>
+        )}
 
         {/* ── Crédit travaux CTA (pour gros montants) ── */}
-        {AMOUNT >= 300 && (
+        {paymentMode === "online" && AMOUNT >= 300 && (
           <TouchableOpacity
             style={styles.creditTravauxCta}
             activeOpacity={0.85}
@@ -245,28 +313,31 @@ export function PaymentScreen({
         )}
 
         {/* Escrow info */}
-        <View style={styles.escrowInfo}>
-          <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.escrowInfoTitle}>
-              Votre argent est sécurisé
-            </Text>
-            <Text style={styles.escrowInfoDesc}>
-              {isKlarna
-                ? `Klarna avance le paiement total. Le montant est bloqué en séquestre. L'artisan ne sera payé qu'après validation.`
-                : `Le montant est bloqué sur notre compte séquestre. L'artisan ne sera payé qu'après validation par nos équipes.`}
-            </Text>
+        {paymentMode === "online" && (
+          <View style={styles.escrowInfo}>
+            <Text style={{ fontSize: 16 }}><MaterialCommunityIcons name="shield-check" size={20} color={Colors.forest} /></Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.escrowInfoTitle}>Votre argent est sécurisé</Text>
+              <Text style={styles.escrowInfoDesc}>
+                {isKlarna
+                  ? `Klarna avance le paiement total. Le montant est bloqué en séquestre. L'artisan ne sera payé qu'après validation.`
+                  : `Le montant est bloqué sur notre compte séquestre. L'artisan ne sera payé qu'après validation par nos équipes.`}
+              </Text>
+            </View>
           </View>
-        </View>
+        )}
 
         {/* Pay button */}
         <Button
-          title={isKlarna
-            ? `Payer en ${installment} avec Klarna`
-            : `Payer ${AMOUNT_FMT}€`}
-          onPress={() =>
-            navigation.navigate("Tracking", { missionId: "1" })
+          title={
+            paymentMode === "cash"
+              ? "Confirmer (paiement en espèces)"
+              : isKlarna
+              ? `Payer en ${installment} avec Klarna`
+              : `Payer ${AMOUNT_FMT}€`
           }
+          onPress={handlePay}
+          loading={loading}
           fullWidth
           size="lg"
         />
@@ -335,6 +406,23 @@ const styles = StyleSheet.create({
     color: Colors.navy,
     marginBottom: 10,
   },
+
+  /* Mode selector */
+  modeRow: { flexDirection: "row", gap: 8, marginBottom: 16 },
+  modeBtn: {
+    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+    paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, borderColor: Colors.border,
+    backgroundColor: Colors.white,
+  },
+  modeBtnSel: { backgroundColor: Colors.forest, borderColor: Colors.forest },
+  modeBtnText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.forest },
+  modeBtnTextSel: { color: Colors.white },
+  cashWarning: {
+    flexDirection: "row", alignItems: "flex-start", gap: 10,
+    backgroundColor: "#FFFBEB", borderRadius: 14, padding: 14,
+    borderWidth: 1, borderColor: "#FDE68A", marginBottom: 16,
+  },
+  cashWarningText: { flex: 1, fontSize: 13, color: "#92400E", lineHeight: 19, fontFamily: "DMSans_400Regular" },
 
   /* Method cards */
   methodCard: {
