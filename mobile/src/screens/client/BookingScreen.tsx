@@ -57,13 +57,19 @@ const ProgressSteps = ({
 
 export function BookingScreen({
   navigation,
+  route: navRoute,
 }: RootStackScreenProps<"Booking">) {
+  const serviceId = navRoute.params?.serviceId ?? "plombier";
+  const serviceLabel = navRoute.params?.serviceLabel ?? "Plomberie";
+
   const [step, setStep] = useState(0);
   const [selectedDay, setSelectedDay] = useState(22);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   const [media, setMedia] = useState<{ uri: string; type: "image" | "video" }[]>([]);
-  const [confirmed, setConfirmed] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [searchProgress, setSearchProgress] = useState(0);
+  const [matchFound, setMatchFound] = useState(false);
   const [paymentType, setPaymentType] = useState<"card" | "cash" | null>("card");
   const [savedCards] = useState([
     { id: 0, type: "Visa", last4: "6411", expiry: "09/28" },
@@ -138,33 +144,102 @@ export function BookingScreen({
         >
           <Text style={styles.backArrow}>{"‹"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Prise de rendez-vous</Text>
+        <Text style={styles.headerTitle}>{serviceLabel}</Text>
       </View>
 
-      <ProgressSteps steps={["Date", "Détails", "Paiement", "Confirmation"]} current={step} />
+      <ProgressSteps steps={["Besoin", "Creneau", "Paiement", "Recherche"]} current={step} />
 
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* ====== STEP 0 : Calendar ====== */}
+        {/* ====== STEP 0 : Description + Photos/Video ====== */}
         {step === 0 && (
           <View>
-            <Text style={styles.stepTitle}>Mars 2026</Text>
+            <View style={styles.serviceBadge}>
+              <MaterialCommunityIcons name="wrench" size={16} color={Colors.forest} />
+              <Text style={styles.serviceBadgeText}>{serviceLabel}</Text>
+            </View>
+
+            <Text style={styles.stepTitle}>Decrivez votre besoin</Text>
+
+            <TextInput
+              style={[styles.textarea, description.length > 0 && description.trim().length < 20 && { borderColor: Colors.red }]}
+              placeholder="Decrivez votre probleme en detail (20 caracteres min.)..."
+              placeholderTextColor={Colors.textHint}
+              multiline
+              numberOfLines={5}
+              textAlignVertical="top"
+              value={description}
+              onChangeText={setDescription}
+            />
+            <Text style={[styles.charCount, description.trim().length >= 20 && { color: Colors.success }]}>
+              {description.trim().length}/20{description.trim().length < 20 ? " min" : " \u2713"}
+            </Text>
+
+            <Text style={styles.mediaTitle}>Photos ou videos (optionnel)</Text>
+            <Text style={styles.mediaSubtitle}>Ajoutez des visuels pour aider l'artisan a diagnostiquer</Text>
+
+            <View style={styles.mediaActions}>
+              <TouchableOpacity style={styles.mediaBtn} activeOpacity={0.7} onPress={pickFromGallery}>
+                <MaterialCommunityIcons name="image-multiple" size={18} color={Colors.forest} />
+                <Text style={styles.mediaBtnText}>Galerie</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.mediaBtn} activeOpacity={0.7} onPress={takePhoto}>
+                <MaterialCommunityIcons name="camera" size={18} color={Colors.forest} />
+                <Text style={styles.mediaBtnText}>Photo</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.mediaBtn} activeOpacity={0.7} onPress={recordVideo}>
+                <MaterialCommunityIcons name="video" size={18} color={Colors.forest} />
+                <Text style={styles.mediaBtnText}>Video</Text>
+              </TouchableOpacity>
+            </View>
+
+            {media.length > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.mediaPreviewScroll}>
+                {media.map((m, i) => (
+                  <View key={i} style={styles.mediaThumb}>
+                    <Image source={{ uri: m.uri }} style={styles.mediaImage} />
+                    {m.type === "video" && (
+                      <View style={styles.mediaVideoOverlay}>
+                        <MaterialCommunityIcons name="play-circle" size={24} color={Colors.white} />
+                      </View>
+                    )}
+                    <TouchableOpacity style={styles.mediaRemove} onPress={() => removeMedia(i)}>
+                      <MaterialCommunityIcons name="close" size={14} color={Colors.white} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+
+            <View style={{ marginTop: 16 }}>
+              <Button
+                title="Suivant"
+                onPress={() => setStep(1)}
+                fullWidth
+                size="lg"
+                disabled={description.trim().length < 20}
+              />
+            </View>
+          </View>
+        )}
+
+        {/* ====== STEP 1 : Date + Creneau ====== */}
+        {step === 1 && (
+          <View>
+            <Text style={styles.stepTitle}>Choisissez une date</Text>
             <View style={styles.calendarCard}>
-              {/* Day-of-week headers */}
               <View style={styles.calendarGrid}>
                 {DAY_LABELS.map((d, i) => (
                   <View key={`h${i}`} style={styles.calendarHeaderCell}>
                     <Text style={styles.calendarHeaderText}>{d}</Text>
                   </View>
                 ))}
-                {/* Empty offset cells */}
                 {Array.from({ length: FIRST_DAY_OFFSET }).map((_, i) => (
                   <View key={`e${i}`} style={styles.calendarDayCell} />
                 ))}
-                {/* Day cells */}
                 {Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).map(
                   (day) => {
                     const isPast = day < TODAY;
@@ -197,109 +272,35 @@ export function BookingScreen({
                         >
                           {day}
                         </Text>
-                        {isUnavail && !isSel && (
-                          <View style={styles.calendarRedDot} />
-                        )}
+                        {isUnavail && !isSel && <View style={styles.calendarRedDot} />}
                       </TouchableOpacity>
                     );
                   }
                 )}
               </View>
             </View>
-            <Button
-              title="Suivant"
-              onPress={() => setStep(1)}
-              fullWidth
-              size="lg"
-            />
-          </View>
-        )}
 
-        {/* ====== STEP 1 : Details ====== */}
-        {step === 1 && (
-          <View>
-            <Text style={styles.stepTitle}>Choisissez un créneau</Text>
+            <Text style={[styles.stepTitle, { marginTop: 4 }]}>Choisissez un creneau</Text>
             <View style={styles.slotsRow}>
               {TIME_SLOTS.map((s) => (
                 <TouchableOpacity
                   key={s}
                   onPress={() => setSelectedSlot(s)}
-                  style={[
-                    styles.slotBtn,
-                    selectedSlot === s && styles.slotBtnSel,
-                  ]}
+                  style={[styles.slotBtn, selectedSlot === s && styles.slotBtnSel]}
                   activeOpacity={0.7}
                 >
-                  <Text
-                    style={[
-                      styles.slotText,
-                      selectedSlot === s && styles.slotTextSel,
-                    ]}
-                  >
-                    {s}
-                  </Text>
+                  <Text style={[styles.slotText, selectedSlot === s && styles.slotTextSel]}>{s}</Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <TextInput
-              style={[styles.textarea, description.length > 0 && description.trim().length < 20 && { borderColor: Colors.red }]}
-              placeholder="Décrivez votre problème (20 caractères min.)..."
-              placeholderTextColor={Colors.textHint}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-              value={description}
-              onChangeText={setDescription}
+            <Button
+              title="Suivant"
+              onPress={() => setStep(2)}
+              fullWidth
+              size="lg"
+              disabled={!selectedSlot}
             />
-            <Text style={[styles.charCount, description.trim().length >= 20 && { color: Colors.success }]}>
-              {description.trim().length}/20 caractères{description.trim().length < 20 ? " minimum" : " ✓"}
-            </Text>
-
-            {/* Media picker buttons */}
-            <View style={styles.mediaActions}>
-              <TouchableOpacity style={styles.mediaBtn} activeOpacity={0.7} onPress={pickFromGallery}>
-                <MaterialCommunityIcons name="image-multiple" size={18} color={Colors.forest} />
-                <Text style={styles.mediaBtnText}>Galerie</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.mediaBtn} activeOpacity={0.7} onPress={takePhoto}>
-                <MaterialCommunityIcons name="camera" size={18} color={Colors.forest} />
-                <Text style={styles.mediaBtnText}>Photo</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.mediaBtn} activeOpacity={0.7} onPress={recordVideo}>
-                <MaterialCommunityIcons name="video" size={18} color={Colors.forest} />
-                <Text style={styles.mediaBtnText}>Vidéo</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Media preview */}
-            {media.length > 0 && (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.mediaPreviewScroll}>
-                {media.map((m, i) => (
-                  <View key={i} style={styles.mediaThumb}>
-                    <Image source={{ uri: m.uri }} style={styles.mediaImage} />
-                    {m.type === "video" && (
-                      <View style={styles.mediaVideoOverlay}>
-                        <MaterialCommunityIcons name="play-circle" size={24} color={Colors.white} />
-                      </View>
-                    )}
-                    <TouchableOpacity style={styles.mediaRemove} onPress={() => removeMedia(i)}>
-                      <MaterialCommunityIcons name="close" size={14} color={Colors.white} />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </ScrollView>
-            )}
-
-            <View style={{ marginTop: 16 }}>
-              <Button
-                title="Suivant"
-                onPress={() => setStep(2)}
-                fullWidth
-                size="lg"
-                disabled={!selectedSlot || description.trim().length < 20}
-              />
-            </View>
           </View>
         )}
 
@@ -408,66 +409,132 @@ export function BookingScreen({
           </View>
         )}
 
-        {/* ====== STEP 3 : Confirmation ====== */}
+        {/* ====== STEP 3 : Recherche artisan ====== */}
         {step === 3 && (
           <View>
-            <Text style={styles.stepTitle}>Récapitulatif</Text>
-            <Card style={{ marginBottom: 16 }}>
-              {[
-                ["Artisan", "Jean-Michel P."],
-                ["Date", `${selectedDay} mars 2026`],
-                ["Créneau", selectedSlot || "14h00"],
-                ["Adresse", "12 rue de Rivoli, Paris 4e"],
-              ].map(([k, v], i) => (
-                <View
-                  key={k}
-                  style={[
-                    styles.summaryRow,
-                    i < 3 && styles.summaryRowBorder,
-                  ]}
-                >
-                  <Text style={styles.summaryLabel}>{k}</Text>
-                  <Text style={styles.summaryValue}>{v}</Text>
+            {!searching && !matchFound && (
+              <View>
+                <Text style={styles.stepTitle}>Recapitulatif</Text>
+                <Card style={{ marginBottom: 16 }}>
+                  {[
+                    ["Service", serviceLabel],
+                    ["Date", `${selectedDay} mars 2026`],
+                    ["Creneau", selectedSlot || "14h00"],
+                    ["Paiement", paymentType === "card" ? "Carte bancaire" : "Especes"],
+                    ["Medias", `${media.length} fichier${media.length > 1 ? "s" : ""}`],
+                  ].map(([k, v], i, arr) => (
+                    <View key={k} style={[styles.summaryRow, i < arr.length - 1 && styles.summaryRowBorder]}>
+                      <Text style={styles.summaryLabel}>{k}</Text>
+                      <Text style={styles.summaryValue}>{v}</Text>
+                    </View>
+                  ))}
+                </Card>
+
+                <View style={styles.escrowBadge}>
+                  <MaterialCommunityIcons name="shield-lock" size={14} color={Colors.forest} />
+                  <Text style={styles.escrowBadgeText}>
+                    Aucun debit maintenant. Vous ne payez qu'apres signature du devis sur place.
+                  </Text>
                 </View>
-              ))}
-            </Card>
 
-            {/* Escrow info */}
-            <View style={styles.escrowBadge}>
-              <MaterialCommunityIcons name="information-outline" size={16} color={Colors.forest} />
-              <Text style={styles.escrowBadgeText}>
-                Aucun paiement maintenant — l'artisan établira le devis sur place après diagnostic
-              </Text>
-            </View>
+                <Button
+                  title="Lancer la recherche"
+                  onPress={() => {
+                    setSearching(true);
+                    setSearchProgress(0);
+                    // Simulate search progress
+                    let p = 0;
+                    const interval = setInterval(() => {
+                      p += 0.08;
+                      if (p >= 1) {
+                        clearInterval(interval);
+                        setSearchProgress(1);
+                        setTimeout(() => {
+                          setSearching(false);
+                          setMatchFound(true);
+                        }, 500);
+                      } else {
+                        setSearchProgress(p);
+                      }
+                    }, 300);
+                  }}
+                  fullWidth
+                  size="lg"
+                />
+              </View>
+            )}
 
-            {!confirmed ? (
-              <Button
-                title="Confirmer le rendez-vous"
-                onPress={() => {
-                  setConfirmed(true);
-                  setModal({
-                    visible: true,
-                    type: "success",
-                    title: "Rendez-vous confirmé",
-                    message: `Votre RDV avec Jean-Michel P. le ${selectedDay} mars à ${selectedSlot || "14h00"} est confirmé.\n\nL'artisan se déplacera, diagnostiquera et établira un devis sur place. Vous ne payez rien pour le moment.`,
-                    actions: [
-                      {
+            {searching && (
+              <View style={styles.searchingContainer}>
+                <View style={styles.searchingIconWrap}>
+                  <MaterialCommunityIcons name="radar" size={36} color={Colors.forest} />
+                </View>
+                <Text style={styles.searchingTitle}>Recherche en cours...</Text>
+                <Text style={styles.searchingDesc}>
+                  Nous recherchons un artisan en {serviceLabel.toLowerCase()} disponible le {selectedDay} mars a {selectedSlot}
+                </Text>
+
+                <View style={styles.searchProgressBar}>
+                  <View style={[styles.searchProgressFill, { width: `${Math.round(searchProgress * 100)}%` as any }]} />
+                </View>
+
+                <View style={styles.searchSteps}>
+                  {[
+                    { label: "Analyse de la demande", done: searchProgress > 0.2 },
+                    { label: "Verification des disponibilites", done: searchProgress > 0.5 },
+                    { label: "Selection du meilleur profil", done: searchProgress > 0.8 },
+                  ].map((s, i) => (
+                    <View key={i} style={styles.searchStepRow}>
+                      <View style={[styles.searchStepDot, s.done && styles.searchStepDotDone]}>
+                        {s.done && <MaterialCommunityIcons name="check" size={10} color={Colors.white} />}
+                      </View>
+                      <Text style={[styles.searchStepLabel, s.done && { color: Colors.forest }]}>{s.label}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {matchFound && (
+              <View style={styles.matchContainer}>
+                <View style={styles.matchIconWrap}>
+                  <MaterialCommunityIcons name="check-circle" size={40} color={Colors.success} />
+                </View>
+                <Text style={styles.matchTitle}>Artisan trouve !</Text>
+                <Text style={styles.matchDesc}>
+                  Un artisan certifie en {serviceLabel.toLowerCase()} est disponible le {selectedDay} mars a {selectedSlot}.
+                </Text>
+
+                <View style={styles.matchArtisanCard}>
+                  <View style={styles.matchAvatar}>
+                    <Text style={styles.matchAvatarText}>JM</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.matchArtisanName}>Jean-Michel P.</Text>
+                    <Text style={styles.matchArtisanMeta}>{serviceLabel} • 4.9 ★ • 127 avis</Text>
+                  </View>
+                </View>
+
+                <Button
+                  title="Confirmer le rendez-vous"
+                  onPress={() => {
+                    setModal({
+                      visible: true,
+                      type: "success",
+                      title: "Rendez-vous confirme",
+                      message: `Votre RDV avec Jean-Michel P. le ${selectedDay} mars a ${selectedSlot} est confirme.\n\nL'artisan se deplacera et etablira un devis sur place.`,
+                      actions: [{
                         label: "Voir mes interventions",
                         onPress: () => {
                           setModal(m => ({ ...m, visible: false }));
                           navigation.navigate("ClientTabs" as any, { screen: "ClientMissions" });
                         },
-                      },
-                    ],
-                  });
-                }}
-                fullWidth
-                size="lg"
-              />
-            ) : (
-              <View style={styles.confirmedBanner}>
-                <MaterialCommunityIcons name="check-circle" size={20} color={Colors.success} />
-                <Text style={styles.confirmedText}>Rendez-vous confirmé</Text>
+                      }],
+                    });
+                  }}
+                  fullWidth
+                  size="lg"
+                />
               </View>
             )}
           </View>
@@ -766,5 +833,168 @@ const styles = StyleSheet.create({
     color: "#14523B",
     fontWeight: "500",
     flex: 1,
+  },
+
+  /* Service badge */
+  serviceBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(27,107,78,0.08)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  serviceBadgeText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 12,
+    color: Colors.forest,
+  },
+
+  /* Media titles */
+  mediaTitle: {
+    fontFamily: "DMSans_700Bold",
+    fontSize: 14,
+    color: Colors.navy,
+    marginBottom: 2,
+  },
+  mediaSubtitle: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 10,
+  },
+
+  /* Searching */
+  searchingContainer: {
+    alignItems: "center",
+    paddingTop: 30,
+    paddingBottom: 20,
+  },
+  searchingIconWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: 22,
+    backgroundColor: "rgba(27,107,78,0.08)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  searchingTitle: {
+    fontFamily: "Manrope_800ExtraBold",
+    fontSize: 18,
+    color: Colors.navy,
+    marginBottom: 6,
+  },
+  searchingDesc: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 13,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 20,
+    paddingHorizontal: 16,
+  },
+  searchProgressBar: {
+    width: "80%",
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.border,
+    overflow: "hidden",
+    marginBottom: 20,
+  },
+  searchProgressFill: {
+    height: "100%",
+    borderRadius: 2,
+    backgroundColor: Colors.forest,
+  },
+  searchSteps: {
+    alignSelf: "stretch",
+    gap: 10,
+  },
+  searchStepRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 20,
+  },
+  searchStepDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: Colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  searchStepDotDone: {
+    backgroundColor: Colors.forest,
+  },
+  searchStepLabel: {
+    fontFamily: "DMSans_500Medium",
+    fontSize: 13,
+    color: Colors.textMuted,
+  },
+
+  /* Match found */
+  matchContainer: {
+    alignItems: "center",
+    paddingTop: 20,
+  },
+  matchIconWrap: {
+    marginBottom: 12,
+  },
+  matchTitle: {
+    fontFamily: "Manrope_800ExtraBold",
+    fontSize: 20,
+    color: Colors.navy,
+    marginBottom: 6,
+  },
+  matchDesc: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 13,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 20,
+    paddingHorizontal: 16,
+  },
+  matchArtisanCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 20,
+    alignSelf: "stretch",
+    borderWidth: 1,
+    borderColor: "rgba(27,107,78,0.15)",
+    ...Shadows.sm,
+  },
+  matchAvatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 15,
+    backgroundColor: Colors.deepForest,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  matchAvatarText: {
+    fontFamily: "Manrope_800ExtraBold",
+    fontSize: 14,
+    color: Colors.white,
+  },
+  matchArtisanName: {
+    fontFamily: "DMSans_700Bold",
+    fontSize: 15,
+    color: Colors.navy,
+  },
+  matchArtisanMeta: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 1,
   },
 });

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -22,15 +22,24 @@ import {
 
 import { RootNavigator } from "./src/navigation/RootNavigator";
 import { ThemeProvider, useTheme } from "./src/hooks/useTheme";
+import SplashLoading from "./src/screens/SplashLoading";
 
 SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
   const { dark } = useTheme();
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return <SplashLoading onFinish={() => setShowSplash(false)} />;
+  }
+
   return (
     <>
       <StatusBar barStyle={dark ? "light-content" : "dark-content"} />
-      <RootNavigator />
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
     </>
   );
 }
@@ -61,9 +70,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <SafeAreaProvider onLayout={onLayoutRootView}>
-        <NavigationContainer>
-          <AppContent />
-        </NavigationContainer>
+        <AppContent />
       </SafeAreaProvider>
     </ThemeProvider>
   );

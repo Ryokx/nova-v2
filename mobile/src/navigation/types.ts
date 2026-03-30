@@ -12,7 +12,7 @@ export type RootStackParamList = {
   ArtisanProfile: { id: string };
   ArtisanListByCategory: { category: string };
   AllCategories: undefined;
-  Booking: { artisanId: string };
+  Booking: { artisanId?: string; serviceId?: string; serviceLabel?: string };
   Payment: { missionId: string; amount: number };
   MissionDetail: { id: string };
   ReportDispute: { missionId: string };

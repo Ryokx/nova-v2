@@ -18,7 +18,7 @@ import {
   ArrowLeft, ArrowRight, MapPin, User, Mail, Phone,
   FileText, CreditCard, Banknote, Shield, Check, Lock,
   AlertTriangle, Loader2, LogIn, Clock, Zap, ChevronRight,
-  Calendar, Navigation,
+  Calendar, Navigation, Car, Home as HomeIcon, Wrench, LocateFixed,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -110,8 +110,27 @@ const TRADES = [
   { id: "peintre", name: "Peinture", desc: "Intérieur, extérieur, revêtements, finitions", img: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=400&h=250&fit=crop" },
   { id: "menuisier", name: "Menuiserie", desc: "Portes, fenêtres, parquet, meubles sur mesure", img: "https://images.unsplash.com/photo-1626081062126-d3b192c1fcb0?w=400&h=250&fit=crop" },
   { id: "carreleur", name: "Carrelage", desc: "Sols, murs, salles de bain, terrasses", img: "https://images.unsplash.com/photo-1523413363574-c30aa1c2a516?w=400&h=250&fit=crop" },
-  { id: "macon", name: "Maçonnerie", desc: "Murs, fondations, terrasses, gros œuvre", img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&h=250&fit=crop" },
-  { id: "autre", name: "Autre", desc: "Précisez votre besoin ci-dessous", img: "" },
+  { id: "mecanicien", name: "Mécaniciens", desc: "Entretien, réparation, diagnostic automobile", img: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=400&h=250&fit=crop" },
+];
+
+const PHONE_COUNTRIES = [
+  { code: "FR", flag: "\u{1F1EB}\u{1F1F7}", dial: "+33", label: "France" },
+  { code: "BE", flag: "\u{1F1E7}\u{1F1EA}", dial: "+32", label: "Belgique" },
+  { code: "CH", flag: "\u{1F1E8}\u{1F1ED}", dial: "+41", label: "Suisse" },
+  { code: "LU", flag: "\u{1F1F1}\u{1F1FA}", dial: "+352", label: "Luxembourg" },
+  { code: "MC", flag: "\u{1F1F2}\u{1F1E8}", dial: "+377", label: "Monaco" },
+  { code: "DE", flag: "\u{1F1E9}\u{1F1EA}", dial: "+49", label: "Allemagne" },
+  { code: "ES", flag: "\u{1F1EA}\u{1F1F8}", dial: "+34", label: "Espagne" },
+  { code: "IT", flag: "\u{1F1EE}\u{1F1F9}", dial: "+39", label: "Italie" },
+  { code: "PT", flag: "\u{1F1F5}\u{1F1F9}", dial: "+351", label: "Portugal" },
+  { code: "GB", flag: "\u{1F1EC}\u{1F1E7}", dial: "+44", label: "Royaume-Uni" },
+  { code: "US", flag: "\u{1F1FA}\u{1F1F8}", dial: "+1", label: "USA" },
+  { code: "MA", flag: "\u{1F1F2}\u{1F1E6}", dial: "+212", label: "Maroc" },
+  { code: "DZ", flag: "\u{1F1E9}\u{1F1FF}", dial: "+213", label: "Algerie" },
+  { code: "TN", flag: "\u{1F1F9}\u{1F1F3}", dial: "+216", label: "Tunisie" },
+  { code: "SN", flag: "\u{1F1F8}\u{1F1F3}", dial: "+221", label: "Senegal" },
+  { code: "CI", flag: "\u{1F1E8}\u{1F1EE}", dial: "+225", label: "Cote d'Ivoire" },
+  { code: "CM", flag: "\u{1F1E8}\u{1F1F2}", dial: "+237", label: "Cameroun" },
 ];
 
 const STEP_TITLES = [
@@ -137,10 +156,13 @@ export default function HomePage() {
 
   /* Step 1 */
   const [isUrgent, setIsUrgent] = useState(false);
+  const [serviceMode, setServiceMode] = useState<"domicile" | "garage" | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneCountry, setPhoneCountry] = useState("FR");
+  const [showPhoneCountries, setShowPhoneCountries] = useState(false);
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
   const [locating, setLocating] = useState(false);
@@ -149,6 +171,7 @@ export default function HomePage() {
   const [addressManual, setAddressManual] = useState(false);
   const [addressConfirmed, setAddressConfirmed] = useState(false);
   const [addressNotFound, setAddressNotFound] = useState(false);
+  const [detectedAddress, setDetectedAddress] = useState("");
   const addressDebounce = useRef<NodeJS.Timeout | null>(null);
 
   /* Step 2 */
@@ -186,7 +209,7 @@ export default function HomePage() {
   const [stepKey, setStepKey] = useState(0);
 
   const trade = TRADES.find(t => t.id === selectedTrade);
-  const tradeName = selectedTrade === "autre" ? customTrade : (trade?.name ?? "");
+  const tradeName = trade?.name ?? "";
   const isLoggedIn = !!session?.user;
 
   useEffect(() => {
@@ -234,8 +257,8 @@ export default function HomePage() {
 
   const canNext = (): boolean => {
     switch (step) {
-      case 0: return !!selectedTrade && (selectedTrade !== "autre" || customTrade.trim().length >= 3);
-      case 1: return firstName.trim().length >= 2 && email.includes("@") && address.trim().length >= 5 && description.trim().length >= 10;
+      case 0: return !!selectedTrade;
+      case 1: return firstName.trim().length >= 2 && email.includes("@") && address.trim().length >= 5 && description.trim().length >= 10 && (selectedTrade !== "mecanicien" || !!serviceMode);
       case 2: return paymentMethod === "cash" || (paymentMethod === "card" && (isLoggedIn ? !!selectedCard : true));
       case 3: return isLoggedIn || (accountMode === "create" && password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) || (accountMode === "login" && loginEmail.includes("@") && loginPassword.length >= 1);
       default: return true;
@@ -392,7 +415,7 @@ export default function HomePage() {
       </header>
 
       {/* ─── Main content ─── */}
-      <main className={cn("max-w-5xl mx-auto w-full px-5 py-6", step === 0 && selectedTrade !== "autre" ? "pb-6" : "pb-32")}>
+      <main className={cn("max-w-5xl mx-auto w-full px-5 py-6", step === 0 ? "pb-6" : "pb-32")}>
        <div
          key={stepKey}
          className="animate-stepIn"
@@ -402,7 +425,7 @@ export default function HomePage() {
         {step === 0 && (
           <div>
             {/* Hero carte interactive — localisation */}
-            <LocationMap onLocationChange={(addr) => { setAddress(addr); setAddressConfirmed(true); }} />
+            <LocationMap onLocationChange={(addr) => { setAddress(addr); setAddressConfirmed(true); setDetectedAddress(addr); }} />
 
             {/* Hero banner with image */}
             <div className="relative rounded-[6px] overflow-hidden mb-6">
@@ -439,13 +462,14 @@ export default function HomePage() {
 
             {/* Service grid 2x4 avec images */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {TRADES.filter(t => t.id !== "autre").map(t => {
+              {TRADES.map(t => {
                 const sel = selectedTrade === t.id;
                 return (
                   <button
                     key={t.id}
                     onClick={() => {
                       setSelectedTrade(t.id);
+                      if (t.id !== "mecanicien") setServiceMode(null);
                       setTimeout(() => setStep(1), 400);
                     }}
                     className={cn(
@@ -483,246 +507,294 @@ export default function HomePage() {
               })}
             </div>
 
-            {/* Autre — pleine largeur */}
-            <button
-              onClick={() => setSelectedTrade("autre")}
-              className={cn(
-                "w-full mt-3 flex items-center gap-3 px-4 py-3.5 rounded-[6px] border transition-all duration-200 text-left cursor-pointer",
-                selectedTrade === "autre"
-                  ? "border-forest bg-forest/5 shadow-sm"
-                  : "border-border bg-white hover:border-forest/30",
-              )}
-            >
-              <div className={cn(
-                "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",
-                selectedTrade === "autre" ? "border-forest bg-forest" : "border-gray-300",
-              )}>
-                {selectedTrade === "autre" && <Check className="w-3 h-3 text-white" />}
-              </div>
-              <div className="flex-1">
-                <span className="text-sm font-semibold text-navy">Autre</span>
-                <span className="text-xs text-grayText ml-2">Précisez votre besoin</span>
-              </div>
-              <ChevronRight className={cn("w-4 h-4 shrink-0", selectedTrade === "autre" ? "text-forest" : "text-gray-300")} />
-            </button>
-
-            {/* Champ libre si "Autre" */}
-            {selectedTrade === "autre" && (
-              <div className="mt-3">
-                <label className="text-xs font-semibold text-navy mb-1 block">Précisez le service souhaité *</label>
-                <input
-                  type="text"
-                  value={customTrade}
-                  onChange={e => setCustomTrade(e.target.value)}
-                  placeholder="Ex : isolation, domotique, vitrerie..."
-                  className="w-full px-3 py-2.5 rounded-[6px] border border-border bg-white text-sm text-navy placeholder:text-gray-400 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none transition-colors duration-200"
-                  autoFocus
-                />
-              </div>
-            )}
           </div>
         )}
 
-        {/* ════════════ STEP 1 — Détails + Urgence ════════════ */}
+        {/* ════════════ STEP 1 — Votre intervention ════════════ */}
         {step === 1 && (
-          <div className="space-y-5">
-            {/* Trade badge */}
+          <div className="space-y-6">
+            {/* Header avec badge service */}
+            <div>
+              <h2 className="text-xl font-extrabold text-navy font-heading mb-1">Votre intervention</h2>
+              <p className="text-sm text-grayText">Completez les details pour trouver le bon professionnel.</p>
+            </div>
+
             {selectedTrade && (
-              <div className="flex items-center gap-2.5 pb-4 border-b border-border">
-                <div className="w-8 h-8 rounded-[6px] bg-forest/10 flex items-center justify-center">
-                  <span className="text-xs font-bold text-forest">{tradeName.charAt(0).toUpperCase()}</span>
+              <div className="flex items-center gap-3 p-3 rounded-[12px] bg-surface border border-border/60">
+                <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white font-extrabold text-sm shrink-0">
+                  {tradeName.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-sm font-bold text-navy">{tradeName}</span>
+                <div className="flex-1">
+                  <div className="text-sm font-bold text-navy">{tradeName}</div>
+                  <div className="text-[11px] text-grayText">{trade?.desc}</div>
+                </div>
+                <button onClick={() => setStep(0)} className="text-[11px] text-forest font-semibold hover:text-deepForest cursor-pointer">Changer</button>
               </div>
             )}
 
-            {/* Urgence toggle */}
-            <div>
-              <label className="text-xs font-semibold text-navy mb-2 block uppercase tracking-wide">Type d&apos;intervention</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => setIsUrgent(false)}
-                  className={cn(
-                    "p-4 rounded-[6px] border-2 text-left transition-all duration-200 cursor-pointer",
-                    !isUrgent
-                      ? "border-forest bg-forest/4 shadow-sm"
-                      : "border-border bg-white hover:border-forest/30",
-                  )}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="w-4 h-4 text-forest" />
-                    <span className="text-[13px] font-bold text-navy">Classique</span>
-                  </div>
-                  <p className="text-[11px] text-grayText leading-snug">Planifiée selon vos disponibilités. Devis sur place avant travaux.</p>
-                  {!isUrgent && (
-                    <div className="mt-3 flex items-center gap-1">
-                      <div className="w-4 h-4 rounded-full bg-forest flex items-center justify-center">
-                        <Check className="w-2.5 h-2.5 text-white" />
-                      </div>
-                      <span className="text-[11px] font-semibold text-forest">Sélectionné</span>
-                    </div>
-                  )}
-                </button>
-
-                <button
-                  onClick={() => setIsUrgent(true)}
-                  className={cn(
-                    "p-4 rounded-[6px] border-2 text-left transition-all duration-200 cursor-pointer",
-                    isUrgent
-                      ? "border-red bg-red/4 shadow-sm"
-                      : "border-border bg-white hover:border-red/30",
-                  )}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Zap className="w-4 h-4 text-red" />
-                    <span className="text-[13px] font-bold text-navy">Urgence 24h/24</span>
-                  </div>
-                  <p className="text-[11px] text-grayText leading-snug">Intervention rapide. Artisan disponible dans les plus brefs délais.</p>
-                  {isUrgent && (
-                    <div className="mt-3 flex items-center gap-1">
-                      <div className="w-4 h-4 rounded-full bg-red flex items-center justify-center">
-                        <Check className="w-2.5 h-2.5 text-white" />
-                      </div>
-                      <span className="text-[11px] font-semibold text-red">Sélectionné</span>
-                    </div>
-                  )}
-                </button>
+            {/* Section 1 — Type d'intervention */}
+            <div className="rounded-[12px] border border-border bg-white shadow-sm overflow-hidden">
+              <div className="px-4 py-3 bg-bgPage border-b border-border">
+                <span className="text-[11px] font-bold text-navy uppercase tracking-wider">1. Type d&apos;intervention</span>
               </div>
-            </div>
+              <div className="p-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setIsUrgent(false)}
+                    className={cn(
+                      "p-4 rounded-[10px] border-2 text-left transition-all duration-200 cursor-pointer",
+                      !isUrgent ? "border-forest bg-forest/4 shadow-sm" : "border-border bg-white hover:border-forest/30",
+                    )}
+                  >
+                    <div className="w-9 h-9 rounded-[8px] bg-forest/10 flex items-center justify-center mb-3">
+                      <Calendar className="w-4.5 h-4.5 text-forest" />
+                    </div>
+                    <span className="text-[13px] font-bold text-navy block mb-1">Classique</span>
+                    <p className="text-[11px] text-grayText leading-snug">Planifiee selon vos disponibilites. Devis sur place.</p>
+                    {!isUrgent && (
+                      <div className="mt-3 flex items-center gap-1">
+                        <div className="w-4 h-4 rounded-full bg-forest flex items-center justify-center"><Check className="w-2.5 h-2.5 text-white" /></div>
+                        <span className="text-[11px] font-semibold text-forest">Selectionne</span>
+                      </div>
+                    )}
+                  </button>
 
-            {/* Connexion inline ou formulaire infos */}
-            <div>
-              {!isLoggedIn && (
-                <div className="mb-4">
-                  {!showInlineLogin ? (
-                    <button
-                      onClick={() => setShowInlineLogin(true)}
-                      className="w-full flex items-center justify-center gap-2 py-3 rounded-[6px] bg-forest text-white text-sm font-bold hover:bg-deepForest transition-colors duration-200 cursor-pointer shadow-sm"
-                    >
-                      <LogIn className="w-4 h-4" />
-                      J&apos;ai déjà un compte
-                    </button>
-                  ) : (
-                    <div className="p-4 rounded-[6px] bg-white border border-border shadow-sm space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-navy">Connectez-vous</span>
-                        <button
-                          onClick={() => { setShowInlineLogin(false); setInlineError(""); }}
-                          className="text-xs text-grayText hover:text-navy cursor-pointer"
-                        >
-                          Annuler
-                        </button>
+                  <button
+                    onClick={() => setIsUrgent(true)}
+                    className={cn(
+                      "p-4 rounded-[10px] border-2 text-left transition-all duration-200 cursor-pointer",
+                      isUrgent ? "border-red bg-red/4 shadow-sm" : "border-border bg-white hover:border-red/30",
+                    )}
+                  >
+                    <div className="w-9 h-9 rounded-[8px] bg-red/10 flex items-center justify-center mb-3">
+                      <Zap className="w-4.5 h-4.5 text-red" />
+                    </div>
+                    <span className="text-[13px] font-bold text-navy block mb-1">Urgence 24h/24</span>
+                    <p className="text-[11px] text-grayText leading-snug">Intervention rapide dans les plus brefs delais.</p>
+                    {isUrgent && (
+                      <div className="mt-3 flex items-center gap-1">
+                        <div className="w-4 h-4 rounded-full bg-red flex items-center justify-center"><Check className="w-2.5 h-2.5 text-white" /></div>
+                        <span className="text-[11px] font-semibold text-red">Selectionne</span>
                       </div>
-                      <div>
-                        <label className={labelClass}>Email</label>
-                        <input
-                          type="email"
-                          value={inlineEmail}
-                          onChange={e => { setInlineEmail(e.target.value); setInlineError(""); }}
-                          placeholder="votre@email.fr"
-                          className={fieldClass}
-                        />
-                      </div>
-                      <div>
-                        <label className={labelClass}>Mot de passe</label>
-                        <input
-                          type="password"
-                          value={inlinePassword}
-                          onChange={e => { setInlinePassword(e.target.value); setInlineError(""); }}
-                          placeholder="Votre mot de passe"
-                          className={fieldClass}
-                        />
-                      </div>
-                      {inlineError && (
-                        <div className="flex items-center gap-2 text-xs text-red font-medium">
-                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                          {inlineError}
-                        </div>
-                      )}
+                    )}
+                  </button>
+                </div>
+
+                {/* Choix domicile / garage (mecaniciens uniquement) */}
+                {selectedTrade === "mecanicien" && (
+                  <div className="mt-4 pt-4 border-t border-border/60">
+                    <label className="text-[11px] font-bold text-navy uppercase tracking-wider mb-2 block">Lieu de l&apos;intervention</label>
+                    <div className="grid grid-cols-2 gap-3">
                       <button
-                        onClick={async () => {
-                          if (!inlineEmail.includes("@") || !inlinePassword) {
-                            setInlineError("Veuillez remplir tous les champs");
-                            return;
-                          }
-                          setInlineLoading(true);
-                          setInlineError("");
-                          const res = await signIn("credentials", {
-                            email: inlineEmail.trim(),
-                            password: inlinePassword,
-                            redirect: false,
-                          });
-                          setInlineLoading(false);
-                          if (res?.error) {
-                            setInlineError("Email ou mot de passe incorrect");
-                          } else {
-                            setShowInlineLogin(false);
-                            // Passer directement à l'étape paiement
-                            setTimeout(() => setStep(2), 400);
-                          }
-                        }}
-                        disabled={inlineLoading}
+                        onClick={() => setServiceMode("domicile")}
                         className={cn(
-                          "w-full py-2.5 rounded-[6px] text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200",
-                          inlineLoading
-                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            : "bg-gradient-to-r from-deepForest to-forest text-white shadow-sm hover:shadow-md cursor-pointer",
+                          "p-3.5 rounded-[10px] border-2 text-left transition-all duration-200 cursor-pointer",
+                          serviceMode === "domicile" ? "border-forest bg-forest/4 shadow-sm" : "border-border bg-white hover:border-forest/30",
                         )}
                       >
-                        {inlineLoading ? (
-                          <><Loader2 className="w-4 h-4 animate-spin" /> Connexion...</>
-                        ) : (
-                          <>Se connecter</>
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <HomeIcon className="w-4 h-4 text-forest" />
+                          <span className="text-[13px] font-bold text-navy">A domicile</span>
+                        </div>
+                        <p className="text-[11px] text-grayText leading-snug">Le mecanicien se deplace chez vous.</p>
+                        {serviceMode === "domicile" && (
+                          <div className="mt-2.5 flex items-center gap-1">
+                            <div className="w-3.5 h-3.5 rounded-full bg-forest flex items-center justify-center"><Check className="w-2 h-2 text-white" /></div>
+                            <span className="text-[10px] font-semibold text-forest">Selectionne</span>
+                          </div>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setServiceMode("garage")}
+                        className={cn(
+                          "p-3.5 rounded-[10px] border-2 text-left transition-all duration-200 cursor-pointer",
+                          serviceMode === "garage" ? "border-forest bg-forest/4 shadow-sm" : "border-border bg-white hover:border-forest/30",
+                        )}
+                      >
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <Wrench className="w-4 h-4 text-forest" />
+                          <span className="text-[13px] font-bold text-navy">Au garage</span>
+                        </div>
+                        <p className="text-[11px] text-grayText leading-snug">Deposez votre vehicule au garage.</p>
+                        {serviceMode === "garage" && (
+                          <div className="mt-2.5 flex items-center gap-1">
+                            <div className="w-3.5 h-3.5 rounded-full bg-forest flex items-center justify-center"><Check className="w-2 h-2 text-white" /></div>
+                            <span className="text-[10px] font-semibold text-forest">Selectionne</span>
+                          </div>
                         )}
                       </button>
                     </div>
-                  )}
-                </div>
-              )}
+                    {serviceMode && (
+                      <div className="mt-3 flex items-start gap-2 p-2.5 rounded-[8px] bg-forest/5 border border-forest/15">
+                        <Car className="w-4 h-4 text-forest shrink-0 mt-0.5" />
+                        <span className="text-[11px] text-grayText leading-snug">
+                          {serviceMode === "domicile"
+                            ? "Nous rechercherons des mecaniciens proposant le deplacement a domicile."
+                            : "Nous rechercherons des garages partenaires proches de votre adresse."}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
 
-              {isLoggedIn && (
-                <div className="mb-4 p-3 rounded-[6px] bg-surface border border-forest/10 flex items-center gap-2">
-                  <Check className="w-4 h-4 text-forest shrink-0" />
-                  <span className="text-xs text-navy font-medium">
-                    Connecté en tant que <strong>{session?.user?.name ?? session?.user?.email}</strong>
-                  </span>
-                </div>
-              )}
+            {/* Section 2 — Vos coordonnees */}
+            <div className="rounded-[12px] border border-border bg-white shadow-sm overflow-hidden">
+              <div className="px-4 py-3 bg-bgPage border-b border-border flex items-center justify-between">
+                <span className="text-[11px] font-bold text-navy uppercase tracking-wider">2. Vos coordonnees</span>
+                {!isLoggedIn && !showInlineLogin && (
+                  <button
+                    onClick={() => setShowInlineLogin(true)}
+                    className="flex items-center gap-1 text-[11px] font-semibold text-forest hover:text-deepForest cursor-pointer"
+                  >
+                    <LogIn className="w-3 h-3" />
+                    Deja un compte ?
+                  </button>
+                )}
+              </div>
+              <div className="p-4">
+                {/* Inline login */}
+                {!isLoggedIn && showInlineLogin && (
+                  <div className="mb-4 p-4 rounded-[10px] bg-bgPage border border-border/60 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold text-navy">Connexion rapide</span>
+                      <button onClick={() => { setShowInlineLogin(false); setInlineError(""); }} className="text-[11px] text-grayText hover:text-navy cursor-pointer">Annuler</button>
+                    </div>
+                    <div>
+                      <label className={labelClass}>Email</label>
+                      <div className="relative">
+                        <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                        <input type="email" value={inlineEmail} onChange={e => { setInlineEmail(e.target.value); setInlineError(""); }} placeholder="votre@email.fr" className={fieldWithIconClass} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className={labelClass}>Mot de passe</label>
+                      <div className="relative">
+                        <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                        <input type="password" value={inlinePassword} onChange={e => { setInlinePassword(e.target.value); setInlineError(""); }} placeholder="Votre mot de passe" className={fieldWithIconClass} />
+                      </div>
+                    </div>
+                    {inlineError && (
+                      <div className="flex items-center gap-2 text-xs text-red font-medium">
+                        <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{inlineError}
+                      </div>
+                    )}
+                    <button
+                      onClick={async () => {
+                        if (!inlineEmail.includes("@") || !inlinePassword) { setInlineError("Veuillez remplir tous les champs"); return; }
+                        setInlineLoading(true); setInlineError("");
+                        const res = await signIn("credentials", { email: inlineEmail.trim(), password: inlinePassword, redirect: false });
+                        setInlineLoading(false);
+                        if (res?.error) { setInlineError("Email ou mot de passe incorrect"); }
+                        else { setShowInlineLogin(false); setTimeout(() => setStep(2), 400); }
+                      }}
+                      disabled={inlineLoading}
+                      className={cn(
+                        "w-full py-2.5 rounded-[8px] text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200",
+                        inlineLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-deepForest to-forest text-white shadow-sm hover:shadow-md cursor-pointer",
+                      )}
+                    >
+                      {inlineLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Connexion...</> : "Se connecter"}
+                    </button>
+                  </div>
+                )}
 
-              <label className="text-xs font-semibold text-navy mb-3 block uppercase tracking-wide">Vos informations</label>
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className={labelClass}>Prénom *</label>
-                    <div className="relative">
-                      <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
-                      <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Jean" className={fieldWithIconClass} />
+                {isLoggedIn && (
+                  <div className="mb-4 p-3 rounded-[10px] bg-forest/5 border border-forest/15 flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white font-bold text-xs shrink-0">
+                      {(session?.user?.name ?? "U").charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs text-navy font-semibold block truncate">{session?.user?.name ?? session?.user?.email}</span>
+                      <span className="text-[10px] text-grayText">Connecte</span>
+                    </div>
+                    <Check className="w-4 h-4 text-forest shrink-0" />
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className={labelClass}>Prenom *</label>
+                      <div className="relative">
+                        <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                        <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Jean" className={fieldWithIconClass} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className={labelClass}>Nom</label>
+                      <div className="relative">
+                        <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                        <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Dupont" className={fieldWithIconClass} />
+                      </div>
                     </div>
                   </div>
+
                   <div>
-                    <label className={labelClass}>Nom</label>
-                    <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Dupont" className={fieldClass} />
+                    <label className={labelClass}>Email *</label>
+                    <div className="relative">
+                      <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                      <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jean@exemple.fr" className={fieldWithIconClass} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Telephone</label>
+                    <div className="relative flex gap-0">
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setShowPhoneCountries(!showPhoneCountries)}
+                          className="flex items-center gap-1.5 h-full px-3 py-2.5 rounded-l-[6px] border border-r-0 border-border bg-bgPage hover:bg-surface transition-colors cursor-pointer"
+                        >
+                          <span className="text-base leading-none">{PHONE_COUNTRIES.find(c => c.code === phoneCountry)?.flag}</span>
+                          <span className="text-xs font-semibold text-navy">{PHONE_COUNTRIES.find(c => c.code === phoneCountry)?.dial}</span>
+                          <svg className="w-3 h-3 text-grayText" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
+                        </button>
+                        {showPhoneCountries && (
+                          <div className="absolute z-30 top-full left-0 mt-1 bg-white rounded-[8px] shadow-lg border border-border overflow-hidden max-h-[240px] overflow-y-auto w-[220px]">
+                            {PHONE_COUNTRIES.map(c => (
+                              <button
+                                key={c.code}
+                                type="button"
+                                onClick={() => { setPhoneCountry(c.code); setShowPhoneCountries(false); }}
+                                className={cn(
+                                  "w-full text-left px-3 py-2 flex items-center gap-2.5 hover:bg-bgPage transition-colors cursor-pointer border-b border-border/20 last:border-0",
+                                  phoneCountry === c.code && "bg-forest/5"
+                                )}
+                              >
+                                <span className="text-base leading-none">{c.flag}</span>
+                                <span className="text-xs text-navy font-medium flex-1">{c.label}</span>
+                                <span className="text-xs text-grayText font-mono">{c.dial}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="relative flex-1">
+                        <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder={phoneCountry === "FR" ? "06 12 34 56 78" : "Votre numero"} className="w-full px-3 py-2.5 rounded-r-[6px] border border-border bg-white text-sm text-navy placeholder:text-gray-400 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none transition-colors duration-200" />
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
 
+            {/* Section 3 — Adresse & description */}
+            <div className="rounded-[12px] border border-border bg-white shadow-sm overflow-hidden">
+              <div className="px-4 py-3 bg-bgPage border-b border-border">
+                <span className="text-[11px] font-bold text-navy uppercase tracking-wider">3. Intervention</span>
+              </div>
+              <div className="p-4 space-y-4">
                 <div>
-                  <label className={labelClass}>Email *</label>
-                  <div className="relative">
-                    <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
-                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jean@exemple.fr" className={fieldWithIconClass} />
-                  </div>
-                </div>
-
-                <div>
-                  <label className={labelClass}>Téléphone</label>
-                  <div className="relative">
-                    <Phone className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
-                    <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="06 12 34 56 78" className={fieldWithIconClass} />
-                  </div>
-                </div>
-
-                <div>
-                  <label className={labelClass}>Adresse d&apos;intervention *</label>
+                  <label className={labelClass}>
+                    {selectedTrade === "mecanicien" && serviceMode === "garage"
+                      ? "Votre adresse (pour trouver un garage proche) *"
+                      : selectedTrade === "mecanicien" && serviceMode === "domicile"
+                        ? "Adresse d\u0027intervention (domicile) *"
+                        : "Adresse d\u0027intervention *"}
+                  </label>
 
                   {/* Adresse confirmée — affichage compact */}
                   {addressConfirmed && !addressManual ? (
@@ -741,6 +813,22 @@ export default function HomePage() {
                     </div>
                   ) : (
                     <div className="space-y-2">
+                      {/* Suggestion adresse detectee par la carte */}
+                      {detectedAddress && !address && (
+                        <button
+                          type="button"
+                          onClick={() => { setAddress(detectedAddress); setAddressConfirmed(true); }}
+                          className="w-full flex items-center gap-2.5 p-2.5 rounded-[6px] bg-forest/5 border border-forest/20 hover:bg-forest/10 transition-colors cursor-pointer text-left"
+                        >
+                          <LocateFixed className="w-4 h-4 text-forest shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[11px] font-semibold text-forest block">Adresse detectee</span>
+                            <span className="text-[12px] text-navy truncate block">{detectedAddress}</span>
+                          </div>
+                          <ChevronRight className="w-3.5 h-3.5 text-forest shrink-0" />
+                        </button>
+                      )}
+
                       {/* Champ de saisie avec autocomplete */}
                       <div className="relative">
                         <div className="relative flex gap-2">
@@ -882,9 +970,11 @@ export default function HomePage() {
                     <textarea
                       value={description}
                       onChange={e => setDescription(e.target.value)}
-                      placeholder="Décrivez votre problème ou le travail à réaliser..."
+                      placeholder={selectedTrade === "mecanicien"
+                        ? "Decrivez le probleme ou l'entretien souhaite (marque, modele, kilometrage)..."
+                        : "Decrivez votre probleme ou le travail a realiser..."}
                       rows={4}
-                      className="w-full pl-9 pr-3 py-2.5 rounded-[6px] border border-border bg-white text-sm text-navy placeholder:text-gray-400 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none transition-colors duration-200 resize-none"
+                      className="w-full pl-9 pr-3 py-2.5 rounded-[8px] border border-border bg-white text-sm text-navy placeholder:text-gray-400 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none transition-colors duration-200 resize-none"
                     />
                   </div>
                   <div className="flex justify-end mt-1">
@@ -894,6 +984,14 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Indicateur de progression */}
+            <div className="flex items-center gap-3 p-3 rounded-[10px] bg-bgPage border border-border/40">
+              <Shield className="w-4 h-4 text-forest shrink-0" />
+              <p className="text-[11px] text-grayText leading-snug">
+                <strong className="text-navy">100% securise</strong> — Vos donnees sont protegees et ne seront partagees qu&apos;avec l&apos;artisan selectionne.
+              </p>
             </div>
           </div>
         )}
@@ -1097,120 +1195,225 @@ export default function HomePage() {
           <div>
             {isLoggedIn ? (
               <div className="py-12 text-center">
-                <div className="w-14 h-14 rounded-[6px] bg-success/10 flex items-center justify-center mx-auto mb-4">
+                <div className="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
                   <Check className="w-7 h-7 text-success" />
                 </div>
-                <h2 className="text-lg font-extrabold text-navy font-heading mb-2">Vous êtes connecté</h2>
+                <h2 className="text-lg font-extrabold text-navy font-heading mb-2">Vous etes connecte</h2>
                 <p className="text-sm text-grayText">
-                  Bonjour <strong className="text-navy">{session?.user?.name ?? ""}</strong>. Votre demande sera liée à votre compte.
+                  Bonjour <strong className="text-navy">{session?.user?.name ?? ""}</strong>. Votre demande sera liee a votre compte.
                 </p>
               </div>
             ) : (
-              <>
-                <h2 className="text-xl font-extrabold text-navy font-heading mb-1">Finalisez votre demande</h2>
-                <p className="text-sm text-grayText mb-6">
-                  Créez un compte avec les informations saisies ou connectez-vous à un compte existant.
-                </p>
-
-                {/* Selector */}
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                  <button
-                    onClick={() => setAccountMode("create")}
-                    className={cn(
-                      "p-4 rounded-[6px] border-2 text-center transition-all duration-200 cursor-pointer",
-                      accountMode === "create"
-                        ? "border-forest bg-forest/4"
-                        : "border-border bg-white hover:border-forest/30",
-                    )}
-                  >
-                    <User className="w-5 h-5 mx-auto mb-2 text-forest" />
-                    <div className="text-xs font-bold text-navy">Créer un compte</div>
-                    <div className="text-[10px] text-grayText mt-0.5">Avec vos informations</div>
-                  </button>
-                  <button
-                    onClick={() => setAccountMode("login")}
-                    className={cn(
-                      "p-4 rounded-[6px] border-2 text-center transition-all duration-200 cursor-pointer",
-                      accountMode === "login"
-                        ? "border-forest bg-forest/4"
-                        : "border-border bg-white hover:border-forest/30",
-                    )}
-                  >
-                    <LogIn className="w-5 h-5 mx-auto mb-2 text-forest" />
-                    <div className="text-xs font-bold text-navy">Se connecter</div>
-                    <div className="text-[10px] text-grayText mt-0.5">Compte existant</div>
-                  </button>
+              <div className="space-y-6">
+                {/* Header */}
+                <div>
+                  <h2 className="text-xl font-extrabold text-navy font-heading mb-1">Derniere etape</h2>
+                  <p className="text-sm text-grayText">Creez votre compte ou connectez-vous pour finaliser.</p>
                 </div>
 
-                {/* Create */}
-                {accountMode === "create" && (
-                  <div className="p-4 rounded-[6px] bg-white border border-border shadow-sm space-y-3">
-                    <div className="flex items-center gap-2 pb-3 border-b border-border">
-                      <div className="w-6 h-6 rounded-[6px] bg-forest/10 flex items-center justify-center">
-                        <User className="w-3 h-3 text-forest" />
-                      </div>
-                      <span className="text-sm font-bold text-navy">Votre compte Nova</span>
+                {/* Resume de la demande */}
+                <div className="p-4 rounded-[12px] bg-surface border border-border/60">
+                  <div className="text-[10px] font-semibold text-grayText uppercase tracking-wider mb-3">Resume de votre demande</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2.5 rounded-[8px] bg-white">
+                      <div className="text-[10px] text-grayText">Service</div>
+                      <div className="text-xs text-navy font-bold truncate">{tradeName}</div>
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { label: "Prénom", value: firstName },
-                        { label: "Nom", value: lastName },
-                        { label: "Email", value: email },
-                      ].map(({ label, value }) => (
-                        <div key={label} className="p-2 rounded-[6px] bg-bgPage">
-                          <div className="text-[10px] text-grayText uppercase tracking-wide">{label}</div>
-                          <div className="text-xs text-navy font-medium truncate">{value || "—"}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <div>
-                      <label className={labelClass}>Mot de passe *</label>
-                      <input
-                        type="password"
-                        value={password}
-                        onChange={e => { setPassword(e.target.value); setAuthError(""); }}
-                        placeholder="8 caractères, 1 majuscule, 1 chiffre"
-                        className={fieldClass}
-                      />
-                      <div className="flex gap-3 mt-2">
-                        {[
-                          { ok: password.length >= 8, label: "8 caractères" },
-                          { ok: /[A-Z]/.test(password), label: "1 majuscule" },
-                          { ok: /[0-9]/.test(password), label: "1 chiffre" },
-                        ].map(({ ok, label }) => (
-                          <span key={label} className={cn("text-[11px] font-medium", ok ? "text-success" : "text-grayText")}>
-                            {ok ? "\u2713" : "\u2022"} {label}
-                          </span>
-                        ))}
+                    <div className="p-2.5 rounded-[8px] bg-white">
+                      <div className="text-[10px] text-grayText">Type</div>
+                      <div className="text-xs font-bold truncate" style={{ color: isUrgent ? "#E8302A" : "#1B6B4E" }}>
+                        {isUrgent ? "Urgence 24h/24" : "Classique"}
                       </div>
                     </div>
-                    <p className="text-[11px] text-grayText">Vos informations seront utilisées pour créer votre compte Nova.</p>
+                    <div className="col-span-2 p-2.5 rounded-[8px] bg-white">
+                      <div className="text-[10px] text-grayText">Adresse</div>
+                      <div className="text-xs text-navy font-medium truncate">{address || "Non renseignee"}</div>
+                    </div>
                   </div>
-                )}
+                </div>
 
-                {/* Login */}
-                {accountMode === "login" && (
-                  <div className="p-4 rounded-[6px] bg-white border border-border shadow-sm space-y-3">
-                    <div>
-                      <label className={labelClass}>Email</label>
-                      <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="votre@email.fr" className={fieldClass} />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Mot de passe</label>
-                      <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} placeholder="Votre mot de passe" className={fieldClass} />
-                    </div>
-                    <p className="text-[11px] text-grayText">Vos informations saisies seront automatiquement liées à votre demande.</p>
+                {/* Tabs Creer / Se connecter */}
+                <div className="rounded-[12px] border border-border bg-white shadow-sm overflow-hidden">
+                  <div className="grid grid-cols-2 border-b border-border">
+                    <button
+                      onClick={() => setAccountMode("create")}
+                      className={cn(
+                        "py-3.5 text-center text-xs font-bold transition-all cursor-pointer relative",
+                        accountMode === "create"
+                          ? "text-forest bg-white"
+                          : "text-grayText bg-bgPage hover:text-navy",
+                      )}
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <User className="w-3.5 h-3.5" />
+                        Creer un compte
+                      </div>
+                      {accountMode === "create" && (
+                        <div className="absolute bottom-0 left-4 right-4 h-[2px] bg-forest rounded-full" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setAccountMode("login")}
+                      className={cn(
+                        "py-3.5 text-center text-xs font-bold transition-all cursor-pointer relative",
+                        accountMode === "login"
+                          ? "text-forest bg-white"
+                          : "text-grayText bg-bgPage hover:text-navy",
+                      )}
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <LogIn className="w-3.5 h-3.5" />
+                        Se connecter
+                      </div>
+                      {accountMode === "login" && (
+                        <div className="absolute bottom-0 left-4 right-4 h-[2px] bg-forest rounded-full" />
+                      )}
+                    </button>
                   </div>
-                )}
+
+                  <div className="p-5">
+                    {/* Create */}
+                    {accountMode === "create" && (
+                      <div className="space-y-4">
+                        {/* Infos pre-remplies */}
+                        <div className="flex items-center gap-3 p-3 rounded-[8px] bg-bgPage">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white font-extrabold text-sm shrink-0">
+                            {firstName ? firstName.charAt(0).toUpperCase() : "?"}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-bold text-navy truncate">
+                              {firstName} {lastName}
+                            </div>
+                            <div className="text-xs text-grayText truncate">{email || "Email non renseigne"}</div>
+                          </div>
+                          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-forest/10">
+                            <Check className="w-3 h-3 text-forest" />
+                            <span className="text-[10px] font-semibold text-forest">Pre-rempli</span>
+                          </div>
+                        </div>
+
+                        {/* Mot de passe */}
+                        <div>
+                          <label className={labelClass}>Choisissez un mot de passe *</label>
+                          <div className="relative">
+                            <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                            <input
+                              type="password"
+                              value={password}
+                              onChange={e => { setPassword(e.target.value); setAuthError(""); }}
+                              placeholder="Min. 8 caracteres"
+                              className={fieldWithIconClass}
+                            />
+                          </div>
+
+                          {/* Indicateurs de force */}
+                          <div className="mt-3 space-y-2">
+                            <div className="flex gap-1.5">
+                              {[
+                                password.length >= 8,
+                                /[A-Z]/.test(password),
+                                /[0-9]/.test(password),
+                              ].map((ok, i) => (
+                                <div key={i} className={cn("h-1 flex-1 rounded-full transition-colors", ok ? "bg-success" : "bg-border")} />
+                              ))}
+                            </div>
+                            <div className="flex justify-between">
+                              {[
+                                { ok: password.length >= 8, label: "8 caracteres" },
+                                { ok: /[A-Z]/.test(password), label: "1 majuscule" },
+                                { ok: /[0-9]/.test(password), label: "1 chiffre" },
+                              ].map(({ ok, label }) => (
+                                <span key={label} className={cn("text-[10px] font-medium flex items-center gap-1", ok ? "text-success" : "text-grayText")}>
+                                  {ok ? <Check className="w-2.5 h-2.5" /> : <span className="w-2.5 h-2.5 rounded-full border border-current inline-block" />}
+                                  {label}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* CGU */}
+                        <p className="text-[11px] text-grayText leading-relaxed">
+                          En creant votre compte, vous acceptez les{" "}
+                          <span className="text-forest font-semibold cursor-pointer hover:underline">conditions generales</span>{" "}
+                          et la{" "}
+                          <span className="text-forest font-semibold cursor-pointer hover:underline">politique de confidentialite</span>{" "}
+                          de Nova.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Login */}
+                    {accountMode === "login" && (
+                      <div className="space-y-4">
+                        <div>
+                          <label className={labelClass}>Email</label>
+                          <div className="relative">
+                            <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                            <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="votre@email.fr" className={fieldWithIconClass} />
+                          </div>
+                        </div>
+                        <div>
+                          <label className={labelClass}>Mot de passe</label>
+                          <div className="relative">
+                            <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grayText" />
+                            <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} placeholder="Votre mot de passe" className={fieldWithIconClass} />
+                          </div>
+                        </div>
+
+                        {/* Separateur */}
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 h-px bg-border" />
+                          <span className="text-[10px] text-grayText font-medium">OU</span>
+                          <div className="flex-1 h-px bg-border" />
+                        </div>
+
+                        {/* Connexion sociale */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => signIn("google")}
+                            className="flex items-center justify-center gap-2 py-2.5 rounded-[8px] border border-border bg-white hover:bg-bgPage transition-colors cursor-pointer"
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                            <span className="text-xs font-semibold text-navy">Google</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => signIn("apple")}
+                            className="flex items-center justify-center gap-2 py-2.5 rounded-[8px] border border-border bg-white hover:bg-bgPage transition-colors cursor-pointer"
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#000"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+                            <span className="text-xs font-semibold text-navy">Apple</span>
+                          </button>
+                        </div>
+
+                        <p className="text-[11px] text-grayText text-center">
+                          Les informations saisies seront automatiquement liees a votre demande.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Pas encore choisi */}
+                    {!accountMode && (
+                      <div className="py-6 text-center">
+                        <div className="w-12 h-12 rounded-full bg-bgPage flex items-center justify-center mx-auto mb-3">
+                          <User className="w-5 h-5 text-grayText" />
+                        </div>
+                        <p className="text-sm text-grayText">Choisissez une option ci-dessus</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 {/* Auth error */}
                 {authError && (
-                  <div className="mt-4 p-3 rounded-[6px] bg-red/5 border border-red/20 flex items-center gap-2">
+                  <div className="p-3 rounded-[8px] bg-red/5 border border-red/20 flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-red shrink-0" />
                     <span className="text-xs text-red font-medium">{authError}</span>
                   </div>
                 )}
-              </>
+              </div>
             )}
           </div>
         )}
@@ -1360,7 +1563,7 @@ export default function HomePage() {
       </main>
 
       {/* ─── Sticky CTA ─── */}
-      {step > 0 && step < 4 || (step === 0 && selectedTrade === "autre") ? (
+      {step > 0 && step < 4 ? (
         <div className="fixed bottom-0 inset-x-0 bg-bgPage/90 backdrop-blur-md border-t border-border z-30">
           <div className="max-w-5xl mx-auto px-5 py-4">
             <button

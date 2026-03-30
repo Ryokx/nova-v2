@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Linking,
+  Alert,
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -15,26 +17,33 @@ import { Avatar, Button, ConfirmModal } from "../../components/ui";
 import { getAvatarUri } from "../../constants/avatars";
 import type { RootStackScreenProps } from "../../navigation/types";
 
+/* ── Artisan contact (en prod: fetch API) ── */
+const ARTISAN_PHONE = "+33612345678";
+const ARTISAN_NAME = "Jean-Michel Petit";
+
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-/* ── Route points Paris 4e ── */
-const ROUTE = [
-  [48.8610, 2.3700],
-  [48.8595, 2.3650],
-  [48.8580, 2.3600],
-  [48.8570, 2.3560],
-  [48.8560, 2.3520],
-  [48.8550, 2.3490],
-  [48.8546, 2.3477], // client
-] as const;
+/* ── Adresses reelles ── */
+const ORIGIN: [number, number] = [48.8533, 2.3692]; // 15 Place de la Bastille
+const DESTINATION: [number, number] = [48.8568, 2.3170]; // 12 Rue de Rivoli
+const ORIGIN_LABEL = "15 Place de la Bastille";
+const DESTINATION_LABEL = "12 Rue de Rivoli";
 
-const CLIENT = ROUTE[ROUTE.length - 1]!;
+/* ── Fallback route (ligne droite simplifiee) ── */
+const FALLBACK_ROUTE: [number, number][] = [ORIGIN, DESTINATION];
 
-function buildMapHtml(artisanIndex: number, step: number) {
-  const artisan = ROUTE[Math.min(artisanIndex, ROUTE.length - 1)]!;
-  const traveled = ROUTE.slice(0, artisanIndex + 1).map(p => `[${p[0]},${p[1]}]`).join(",");
-  const remaining = ROUTE.slice(artisanIndex).map(p => `[${p[0]},${p[1]}]`).join(",");
+function buildMapHtml(route: [number, number][], artisanProgress: number, step: number) {
+  const points = route.length >= 2 ? route : FALLBACK_ROUTE;
+  const idx = Math.min(Math.floor(artisanProgress * (points.length - 1)), points.length - 2);
+  const frac = (artisanProgress * (points.length - 1)) - idx;
+  const artLat = points[idx][0] + (points[idx + 1][0] - points[idx][0]) * frac;
+  const artLng = points[idx][1] + (points[idx + 1][1] - points[idx][1]) * frac;
+
+  const artIdx = Math.round(artisanProgress * (points.length - 1));
+  const traveled = points.slice(0, artIdx + 1).map(p => `[${p[0]},${p[1]}]`).join(",");
+  const remaining = points.slice(artIdx).map(p => `[${p[0]},${p[1]}]`).join(",");
   const showTruck = step <= 1;
+  const dest = points[points.length - 1];
 
   return `<!DOCTYPE html>
 <html><head>
@@ -46,37 +55,43 @@ function buildMapHtml(artisanIndex: number, step: number) {
   #map{width:100%;height:100vh}
   .client-marker{background:#1B6B4E;border:3px solid #fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
   .client-marker svg{fill:#fff;width:14px;height:14px}
-  .artisan-marker{background:#0A1628;border:3px solid #fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.4);transition:all 1s ease}
+  .artisan-marker{background:#0A4030;border:3px solid #F5A623;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,0.4)}
   .artisan-marker svg{fill:#fff;width:16px;height:16px}
   .onsite-marker{background:#22C88A;border:3px solid #fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
   .onsite-marker svg{fill:#fff;width:14px;height:14px}
+  .start-dot{width:10px;height:10px;background:#6B7280;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+  .leaflet-control-zoom{display:none!important}
 </style>
 </head><body>
 <div id="map"></div>
 <script>
-var map=L.map('map',{zoomControl:false,attributionControl:false}).setView([48.8575,2.358],14);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+var map=L.map('map',{zoomControl:false,attributionControl:false});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20,subdomains:'abcd'}).addTo(map);
 
-// Traveled route
+// Traveled route (solid green)
 L.polyline([${traveled}],{color:'#1B6B4E',weight:4,opacity:0.9}).addTo(map);
-// Remaining route
+// Remaining route (dashed)
 L.polyline([${remaining}],{color:'#D4EBE0',weight:3,dashArray:'8,8'}).addTo(map);
 
-// Client marker
+// Start dot
+L.marker([${points[0][0]},${points[0][1]}],{icon:L.divIcon({className:'',html:'<div class="start-dot"></div>',iconSize:[10,10],iconAnchor:[5,5]})}).addTo(map);
+
+// Client marker (destination)
 var clientIcon=L.divIcon({className:'',html:'<div class="client-marker"><svg viewBox="0 0 24 24"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/></svg></div>',iconSize:[28,28],iconAnchor:[14,14]});
-L.marker([${CLIENT[0]},${CLIENT[1]}],{icon:clientIcon}).addTo(map);
+L.marker([${dest[0]},${dest[1]}],{icon:clientIcon}).addTo(map);
 
 ${showTruck ? `
-// Artisan marker (truck)
+// Artisan marker (truck, animated position)
 var artisanIcon=L.divIcon({className:'',html:'<div class="artisan-marker"><svg viewBox="0 0 24 24"><path d="M18,18.5A1.5,1.5 0 0,1 16.5,17A1.5,1.5 0 0,1 18,15.5A1.5,1.5 0 0,1 19.5,17A1.5,1.5 0 0,1 18,18.5M19.5,9.5L21.46,12H17V9.5M6,18.5A1.5,1.5 0 0,1 4.5,17A1.5,1.5 0 0,1 6,15.5A1.5,1.5 0 0,1 7.5,17A1.5,1.5 0 0,1 6,18.5M20,8H17V4H3C1.89,4 1,4.89 1,6V17H3A3,3 0 0,0 6,20A3,3 0 0,0 9,17H15A3,3 0 0,0 18,20A3,3 0 0,0 21,17H23V12L20,8Z"/></svg></div>',iconSize:[32,32],iconAnchor:[16,16]});
-L.marker([${artisan[0]},${artisan[1]}],{icon:artisanIcon}).addTo(map);
+L.marker([${artLat},${artLng}],{icon:artisanIcon}).addTo(map);
 ` : `
 // On-site marker (wrench)
 var onsiteIcon=L.divIcon({className:'',html:'<div class="onsite-marker"><svg viewBox="0 0 24 24"><path d="M22.7,19L13.6,9.9C14.5,7.6 14,4.9 12.1,3C10.1,1 7.1,0.6 4.7,1.7L9,6L6,9L1.6,4.7C0.4,7.1 0.9,10.1 2.9,12.1C4.8,14 7.5,14.5 9.8,13.6L18.9,22.7C19.3,23.1 19.9,23.1 20.3,22.7L22.6,20.4C23.1,20 23.1,19.3 22.7,19Z"/></svg></div>',iconSize:[28,28],iconAnchor:[14,14]});
-L.marker([${CLIENT[0]},${CLIENT[1]}],{icon:onsiteIcon}).addTo(map);
+L.marker([${dest[0]},${dest[1]}],{icon:onsiteIcon}).addTo(map);
 `}
 
-map.fitBounds([[${ROUTE[0]![0]},${ROUTE[0]![1]}],[${CLIENT[0]},${CLIENT[1]}]],{padding:[40,40]});
+var allPts=[${points.map(p => `[${p[0]},${p[1]}]`).join(",")}];
+map.fitBounds(L.latLngBounds(allPts).pad(0.15));
 </script></body></html>`;
 }
 
@@ -90,12 +105,35 @@ interface TimelineStep {
 // Steps: 0=En route, 1=Sur place, 2=Devis signé, 3=Paiement bloqué, 4=Intervention en cours, 5=Intervention terminée, 6=Validation Nova, 7=Artisan payé
 export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">) {
   const [trackingStep, setTrackingStep] = useState(0);
-  const [routeIndex, setRouteIndex] = useState(0);
-  const [mapHtml, setMapHtml] = useState(() => buildMapHtml(0, 0));
+  const [progress, setProgress] = useState(0);
+  const [route, setRoute] = useState<[number, number][]>(FALLBACK_ROUTE);
+  const [routeInfo, setRouteInfo] = useState({ distanceKm: 2.8, durationMin: 18 });
+  const [routeLoaded, setRouteLoaded] = useState(false);
+  const [mapHtml, setMapHtml] = useState(() => buildMapHtml(FALLBACK_ROUTE, 0, 0));
   const [cancelled, setCancelled] = useState(false);
   const [modal, setModal] = useState({ visible: false, type: "info" as const, title: "", message: "", actions: [] as any[] });
   const startTimeRef = useRef(Date.now());
   const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  // Fetch real route from OSRM (once)
+  useEffect(() => {
+    (async () => {
+      try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${ORIGIN[1]},${ORIGIN[0]};${DESTINATION[1]},${DESTINATION[0]}?overview=full&geometries=geojson&steps=false`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.routes?.[0]) {
+          const r = data.routes[0];
+          const coords: [number, number][] = r.geometry.coordinates.map((c: [number, number]) => [c[1], c[0]]);
+          const step = Math.max(1, Math.floor(coords.length / 60));
+          const simplified = coords.filter((_: [number, number], i: number) => i % step === 0 || i === coords.length - 1);
+          setRoute(simplified);
+          setRouteInfo({ distanceKm: r.distance / 1000, durationMin: r.duration / 60 });
+        }
+      } catch {}
+      setRouteLoaded(true);
+    })();
+  }, []);
 
   // Artisan profile config (in production, fetched from API)
   const artisanConfig = {
@@ -158,31 +196,33 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
     return () => loop.stop();
   }, [pulseAnim]);
 
-  // Simulate artisan movement
+  // Animate artisan progress (30s demo, only while en route)
   useEffect(() => {
-    if (trackingStep !== 0) return;
+    if (!routeLoaded || trackingStep !== 0) return;
     const interval = setInterval(() => {
-      setRouteIndex((prev) => {
-        const next = prev + 1;
-        if (next >= ROUTE.length) { clearInterval(interval); return prev; }
-        setMapHtml(buildMapHtml(next, 0));
+      setProgress(p => {
+        const next = Math.min(p + 0.015, 1);
         return next;
       });
-    }, 3000);
+    }, 450);
     return () => clearInterval(interval);
-  }, [trackingStep]);
+  }, [routeLoaded, trackingStep]);
 
-  // Update map on step change
+  // Update map when progress or step changes (throttled)
+  const lastMapUpdate = useRef(0);
   useEffect(() => {
-    if (trackingStep >= 1) {
-      setMapHtml(buildMapHtml(ROUTE.length - 1, trackingStep));
-    }
-  }, [trackingStep]);
+    const now = Date.now();
+    if (now - lastMapUpdate.current < 400 && trackingStep === 0) return;
+    lastMapUpdate.current = now;
+    const p = trackingStep >= 1 ? 1 : progress;
+    setMapHtml(buildMapHtml(route, p, trackingStep));
+  }, [progress, trackingStep, route]);
 
-  const etaMinutes = Math.max(0, (ROUTE.length - 1 - routeIndex) * 2);
+  const etaMinutes = Math.max(1, Math.round((1 - progress) * routeInfo.durationMin));
+  const distanceKm = Math.max(0.1, (1 - progress) * routeInfo.distanceKm).toFixed(1);
 
   const steps: TimelineStep[] = [
-    { label: "Artisan en route", desc: `Jean-Michel P. arrive dans ~${etaMinutes} min`, time: "14:20", done: trackingStep >= 0 },
+    { label: "Artisan en route", desc: `Jean-Michel P. arrive dans ~${etaMinutes} min (${distanceKm} km)`, time: "14:20", done: trackingStep >= 0 },
     { label: "Artisan sur place", desc: "L'artisan est arrivé chez vous", time: trackingStep >= 1 ? "14:35" : "—", done: trackingStep >= 1 },
     { label: "Devis signé", desc: "Le devis a été établi et signé sur place", time: trackingStep >= 2 ? "14:45" : "—", done: trackingStep >= 2 },
     { label: "Paiement bloqué", desc: "Montant bloqué en séquestre chez Nova", time: trackingStep >= 3 ? "14:46" : "—", done: trackingStep >= 3 },
@@ -210,9 +250,12 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
         {trackingStep === 0 && (
           <View style={styles.etaOverlay}>
             <Animated.View style={[styles.etaDot, { opacity: pulseAnim }]} />
-            <Text style={styles.etaText}>
-              {etaMinutes > 0 ? `Arrivée dans ~${etaMinutes} min` : "Arrivée imminente"}
-            </Text>
+            <View>
+              <Text style={styles.etaText}>
+                {etaMinutes > 0 ? `Arrivee dans ~${etaMinutes} min` : "Arrivee imminente"}
+              </Text>
+              <Text style={styles.etaSubtext}>{distanceKm} km restants</Text>
+            </View>
           </View>
         )}
         {trackingStep === 1 && (
@@ -262,8 +305,42 @@ export function TrackingScreen({ navigation }: RootStackScreenProps<"Tracking">)
             <Text style={styles.artisanMeta}>Plombier • Fuite sous évier</Text>
           </View>
           <View style={styles.artisanActions}>
-            <TouchableOpacity style={styles.smBtn}><MaterialCommunityIcons name="chat-outline" size={16} color={Colors.forest} /></TouchableOpacity>
-            <TouchableOpacity style={styles.smBtn}><MaterialCommunityIcons name="phone-outline" size={16} color={Colors.forest} /></TouchableOpacity>
+            <TouchableOpacity
+              style={styles.smBtn}
+              activeOpacity={0.7}
+              onPress={() => {
+                const smsUrl = `sms:${ARTISAN_PHONE}`;
+                Linking.canOpenURL(smsUrl).then(supported => {
+                  if (supported) Linking.openURL(smsUrl);
+                  else Alert.alert("SMS", `Envoyez un SMS au ${ARTISAN_PHONE}`);
+                });
+              }}
+            >
+              <MaterialCommunityIcons name="chat-outline" size={16} color={Colors.forest} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.smBtn}
+              activeOpacity={0.7}
+              onPress={() => {
+                const telUrl = `tel:${ARTISAN_PHONE}`;
+                Linking.canOpenURL(telUrl).then(supported => {
+                  if (supported) {
+                    Alert.alert(
+                      "Appeler l'artisan",
+                      `Appeler ${ARTISAN_NAME} ?`,
+                      [
+                        { text: "Annuler", style: "cancel" },
+                        { text: "Appeler", onPress: () => Linking.openURL(telUrl) },
+                      ]
+                    );
+                  } else {
+                    Alert.alert("Appel", `Appelez le ${ARTISAN_PHONE}`);
+                  }
+                });
+              }}
+            >
+              <MaterialCommunityIcons name="phone-outline" size={16} color={Colors.forest} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -408,6 +485,7 @@ const styles = StyleSheet.create({
   },
   etaDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.gold },
   etaText: { fontFamily: "DMSans_600SemiBold", fontSize: 13, color: Colors.navy },
+  etaSubtext: { fontFamily: "DMMono_400Regular", fontSize: 10, color: Colors.textSecondary, marginTop: 1 },
 
   bottomSheet: {
     flex: 1, backgroundColor: Colors.white,

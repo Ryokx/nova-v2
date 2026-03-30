@@ -1,20 +1,33 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { MapPin, Navigation, Search, X, Loader2, LocateFixed } from "lucide-react";
+import { MapPin, Navigation, Search, X, Loader2, LocateFixed, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import "leaflet/dist/leaflet.css";
 
+/* ── Types de services disponibles ── */
+const SERVICE_TYPES = [
+  { id: "all", label: "Tous" },
+  { id: "plomberie", label: "Plomberie" },
+  { id: "electricite", label: "Electricite" },
+  { id: "serrurerie", label: "Serrurerie" },
+  { id: "menuiserie", label: "Menuiserie" },
+  { id: "peinture", label: "Peinture" },
+  { id: "carrelage", label: "Carrelage" },
+  { id: "chauffage", label: "Chauffage" },
+  { id: "mecanique", label: "Mecaniciens" },
+];
+
 /* ── Artisans factices (positionnés dynamiquement autour de l'utilisateur) ── */
 const FAKE_ARTISANS = [
-  { id: 1, name: "Durand Plomberie", services: "Plomberie, Chauffage", available: true, offset: [0.004, 0.006] },
-  { id: 2, name: "Martin Électricité", services: "Électricité, Domotique", available: true, offset: [-0.003, 0.005] },
-  { id: 3, name: "Leroy Serrurerie", services: "Serrurerie, Blindage", available: false, offset: [0.005, -0.004] },
-  { id: 4, name: "Petit Menuiserie", services: "Menuiserie, Parquet", available: true, offset: [-0.006, -0.003] },
-  { id: 5, name: "Moreau Peinture", services: "Peinture, Revêtements", available: true, offset: [0.002, -0.007] },
-  { id: 6, name: "Bernard Carrelage", services: "Carrelage, Faïence", available: false, offset: [-0.005, 0.002] },
-  { id: 7, name: "Lopez Chauffage", services: "Chauffage, Climatisation", available: true, offset: [0.007, 0.001] },
-  { id: 8, name: "Roux Maçonnerie", services: "Maçonnerie, Gros œuvre", available: true, offset: [-0.002, -0.006] },
+  { id: 1, name: "Durand Plomberie", services: "Plomberie, Chauffage", category: "plomberie", available: true, offset: [0.004, 0.006] },
+  { id: 2, name: "Martin Electricite", services: "Electricite, Domotique", category: "electricite", available: true, offset: [-0.003, 0.005] },
+  { id: 3, name: "Leroy Serrurerie", services: "Serrurerie, Blindage", category: "serrurerie", available: false, offset: [0.005, -0.004] },
+  { id: 4, name: "Petit Menuiserie", services: "Menuiserie, Parquet", category: "menuiserie", available: true, offset: [-0.006, -0.003] },
+  { id: 5, name: "Moreau Peinture", services: "Peinture, Revetements", category: "peinture", available: true, offset: [0.002, -0.007] },
+  { id: 6, name: "Bernard Carrelage", services: "Carrelage, Faience", category: "carrelage", available: false, offset: [-0.005, 0.002] },
+  { id: 7, name: "Lopez Chauffage", services: "Chauffage, Climatisation", category: "chauffage", available: true, offset: [0.007, 0.001] },
+  { id: 8, name: "Roux Mecanique", services: "Mecanique, Diagnostic auto", category: "mecanique", available: true, offset: [-0.002, -0.006] },
 ];
 
 interface LocationMapProps {
@@ -23,6 +36,7 @@ interface LocationMapProps {
 
 export default function LocationMap({ onLocationChange }: LocationMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
   const artisanMarkersRef = useRef<L.Marker[]>([]);
@@ -34,17 +48,21 @@ export default function LocationMap({ onLocationChange }: LocationMapProps) {
   const [searchResults, setSearchResults] = useState<{ display_name: string; lat: string; lon: string }[]>([]);
   const [searching, setSearching] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
   /* ── Ajouter les marqueurs artisans autour d'une position ── */
-  const addArtisanMarkers = useCallback((lat: number, lng: number, L: typeof import("leaflet")) => {
-    // Supprimer les anciens marqueurs
+  const addArtisanMarkers = useCallback((lat: number, lng: number, L: typeof import("leaflet"), filter = "all") => {
     artisanMarkersRef.current.forEach(m => m.remove());
     artisanMarkersRef.current = [];
 
     if (!mapInstance.current) return;
 
-    FAKE_ARTISANS.forEach(artisan => {
+    const filtered = filter === "all" ? FAKE_ARTISANS : FAKE_ARTISANS.filter(a => a.category === filter);
+
+    filtered.forEach(artisan => {
       const aLat = lat + artisan.offset[0];
       const aLng = lng + artisan.offset[1];
 
@@ -110,9 +128,8 @@ export default function LocationMap({ onLocationChange }: LocationMapProps) {
       subdomains: "abcd",
     }).addTo(map);
 
-    L.control.zoom({ position: "bottomright" }).addTo(map);
+    L.control.zoom({ position: "topright" }).addTo(map);
 
-    // Marqueur utilisateur
     const icon = L.divIcon({
       html: `<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;">
         <div style="width:18px;height:18px;background:#1B6B4E;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>
@@ -128,13 +145,11 @@ export default function LocationMap({ onLocationChange }: LocationMapProps) {
     mapInstance.current = map;
     userLatLng.current = [lat, lng];
 
-    // Ajouter les artisans
     addArtisanMarkers(lat, lng, L);
-
     reverseGeocode(lat, lng);
   }, [addArtisanMarkers]);
 
-  /* ── Mise à jour position sur la carte ── */
+  /* ── Mise a jour position sur la carte ── */
   const updatePosition = useCallback((lat: number, lng: number) => {
     const L = require("leaflet");
     if (mapInstance.current) {
@@ -148,7 +163,7 @@ export default function LocationMap({ onLocationChange }: LocationMapProps) {
     reverseGeocode(lat, lng);
   }, [addArtisanMarkers]);
 
-  /* ── Reverse geocoding (coordonnées → adresse) ── */
+  /* ── Reverse geocoding ── */
   const reverseGeocode = async (lat: number, lng: number) => {
     try {
       const res = await fetch(
@@ -164,105 +179,101 @@ export default function LocationMap({ onLocationChange }: LocationMapProps) {
     } catch {}
   };
 
-  /* ── Formater l'adresse ── */
   const formatAddress = (data: { address?: Record<string, string>; display_name: string }) => {
     if (data.address) {
       const a = data.address;
-      const parts = [
-        a.house_number,
-        a.road,
-        a.postcode,
-        a.city || a.town || a.village || a.municipality,
-      ].filter(Boolean);
+      const parts = [a.house_number, a.road, a.postcode, a.city || a.town || a.village || a.municipality].filter(Boolean);
       if (parts.length >= 2) return parts.join(" ");
     }
     return data.display_name.split(",").slice(0, 3).join(",").trim();
   };
 
-  /* ── Recherche d'adresse (forward geocoding) ── */
   const searchAddress = async (query: string) => {
-    if (query.length < 3) {
-      setSearchResults([]);
-      return;
-    }
+    if (query.length < 3) { setSearchResults([]); return; }
     setSearching(true);
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr&limit=5&addressdetails=1`,
         { headers: { "Accept-Language": "fr" } }
       );
-      const data = await res.json();
-      setSearchResults(data);
-    } catch {
-      setSearchResults([]);
-    }
+      setSearchResults(await res.json());
+    } catch { setSearchResults([]); }
     setSearching(false);
   };
 
-  /* ── Debounce de la recherche ── */
   const handleSearchInput = (value: string) => {
     setSearchQuery(value);
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     searchTimeout.current = setTimeout(() => searchAddress(value), 400);
   };
 
-  /* ── Sélection d'un résultat de recherche ── */
   const selectResult = (result: { display_name: string; lat: string; lon: string }) => {
     const lat = parseFloat(result.lat);
     const lng = parseFloat(result.lon);
-
-    if (!mapInstance.current) {
-      initMap(lat, lng);
-    } else {
-      updatePosition(lat, lng);
-    }
-
+    if (!mapInstance.current) initMap(lat, lng);
+    else updatePosition(lat, lng);
     setSearchQuery("");
     setSearchResults([]);
     setShowSearch(false);
     setStatus("manual");
   };
 
-  /* ── Demande de géolocalisation au montage ── */
+  /* ── Re-filtrer quand le filtre change ── */
+  useEffect(() => {
+    if (!mapInstance.current) return;
+    const L = require("leaflet");
+    const [lat, lng] = userLatLng.current;
+    addArtisanMarkers(lat, lng, L, activeFilter);
+  }, [activeFilter, addArtisanMarkers]);
+
+  /* ── Clic en dehors -> reduire la carte ── */
+  useEffect(() => {
+    if (!expanded) return;
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setExpanded(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [expanded]);
+
+  /* ── Geolocalisation au montage ── */
   useEffect(() => {
     initMap(48.8566, 2.3522);
-
     setStatus("requesting");
-    if (!navigator.geolocation) {
-      setStatus("denied");
-      return;
-    }
-
+    if (!navigator.geolocation) { setStatus("denied"); return; }
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setStatus("granted");
-        updatePosition(pos.coords.latitude, pos.coords.longitude);
-      },
-      () => {
-        setStatus("denied");
-        setShowSearch(true);
-      },
+      (pos) => { setStatus("granted"); updatePosition(pos.coords.latitude, pos.coords.longitude); },
+      () => { setStatus("denied"); setShowSearch(true); },
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }, [initMap, updatePosition]);
 
-  /* ── Recentrer sur ma position ── */
   const recenter = () => {
     setStatus("requesting");
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setStatus("granted");
-        updatePosition(pos.coords.latitude, pos.coords.longitude);
-        setShowSearch(false);
-      },
+      (pos) => { setStatus("granted"); updatePosition(pos.coords.latitude, pos.coords.longitude); setShowSearch(false); },
       () => setStatus("denied"),
       { enableHighAccuracy: true, timeout: 10000 }
     );
   };
 
   return (
-    <div className="relative rounded-[12px] overflow-hidden mb-5 border border-border shadow-sm">
-      {/* Animations + styles popup artisan */}
+    <div
+      ref={containerRef}
+      onClick={() => {
+        if (!expanded) {
+          setExpanded(true);
+          setTimeout(() => mapInstance.current?.invalidateSize(), 10);
+        }
+      }}
+      className={cn(
+        "relative rounded-[12px] overflow-hidden mb-5 border border-border shadow-sm transition-[max-height] duration-300 ease-in-out",
+        expanded ? "max-h-[500px] cursor-default" : "max-h-[220px] md:max-h-[280px] cursor-pointer ring-2 ring-transparent hover:ring-forest/20"
+      )}
+    >
+      {/* Styles */}
       <style jsx global>{`
         @keyframes pulse-ring {
           0% { transform: scale(0.8); opacity: 0.4; }
@@ -270,26 +281,34 @@ export default function LocationMap({ onLocationChange }: LocationMapProps) {
         }
         .leaflet-container { font-family: inherit; }
         .artisan-popup .leaflet-popup-content-wrapper {
-          border-radius: 12px;
-          padding: 4px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-          border: 1px solid #D4EBE0;
+          border-radius: 12px; padding: 4px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.12); border: 1px solid #D4EBE0;
         }
-        .artisan-popup .leaflet-popup-content {
-          margin: 8px 10px;
-          line-height: 1.4;
+        .artisan-popup .leaflet-popup-content { margin: 8px 10px; line-height: 1.4; }
+        .artisan-popup .leaflet-popup-tip { box-shadow: none; border: 1px solid #D4EBE0; }
+        .leaflet-top.leaflet-right { top: 40px !important; right: 4px !important; }
+        .leaflet-control-zoom {
+          border: none !important; box-shadow: none !important;
+          display: flex; flex-direction: column; gap: 4px;
         }
-        .artisan-popup .leaflet-popup-tip {
-          box-shadow: none;
-          border: 1px solid #D4EBE0;
+        .leaflet-control-zoom a {
+          width: 32px !important; height: 32px !important; line-height: 32px !important;
+          font-size: 16px !important; border-radius: 50% !important;
+          background: rgba(255,255,255,0.95) !important;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+          border: none !important; color: #0A1628 !important;
         }
       `}</style>
 
-      {/* Carte */}
-      <div ref={mapRef} className="w-full h-[220px] md:h-[280px] bg-surface" />
+      {/* Carte Leaflet — toujours 500px, le conteneur clip avec max-h */}
+      <div
+        ref={mapRef}
+        onTransitionEnd={() => mapInstance.current?.invalidateSize()}
+        className="w-full h-[500px] bg-surface"
+      />
 
-      {/* Badge statut en haut à gauche */}
-      <div className="absolute top-3 left-3 z-[1000]">
+      {/* Badge statut + bouton filtre */}
+      <div className="absolute top-3 left-3 z-[1000] flex items-center gap-2">
         <div className={cn(
           "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold shadow-md backdrop-blur-md",
           status === "granted" ? "bg-white/95 text-forest" :
@@ -301,22 +320,63 @@ export default function LocationMap({ onLocationChange }: LocationMapProps) {
           {status === "denied" && <MapPin className="w-3 h-3" />}
           {status === "manual" && <MapPin className="w-3 h-3 text-forest" />}
           {status === "requesting" ? "Localisation..." :
-           status === "granted" ? "Position détectée" :
-           status === "manual" ? "Position définie" :
+           status === "granted" ? "Position detectee" :
+           status === "manual" ? "Position definie" :
            "Position manuelle"}
         </div>
+
+        <button
+          onClick={(e) => { e.stopPropagation(); setShowFilters(!showFilters); }}
+          className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold shadow-md backdrop-blur-md transition-all cursor-pointer",
+            showFilters
+              ? "bg-deepForest text-white"
+              : activeFilter !== "all"
+                ? "bg-forest text-white"
+                : "bg-white/95 text-navy hover:bg-white"
+          )}
+        >
+          <Filter className="w-3 h-3" />
+          {activeFilter !== "all"
+            ? SERVICE_TYPES.find(s => s.id === activeFilter)?.label
+            : "Filtrer"}
+        </button>
       </div>
 
       {/* Bouton recentrer */}
       <button
-        onClick={recenter}
+        onClick={(e) => { e.stopPropagation(); recenter(); }}
         className="absolute top-3 right-3 z-[1000] w-8 h-8 rounded-full bg-white/95 shadow-md flex items-center justify-center hover:bg-white transition-colors cursor-pointer"
         title="Me localiser"
       >
         <Navigation className="w-3.5 h-3.5 text-forest" />
       </button>
 
-      {/* Adresse détectée */}
+      {/* Panneau de filtres */}
+      {showFilters && (
+        <div className="absolute top-12 left-3 right-3 z-[1000]">
+          <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-lg border border-border/50 p-2.5">
+            <div className="flex flex-wrap gap-1.5">
+              {SERVICE_TYPES.map(s => (
+                <button
+                  key={s.id}
+                  onClick={(e) => { e.stopPropagation(); setActiveFilter(s.id); setShowFilters(false); }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer",
+                    activeFilter === s.id
+                      ? "bg-deepForest text-white shadow-sm"
+                      : "bg-bgPage text-navy hover:bg-surface border border-border/40"
+                  )}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Adresse detectee */}
       {address && (
         <div className="absolute bottom-14 left-3 right-3 z-[1000]">
           <div className="bg-white/95 backdrop-blur-md rounded-lg px-3 py-2 shadow-md flex items-center gap-2">
@@ -337,6 +397,7 @@ export default function LocationMap({ onLocationChange }: LocationMapProps) {
                 value={searchQuery}
                 onChange={(e) => handleSearchInput(e.target.value)}
                 onFocus={() => setShowSearch(true)}
+                onClick={(e) => e.stopPropagation()}
                 placeholder="Entrez votre adresse manuellement..."
                 className="flex-1 bg-transparent text-[12px] text-navy placeholder:text-grayText/60 outline-none font-medium"
               />
@@ -348,7 +409,6 @@ export default function LocationMap({ onLocationChange }: LocationMapProps) {
               {searching && <Loader2 className="w-3.5 h-3.5 text-forest animate-spin" />}
             </div>
 
-            {/* Résultats de recherche */}
             {searchResults.length > 0 && (
               <div className="absolute bottom-full left-0 right-0 mb-1 bg-white rounded-lg shadow-lg border border-border overflow-hidden max-h-[200px] overflow-y-auto">
                 {searchResults.map((r, i) => (
