@@ -17,6 +17,9 @@ import {
   AlertTriangle,
   FileText,
   Lock,
+  MapPin,
+  Radio,
+  ArrowRight,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -47,6 +50,32 @@ interface MissionData {
 /* ------------------------------------------------------------------ */
 
 const mockMissions: MissionData[] = [
+  {
+    id: "active-1",
+    type: "Plomberie urgente",
+    status: "IN_PROGRESS",
+    amount: 180,
+    scheduledDate: "2026-03-31T14:00:00",
+    category: "Plomberie",
+    address: "42 rue de Rivoli, 75004 Paris",
+    description: "Fuite importante sous le ballon d'eau chaude. Intervention urgente demandée.",
+    artisan: { user: { name: "Marc D.", avatar: null } },
+    devis: { number: "DEV-2026-052", totalHT: 150, totalTTC: 180, tva: 30 },
+    invoice: null,
+  },
+  {
+    id: "active-2",
+    type: "Serrurerie",
+    status: "ACCEPTED",
+    amount: 220,
+    scheduledDate: "2026-04-01T09:30:00",
+    category: "Serrurerie",
+    address: "15 rue de Vaugirard, 75006 Paris",
+    description: "Remplacement cylindre de serrure et copie de 3 clés.",
+    artisan: { user: { name: "Yassine K.", avatar: null } },
+    devis: { number: "DEV-2026-053", totalHT: 183.33, totalTTC: 220, tva: 36.67 },
+    invoice: null,
+  },
   {
     id: "1",
     type: "Plomberie",
@@ -108,6 +137,7 @@ const mockMissions: MissionData[] = [
 /** Onglets de filtrage */
 const tabs = [
   { id: "all", label: "Toutes" },
+  { id: "IN_PROGRESS", label: "En cours" },
   { id: "COMPLETED", label: "Terminées" },
   { id: "VALIDATED", label: "Validées" },
   { id: "DISPUTED", label: "Litiges" },
@@ -115,6 +145,8 @@ const tabs = [
 
 /** Apparence des badges de statut */
 const statusBadge: Record<string, { label: string; cls: string }> = {
+  PENDING: { label: "En attente", cls: "bg-gold/10 text-gold" },
+  ACCEPTED: { label: "Acceptée", cls: "bg-forest/10 text-forest" },
   IN_PROGRESS: { label: "En cours", cls: "bg-forest/10 text-forest" },
   COMPLETED: { label: "Terminée", cls: "bg-success/10 text-success" },
   VALIDATED: { label: "Validée", cls: "bg-gold/10 text-gold" },
@@ -212,9 +244,15 @@ export default function MissionsPage() {
   /* Filtrage selon l'onglet sélectionné */
   const filteredMissions = missions.filter((m) => {
     if (tab === "all") return true;
+    if (tab === "IN_PROGRESS") return m.status === "IN_PROGRESS" || m.status === "ACCEPTED";
     if (tab === "COMPLETED") return m.status === "COMPLETED";
     return m.status === tab;
   });
+
+  /* Missions actives (en cours / acceptées) pour la bannière en haut */
+  const activeMissions = missions.filter(
+    (m) => m.status === "IN_PROGRESS" || m.status === "ACCEPTED"
+  );
 
   /** Bascule le déplié d'une mission */
   const toggle = (id: string) => setExpandedId(expandedId === id ? null : id);
@@ -225,6 +263,109 @@ export default function MissionsPage() {
         Mes missions
       </h1>
       <p className="text-sm text-grayText mb-6">Suivez vos interventions</p>
+
+      {/* Bannière interventions en cours */}
+      {activeMissions.length > 0 && (
+        <div className="mb-6 space-y-3">
+          {activeMissions.map((m) => {
+            const name = m.artisan.user.name ?? "Artisan";
+            const initials = getInitials(name);
+            const isInProgress = m.status === "IN_PROGRESS";
+            return (
+              <div
+                key={m.id}
+                className={cn(
+                  "relative overflow-hidden rounded-[14px] border-2 p-4",
+                  isInProgress
+                    ? "border-forest bg-gradient-to-r from-forest/5 to-sage/10"
+                    : "border-gold/40 bg-gradient-to-r from-gold/5 to-gold/10",
+                )}
+              >
+                {/* Pastille live */}
+                {isInProgress && (
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-forest opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-forest" />
+                    </span>
+                    <span className="text-[11px] font-bold text-forest uppercase tracking-wide">
+                      En direct
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-3">
+                  {/* Avatar */}
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-forest to-sage flex items-center justify-center text-white text-sm font-bold shrink-0">
+                    {initials}
+                  </div>
+
+                  {/* Infos */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-heading font-bold text-[15px] text-navy">
+                        {m.type}
+                      </span>
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold",
+                          isInProgress
+                            ? "bg-forest/10 text-forest"
+                            : "bg-gold/10 text-gold",
+                        )}
+                      >
+                        {isInProgress ? "En cours" : "Acceptée"}
+                      </span>
+                    </div>
+                    <div className="text-sm text-grayText flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{m.address ?? "---"}</span>
+                    </div>
+                    <div className="text-xs text-grayText mt-0.5">
+                      {name} ·{" "}
+                      {m.scheduledDate
+                        ? new Date(m.scheduledDate).toLocaleDateString("fr-FR", {
+                            day: "numeric",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "---"}
+                    </div>
+                  </div>
+
+                  {/* Montant + bouton suivi */}
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    {m.amount != null && (
+                      <span className="font-mono font-bold text-navy">
+                        {formatPrice(m.amount)}
+                      </span>
+                    )}
+                    {isInProgress ? (
+                      <button
+                        onClick={() => router.push(`/tracking/${m.id}`)}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] bg-forest text-white text-xs font-bold hover:-translate-y-0.5 transition-transform shadow-md"
+                      >
+                        <Radio className="w-3.5 h-3.5" />
+                        Suivi en direct
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => toggle(m.id)}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] bg-gold/20 text-gold text-xs font-bold hover:bg-gold/30 transition-colors"
+                      >
+                        Voir détails
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Onglets de filtrage */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
@@ -407,6 +548,32 @@ export default function MissionsPage() {
                     </div>
 
                     {/* Actions selon le statut */}
+
+                    {/* Mission en cours : bouton suivi en direct */}
+                    {(m.status === "IN_PROGRESS" || m.status === "ACCEPTED") && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 p-3 rounded-[5px] bg-forest/5 text-forest text-sm font-semibold">
+                          <Shield className="w-5 h-5 shrink-0" />
+                          Paiement sécurisé en séquestre — l&apos;artisan sera payé après votre validation
+                        </div>
+                        {m.status === "IN_PROGRESS" && (
+                          <button
+                            onClick={() => router.push(`/tracking/${m.id}`)}
+                            className="w-full py-3 rounded-[5px] bg-forest text-white font-bold font-heading text-sm hover:-translate-y-0.5 transition-transform flex items-center justify-center gap-2"
+                          >
+                            <Radio className="w-4 h-4" />
+                            Suivre l&apos;intervention en direct
+                            <ArrowRight className="w-4 h-4" />
+                          </button>
+                        )}
+                        {m.status === "ACCEPTED" && (
+                          <div className="flex items-center gap-2 p-3 rounded-[5px] bg-gold/10 text-gold text-sm font-semibold">
+                            <MapPin className="w-5 h-5 shrink-0" />
+                            L&apos;artisan a accepté — le suivi en direct sera disponible au début de l&apos;intervention
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Mission terminée : noter + valider ou signaler */}
                     {m.status === "COMPLETED" && (

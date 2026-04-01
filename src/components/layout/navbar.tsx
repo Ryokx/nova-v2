@@ -26,6 +26,13 @@ import {
   MapPin, Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Plus_Jakarta_Sans } from "next/font/google";
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
 
 /* ━━━ Bannière de suivi intervention en cours ━━━ */
 
@@ -145,7 +152,7 @@ const artisanLinks = [...artisanMainLinks, ...artisanMoreLinks];
 
 /** Chemins publics où la navbar verte est affichée (sauf si connecté) */
 const PUBLIC_PATHS = [
-  "/", "/login", "/signup", "/comment-ca-marche", "/devenir-partenaire", "/support", "/cgu", "/confidentialite", "/mentions-legales", "/reset-password", "/complete-profile",
+  "/", "/login", "/signup", "/comment-ca-marche", "/devenir-partenaire", "/support", "/cgu", "/confidentialite", "/mentions-legales", "/reset-password", "/complete-profile", "/landing-v2",
   // Pages SEO métiers
   "/serrurier", "/plombier", "/electricien", "/chauffagiste", "/peintre", "/menuisier", "/carreleur", "/macon",
   // Pages SEO urgences
@@ -465,6 +472,7 @@ export function Navbar() {
 
       <nav
         className={cn(
+          jakarta.className,
           "fixed top-3 left-4 right-4 z-50 mx-auto max-w-[1200px]",
           "h-12 rounded-2xl px-5 flex items-center justify-between",
           "border transition-all duration-300",
@@ -477,18 +485,10 @@ export function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="relative flex items-center gap-2 mr-6 group"
+          className="relative flex items-center mr-6 group"
         >
-          <div className={cn(
-            "w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300",
-            onDark
-              ? "bg-gradient-to-br from-deepForest to-forest shadow-[0_2px_8px_rgba(10,64,48,0.25)]"
-              : "bg-white/15",
-          )}>
-            <Shield className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-          </div>
           <span className={cn(
-            "font-heading text-[18px] font-extrabold tracking-tight transition-colors duration-300",
+            "text-[20px] font-extrabold tracking-tight transition-colors duration-300",
             onDark ? "text-navy" : "text-white",
           )}>
             Nova
